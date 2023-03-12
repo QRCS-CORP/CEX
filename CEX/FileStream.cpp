@@ -35,7 +35,7 @@ FileStream::FileStream(const std::string &FileName, FileAccess Access, FileModes
 
 	try
 	{
-		m_fileStream.open(m_fileName, static_cast<int>(Access) | static_cast<int>(Mode));
+		m_fileStream.open(m_fileName, static_cast<int32_t>(Access) | static_cast<int32_t>(Mode));
 		m_fileStream.unsetf(std::ios::skipws);
 	}
 	catch (std::exception&)
@@ -86,7 +86,7 @@ std::string FileStream::FileName()
 	return m_fileName; 
 }
 
-const ulong FileStream::Length() 
+const uint64_t FileStream::Length() 
 { 
 	return m_fileSize;
 }
@@ -96,7 +96,7 @@ const std::string FileStream::Name()
 	return CLASS_NAME;
 }
 
-const ulong FileStream::Position()
+const uint64_t FileStream::Position()
 { 
 	return m_filePosition;
 }
@@ -125,17 +125,17 @@ void FileStream::Close()
 
 void FileStream::CopyTo(IByteStream* Destination)
 {
-	CEXASSERT(m_fileSize != 0, "Stream is too short");
+	CEXASSERT(m_fileSize != 0, "Stream is too int16_t");
 
 	Destination->Seek(0, IO::SeekOrigin::Begin);
 
 	if (m_fileSize > CHUNK_SIZE)
 	{
 		const size_t ALNLEN = m_fileSize - (m_fileSize % CHUNK_SIZE);
-		std::vector<byte> buffer(CHUNK_SIZE);
+		std::vector<uint8_t> buffer(CHUNK_SIZE);
 		m_fileStream.seekg(0, std::ios::beg);
 
-		uint bteCtr = 0;
+		uint32_t bteCtr = 0;
 
 		if (ALNLEN >= CHUNK_SIZE)
 		{
@@ -155,7 +155,7 @@ void FileStream::CopyTo(IByteStream* Destination)
 	}
 	else
 	{
-		std::vector<byte> buffer(m_fileSize);
+		std::vector<uint8_t> buffer(m_fileSize);
 		m_fileStream.seekg(0, std::ios::beg);
 		Destination->Write(buffer, 0, m_fileSize);
 	}
@@ -177,16 +177,16 @@ bool FileStream::FileExists(const std::string &FileName)
 	return infile.good();
 }
 
-ulong FileStream::FileSize(const std::string &FileName)
+uint64_t FileStream::FileSize(const std::string &FileName)
 {
-	ulong res;
+	uint64_t res;
 
 	res = 0;
 
 	if (FileExists(FileName))
 	{
 		std::ifstream in(FileName.c_str(), std::ifstream::ate | std::ifstream::binary);
-		res = static_cast<ulong>(in.tellg());
+		res = static_cast<uint64_t>(in.tellg());
 	}
 
 	return res;
@@ -202,7 +202,7 @@ void FileStream::Flush()
 	}
 }
 
-size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
+size_t FileStream::Read(std::vector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	CEXASSERT(m_fileAccess != FileAccess::Write, "File is write only");
 
@@ -221,12 +221,12 @@ size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
 	return Length;
 }
 
-byte FileStream::ReadByte()
+uint8_t FileStream::ReadByte()
 {
 	CEXASSERT(m_fileSize - m_filePosition >= 1, "Reached end of file");
 	CEXASSERT(m_fileAccess != FileAccess::Write, "File is write only");
 
-	byte data(1);
+	uint8_t data(1);
 	m_fileStream.read(reinterpret_cast<char*>(&data), 1);
 	m_filePosition += 1;
 
@@ -239,7 +239,7 @@ void FileStream::Reset()
 	m_filePosition = 0;
 }
 
-void FileStream::Seek(ulong Offset, SeekOrigin Origin)
+void FileStream::Seek(uint64_t Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
 	{
@@ -254,17 +254,17 @@ void FileStream::Seek(ulong Offset, SeekOrigin Origin)
 		m_fileStream.seekg(Offset, std::ios::cur);
 	}
 
-	m_filePosition = static_cast<ulong>(m_fileStream.tellg());
+	m_filePosition = static_cast<uint64_t>(m_fileStream.tellg());
 }
 
-void FileStream::SetLength(ulong Length)
+void FileStream::SetLength(uint64_t Length)
 {
 	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
 
 	if (Length < m_fileSize)
 	{
 #if defined(CEX_OS_WINDOWS)
-		int handle = 0;
+		int32_t handle = 0;
 
 		if (_sopen_s(&handle, m_fileName.c_str(), _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE) == 0)
 		{
@@ -282,7 +282,7 @@ void FileStream::SetLength(ulong Length)
 	}
 }
 
-void FileStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
+void FileStream::Write(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
 
@@ -298,7 +298,7 @@ void FileStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Len
 	}
 }
 
-void FileStream::WriteByte(byte Value)
+void FileStream::WriteByte(uint8_t Value)
 {
 	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
 

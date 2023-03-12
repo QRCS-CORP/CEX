@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -113,7 +113,7 @@ public:
 	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Read Only: A vector of allowed cipher-mode input key byte-sizes
+	/// Read Only: A vector of allowed cipher-mode input key uint8_t-sizes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
@@ -123,7 +123,7 @@ public:
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	virtual const size_t ParallelBlockSize() = 0;
@@ -146,7 +146,7 @@ public:
 	/// 
 	/// <param name="Input">The input vector of cipher-text bytes</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
@@ -158,7 +158,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -168,7 +168,7 @@ public:
 	/// 
 	/// <param name="Input">The input vector of plain-text bytes</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
@@ -180,7 +180,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Initialize the Cipher instance
@@ -216,7 +216,7 @@ public:
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	virtual void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
+	virtual void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) = 0;
 };
 
 NAMESPACE_MODEEND

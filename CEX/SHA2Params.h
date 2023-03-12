@@ -49,15 +49,15 @@ private:
 	// 20		4		Reserved3, set to 0
 	// 24		8-104	Personalization string
 
-	uint m_nodeOffset;
-	ushort m_treeVersion;
-	ulong m_outputSize;
-	uint m_leafSize;
-	byte m_treeDepth;
-	byte m_treeFanout;
-	uint m_reserved;
+	uint32_t m_nodeOffset;
+	uint16_t m_treeVersion;
+	uint64_t m_outputSize;
+	uint32_t m_leafSize;
+	uint8_t m_treeDepth;
+	uint8_t m_treeFanout;
+	uint32_t m_reserved;
 	// 256=112|512=48
-	std::vector<byte> m_dstCode;
+	std::vector<uint8_t> m_dstCode;
 
 public:
 
@@ -69,33 +69,33 @@ public:
 	SHA2Params();
 
 	/// <summary>
-	/// Initialize the SHA2Params structure using a serialized byte array
+	/// Initialize the SHA2Params structure using a serialized uint8_t array
 	/// </summary>
 	///
 	/// <param name="TreeArray">A serialized SHA2Params structure</param>
-	explicit SHA2Params(const std::vector<byte> &TreeArray);
+	explicit SHA2Params(const std::vector<uint8_t> &TreeArray);
 
 	/// <summary>
 	/// Initialize with the default parameters.
 	/// <para>Default settings are configured for sequential mode.</para>
 	/// </summary>
-	/// <param name="OutputSize">Digest output byte length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
+	/// <param name="OutputSize">Digest output uint8_t length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
 	/// <param name="LeafSize">The outer leaf length in bytes; this must be the digests block size</param>
 	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (one state per processor core is recommended)</param>
-	explicit SHA2Params(ulong OutputSize, uint LeafSize = 0, byte Fanout = 0);
+	explicit SHA2Params(uint64_t OutputSize, uint32_t LeafSize = 0, uint8_t Fanout = 0);
 
 	/// <summary>
 	/// Initialize this structure with all parameters
 	/// </summary>
 	/// 
 	/// <param name="NodeOffset">The tree nodes relational offset</param>
-	/// <param name="OutputSize">Digest output byte length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
+	/// <param name="OutputSize">Digest output uint8_t length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
 	/// <param name="Version">The Skein version number; should always be a value of '1'</param>
 	/// <param name="LeafSize">The outer leaf length in bytes; this should be the digest block size in bytes</param>
 	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (one state per processor core is recommended)</param>
 	/// <param name="TreeDepth">The depth of the parallel tree; this value is always zero in this implementation</param>
 	/// <param name="Info">Optional personalization string</param>
-	SHA2Params(uint NodeOffset, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &Info);
+	SHA2Params(uint32_t NodeOffset, uint64_t OutputSize, uint16_t Version, uint32_t LeafSize, uint8_t Fanout, uint8_t TreeDepth, std::vector<uint8_t> &Info);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -107,32 +107,32 @@ public:
 	/// <summary>
 	/// Read/Write: The number of leaf nodes in the last tier branch of the tree
 	/// </summary>
-	byte &FanOut();
+	uint8_t &FanOut();
 
 	/// <summary>
 	/// Read/Write: The outer leaf length
 	/// </summary>
-	uint &LeafSize();
+	uint32_t &LeafSize();
 
 	/// <summary>
 	/// Read/Write: The tree nodes relational offset
 	/// </summary>
-	uint &NodeOffset();
+	uint32_t &NodeOffset();
 
 	/// <summary>
-	/// Read/Write: Digest output byte length
+	/// Read/Write: Digest output uint8_t length
 	/// </summary>
-	ulong &OutputSize();
+	uint64_t &OutputSize();
 
 	/// <summary>
 	/// Read/Write: Reserved for future use
 	/// </summary>
-	uint &Reserved();
+	uint32_t &Reserved();
 
 	/// <summary>
 	/// Read/Write: The personalization string
 	/// </summary>
-	std::vector<byte> &DistributionCode();
+	std::vector<uint8_t> &DistributionCode();
 
 	/// <summary>
 	/// Read Only: The maximum recommended size of the distribution code
@@ -142,7 +142,7 @@ public:
 	/// <summary>
 	/// Read/Write: The skein version number
 	/// </summary>
-	ushort &Version();
+	uint16_t &Version();
 
 	//~~~Public Functions~~~//
 
@@ -175,7 +175,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Hash code</returns>
-	int GetHashCode();
+	int32_t GetHashCode();
 
 	/// <summary>
 	/// Get the header size in bytes
@@ -190,11 +190,11 @@ public:
 	void Reset();
 
 	/// <summary>
-	/// Convert the SHA2Params structure to a serialized byte array
+	/// Convert the SHA2Params structure to a serialized uint8_t array
 	/// </summary>
 	/// 
-	/// <returns>The byte array containing the serialized SHA2Params structure</returns>
-	std::vector<byte> ToBytes();
+	/// <returns>The uint8_t array containing the serialized SHA2Params structure</returns>
+	std::vector<uint8_t> ToBytes();
 };
 
 NAMESPACE_DIGESTEND

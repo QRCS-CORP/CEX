@@ -12,23 +12,23 @@ namespace Test
 	{
 	public:
 
-		static void Decode(const std::string &Input, std::vector<byte> &Output);
-		static void Decode(const std::vector<std::string> &Input, std::vector<std::vector<byte>> &Output);
-		static void Decode(const char* Input[], size_t Length, std::vector<std::vector<byte>> &Output);
-		static void Decode(const std::vector<std::string> &Input, size_t Length, std::vector<std::vector<byte>> &Output);
-		static void Encode(const std::vector<byte> &Input, size_t Offset, size_t Length, std::vector<byte> &Output);
-		static void Encode(const std::vector<byte> &Input, std::string &Output);
+		static void Decode(const std::string &Input, std::vector<uint8_t> &Output);
+		static void Decode(const std::vector<std::string> &Input, std::vector<std::vector<uint8_t>> &Output);
+		static void Decode(const char* Input[], size_t Length, std::vector<std::vector<uint8_t>> &Output);
+		static void Decode(const std::vector<std::string> &Input, size_t Length, std::vector<std::vector<uint8_t>> &Output);
+		static void Encode(const std::vector<uint8_t> &Input, size_t Offset, size_t Length, std::vector<uint8_t> &Output);
+		static void Encode(const std::vector<uint8_t> &Input, std::string &Output);
 		static bool Ignore(char Value);
 		static void Print(const std::string &Input, size_t Length = 128);
-		static void Print(const std::vector<byte> &Input, size_t Length = 128);
-		static std::string ToString(const std::vector<byte> &Input);
-		static void ToString(const std::vector<byte> &Input, std::string &Output);
+		static void Print(const std::vector<uint8_t> &Input, size_t Length = 128);
+		static std::string ToString(const std::vector<uint8_t> &Input);
+		static void ToString(const std::vector<uint8_t> &Input, std::string &Output);
 
 	private:
 
-		static const byte ENCODING_TABLE[16];
-		static std::vector<byte> GetEncodingTable();
-		static std::vector<byte> GetDecodingTable();
+		static const uint8_t ENCODING_TABLE[16];
+		static std::vector<uint8_t> GetEncodingTable();
+		static std::vector<uint8_t> GetDecodingTable();
 	};
 }
 

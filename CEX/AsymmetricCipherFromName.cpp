@@ -1,8 +1,7 @@
 #include "AsymmetricCipherFromName.h"
+#include "ECDH.h"
 #include "Kyber.h"
 #include "McEliece.h"
-#include "NewHope.h"
-#include "NtruPrime.h"
 
 NAMESPACE_HELPER
 
@@ -29,16 +28,6 @@ IAsymmetricCipher* AsymmetricCipherFromName::GetInstance(AsymmetricCiphers Ciphe
 			case AsymmetricCiphers::McEliece:
 			{
 				mptr = new MPKC::McEliece(static_cast<Enumeration::McElieceParameters>(Parameters)); 
-				break;
-			}
-			case AsymmetricCiphers::NewHope:
-			{
-				mptr = new RLWE::NewHope(static_cast<Enumeration::NewHopeParameters>(Parameters)); 
-				break;
-			}
-			case AsymmetricCiphers::NTRUPrime:
-			{
-				mptr = new NTRUP::NTRUPrime(static_cast<Enumeration::NTRUPrimeParameters>(Parameters)); 
 				break;
 			}
 			default:

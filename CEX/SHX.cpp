@@ -22,30 +22,31 @@ class SHX::ShxState
 {
 public:
 
-	SecureVector<byte> Custom;
-	SecureVector<uint> RoundKeys;
-	size_t Rounds;
+	SecureVector<uint8_t> Custom = { 0 };
+	SecureVector<uint32_t> RoundKeys = { 0 };
+	std::vector<SymmetricKeySize> LegalKeySizes{
+		SymmetricKeySize(IK128_SIZE, BLOCK_SIZE, INFO_SIZE),
+		SymmetricKeySize(IK192_SIZE, BLOCK_SIZE, INFO_SIZE),
+		SymmetricKeySize(IK256_SIZE, BLOCK_SIZE, INFO_SIZE),
+		SymmetricKeySize(IK512_SIZE, BLOCK_SIZE, INFO_SIZE) };
+	size_t Rounds = 0;
 	BlockCipherExtensions Extension;
 	bool Destroyed;
-	bool Encryption;
-	bool Initialized;
+	bool Encryption = false;
+	bool Initialized = false;
 
 	ShxState(BlockCipherExtensions CipherExtension, bool IsDestroyed)
 		:
-		Custom(0),
-		RoundKeys(0),
-		Rounds(0),
 		Extension(CipherExtension),
-		Destroyed(IsDestroyed),
-		Encryption(false),
-		Initialized(false)
+		Destroyed(IsDestroyed)
 	{
 	}
 
 	~ShxState()
 	{
+		LegalKeySizes.clear();
 		MemoryTools::Clear(Custom, 0, Custom.size());
-		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint32_t));
 		Rounds = 0;
 		Extension = BlockCipherExtensions::None;
 		Destroyed = false;
@@ -56,7 +57,7 @@ public:
 	void Reset()
 	{
 		MemoryTools::Clear(Custom, 0, Custom.size());
-		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint32_t));
 		Encryption = false;
 		Initialized = false;
 	}
@@ -69,8 +70,7 @@ SHX::SHX(BlockCipherExtensions CipherExtension)
 	m_shxState(new ShxState(CipherExtension, true)),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? 
 		nullptr :
-		Helper::KdfFromName::GetInstance(CipherExtension)),
-	m_legalKeySizes(CalculateKeySizes(CipherExtension))
+		Helper::KdfFromName::GetInstance(CipherExtension))
 {
 }
 
@@ -80,9 +80,7 @@ SHX::SHX(IKdf* Kdf)
 		static_cast<BlockCipherExtensions>(Kdf->Enumeral()) :
 		BlockCipherExtensions::None,
 		false)),
-	m_kdfGenerator(Kdf),
-	m_legalKeySizes(CalculateKeySizes(Kdf != nullptr ? static_cast<BlockCipherExtensions>(Kdf->Enumeral()) : 
-		BlockCipherExtensions::None))
+	m_kdfGenerator(Kdf)
 {
 }
 
@@ -95,8 +93,6 @@ SHX::~SHX()
 			m_kdfGenerator.reset(nullptr);
 		}
 	}
-
-	IntegerTools::Clear(m_legalKeySizes);
 }
 
 //~~~Accessors~~~//
@@ -135,11 +131,6 @@ const BlockCiphers SHX::Enumeral()
 			tmpn = BlockCiphers::SHXS512;
 			break;
 		}
-		case Kdfs::SHAKE1024:
-		{
-			tmpn = BlockCiphers::SHXS1024;
-			break;
-		}
 		default:
 		{
 			tmpn = BlockCiphers::Serpent;
@@ -162,7 +153,7 @@ const bool SHX::IsInitialized()
 
 const std::vector<SymmetricKeySize> &SHX::LegalKeySizes()
 {
-	return m_legalKeySizes;
+	return m_shxState->LegalKeySizes;
 }
 
 const std::string SHX::Name()
@@ -186,29 +177,29 @@ const size_t SHX::StateCacheSize()
 
 //~~~Public Functions~~~//
 
-void SHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+void SHX::DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	Decrypt128(Input, 0, Output, 0);
 }
 
-void SHX::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void SHX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+void SHX::EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	Encrypt128(Input, 0, Output, 0);
 }
 
-void SHX::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void SHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.KeySizes().KeySize()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
@@ -219,14 +210,14 @@ void SHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	if (m_kdfGenerator != nullptr)
 	{
 		std::string tmpn = Name();
-		m_shxState->Custom.resize(tmpn.size() + sizeof(ushort) + Parameters.KeySizes().InfoSize());
+		m_shxState->Custom.resize(tmpn.size() + sizeof(uint16_t) + Parameters.KeySizes().InfoSize());
 		// add the ciphers formal class name to the customization string
 		MemoryTools::CopyFromObject(tmpn.data(), m_shxState->Custom, 0, tmpn.size());
 		// add the key size in bits
-		ushort ksec = static_cast<ushort>(Parameters.KeySizes().KeySize()) * 8;
+		uint16_t ksec = static_cast<uint16_t>(Parameters.KeySizes().KeySize()) * 8;
 		IntegerTools::Le16ToBytes(ksec, m_shxState->Custom, tmpn.size());
 		// append the optional info code
-		MemoryTools::Copy(Parameters.Info(), 0, m_shxState->Custom, tmpn.size() + sizeof(ushort), Parameters.KeySizes().InfoSize());
+		MemoryTools::Copy(Parameters.Info(), 0, m_shxState->Custom, tmpn.size() + sizeof(uint16_t), Parameters.KeySizes().InfoSize());
 
 		// kdf key expansion
 		SecureExpand(Parameters.SecureKey(), m_shxState, m_kdfGenerator);
@@ -241,7 +232,7 @@ void SHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	m_shxState->Initialized = true;
 }
 
-void SHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
+void SHX::Transform(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (m_shxState->Encryption)
 	{
@@ -253,7 +244,7 @@ void SHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 	}
 }
 
-void SHX::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (m_shxState->Encryption)
 	{
@@ -265,7 +256,7 @@ void SHX::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 	}
 }
 
-void SHX::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Transform256(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (m_shxState->Encryption)
 	{
@@ -277,7 +268,7 @@ void SHX::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	}
 }
 
-void SHX::Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Transform512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (m_shxState->Encryption)
 	{
@@ -289,7 +280,7 @@ void SHX::Transform512(const std::vector<byte> &Input, size_t InOffset, std::vec
 	}
 }
 
-void SHX::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Transform1024(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (m_shxState->Encryption)
 	{
@@ -301,7 +292,7 @@ void SHX::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::ve
 	}
 }
 
-void SHX::Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Transform2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (m_shxState->Encryption)
 	{
@@ -315,7 +306,7 @@ void SHX::Transform2048(const std::vector<byte> &Input, size_t InOffset, std::ve
 
 //~~~Key Schedule~~~//
 
-void SHX::SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> &State, std::unique_ptr<IKdf> &Generator)
+void SHX::SecureExpand(const SecureVector<uint8_t> &Key, std::unique_ptr<ShxState> &State, std::unique_ptr<IKdf> &Generator)
 {
 	size_t klen;
 
@@ -323,9 +314,9 @@ void SHX::SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> 
 	State->Rounds = Key.size() == 32 ? 40 : Key.size() == 64 ? 48 : 64;
 	// round-key array size
 	klen = 4 * (State->Rounds + 1);
-	SecureVector<byte> tmpr(klen * sizeof(uint));
+	SecureVector<uint8_t> tmpr(klen * sizeof(uint32_t));
 	// salt is not used
-	SecureVector<byte> salt(0);
+	SecureVector<uint8_t> salt(0);
 	// initialize the generator
 	SymmetricKey kp(Key, salt, State->Custom);
 	Generator->Initialize(kp);
@@ -340,31 +331,31 @@ void SHX::SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> 
 #else
 	for (size_t i = 0; i < State->RoundKeys.size(); ++i)
 	{
-		State->RoundKeys[i] = IntegerTools::LeBytesTo32(tmpr, i * sizeof(uint));
+		State->RoundKeys[i] = IntegerTools::LeBytesTo32(tmpr, i * sizeof(uint32_t));
 	}
 #endif
 
 	MemoryTools::Clear(tmpr, 0, tmpr.size());
 }
 
-void SHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> &State)
+void SHX::StandardExpand(const SecureVector<uint8_t> &Key, std::unique_ptr<ShxState> &State)
 {
 	const size_t WPKLEN = Key.size() < 32 ? 16 : Key.size() / 2;
-	std::vector<uint> tmpw(WPKLEN);
+	std::vector<uint32_t> tmpw(WPKLEN);
 	size_t kctr;
 	size_t kidx;
 	size_t klen;
 	size_t woft;
 
 	State->Rounds = (Key.size() == 64) ? 40 : 32;
-	klen = sizeof(uint) * (State->Rounds + 1);
+	klen = sizeof(uint32_t) * (State->Rounds + 1);
 	kidx = 0;
 	woft = 0;
 
 	// step 1: reverse copy key to temp array
-	for (woft = Key.size(); woft > 0; woft -= sizeof(uint))
+	for (woft = Key.size(); woft > 0; woft -= sizeof(uint32_t))
 	{
-		tmpw[kidx] = IntegerTools::BeBytesTo32(Key, woft - sizeof(uint));
+		tmpw[kidx] = IntegerTools::BeBytesTo32(Key, woft - sizeof(uint32_t));
 		++kidx;
 	}
 
@@ -379,39 +370,39 @@ void SHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState
 
 	if (WPKLEN == 16)
 	{
-		// 32 byte key
+		// 32 uint8_t key
 		// step 2: rotate k into w(k) ints
 		for (size_t i = 8; i < 16; i++)
 		{
-			tmpw[i] = IntegerTools::RotL32(static_cast<uint>(tmpw[i - 8] ^ tmpw[i - 5] ^ tmpw[i - 3] ^ tmpw[i - 1] ^ PHI ^ (i - 8)), 11);
+			tmpw[i] = IntegerTools::RotL32(static_cast<uint32_t>(tmpw[i - 8] ^ tmpw[i - 5] ^ tmpw[i - 3] ^ tmpw[i - 1] ^ PHI ^ (i - 8)), 11);
 		}
 
 		// copy to expanded key
-		MemoryTools::Copy(tmpw, 8, State->RoundKeys, 0, 8 * sizeof(uint));
+		MemoryTools::Copy(tmpw, 8, State->RoundKeys, 0, 8 * sizeof(uint32_t));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 8; i < klen; i++)
 		{
-			State->RoundKeys[i] = IntegerTools::RotL32(static_cast<uint>(State->RoundKeys[i - 8] ^ State->RoundKeys[i - 5] ^ State->RoundKeys[i - 3] ^ State->RoundKeys[i - 1] ^ PHI ^ i), 11);
+			State->RoundKeys[i] = IntegerTools::RotL32(static_cast<uint32_t>(State->RoundKeys[i - 8] ^ State->RoundKeys[i - 5] ^ State->RoundKeys[i - 3] ^ State->RoundKeys[i - 1] ^ PHI ^ i), 11);
 		}
 	}
 	else
 	{
-		// *extended*: 64 byte key
+		// *extended*: 64 uint8_t key
 		// step 3: rotate k into w(k) ints, with extended polynominal
 		// tmpw := (tmpw-16 ^ tmpw-13 ^ tmpw-11 ^ tmpw-10 ^ tmpw-8 ^ tmpw-5 ^ tmpw-3 ^ tmpw-1 ^ PHI ^ i) <<< 11
 		for (size_t i = 16; i < 32; i++)
 		{
-			tmpw[i] = IntegerTools::RotL32(static_cast<uint>(tmpw[i - 16] ^ tmpw[i - 13] ^ tmpw[i - 11] ^ tmpw[i - 10] ^ tmpw[i - 8] ^ tmpw[i - 5] ^ tmpw[i - 3] ^ tmpw[i - 1] ^ PHI ^ (i - 16)), 11);
+			tmpw[i] = IntegerTools::RotL32(static_cast<uint32_t>(tmpw[i - 16] ^ tmpw[i - 13] ^ tmpw[i - 11] ^ tmpw[i - 10] ^ tmpw[i - 8] ^ tmpw[i - 5] ^ tmpw[i - 3] ^ tmpw[i - 1] ^ PHI ^ (i - 16)), 11);
 		}
 
 		// copy to expanded key
-		MemoryTools::Copy(tmpw, 16, State->RoundKeys, 0, 16 * sizeof(uint));
+		MemoryTools::Copy(tmpw, 16, State->RoundKeys, 0, 16 * sizeof(uint32_t));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 16; i < klen; i++)
 		{
-			State->RoundKeys[i] = IntegerTools::RotL32(static_cast<uint>(State->RoundKeys[i - 16] ^ State->RoundKeys[i - 13] ^ State->RoundKeys[i - 11] ^ State->RoundKeys[i - 10] ^ State->RoundKeys[i - 8] ^ State->RoundKeys[i - 5] ^ State->RoundKeys[i - 3] ^ State->RoundKeys[i - 1] ^ PHI ^ i), 11);
+			State->RoundKeys[i] = IntegerTools::RotL32(static_cast<uint32_t>(State->RoundKeys[i - 16] ^ State->RoundKeys[i - 13] ^ State->RoundKeys[i - 11] ^ State->RoundKeys[i - 10] ^ State->RoundKeys[i - 8] ^ State->RoundKeys[i - 5] ^ State->RoundKeys[i - 3] ^ State->RoundKeys[i - 1] ^ PHI ^ i), 11);
 		}
 	}
 
@@ -445,14 +436,14 @@ void SHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState
 
 //~~~Rounds Processing~~~//
 
-void SHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Decrypt128(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	const size_t RNDCNT = 4;
 	size_t kctr;
-	uint R3;
-	uint R2;
-	uint R1;
-	uint R0;
+	uint32_t R3;
+	uint32_t R2;
+	uint32_t R1;
+	uint32_t R0;
 
 	// input round
 	kctr = m_shxState->RoundKeys.size();
@@ -541,13 +532,13 @@ void SHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	IntegerTools::Le32ToBytes(R0 ^ m_shxState->RoundKeys[kctr - 4], Output, OutOffset);
 }
 
-void SHX::Decrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Decrypt256(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
 }
 
-void SHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Decrypt512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 #if (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
 	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
@@ -559,7 +550,7 @@ void SHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vecto
 #endif
 }
 
-void SHX::Decrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Decrypt1024(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 #if (!defined(CEX_HAS_AVX512)) && defined(CEX_HAS_AVX2)
 	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
@@ -578,7 +569,7 @@ void SHX::Decrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vect
 #endif
 }
 
-void SHX::Decrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Decrypt2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 #if defined(CEX_HAS_AVX512)
 	DecryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
@@ -610,14 +601,14 @@ void SHX::Decrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vect
 #endif
 }
 
-void SHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Encrypt128(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	const size_t RNDCNT = m_shxState->RoundKeys.size() - 4;
 	size_t kctr;
-	uint R0;
-	uint R1;
-	uint R2;
-	uint R3;
+	uint32_t R0;
+	uint32_t R1;
+	uint32_t R2;
+	uint32_t R3;
 
 	// input round
 	kctr = 0;
@@ -700,13 +691,13 @@ void SHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	IntegerTools::Le32ToBytes(m_shxState->RoundKeys[kctr + 3] ^ R3, Output, OutOffset + 12);
 }
 
-void SHX::Encrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Encrypt256(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
 }
 
-void SHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Encrypt512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 #if (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
 	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
@@ -718,7 +709,7 @@ void SHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vecto
 #endif
 }
 
-void SHX::Encrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Encrypt1024(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 #if (!defined(CEX_HAS_AVX512)) && defined(CEX_HAS_AVX2)
 	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
@@ -737,7 +728,7 @@ void SHX::Encrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vect
 #endif
 }
 
-void SHX::Encrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void SHX::Encrypt2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 #if defined(CEX_HAS_AVX512)
 	EncryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
@@ -775,7 +766,7 @@ std::vector<SymmetricKeySize> SHX::CalculateKeySizes(BlockCipherExtensions Exten
 {
 	std::vector<SymmetricKeySize> keys(0);
 
-	// Note: the hkdf variants info-size calculation: block-size - (name-size + hash-size + 1-byte hkdf counter + sha2 padding) fills one sha2 final block,
+	// Note: the hkdf variants info-size calculation: block-size - (name-size + hash-size + 1-uint8_t hkdf counter + sha2 padding) fills one sha2 final block,
 	// this avoids permuting a partially empty block, for security and performance reasons.
 	// In the shake variants, info is the shake name string, which is sized as the shake-rate - the classes string-name-size and 2 bytes for the key-size-bits.
 
@@ -821,13 +812,6 @@ std::vector<SymmetricKeySize> SHX::CalculateKeySizes(BlockCipherExtensions Exten
 			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 63));
 			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 63));
 			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 63));
-			break;
-		}
-		case BlockCipherExtensions::SHAKE1024:
-		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 62));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 62));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 62));
 			break;
 		}
 	}

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -16,41 +16,41 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// Updated by September 24, 2019
-// Contact: develop@vtdev.com
+// Updated by March 03, 2023
+// Contact: develop@qscs.ca
 
-#ifndef CEX_MODULELWE_H
-#define CEX_MODULELWE_H
+#ifndef CEX_KYBER_H
+#define CEX_KYBER_H
 
 #include "CexDomain.h"
 #include "IAsymmetricCipher.h"
 #include "KyberParameters.h"
 
-NAMESPACE_MODULELWE
+NAMESPACE_KYBER
 
 using Enumeration::KyberParameters;
 
 /// <summary>
-/// An implementation of the Module Learning With Errors asymmetric cipher (KYBER)
+/// An implementation of the module learning with errors asymmetric cipher (KYBER)
 /// </summary> 
 /// 
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// Kyber cpr(KyberParameters::MLWES2Q3329N256);
+/// Kyber cpr(KyberParameters::KYBERS53168);
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// 
 /// // serialize the public key
 /// IAsymmetricKey* pubk = kp->PublicKey();
-/// std::vector&lt;byte&gt; pk = pubk->ToBytes();
+/// std::vector&lt;uint8_t&gt; pk = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
-/// std::vector&lt;byte&gt; sec(0);
-/// std::vector&lt;byte&gt; cpt(0);
+/// std::vector&lt;uint8_t&gt; sec(0);
+/// std::vector&lt;uint8_t&gt; cpt(0);
 /// 
-/// Kyber cpr(KyberParameters::MLWES2Q3329N256);
+/// Kyber cpr(KyberParameters::KYBERS53168);
 /// cpr.Initialize(PublicKey);
 /// // generate the ciphertext and shared secret
 /// cpr.Encapsulate(cpt, sec);
@@ -58,10 +58,10 @@ using Enumeration::KyberParameters;
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// std::vector&lt;byte&gt; sec(0);
+/// std::vector&lt;uint8_t&gt; sec(0);
 /// bool status;
 /// 
-/// Kyber cpr(KyberParameters::MLWES2Q3329N256);
+/// Kyber cpr(KyberParameters::KYBERS53168);
 /// cpr.Initialize(PrivateKey);
 /// // decrypt the ciphertext and output the shared secret
 ///	status = cpr.Decapsulate(cpt, sec);
@@ -87,9 +87,9 @@ using Enumeration::KyberParameters;
 /// </para>
 ///
 /// <list type="bullet">
-/// <item><description>This version of Kyber aligns with the NIST PQ round 2 implementation</description></item>
+/// <item><description>This implementation of Kyber is the NIST PQ round 3 final version</description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MLWEPublicKey, or MLWEPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>The high-security MLWES2Q3329N256 parameter set is the default cipher configuration; optional parameters of medium-security MLWES1Q3329N256, and highest-security MLWES3Q3329N256 are also available through the class constructor parameter</description></item>
+/// <item><description>The high-security KYBERS53168 parameter set is the default cipher configuration; optional parameters of medium-security KYBERS32400, and highest-security KYBERS63936 are also available through the class constructor parameter</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The message is authenticated using SHAKE, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
 /// </list>
@@ -105,8 +105,8 @@ class Kyber final : public IAsymmetricCipher
 private:
 
 	const size_t SECRET_SIZE = 32;
-	class MlweState;
-	std::unique_ptr<MlweState> m_mlweState;
+	class KyberState;
+	std::unique_ptr<KyberState> m_kyberState;
 	AsymmetricKey* m_privateKey;
 	AsymmetricKey* m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
@@ -133,7 +133,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR (Rijndael-256 CTR) generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	Kyber(KyberParameters Parameters = KyberParameters::MLWES2Q3329N256, Prngs PrngType = Prngs::BCR);
+	Kyber(KyberParameters Parameters = KyberParameters::KYBERS53168, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances
@@ -165,7 +165,7 @@ public:
 	/// For best security, the key should be random, secret, and shared only between hosts within a secure domain.
 	/// This property is used by the Shared Trust Model secure communications protocol.</para>
 	/// </summary>
-	std::vector<byte> &DomainKey();
+	std::vector<uint8_t> &DomainKey();
 
 	/// <summary>
 	/// Read Only: The cipher type-name
@@ -222,7 +222,7 @@ public:
 	/// <param name="SharedSecret">The shared secret key</param>
 	/// 
 	/// <returns>Returns true if decryption is sucesssful</returns>
-	bool Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
+	bool Decapsulate(const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret) override;
 
 	/// <summary>
 	/// Generate a shared secret and ciphertext.
@@ -232,7 +232,7 @@ public:
 	/// 
 	/// <param name="CipherText">The output cipher-text</param>
 	/// <param name="SharedSecret">The shared secret key</param>
-	void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
+	void Encapsulate(std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret) override;
 
 	/// <summary>
 	/// Generate a public/private key-pair
@@ -252,8 +252,8 @@ public:
 
 private:
 
-	void CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate);
+	void CXOF(const std::vector<uint8_t> &Domain, const std::vector<uint8_t> &Key, std::vector<uint8_t> &Secret, size_t Rate);
 };
 
-NAMESPACE_MODULELWEEND
+NAMESPACE_KYBEREND
 #endif

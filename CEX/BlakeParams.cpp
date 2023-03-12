@@ -20,7 +20,7 @@ BlakeParams::BlakeParams() :
 {
 }
 
-BlakeParams::BlakeParams(byte OutputSize, byte TreeDepth, byte Fanout, byte LeafSize, byte InnerLength)
+BlakeParams::BlakeParams(uint8_t OutputSize, uint8_t TreeDepth, uint8_t Fanout, uint8_t LeafSize, uint8_t InnerLength)
 	:
 	m_dstCode(0),
 	m_fanOut(Fanout),
@@ -45,7 +45,7 @@ BlakeParams::BlakeParams(byte OutputSize, byte TreeDepth, byte Fanout, byte Leaf
 	m_dstCode.resize(DistributionCodeMax());
 }
 
-BlakeParams::BlakeParams(const std::vector<byte> &TreeArray)
+BlakeParams::BlakeParams(const std::vector<uint8_t> &TreeArray)
 	:
 	m_dstCode(0),
 	m_fanOut(0),
@@ -76,7 +76,7 @@ BlakeParams::BlakeParams(const std::vector<byte> &TreeArray)
 	std::memcpy(&m_dstCode[0], &TreeArray[12], m_dstCode.size());
 }
 
-BlakeParams::BlakeParams(byte OutputSize, byte KeyLength, byte FanOut, byte MaxDepth, uint LeafLength, byte NodeOffset, byte NodeDepth, byte InnerLength, std::vector<byte> &DistributionCode)
+BlakeParams::BlakeParams(uint8_t OutputSize, uint8_t KeyLength, uint8_t FanOut, uint8_t MaxDepth, uint32_t LeafLength, uint8_t NodeOffset, uint8_t NodeDepth, uint8_t InnerLength, std::vector<uint8_t> &DistributionCode)
 	:
 	m_dstCode(DistributionCode),
 	m_fanOut(FanOut),
@@ -94,52 +94,52 @@ BlakeParams::BlakeParams(byte OutputSize, byte KeyLength, byte FanOut, byte MaxD
 
 //~~~Accessors~~~//
 
-byte &BlakeParams::FanOut() 
+uint8_t &BlakeParams::FanOut() 
 { 
 	return m_fanOut;
 }
 
-byte &BlakeParams::KeyLength() 
+uint8_t &BlakeParams::KeyLength() 
 { 
 	return m_keyLen; 
 }
 
-byte &BlakeParams::InnerLength()
+uint8_t &BlakeParams::InnerLength()
 { 
 	return m_innerLen;
 }
 
-uint &BlakeParams::LeafLength() 
+uint32_t &BlakeParams::LeafLength() 
 { 
 	return m_leafSize; 
 }
 
-byte &BlakeParams::MaxDepth()
+uint8_t &BlakeParams::MaxDepth()
 { 
 	return m_maxDepth; 
 }
 
-byte &BlakeParams::NodeOffset()
+uint8_t &BlakeParams::NodeOffset()
 { 
 	return m_nodeOffset; 
 }
 
-byte &BlakeParams::NodeDepth() 
+uint8_t &BlakeParams::NodeDepth() 
 { 
 	return m_nodeDepth;
 }
 
-byte &BlakeParams::OutputSize() 
+uint8_t &BlakeParams::OutputSize() 
 { 
 	return m_outputSize; 
 }
 
-byte &BlakeParams::Reserved()
+uint8_t &BlakeParams::Reserved()
 { 
 	return m_reserved; 
 }
 
-std::vector<byte> &BlakeParams::DistributionCode()
+std::vector<uint8_t> &BlakeParams::DistributionCode()
 { 
 	return m_dstCode; 
 }
@@ -167,9 +167,9 @@ bool BlakeParams::Equals(BlakeParams &Input)
 	return (GetHashCode() == Input.GetHashCode());
 }
 
-int BlakeParams::GetHashCode()
+int32_t BlakeParams::GetHashCode()
 {
-	int result = 31 * m_outputSize;
+	int32_t result = 31 * m_outputSize;
 
 	result += 31 * m_keyLen;
 	result += 31 * m_fanOut;
@@ -207,9 +207,9 @@ void BlakeParams::Reset()
 	std::memset(&m_dstCode[0], 0, m_dstCode.size());
 }
 
-std::vector<byte> BlakeParams::ToBytes()
+std::vector<uint8_t> BlakeParams::ToBytes()
 {
-	std::vector<byte> trs(GetHeaderSize());
+	std::vector<uint8_t> trs(GetHeaderSize());
 
 	std::memcpy(&trs[0], &m_outputSize, 1);
 	std::memcpy(&trs[1], &m_keyLen, 1);

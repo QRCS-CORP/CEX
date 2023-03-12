@@ -29,9 +29,9 @@ namespace Test
 		static const size_t MONTE_CYCLES = 10000;
 		static const size_t TEST_CYCLES = 100;
 
-        std::vector<std::vector<byte>> m_cipherText;
-        std::vector<std::vector<byte>> m_keys;
-        std::vector<std::vector<byte>> m_plainText;
+        std::vector<std::vector<uint8_t>> m_cipherText;
+        std::vector<std::vector<uint8_t>> m_keys;
+        std::vector<std::vector<uint8_t>> m_plainText;
 		TestEventHandler m_progressEvent;
 		bool m_aesniTest;
 
@@ -42,7 +42,7 @@ namespace Test
 		/// <summary>
 		/// Compares known answer Rijndael vectors for equality (FIPS 197)
 		/// </summary>
-		explicit RijndaelTest(bool TestNI = false);
+		explicit RijndaelTest();
 
 		/// <summary>
 		/// Destructor
@@ -81,7 +81,7 @@ namespace Test
 		/// <param name="Key">The input cipher key</param>
 		/// <param name="Message">The input test message</param>
 		/// <param name="Expected">The expected output vector</param>
-		void Kat(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void Kat(IBlockCipher* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compare known answer test vectors to a looping monte carlo output
@@ -91,7 +91,7 @@ namespace Test
 		/// <param name="Key">The input cipher key</param>
 		/// <param name="Message">The input test message</param>
 		/// <param name="Expected">The expected output vector</param>
-		void MonteCarlo(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void MonteCarlo(IBlockCipher* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compares synchronous to parallel processed random-sized, pseudo-random array transformations and their inverse in a looping [TEST_CYCLES] stress-test
@@ -109,7 +109,6 @@ namespace Test
 
     private:
 
-		static bool HasAESNI();
 		void Initialize();
 		void OnProgress(const std::string &Data);
     };

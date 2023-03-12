@@ -23,16 +23,16 @@ namespace Test
 	const double TestUtils::I_SQRT_PI = 0.5641895835477562869480795;
 	const double TestUtils::BIGX = 20.0;
 
-	double TestUtils::ChiSquare(std::vector<byte> &Input)
+	double TestUtils::ChiSquare(std::vector<uint8_t> &Input)
 	{
-		std::vector<long> count(256, 0);
+		std::vector<int64_t> count(256, 0);
 		double a;
 		double cexp;
 		double chisq(0.0);
-		long totalc;
+		int64_t totalc;
 		size_t i;
 
-		totalc = static_cast<long>(Input.size());
+		totalc = static_cast<int64_t>(Input.size());
 
 		for (i = 0; i < Input.size(); ++i)
 		{
@@ -51,12 +51,81 @@ namespace Test
 		return PoChiSq(chisq, 255);
 	}
 
-	void TestUtils::CopyVector(const std::vector<int> &SrcArray, size_t SrcIndex, std::vector<int> &DstArray, size_t DstIndex, size_t Length)
+	void TestUtils::CopyVector(const std::vector<int32_t> &SrcArray, size_t SrcIndex, std::vector<int32_t> &DstArray, size_t DstIndex, size_t Length)
 	{
 		std::memcpy(&DstArray[DstIndex], &SrcArray[SrcIndex], Length * sizeof(SrcArray[SrcIndex]));
 	}
 
-	bool TestUtils::IsEqual(std::vector<byte> &A, std::vector<byte> &B)
+	void TestUtils::FileClose(std::ifstream &Stream)
+	{
+		if (Stream && Stream.is_open())
+		{
+			Stream.close();
+		}
+	}
+
+	std::ifstream TestUtils::FileOpen(std::string &FilePath)
+	{
+		std::ifstream ifs(FilePath, std::ios::binary | std::ios::ate);
+
+		if (!ifs || !ifs.is_open())
+		{
+			throw TestException(std::string("OpenFile"), FilePath, std::string("Could not open the file!"));
+		}
+
+		return ifs;
+	}
+
+	size_t TestUtils::FileRead(const std::string &FilePath, std::string &Contents) 
+	{
+		std::ifstream ifs(FilePath, std::ios::binary | std::ios::ate);
+		size_t pos;
+
+		pos = 0;
+
+		if (!ifs || !ifs.is_open())
+		{
+			throw TestException(std::string("Read"), FilePath, std::string("Could not open the file!"));
+		}
+		else
+		{
+			ifs.seekg(0, std::ios::end);
+			const int32_t BUFLEN = static_cast<int32_t>(ifs.tellg());
+			ifs.seekg(0, std::ios::beg);
+
+			if (BUFLEN > 0)
+			{
+				std::vector<char> bufv(BUFLEN, 0);
+				char *buf = &bufv[0];
+				ifs.read(buf, BUFLEN);
+				Contents.assign(buf, BUFLEN);
+				pos = BUFLEN;
+			}
+			else
+			{
+				throw TestException(std::string("Read"), FilePath, std::string("The file is empty!"));
+			}
+		}
+
+		return pos;
+	}
+
+	size_t TestUtils::FileReadLine(std::ifstream &Stream, std::string &Line)
+	{
+		size_t pos;
+
+		pos = 0;
+
+		if (Stream && Stream.is_open())
+		{
+			Stream.getline((char*)Line.data(), Line.size());
+			pos = Stream.tellg();
+		}
+
+		return pos;
+	}
+
+	bool TestUtils::IsEqual(std::vector<uint8_t> &A, std::vector<uint8_t> &B)
 	{
 		size_t i = A.size();
 		bool res(true);
@@ -128,7 +197,7 @@ namespace Test
 #endif
 	}
 
-	void TestUtils::GetRandom(std::vector<byte> &Data)
+	void TestUtils::GetRandom(std::vector<uint8_t> &Data)
 	{
 		CSP rng;
 		rng.Generate(Data);
@@ -138,13 +207,13 @@ namespace Test
 	{
 		CSP rng;
 		SymmetricKey* kp;
-		std::vector<byte> key(KeySize, 0);
+		std::vector<uint8_t> key(KeySize, 0);
 
 		rng.Generate(key);
 
 		if (IvSize > 0)
 		{
-			std::vector<byte> iv(IvSize, 0);
+			std::vector<uint8_t> iv(IvSize, 0);
 			rng.Generate(iv);
 			kp = new SymmetricKey(key, iv);
 		}
@@ -165,7 +234,7 @@ namespace Test
 		return res;
 	}
 
-	double TestUtils::MeanValue(std::vector<byte> &Input)
+	double TestUtils::MeanValue(std::vector<uint8_t> &Input)
 	{
 		double ret(0);
 		size_t i;
@@ -178,11 +247,11 @@ namespace Test
 		return ret / static_cast<double>(Input.size());
 	}
 
-	bool TestUtils::OrderedRuns(const std::vector<byte> &Input, size_t Threshold)
+	bool TestUtils::OrderedRuns(const std::vector<uint8_t> &Input, size_t Threshold)
 	{
 		size_t c(0);
 		size_t i;
-		byte val;
+		uint8_t val;
 		bool state(false);
 
 		val = Input[0];
@@ -255,7 +324,7 @@ namespace Test
 		return (Z > 0.0 ? ((x + 1.0) * 0.5) : ((1.0 - x) * 0.5));
 	}
 
-	double TestUtils::PoChiSq(const double Ax, const int Df)
+	double TestUtils::PoChiSq(const double Ax, const int32_t Df)
 	{
 		// obtained chi-square value
 		// degrees of freedom
@@ -268,7 +337,7 @@ namespace Test
 		double y(0);
 		double res;
 		// true if df is an even number
-		int even;
+		int32_t even;
 
 		x = Ax;
 
@@ -334,14 +403,14 @@ namespace Test
 		std::cout << Data << std::endl;
 	}
 
-	void TestUtils::PrintHex(byte* Data, size_t Size)
+	void TestUtils::PrintHex(uint8_t* Data, size_t Size)
 	{
 		std::cout << ToHex(Data, Size);
 	}
 
 	std::string TestUtils::RandomReadableString(size_t Length)
 	{
-		std::vector<byte> fill(1);
+		std::vector<uint8_t> fill(1);
 		CEX::Prng::SecureRandom rnd;
 		std::string rtxt("");
 		size_t ctr = 0;
@@ -353,7 +422,7 @@ namespace Test
 			if (fill[0] > 31 && fill[0] < 123 && (fill[0] != 39 && fill[0] != 40 && fill[0] != 41))
 			{
 
-				rtxt += static_cast<unsigned char>(fill[0]);
+				rtxt += static_cast<uint8_t>(fill[0]);
 				++ctr;
 			}
 		}
@@ -361,71 +430,25 @@ namespace Test
 		return rtxt;
 	}
 
-	bool TestUtils::Read(const std::string &FilePath, std::string &Contents) 
-	{
-		bool status(false);
-		std::ifstream ifs(FilePath, std::ios::binary | std::ios::ate);
-
-		if (!ifs || !ifs.is_open())
-		{
-			throw TestException(std::string("Read"), FilePath, std::string("Could not open the file!"));
-		}
-		else
-		{
-			ifs.seekg(0, std::ios::end);
-			const int BUFLEN = static_cast<int>(ifs.tellg());
-			ifs.seekg(0, std::ios::beg);
-
-			if (BUFLEN > 0)
-			{
-				status = true;
-				std::vector<char> bufv(BUFLEN, 0);
-				char *buf = &bufv[0];
-				ifs.read(buf, BUFLEN);
-				Contents.assign(buf, BUFLEN);
-			}
-			else
-			{
-				throw TestException(std::string("Read"), FilePath, std::string("The file is empty!"));
-			}
-		}
-
-		return status;
-	}
-
-	std::ifstream TestUtils::OpenFile(std::string &FilePath)
-	{
-		std::ifstream ifs(FilePath, std::ios::binary | std::ios::ate);
-
-		if (!ifs || !ifs.is_open())
-		{
-			throw TestException(std::string("OpenFile"), FilePath, std::string("Could not open the file!"));
-		}
-		else
-		{
-			return ifs;
-		}
-	}
-
-	std::vector<byte> TestUtils::Reduce(std::vector<byte> Seed)
+	std::vector<uint8_t> TestUtils::Reduce(std::vector<uint8_t> Seed)
 	{
 		const size_t SEEDLEN = Seed.size() / 2;
-		std::vector<byte> data(SEEDLEN);
+		std::vector<uint8_t> data(SEEDLEN);
 
 		for (size_t i = 0; i < SEEDLEN; i++)
 		{
-			data[i] = static_cast<byte>(Seed[i] ^ Seed[SEEDLEN + i]);
+			data[i] = static_cast<uint8_t>(Seed[i] ^ Seed[SEEDLEN + i]);
 		}
 
 		return data;
 	}
 
-	void TestUtils::Reverse(std::vector<byte> &Data)
+	void TestUtils::Reverse(std::vector<uint8_t> &Data)
 	{
 		std::reverse(Data.begin(), Data.end());
 	}
 
-	bool TestUtils::SuccesiveZeros(const std::vector<byte> &Input, size_t Threshold)
+	bool TestUtils::SuccesiveZeros(const std::vector<uint8_t> &Input, size_t Threshold)
 	{
 		size_t c(0);
 		size_t i;

@@ -13,7 +13,7 @@ StreamWriter::StreamWriter(size_t Length)
 {
 }
 
-StreamWriter::StreamWriter(const std::vector<byte> &DataArray)
+StreamWriter::StreamWriter(const std::vector<uint8_t> &DataArray)
 	:
 	m_streamState(DataArray),
 	m_streamPosition(0)
@@ -47,7 +47,7 @@ const size_t StreamWriter::Position()
 
 //~~~Public Functions~~~//
 
-std::vector<byte> &StreamWriter::Generate()
+std::vector<uint8_t> &StreamWriter::Generate()
 {
 	return m_streamState;
 }

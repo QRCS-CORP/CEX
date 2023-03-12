@@ -55,19 +55,19 @@ private:
 	// 24		8-104	Personalization string
 
 	// bytes 1-8
-	std::vector<byte> m_treeSchema;
-	ushort m_treeVersion;
-	ushort m_reserved1;
+	std::vector<uint8_t> m_treeSchema;
+	uint16_t m_treeVersion;
+	uint16_t m_reserved1;
 	// 8-16
-	ulong m_outputSize;
+	uint64_t m_outputSize;
 	// 16-24
-	byte m_leafSize;
-	byte m_treeDepth;
-	byte m_treeFanout;
-	byte m_reserved2;
-	uint m_reserved3;
+	uint8_t m_leafSize;
+	uint8_t m_treeDepth;
+	uint8_t m_treeFanout;
+	uint8_t m_reserved2;
+	uint32_t m_reserved3;
 	// 24-32/64/128 8/40/104
-	std::vector<byte> m_dstCode;
+	std::vector<uint8_t> m_dstCode;
 
 public:
 
@@ -79,70 +79,70 @@ public:
 	SkeinParams();
 
 	/// <summary>
-	/// Initialize the SkeinParams structure using a serialized byte array
+	/// Initialize the SkeinParams structure using a serialized uint8_t array
 	/// </summary>
 	///
 	/// <param name="TreeArray">A serialized SkeinParams structure</param>
-	explicit SkeinParams(const std::vector<byte> &TreeArray);
+	explicit SkeinParams(const std::vector<uint8_t> &TreeArray);
 
 	/// <summary>
 	/// Initialize with the default parameters.
 	/// <para>Default settings are configured for sequential mode.</para>
 	/// </summary>
-	/// <param name="OutputSize">Digest output byte length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
+	/// <param name="OutputSize">Digest output uint8_t length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
 	/// <param name="LeafSize">The outer leaf length in bytes; this must be the digests block size</param>
 	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (limit of one state per processor core is recommended)</param>
-	SkeinParams(ulong OutputSize, byte LeafSize = 0, byte Fanout = 0);
+	SkeinParams(uint64_t OutputSize, uint8_t LeafSize = 0, uint8_t Fanout = 0);
 
 	/// <summary>
 	/// Initialize this structure with all parameters
 	/// </summary>
 	/// 
-	/// <param name="Schema">The four byte configuration schema array; default should be 'SHA3', (83, 72, 65, 51)</param>
-	/// <param name="OutputSize">Digest output byte length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
+	/// <param name="Schema">The four uint8_t configuration schema array; default should be 'SHA3', (83, 72, 65, 51)</param>
+	/// <param name="OutputSize">Digest output uint8_t length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
 	/// <param name="Version">The Skein version number; should always be a value of '1'</param>
 	/// <param name="LeafSize">The outer leaf length in bytes; this should be the digest block size in bytes</param>
 	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (one state per processor core is recommended)</param>
 	/// <param name="TreeDepth">The depth of the parallel tree; this value is always zero in this implementation</param>
 	/// <param name="DistributionCode">The optional personalization string; must be no longer than DistributionCodeMax in size</param>
-	explicit SkeinParams(const std::vector<byte> &Schema, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &DistributionCode);
+	explicit SkeinParams(const std::vector<uint8_t> &Schema, uint64_t OutputSize, uint16_t Version, uint32_t LeafSize, uint8_t Fanout, uint8_t TreeDepth, std::vector<uint8_t> &DistributionCode);
 
 	//~~~Accessors~~~//
 
 	/// <summary>
 	/// Read/Write: The number of leaf nodes in the last tier branch of the tree
 	/// </summary>
-	byte &FanOut();
+	uint8_t &FanOut();
 
 	/// <summary>
 	/// Read/Write: The outer leaf length
 	/// </summary>
-	byte &LeafSize();
+	uint8_t &LeafSize();
 
 	/// <summary>
-	/// Read/Write: Digest output byte length
+	/// Read/Write: Digest output uint8_t length
 	/// </summary>
-	ulong &OutputSize();
-
-	/// <summary>
-	/// Read/Write: Reserved for future use
-	/// </summary>
-	ushort &Reserved1();
+	uint64_t &OutputSize();
 
 	/// <summary>
 	/// Read/Write: Reserved for future use
 	/// </summary>
-	byte &Reserved2();
+	uint16_t &Reserved1();
 
 	/// <summary>
 	/// Read/Write: Reserved for future use
 	/// </summary>
-	uint &Reserved3();
+	uint8_t &Reserved2();
+
+	/// <summary>
+	/// Read/Write: Reserved for future use
+	/// </summary>
+	uint32_t &Reserved3();
 
 	/// <summary>
 	/// Read/Write: The personalization string
 	/// </summary>
-	std::vector<byte> &DistributionCode();
+	std::vector<uint8_t> &DistributionCode();
 
 	/// <summary>
 	/// Get: The maximum recommended size of the distribution code
@@ -150,14 +150,14 @@ public:
 	const size_t DistributionCodeMax();
 
 	/// <summary>
-	/// Read/Write: The 4 byte schema array
+	/// Read/Write: The 4 uint8_t schema array
 	/// </summary>
-	std::vector<byte> &Schema();
+	std::vector<uint8_t> &Schema();
 
 	/// <summary>
 	/// Read/Write: The skein version number
 	/// </summary>
-	ushort &Version();
+	uint16_t &Version();
 
 	//~~~Public Functions~~~//
 
@@ -166,7 +166,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The configuration string</returns>
-	std::vector<ulong> GetConfig();
+	std::vector<uint64_t> GetConfig();
 
 	/// <summary>
 	/// Create a clone of this structure
@@ -197,7 +197,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Hash code</returns>
-	int GetHashCode();
+	int32_t GetHashCode();
 
 	/// <summary>
 	/// Get the header size in bytes
@@ -212,11 +212,11 @@ public:
 	void Reset();
 
 	/// <summary>
-	/// Convert the SkeinParams structure to a serialized byte array
+	/// Convert the SkeinParams structure to a serialized uint8_t array
 	/// </summary>
 	/// 
-	/// <returns>The byte array containing the serialized SkeinParams structure</returns>
-	std::vector<byte> ToBytes();
+	/// <returns>The uint8_t array containing the serialized SkeinParams structure</returns>
+	std::vector<uint8_t> ToBytes();
 };
 
 NAMESPACE_DIGESTEND

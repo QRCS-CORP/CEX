@@ -70,7 +70,7 @@ namespace Test
 	{
 		try
 		{
-			std::vector<byte> smp(SAMPLE_SIZE);
+			std::vector<uint8_t> smp(SAMPLE_SIZE);
 			Rng->Generate(smp, 0, smp.size());
 			RandomUtils::Evaluate(Rng->Name(), smp);
 		}
@@ -86,7 +86,7 @@ namespace Test
 		try
 		{
 			RDP gen;
-			std::vector<byte> rnd(16);
+			std::vector<uint8_t> rnd(16);
 			// buffer is too small
 			gen.Generate(rnd, 0, rnd.size() + 1);
 
@@ -108,7 +108,7 @@ namespace Test
 
 	void RDPTest::Stress()
 	{
-		std::vector<byte> msg;
+		std::vector<uint8_t> msg;
 		SecureRandom rnd;
 		RDP gen;
 		size_t i;

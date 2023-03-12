@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -67,9 +67,9 @@ private:
 #if defined(CEX_HAS_AVX512)
 
 	template<typename T>
-	static void Store16xUL512(std::array<T, 16> &State, std::vector<byte> &Output, size_t OutOffset)
+	static void Store16xUL512(std::array<T, 16> &State, std::vector<uint8_t> &Output, size_t OutOffset)
 	{
-		std::array<uint, 16> tmp;
+		std::array<uint32_t, 16> tmp;
 		size_t i;
 
 		for (i = 0; i < 16; ++i)
@@ -95,9 +95,9 @@ private:
 	}
 
 	template<typename T>
-	static void Store8xULL1024(std::array<T, 16> &State, std::vector<byte> &Output, size_t OutOffset)
+	static void Store8xULL1024(std::array<T, 16> &State, std::vector<uint8_t> &Output, size_t OutOffset)
 	{
-		std::array<ulong, 8> tmp;
+		std::array<uint64_t, 8> tmp;
 		size_t i;
 
 		for (i = 0; i < 16; ++i)
@@ -117,9 +117,9 @@ private:
 #elif defined(CEX_HAS_AVX2)
 
 	template<typename T>
-	static void Store8xUL512(std::array<T, 16> &State, std::vector<byte> &Output, size_t OutOffset)
+	static void Store8xUL512(std::array<T, 16> &State, std::vector<uint8_t> &Output, size_t OutOffset)
 	{
-		std::array<uint, 8> tmp;
+		std::array<uint32_t, 8> tmp;
 		size_t i;
 
 		for (i = 0; i < 16; ++i)
@@ -137,9 +137,9 @@ private:
 	}
 
 	template<typename T>
-	static void Store4xULL1024(std::array<T, 16> &State, std::vector<byte> &Output, size_t OutOffset)
+	static void Store4xULL1024(std::array<T, 16> &State, std::vector<uint8_t> &Output, size_t OutOffset)
 	{
-		std::array<ulong, 4> tmp;
+		std::array<uint64_t, 4> tmp;
 		size_t i;
 
 		for (i = 0; i < 16; ++i)
@@ -155,9 +155,9 @@ private:
 #elif defined(CEX_HAS_AVX)
 
 	template<typename T>
-	static void Store4xUL512(std::array<T, 16> &State, std::vector<byte> &Output, size_t OutOffset)
+	static void Store4xUL512(std::array<T, 16> &State, std::vector<uint8_t> &Output, size_t OutOffset)
 	{
-		std::array<uint, 4> tmp;
+		std::array<uint32_t, 4> tmp;
 		size_t i;
 
 		for (i = 0; i < 16; ++i)
@@ -188,7 +188,7 @@ public:
 	template<typename ArrayU8, typename Array2xU32, typename Array14xU32>
 	static void PermuteP512C(ArrayU8 &Output, size_t OutOffset, Array2xU32 &Counter, Array14xU32 &State, size_t Rounds)
 	{
-		std::array<ulong, 16> X{ State[0], State[1], State[2], State[3], 
+		std::array<uint64_t, 16> X{ State[0], State[1], State[2], State[3], 
 			State[4], State[5], State[6], State[7], 
 			State[8], State[9], State[10], State[11], 
 			Counter[0], Counter[1], State[12], State[13] };
@@ -295,22 +295,22 @@ public:
 	template<typename ArrayU8, typename Array2xU32, typename Array14xU32>
 	static void PermuteR20P512U(ArrayU8 &Output, size_t OutOffset, Array2xU32 &Counter, Array14xU32 &State)
 	{
-		uint X0 = State[0];
-		uint X1 = State[1];
-		uint X2 = State[2];
-		uint X3 = State[3];
-		uint X4 = State[4];
-		uint X5 = State[5];
-		uint X6 = State[6];
-		uint X7 = State[7];
-		uint X8 = State[8];
-		uint X9 = State[9];
-		uint X10 = State[10];
-		uint X11 = State[11];
-		uint X12 = Counter[0];
-		uint X13 = Counter[1];
-		uint X14 = State[12];
-		uint X15 = State[13];
+		uint32_t X0 = State[0];
+		uint32_t X1 = State[1];
+		uint32_t X2 = State[2];
+		uint32_t X3 = State[3];
+		uint32_t X4 = State[4];
+		uint32_t X5 = State[5];
+		uint32_t X6 = State[6];
+		uint32_t X7 = State[7];
+		uint32_t X8 = State[8];
+		uint32_t X9 = State[9];
+		uint32_t X10 = State[10];
+		uint32_t X11 = State[11];
+		uint32_t X12 = Counter[0];
+		uint32_t X13 = Counter[1];
+		uint32_t X14 = State[12];
+		uint32_t X15 = State[13];
 
 		// rounds 0-1
 		X0 += X4;
@@ -994,7 +994,7 @@ public:
 	template<typename ArrayU8, typename Array2xU64, typename Array14xU64>
 	static void PermuteP1024C(ArrayU8 &Output, size_t OutOffset, Array2xU64 &Counter, Array14xU64 &State, size_t Rounds)
 	{
-		std::array<ulong, 16> X{ State[0], State[1], State[2], State[3], 
+		std::array<uint64_t, 16> X{ State[0], State[1], State[2], State[3], 
 			State[4], State[5], State[6], State[7], 
 			State[8], State[9], State[10], State[11], 
 			Counter[0], Counter[1], State[12], State[13] };

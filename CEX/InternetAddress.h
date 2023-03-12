@@ -13,10 +13,10 @@ using Tools::IntegerTools;
 /// </summary>
 typedef struct ipv4_address
 {
-	byte a1;
-	byte a2;
-	byte a3;
-	byte a4;
+	uint8_t a1;
+	uint8_t a2;
+	uint8_t a3;
+	uint8_t a4;
 
 	//~~~Constructorss~~~//
 
@@ -40,7 +40,7 @@ typedef struct ipv4_address
 	/// <param name="A2">The second octet</param>
 	/// <param name="A3">The third octet</param>
 	/// <param name="A4">The fourth octet</param>
-	ipv4_address(byte A1, byte A2, byte A3, byte A4)
+	ipv4_address(uint8_t A1, uint8_t A2, uint8_t A3, uint8_t A4)
 		:
 		a1(A1),
 		a2(A2),
@@ -53,8 +53,8 @@ typedef struct ipv4_address
 	/// Secondary constructor
 	/// </summary>
 	///
-	/// <param name="Address">A pointer to a byte array containing the ip address</param>
-	ipv4_address(byte* Address)
+	/// <param name="Address">A pointer to a uint8_t array containing the ip address</param>
+	ipv4_address(uint8_t* Address)
 		:
 		a1(Address[0]), 
 		a2(Address[1]), 
@@ -186,15 +186,15 @@ typedef struct ipv4_address
 
 		sadd = Address;
 		len = sadd.find(DELIM);
-		add.a1 = IntegerTools::FromString<byte>(sadd, 0, len);
+		add.a1 = IntegerTools::FromString<uint8_t>(sadd, 0, len);
 		pos = len + 1;
 		len = Address.find(DELIM, pos);
-		add.a2 = IntegerTools::FromString<byte>(sadd, pos, len - pos);
+		add.a2 = IntegerTools::FromString<uint8_t>(sadd, pos, len - pos);
 		pos = len + 1;
 		len = Address.find(DELIM, pos);
-		add.a3 = IntegerTools::FromString<byte>(sadd, pos, len - pos);
+		add.a3 = IntegerTools::FromString<uint8_t>(sadd, pos, len - pos);
 		pos = len + 1;
-		add.a4 = IntegerTools::FromString<byte>(sadd, pos, Address.size() - pos);
+		add.a4 = IntegerTools::FromString<uint8_t>(sadd, pos, Address.size() - pos);
 
 		return add;
 	}
@@ -261,22 +261,22 @@ typedef struct ipv6_address
 		unique_local
 	};
 
-	byte a1;
-	byte a2;
-	byte a3;
-	byte a4;
-	byte a5;
-	byte a6;
-	byte a7;
-	byte a8;
-	byte a9;
-	byte a10;
-	byte a11;
-	byte a12;
-	byte a13;
-	byte a14;
-	byte a15;
-	byte a16;
+	uint8_t a1;
+	uint8_t a2;
+	uint8_t a3;
+	uint8_t a4;
+	uint8_t a5;
+	uint8_t a6;
+	uint8_t a7;
+	uint8_t a8;
+	uint8_t a9;
+	uint8_t a10;
+	uint8_t a11;
+	uint8_t a12;
+	uint8_t a13;
+	uint8_t a14;
+	uint8_t a15;
+	uint8_t a16;
 
 	//~~~Constructors~~~//
 
@@ -324,8 +324,8 @@ typedef struct ipv6_address
 	/// <param name="A2">The fourteenth octet</param>
 	/// <param name="A3">The fifteenth octet</param>
 	/// <param name="A4">The sixteenth octet</param>
-	ipv6_address(byte A1, byte A2, byte A3, byte A4, byte A5, byte A6, byte A7, byte A8, 
-		byte A9, byte A10, byte A11, byte A12, byte A13, byte A14, byte A15, byte A16)
+	ipv6_address(uint8_t A1, uint8_t A2, uint8_t A3, uint8_t A4, uint8_t A5, uint8_t A6, uint8_t A7, uint8_t A8, 
+		uint8_t A9, uint8_t A10, uint8_t A11, uint8_t A12, uint8_t A13, uint8_t A14, uint8_t A15, uint8_t A16)
 		:
 		a1(A1),
 		a2(A2),
@@ -350,8 +350,8 @@ typedef struct ipv6_address
 	/// Secondary constructor
 	/// </summary>
 	///
-	/// <param name="A1">A pointer to a byte array containing the ip address</param>
-	ipv6_address(byte* Address)
+	/// <param name="A1">A pointer to a uint8_t array containing the ip address</param>
+	ipv6_address(uint8_t* Address)
 		:
 		a1(Address[0]), 
 		a2(Address[1]), 
@@ -632,7 +632,7 @@ typedef struct ipv6_address
 		const std::string LPBK = std::string("::1");
 		const std::string DZONE = std::string("%");
 		ipv6_address add;
-		std::vector<byte> tmpa(16);
+		std::vector<uint8_t> tmpa(16);
 		std::string sadd;
 		std::string str1;
 		std::string str2;
@@ -666,12 +666,12 @@ typedef struct ipv6_address
 
 				for (i = 0, j = 0; i < str1.size(); i += 2, ++j)
 				{
-					tmpa[j] = IntegerTools::HexToInt<byte>(str1, i);
+					tmpa[j] = IntegerTools::HexToInt<uint8_t>(str1, i);
 				}
 
 				for (i = 0, j = pos; i < str2.size(); i += 2, ++j)
 				{
-					tmpa[j] = IntegerTools::HexToInt<byte>(str2, i);
+					tmpa[j] = IntegerTools::HexToInt<uint8_t>(str2, i);
 				}
 			}
 			else
@@ -686,7 +686,7 @@ typedef struct ipv6_address
 
 			for (i = 0; i < str1.size(); i += 2)
 			{
-				tmpa[i] = IntegerTools::HexToInt<byte>(str1, i);
+				tmpa[i] = IntegerTools::HexToInt<uint8_t>(str1, i);
 			}
 		}
 
@@ -729,9 +729,9 @@ typedef struct ipv6_address
 	/// <param name="Address">The IPv6 address structure</param>
 	/// 
 	/// <returns>The string representation of the address</returns>
-	static std::vector<byte> ToVector(const ipv6_address &Address)
+	static std::vector<uint8_t> ToVector(const ipv6_address &Address)
 	{
-		std::vector<byte> tmpa{ Address.a1, Address.a2, Address.a3, Address.a4, Address.a5, Address.a6, Address.a7, Address.a8, 
+		std::vector<uint8_t> tmpa{ Address.a1, Address.a2, Address.a3, Address.a4, Address.a5, Address.a6, Address.a7, Address.a8, 
 			Address.a9, Address.a10, Address.a11, Address.a12, Address.a13, Address.a14, Address.a15, Address.a16 };
 
 		return tmpa;
@@ -748,7 +748,7 @@ typedef struct ipv6_address
 	{
 		const std::string DELIM = std::string(":");
 		const std::string DEMRK = std::string("::");
-		std::vector<byte> tmpa;
+		std::vector<uint8_t> tmpa;
 		std::string tmps;
 		size_t i;
 

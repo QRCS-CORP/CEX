@@ -3,14 +3,14 @@
 NAMESPACE_NETWORK
 
 #if defined(CEX_OS_WINDOWS)
-	const int SOCKET_EINVAL = WSAEINVAL;
-	const int SOCKET_EWOULDBLOCK = WSAEWOULDBLOCK;
+	const int32_t SOCKET_EINVAL = WSAEINVAL;
+	const int32_t SOCKET_EWOULDBLOCK = WSAEWOULDBLOCK;
 #else
-	const int SD_RECEIVE = 0x00000000L;
-	const int SD_SEND = 0x00000001L;
-	const int SD_BOTH = 0x00000002L;
-	const int SOCKET_EINVAL = EINVAL;
-	const int SOCKET_EWOULDBLOCK = EWOULDBLOCK;
+	const int32_t SD_RECEIVE = 0x00000000L;
+	const int32_t SD_SEND = 0x00000001L;
+	const int32_t SD_BOTH = 0x00000002L;
+	const int32_t SOCKET_EINVAL = EINVAL;
+	const int32_t SOCKET_EWOULDBLOCK = EWOULDBLOCK;
 #endif
 
 //~~~Accessors~~~//
@@ -27,7 +27,7 @@ bool SocketBase::IsBlocking(Socket &Source)
 
 bool SocketBase::IsConnected(Socket &Source)
 {
-	int err;
+	int32_t err;
 	char buf;
 	bool ret;
 
@@ -69,10 +69,10 @@ void SocketBase::Attach(Socket &Source, Socket &Target)
 	Source = Socket(Target);
 }
 
-bool SocketBase::Bind(Socket &Source, const ipv4_address &Address, ushort Port)
+bool SocketBase::Bind(Socket &Source, const ipv4_address &Address, uint16_t Port)
 {
 	sockaddr_in sa;
-	int res;
+	int32_t res;
 
 	std::memset(&sa, 0x00, sizeof(sa));
 
@@ -80,7 +80,7 @@ bool SocketBase::Bind(Socket &Source, const ipv4_address &Address, ushort Port)
 	sa.sin_len = sizeof(sa);
 #endif
 	sa.sin_family = AF_INET;
-	sa.sin_port = htons(static_cast<ushort>(Port));
+	sa.sin_port = htons(static_cast<uint16_t>(Port));
 	res = bind(Source.Connection, reinterpret_cast<const sockaddr*>(&sa), sizeof(sa));
 	Source.Address = Address.ToString(Address);
 	Source.AddressFamily = SocketAddressFamilies::IPv4;
@@ -88,10 +88,10 @@ bool SocketBase::Bind(Socket &Source, const ipv4_address &Address, ushort Port)
 	return (res != SOCKET_RET_ERROR);
 }
 
-bool SocketBase::Bind(Socket &Source, const ipv6_address &Address, ushort Port)
+bool SocketBase::Bind(Socket &Source, const ipv6_address &Address, uint16_t Port)
 {
 	sockaddr_in6 sa;
-	int res;
+	int32_t res;
 
 	std::memset(&sa, 0x00, sizeof(sa));
 
@@ -99,7 +99,7 @@ bool SocketBase::Bind(Socket &Source, const ipv6_address &Address, ushort Port)
 	sa.sin6_len = sizeof(sa);
 #endif
 	sa.sin6_family = AF_INET6;
-	sa.sin6_port = htons(static_cast<ushort>(Port));
+	sa.sin6_port = htons(static_cast<uint16_t>(Port));
 	res = bind(Source.Connection, reinterpret_cast<const sockaddr*>(&sa), sizeof(sa));
 	Source.Address = Address.ToString(Address);
 	Source.AddressFamily = SocketAddressFamilies::IPv6;
@@ -109,7 +109,7 @@ bool SocketBase::Bind(Socket &Source, const ipv6_address &Address, ushort Port)
 
 void SocketBase::CloseSocket(Socket &Source)
 {
-	int res;
+	int32_t res;
 
 	if (Source.Connection != UNINITIALIZED_SOCKET && Source.Connection != SOCKET_RET_ERROR)
 	{
@@ -138,11 +138,11 @@ void SocketBase::CloseSocket(Socket &Source)
 	Source.Clear();
 }
 
-bool SocketBase::Connect(Socket &Source, const ipv4_address &Address, ushort Port)
+bool SocketBase::Connect(Socket &Source, const ipv4_address &Address, uint16_t Port)
 {
 	sockaddr_in sa;
 	std::string sadd;
-	int res;
+	int32_t res;
 
 	std::memset(&sa, 0x00, sizeof(sa));
 
@@ -171,11 +171,11 @@ bool SocketBase::Connect(Socket &Source, const ipv4_address &Address, ushort Por
 	return (res != SOCKET_RET_ERROR);
 }
 
-bool SocketBase::Connect(Socket &Source, const ipv6_address &Address, ushort Port)
+bool SocketBase::Connect(Socket &Source, const ipv6_address &Address, uint16_t Port)
 {
 	sockaddr_in6 sa;
 	std::string sadd;
-	int res;
+	int32_t res;
 
 	std::memset(&sa, 0x00, sizeof(sa));
 
@@ -208,30 +208,30 @@ bool SocketBase::Create(Socket &Source)
 {
 	CEXASSERT(Source.Connection == UNINITIALIZED_SOCKET, "the socket has been initialized.");
 
-	Source.Connection = socket(static_cast<int>(Source.AddressFamily), static_cast<int>(Source.SocketTransport), static_cast<int>(Source.SocketProtocol));
+	Source.Connection = socket(static_cast<int32_t>(Source.AddressFamily), static_cast<int32_t>(Source.SocketTransport), static_cast<int32_t>(Source.SocketProtocol));
 
 	return (Source.Connection != SOCKET_RET_ERROR);
 }
 
-bool SocketBase::Listen(Socket &Source, int BackLog)
+bool SocketBase::Listen(Socket &Source, int32_t BackLog)
 {
 	CEXASSERT(Source.Connection != UNINITIALIZED_SOCKET, "the socket has not been initialized.");
 
-	int res;
+	int32_t res;
 
 	res = listen(Source.Connection, BackLog);
 
 	return (res != SOCKET_RET_ERROR);
 }
 
-uint SocketBase::Receive(Socket &Source, std::vector<byte> &Output, SocketReceiveFlags Flags)
+uint32_t SocketBase::Receive(Socket &Source, std::vector<uint8_t> &Output, SocketReceiveFlags Flags)
 {
 	CEXASSERT(Source.Connection != UNINITIALIZED_SOCKET, "the socket has not been initialized.");
 	CEXASSERT(Output.size() != 0, "the output parameter is invalid");
 
-	int res;
+	int32_t res;
 
-	res = recv(Source.Connection, reinterpret_cast<char*>(Output.data()), static_cast<int>(Output.size()), static_cast<int>(Flags));
+	res = recv(Source.Connection, reinterpret_cast<char*>(Output.data()), static_cast<int32_t>(Output.size()), static_cast<int32_t>(Flags));
 
 	if (res == SOCKET_RET_ERROR)
 	{
@@ -241,14 +241,14 @@ uint SocketBase::Receive(Socket &Source, std::vector<byte> &Output, SocketReceiv
 	return static_cast<size_t>(res);
 }
 
-uint SocketBase::Send(Socket &Source, const std::vector<byte> &Input, size_t Length, SocketSendFlags Flags)
+uint32_t SocketBase::Send(Socket &Source, const std::vector<uint8_t> &Input, size_t Length, SocketSendFlags Flags)
 {
 	CEXASSERT(Source.Connection != UNINITIALIZED_SOCKET, "the socket has not been initialized.");
 
-	int res;
+	int32_t res;
 
 
-	res = send(Source.Connection, reinterpret_cast<const char*>(Input.data()), static_cast<int>(Length) + 1, static_cast<int>(Flags));
+	res = send(Source.Connection, reinterpret_cast<const char*>(Input.data()), static_cast<int32_t>(Length) + 1, static_cast<int32_t>(Flags));
 
 	if (res == SOCKET_RET_ERROR)
 	{
@@ -262,11 +262,11 @@ void SocketBase::ShutDown(Socket &Source, SocketShutdownFlags Parameters)
 {
 	CEXASSERT(Source.Connection != UNINITIALIZED_SOCKET, "the socket has not been initialized.");
 
-	int res;
+	int32_t res;
 
 	if (Source.Connection != UNINITIALIZED_SOCKET && IsConnected(Source))
 	{
-		res = shutdown(Source.Connection, static_cast<int>(Parameters));
+		res = shutdown(Source.Connection, static_cast<int32_t>(Parameters));
 
 		if (res == SOCKET_RET_ERROR)
 		{
@@ -294,16 +294,16 @@ SocketExceptions SocketBase::GetLastError()
 #endif
 }
 
-void SocketBase::IOCtl(Socket &Source, long Command, ulong* Arguments)
+void SocketBase::IOCtl(Socket &Source, int64_t Command, uint64_t* Arguments)
 {
 	CEXASSERT(Source.Connection != UNINITIALIZED_SOCKET, "the socket has not been initialized.");
 
-	int res;
+	int32_t res;
 
 #if defined(CEX_OS_WINDOWS)
 	res = ioctlsocket(Source.Connection, Command, reinterpret_cast<u_long*>(Arguments));
 #else
-	res = ioctl((int)Source, (int)Command, (char*)Arguments);
+	res = ioctl((int32_t)Source, (int32_t)Command, (char*)Arguments);
 #endif
 
 	if (res == SOCKET_RET_ERROR)
@@ -316,20 +316,20 @@ bool SocketBase::ReceiveReady(Socket &Source, const timeval* Timeout)
 {
 	fd_set fds;
 	const timeval* tcopy;
-	int res;
+	int32_t res;
 
 	FD_ZERO(&fds);
 	FD_SET(Source.Connection, &fds);
 
 	if (Timeout == nullptr)
 	{
-		res = select(static_cast<int>(Source.Connection) + 1, &fds, nullptr, nullptr, nullptr);
+		res = select(static_cast<int32_t>(Source.Connection) + 1, &fds, nullptr, nullptr, nullptr);
 	}
 	else
 	{
 		// select() modified timeout on Linux
 		tcopy = Timeout;
-		res = select(static_cast<int>(Source.Connection) + 1, &fds, nullptr, nullptr, tcopy);
+		res = select(static_cast<int32_t>(Source.Connection) + 1, &fds, nullptr, nullptr, tcopy);
 	}
 
 	return static_cast<bool>(res > 0);
@@ -339,25 +339,25 @@ bool SocketBase::SendReady(Socket &Source, const timeval* Timeout)
 {
 	fd_set fds;
 	const timeval* tcopy;
-	int res;
+	int32_t res;
 
 	FD_ZERO(&fds);
 	FD_SET(Source.Connection, &fds);
 
 	if (Timeout == NULL)
 	{
-		res = select(static_cast<int>(Source.Connection) + 1, NULL, &fds, NULL, NULL);
+		res = select(static_cast<int32_t>(Source.Connection) + 1, NULL, &fds, NULL, NULL);
 	}
 	else
 	{
 		tcopy = Timeout;
-		res = select(static_cast<int>(Source.Connection) + 1, NULL, &fds, NULL, tcopy);
+		res = select(static_cast<int32_t>(Source.Connection) + 1, NULL, &fds, NULL, tcopy);
 	}
 
 	return static_cast<bool>(res > 0);
 }
 
-void SocketBase::SetLastError(int ErrorCode)
+void SocketBase::SetLastError(int32_t ErrorCode)
 {
 #if defined(CEX_OS_WINDOWS)
 	WSASetLastError(ErrorCode);
@@ -369,7 +369,7 @@ void SocketBase::SetLastError(int ErrorCode)
 void SocketBase::ShutDownSockets()
 {
 #if defined(CEX_OS_WINDOWS)
-	int res;
+	int32_t res;
 
 	res = WSACleanup();
 
@@ -386,18 +386,18 @@ void SocketBase::SocketOption(Socket &Source, SocketProtocols Protocol, SocketOp
 	char code;
 	code = static_cast<char>(Protocol);
 #else
-	int code;
-	code = static_cast<int>(Protocol);
+	int32_t code;
+	code = static_cast<int32_t>(Protocol);
 #endif
 
-	setsockopt(Source.Connection, static_cast<int>(TcpOptions), static_cast<int>(Protocol), &code, sizeof(code));
+	setsockopt(Source.Connection, static_cast<int32_t>(TcpOptions), static_cast<int32_t>(Protocol), &code, sizeof(code));
 }
 
 void SocketBase::StartSockets()
 {
 #if defined(CEX_OS_WINDOWS)
 	WSADATA wsd;
-	int res;
+	int32_t res;
 
 	res = WSAStartup(0x0202, &wsd);
 
@@ -437,7 +437,7 @@ bool SocketBase::Acceptv4(Socket &Source, Socket &Target)
 		Target.ConnectionStatus = SocketStates::Connected;
 		inet_ntop(AF_INET, &sa.sin_addr, astr, INET_ADDRSTRLEN);
 		Target.Address = std::string(astr);
-		Target.Port = static_cast<ushort>(ntohs(sa.sin_port));
+		Target.Port = static_cast<uint16_t>(ntohs(sa.sin_port));
 	}
 	else
 	{
@@ -474,7 +474,7 @@ bool SocketBase::Acceptv6(Socket &Source, Socket &Target)
 		Target.ConnectionStatus = SocketStates::Connected;
 		inet_ntop(AF_INET6, &sa.sin6_addr, astr, INET6_ADDRSTRLEN);
 		Target.Address = std::string(astr);
-		Target.Port = static_cast<ushort>(ntohs(sa.sin6_port));
+		Target.Port = static_cast<uint16_t>(ntohs(sa.sin6_port));
 	}
 	else
 	{

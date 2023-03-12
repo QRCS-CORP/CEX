@@ -10,17 +10,17 @@
 
 namespace Test
 {
-	using Asymmetric::AsymmetricKey;
-	using Asymmetric::AsymmetricKeyPair;
-	using Enumeration::AsymmetricKeyTypes;
-	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricParameters;
-	using Exception::CryptoAsymmetricException;
-	using Tools::IntegerTools;
+	using CEX::Asymmetric::AsymmetricKey;
+	using CEX::Asymmetric::AsymmetricKeyPair;
+	using CEX::Asymmetric::Sign::XMSS::XMSS;
+	using CEX::Enumeration::AsymmetricKeyTypes;
+	using CEX::Enumeration::AsymmetricPrimitives;
+	using CEX::Enumeration::AsymmetricParameters;
+	using CEX::Enumeration::XmssParameters;
+	using CEX::Exception::CryptoAsymmetricException;
+	using CEX::Prng::SecureRandom;
+	using CEX::Tools::IntegerTools;
 	using Test::NistRng;
-	using Prng::SecureRandom;
-	using Asymmetric::Sign::XMSS::XMSS;
-	using Enumeration::XmssParameters;
 
 	const std::string XMSSTest::CLASSNAME = "XMSSTest";
 	const std::string XMSSTest::DESCRIPTION = "XMSSTest key generation, signature generation, and verification tests..";
@@ -101,9 +101,9 @@ namespace Test
 	{
 		XMSS sgn1(XmssParameters::XMSSSHA2256H10);
 		XMSS sgn2(XmssParameters::XMSSSHA2256H10);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 		SecureRandom rnd;
 		bool ret;
 
@@ -175,8 +175,8 @@ namespace Test
 		// test sign without initialization
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
 			XMSS sgn(XmssParameters::XMSSSHA2256H10);
 			sgn.Sign(msg, sig);
 
@@ -193,8 +193,8 @@ namespace Test
 		// test verif without initialization
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
 			XMSS sgn(XmssParameters::XMSSSHA2256H10);
 			sgn.Verify(sig, msg);
 
@@ -230,8 +230,8 @@ namespace Test
 		// test initialization with wrong key
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
 			XMSS sgn(XmssParameters::XMSSSHA2256H10);
 			AsymmetricKeyPair* kp = sgn.Generate();
 			sgn.Initialize(kp->PublicKey());
@@ -250,8 +250,8 @@ namespace Test
 
 	void XMSSTest::Integrity()
 	{
-		std::vector<byte> msg(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg(0);
+		std::vector<uint8_t> sig(0);
 		NistRng gen;
 
 		// XMSSSHA2256H10
@@ -263,8 +263,8 @@ namespace Test
 		// generate the key pair
 		AsymmetricKeyPair* kp1 = sgn1.Generate();
 
-		std::vector<byte> ptmp = kp1->PublicKey()->Polynomial();
-		std::vector<byte> stmp = kp1->PrivateKey()->Polynomial();
+		std::vector<uint8_t> ptmp = kp1->PublicKey()->Polynomial();
+		std::vector<uint8_t> stmp = kp1->PrivateKey()->Polynomial();
 
 		// verify private and public keys
 		if (kp1->PublicKey()->Polynomial() != m_pubexp[0])
@@ -353,8 +353,8 @@ namespace Test
 
 	void XMSSTest::Kat()
 	{
-		std::vector<byte> msg(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg(0);
+		std::vector<uint8_t> sig(0);
 		NistRng gen;
 
 		// XMSSSHA2256H10
@@ -657,14 +657,14 @@ namespace Test
 	{
 		SecureRandom gen;
 		XMSS sgn(XmssParameters::XMSSSHA2256H10);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 
 		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter private key
-		std::vector<byte> sk1 = kp->PrivateKey()->Polynomial();
+		std::vector<uint8_t> sk1 = kp->PrivateKey()->Polynomial();
 		gen.Generate(sk1, 0, 16);
 		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::XMSS, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(XmssParameters::XMSSSHA2256H10));
 
@@ -683,14 +683,14 @@ namespace Test
 	{
 		SecureRandom gen;
 		XMSS sgn(XmssParameters::XMSSSHA2256H10);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 
 		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = (kp->PublicKey()->Polynomial());
+		std::vector<uint8_t> pk1 = (kp->PublicKey()->Polynomial());
 		gen.Generate(pk1, 0, 16);
 		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::XMSS, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(XmssParameters::XMSSSHA2256H10));
 
@@ -708,7 +708,7 @@ namespace Test
 	void XMSSTest::Serialization()
 	{
 		XMSS sgn(XmssParameters::XMSSSHA2256H10);
-		SecureVector<byte> skey(0);
+		SecureVector<uint8_t> skey(0);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -739,9 +739,9 @@ namespace Test
 	{
 		SecureRandom gen;
 		XMSS sgn(XmssParameters::XMSSSHA2256H10);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 
 		AsymmetricKeyPair* kp = sgn.Generate();
 
@@ -766,9 +766,9 @@ namespace Test
 		SecureRandom gen;
 		XMSS sgn1(XmssParameters::XMSSSHA2256H10);
 		XMSS sgn2(XmssParameters::XMSSSHA2256H10);
-		std::vector<byte> msg1(0);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(0);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 		size_t msglen;
 		bool status;
 

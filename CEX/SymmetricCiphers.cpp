@@ -26,9 +26,6 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 		case SymmetricCiphers::RHXH512:
 			name = std::string("RHXH512");
 			break;
-		case SymmetricCiphers::RHXS1024:
-			name = std::string("RHXS1024");
-			break;
 		case SymmetricCiphers::SHXH256:
 			name = std::string("SHXH256");
 			break;
@@ -40,9 +37,6 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 			break;
 		case SymmetricCiphers::SHXS512:
 			name = std::string("SHXS512");
-			break;
-		case SymmetricCiphers::SHXS1024:
-			name = std::string("SHXS1024");
 			break;
 		case SymmetricCiphers::ChaChaP20:
 			name = std::string("ChaChaP20");
@@ -92,8 +86,8 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 		case SymmetricCiphers::TSX1024:
 			name = std::string("TSX1024");
 			break;
-		case SymmetricCiphers::TSXR120K1024:
-			name = std::string("TSXR120K1024");
+		case SymmetricCiphers::TSXR120K512:
+			name = std::string("TSXR120K512");
 			break;
 		default:
 			name = std::string("None");
@@ -143,10 +137,6 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 	{
 		tname = SymmetricCiphers::RHXS512;
 	}
-	else if (Name == std::string("RHXS1024"))
-	{
-		tname = SymmetricCiphers::RHXS1024;
-	}
 	else if (Name == std::string("SHXH256"))
 	{
 		tname = SymmetricCiphers::SHXH256;
@@ -162,10 +152,6 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 	else if (Name == std::string("SHXS512"))
 	{
 		tname = SymmetricCiphers::SHXS512;
-	}
-	else if (Name == std::string("SHXS1024"))
-	{
-		tname = SymmetricCiphers::SHXS1024;
 	}
 	else if (Name == std::string("ChaChaP20"))
 	{
@@ -235,9 +221,9 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 	{
 		tname = SymmetricCiphers::TSX1024;
 	}
-	else if (Name == std::string("TSXR120K1024"))
+	else if (Name == std::string("TSXR120K512"))
 	{
-		tname = SymmetricCiphers::TSXR120K1024;
+		tname = SymmetricCiphers::TSXR120K512;
 	}
 	else
 	{

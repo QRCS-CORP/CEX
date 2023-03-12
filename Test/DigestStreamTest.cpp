@@ -50,19 +50,19 @@ namespace Test
 	void DigestStreamTest::Evaluate(Enumeration::Digests Engine)
 	{
 		Prng::SecureRandom rnd;
-		std::vector<byte> data(rnd.NextUInt32(1000, 100));
+		std::vector<uint8_t> data(rnd.NextUInt32(1000, 100));
 		rnd.Generate(data);
 
 		// digest instance for baseline
 		Digest::IDigest* gen = Helper::DigestFromName::GetInstance(Engine);
 		const std::string GENNME = gen->Name();
 		size_t dgtSze = gen->DigestSize();
-		std::vector<byte> hash1(dgtSze);
+		std::vector<uint8_t> hash1(dgtSze);
 		gen->Compute(data, hash1);
 		delete gen;
 
 		// test stream method
-		std::vector<byte> hash2(dgtSze);
+		std::vector<uint8_t> hash2(dgtSze);
 		Processing::DigestStream ds(Engine);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
 		hash2 = ds.Compute(ms);
@@ -72,7 +72,7 @@ namespace Test
 			throw TestException(std::string("Evaluate"), GENNME, std::string("DigestStreamTest: Expected hash is not equal! -DE1"));
 		}
 
-		// test byte access method
+		// test uint8_t access method
 		hash2 = ds.Compute(data, 0, data.size());
 
 		if (hash1 != hash2)

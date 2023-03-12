@@ -10,17 +10,17 @@
 
 namespace Test
 {
-	using Asymmetric::AsymmetricKey;
-	using Asymmetric::AsymmetricKeyPair;
-	using Enumeration::AsymmetricKeyTypes;
-	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricParameters;
-	using Exception::CryptoAsymmetricException;
-	using Tools::IntegerTools;
-	using Enumeration::ECDHParameters;
-	using Asymmetric::Encrypt::ECDH::ECDH;
+	using CEX::Asymmetric::AsymmetricKey;
+	using CEX::Asymmetric::AsymmetricKeyPair;
+	using CEX::Asymmetric::Encrypt::ECDH::ECDH;
+	using CEX::Enumeration::AsymmetricKeyTypes;
+	using CEX::Enumeration::AsymmetricPrimitives;
+	using CEX::Enumeration::AsymmetricParameters;
+	using CEX::Enumeration::ECDHParameters;
+	using CEX::Exception::CryptoAsymmetricException;
+	using CEX::Prng::SecureRandom;
+	using CEX::Tools::IntegerTools;
 	using Test::NistRng;
-	using Prng::SecureRandom;
 
 	const std::string ECDHTest::CLASSNAME = "ECDHTest";
 	const std::string ECDHTest::DESCRIPTION = "ECDH key generation, encryption, and decryption tests..";
@@ -93,8 +93,8 @@ namespace Test
 
 	void ECDHTest::Authentication()
 	{
-		std::vector<byte> sec1(32);
-		std::vector<byte> sec2(32);
+		std::vector<uint8_t> sec1(32);
+		std::vector<uint8_t> sec2(32);
 
 		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
@@ -116,9 +116,9 @@ namespace Test
 
 	void ECDHTest::Integrity()
 	{
-		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(32);
-		std::vector<byte> sec2(32);
+		std::vector<uint8_t> cpt(0);
+		std::vector<uint8_t> sec1(32);
+		std::vector<uint8_t> sec2(32);
 
 		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
 		AsymmetricKeyPair* kp1 = cpr1.Generate(m_rngseed[0]);
@@ -138,8 +138,8 @@ namespace Test
 
 	void ECDHTest::Kat()
 	{
-		std::vector<byte> sec1(32);
-		std::vector<byte> sec2(32);
+		std::vector<uint8_t> sec1(32);
+		std::vector<uint8_t> sec2(32);
 
 		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
 		AsymmetricKeyPair* kp1 = cpr1.Generate(m_rngseed[0]);
@@ -204,8 +204,8 @@ namespace Test
 
 	void ECDHTest::PublicKey()
 	{
-		std::vector<byte> sec1(32);
-		std::vector<byte> sec2(32);
+		std::vector<uint8_t> sec1(32);
+		std::vector<uint8_t> sec2(32);
 
 		// test param 1: ECDHS2EC25519S
 		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
@@ -215,7 +215,7 @@ namespace Test
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
-		std::vector<byte> plm = kp1->PublicKey()->Polynomial();
+		std::vector<uint8_t> plm = kp1->PublicKey()->Polynomial();
 		plm[0] += 1;
 		plm[1] += 1;
 		AsymmetricKey* pk = new AsymmetricKey(plm, AsymmetricPrimitives::ECDH, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(ECDHParameters::ECDHS2EC25519S));
@@ -235,7 +235,7 @@ namespace Test
 
 	void ECDHTest::Serialization()
 	{
-		SecureVector<byte> skey(0);
+		SecureVector<uint8_t> skey(0);
 		size_t i;
 
 		// test param 1: ECDHS2EC25519S
@@ -272,10 +272,10 @@ namespace Test
 
 	void ECDHTest::Stress()
 	{
-		std::vector<byte> sec1(32);
-		std::vector<byte> sec2(32);
-		std::vector<byte> seed1(32);
-		std::vector<byte> seed2(32);
+		std::vector<uint8_t> sec1(32);
+		std::vector<uint8_t> sec2(32);
+		std::vector<uint8_t> seed1(32);
+		std::vector<uint8_t> seed2(32);
 		SecureRandom gen;
 		size_t i;
 

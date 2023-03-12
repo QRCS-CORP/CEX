@@ -29,9 +29,9 @@ namespace Test
 		static const size_t MONTE_CYCLES = 10000;
 		static const size_t TEST_CYCLES = 100;
 
-		std::vector<std::vector<byte>> m_expected;
-		std::vector<std::vector<byte>> m_keys;
-		std::vector<std::vector<byte>> m_message;
+		std::vector<std::vector<uint8_t>> m_expected;
+		std::vector<std::vector<uint8_t>> m_keys;
+		std::vector<std::vector<uint8_t>> m_message;
 		TestEventHandler m_progressEvent;
 
     public:
@@ -95,7 +95,7 @@ namespace Test
 		/// <param name="Key">The cipher key array</param>
 		/// <param name="Message">The input message array</param>
 		/// <param name="Expected">The expected output answer</param>
-		void KatEx(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void KatEx(IBlockCipher* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// The SHX extended monte carlo tests
@@ -105,7 +105,7 @@ namespace Test
 		/// <param name="Key">The cipher key array</param>
 		/// <param name="Message">The input message array</param>
 		/// <param name="Expected">The expected output answer</param>
-		void MonteCarloEx(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void MonteCarloEx(IBlockCipher* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compares synchronous to parallel processed random-sized, pseudo-random array transformations and their inverse in a looping [TEST_CYCLES] stress-test
@@ -123,9 +123,9 @@ namespace Test
 
     private:
 
-		void Kat(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void Kat(std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected);
 		void Initialize();
-		void MonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, size_t Count = 100);
+		void MonteCarlo(std::vector<uint8_t> &Key, std::vector<uint8_t> &Input, std::vector<uint8_t> &Output, size_t Count = 100);
 		void OnProgress(const std::string &Data);
     };
 }

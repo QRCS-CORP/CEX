@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Symmetric encryption ciphers enumeration names
 /// </summary>
-enum class SymmetricCiphers : byte
+enum class SymmetricCiphers : uint8_t
 {
 	/// <summary>
 	/// No symmetric cipher is specified
@@ -48,11 +48,6 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	RHXS512 = 42,
 	/// <summary>
-	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an cSHAKE-1024 secure key schedule.
-	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	RHXS1024 = 43,
-	/// <summary>
 	/// An implementation of the Serpent Block Cipher extended with an HKDF(HMAC-SHA2-256) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
@@ -72,17 +67,12 @@ enum class SymmetricCiphers : byte
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	SHXS512 = 48,
-	/// <summary>
-	/// An implementation of the Serpent Block Cipher extended with an cSHAKE-1024 secure key schedule.
-	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	SHXS1024 = 49,
 
 	//~~~ ChaCha Stream-cipher Extended Variants~~//
 
 	/// <summary>
 	/// A standard implementation of the ChaChaPoly20 stream-cipher, this variant uses 20 rounds and has no athentication.
-	/// <para>A standard ChaChaPoly20 stream-cipher implementation: uses a 512-bit block and a 256-bit key, and 8-byte nonce</para>
+	/// <para>A standard ChaChaPoly20 stream-cipher implementation: uses a 512-bit block and a 256-bit key, and 8-uint8_t nonce</para>
 	/// </summary>
 	ChaChaP20 = 96,
 	/// <summary>
@@ -178,7 +168,7 @@ enum class SymmetricCiphers : byte
 	/// The Threefish 1024-bit stream cipher authenticated with KMAC-1024.
 	/// <para>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</para>
 	/// </summary>
-	TSXR120K1024 = 133,
+	TSXR120K512 = 133,
 };
 
 class SymmetricCipherConvert

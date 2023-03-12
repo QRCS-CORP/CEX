@@ -2,7 +2,7 @@
 
 namespace Test
 {
-	void RandomUtils::Evaluate(const std::string &Name, std::vector<byte> &Sample)
+	void RandomUtils::Evaluate(const std::string &Name, std::vector<uint8_t> &Sample)
 	{
 		const std::string TPASS = std::string(": PASS");
 		const std::string TWARN = std::string(": WARN");

@@ -18,18 +18,16 @@ class SHA2256::SHA2256State
 {
 public:
 
-	std::array<uint, 8> H = { 0 };
-	ulong T;
+	std::array<uint32_t, 8> H = { 0 };
+	uint64_t T = 0;
 
 	SHA2256State()
-		:
-		T(0)
 	{
 	}
 
 	~SHA2256State()
 	{
-		MemoryTools::Clear(H, 0, H.size() * sizeof(uint));
+		MemoryTools::Clear(H, 0, H.size() * sizeof(uint32_t));
 		T = 0;
 	}
 
@@ -41,7 +39,7 @@ public:
 	void Reset()
 	{
 		T = 0;
-		MemoryTools::Copy(SHA2::SHA2256State, 0, H, 0, H.size() * sizeof(uint));
+		MemoryTools::Copy(SHA2::SHA2256State, 0, H, 0, H.size() * sizeof(uint32_t));
 	}
 };
 
@@ -58,7 +56,7 @@ SHA2256::SHA2256(bool Parallel)
 	m_msgLength(0),
 	m_parallelProfile(SHA2::SHA2256_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
 	m_treeParams(Parallel ? 
-		SHA2Params(SHA2::SHA2256_DIGEST_SIZE, static_cast<byte>(SHA2::SHA2256_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) :
+		SHA2Params(SHA2::SHA2256_DIGEST_SIZE, static_cast<uint8_t>(SHA2::SHA2256_RATE_SIZE), static_cast<uint8_t>(DEF_PRLDEGREE)) :
 		SHA2Params(SHA2::SHA2256_DIGEST_SIZE, 0UL, 0x00))
 {
 	Reset();
@@ -134,7 +132,7 @@ ParallelOptions &SHA2256::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void SHA2256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void SHA2256::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (Output.size() < SHA2::SHA2256_DIGEST_SIZE)
 	{
@@ -145,7 +143,7 @@ void SHA2256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Finalize(Output, 0);
 }
 
-void SHA2256::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void SHA2256::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (Output.size() - OutOffset < SHA2::SHA2256_DIGEST_SIZE)
 	{
@@ -232,7 +230,7 @@ void SHA2256::ParallelMaxDegree(size_t Degree)
 
 void SHA2256::Reset()
 {
-	std::vector<byte> params(SHA2::SHA2256_RATE_SIZE);
+	std::vector<uint8_t> params(SHA2::SHA2256_RATE_SIZE);
 
 	m_dgtState.clear();
 	m_dgtState.resize(m_parallelProfile.IsParallel() ? m_parallelProfile.ParallelMaxDegree() : 1);
@@ -246,36 +244,36 @@ void SHA2256::Reset()
 
 		if (m_parallelProfile.IsParallel())
 		{
-			m_treeParams.NodeOffset() = static_cast<uint>(i);
+			m_treeParams.NodeOffset() = static_cast<uint32_t>(i);
 			MemoryTools::Copy(m_treeParams.ToBytes(), 0, params, 0, params.size());
 			Permute(params, 0, m_dgtState[i]);
 		}
 	}
 }
 
-void SHA2256::Update(byte Input) // Note: expand or remove? ushort, uint, ulong..?
+void SHA2256::Update(uint8_t Input) // Note: expand or remove? uint16_t, uint32_t, uint64_t..?
 {
-	std::vector<byte> inp(1, Input);
+	std::vector<uint8_t> inp(1, Input);
 	Update(inp, 0, 1);
 }
 
-void SHA2256::Update(uint Input)
+void SHA2256::Update(uint32_t Input)
 {
-	std::vector<byte> tmp(sizeof(uint));
+	std::vector<uint8_t> tmp(sizeof(uint32_t));
 	IntegerTools::Le32ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void SHA2256::Update(ulong Input)
+void SHA2256::Update(uint64_t Input)
 {
-	std::vector<byte> tmp(sizeof(ulong));
+	std::vector<uint8_t> tmp(sizeof(uint64_t));
 	IntegerTools::Le64ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void SHA2256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void SHA2256::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too int16_t!");
 
 	if (Length != 0)
 	{
@@ -366,10 +364,10 @@ void SHA2256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Len
 
 //~~~Private Functions~~~//
 
-void SHA2256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA2256State &State)
+void SHA2256::HashFinal(std::vector<uint8_t> &Input, size_t InOffset, size_t Length, SHA2256State &State)
 {
 	State.T += Length;
-	ulong bitLen = (State.T << 3);
+	uint64_t bitLen = (State.T << 3);
 
 	if (Length == SHA2::SHA2256_RATE_SIZE)
 	{
@@ -393,12 +391,12 @@ void SHA2256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length
 	}
 
 	// finalize state with counter and last compression
-	IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitLen) >> 32), Input, InOffset + 56);
-	IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitLen)), Input, InOffset + 60);
+	IntegerTools::Be32ToBytes(static_cast<uint32_t>(static_cast<uint64_t>(bitLen) >> 32), Input, InOffset + 56);
+	IntegerTools::Be32ToBytes(static_cast<uint32_t>(static_cast<uint64_t>(bitLen)), Input, InOffset + 60);
 	Permute(Input, InOffset, State);
 }
 
-void SHA2256::Permute(const std::vector<byte> &Input, size_t InOffset, SHA2256State &State)
+void SHA2256::Permute(const std::vector<uint8_t> &Input, size_t InOffset, SHA2256State &State)
 {
 #if defined(CEX_HAS_AVX2)
 	if (m_parallelProfile.HasSHA2())
@@ -418,7 +416,7 @@ void SHA2256::Permute(const std::vector<byte> &Input, size_t InOffset, SHA2256St
 	State.Increase(SHA2::SHA2256_RATE_SIZE);
 }
 
-void SHA2256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA2256State &State, ulong Length)
+void SHA2256::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, SHA2256State &State, uint64_t Length)
 {
 	do
 	{

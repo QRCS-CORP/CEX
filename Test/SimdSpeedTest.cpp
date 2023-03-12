@@ -80,7 +80,7 @@ namespace Test
 			OnProgress(std::string("### Uses the highest available intrinsics instruction set AVX, AVX2, or AVX512"));
 			OnProgress(std::string("### Measures the performance of sequential to parallel memory operations: copy, set, clear, and xor"));
 			OnProgress(std::string("### The Block operations use a 512 block of bytes to perform the operations"));
-			OnProgress(std::string("### The Vectorized operations use the SIMD byte size (128/256/512) as the buffer size"));
+			OnProgress(std::string("### The Vectorized operations use the SIMD uint8_t size (128/256/512) as the buffer size"));
 #if defined(__AVX512__)
 			OnProgress(std::string("### Highest detected SIMD instruction set is AVX512 ###"));
 #elif defined(__AVX2__)
@@ -135,8 +135,8 @@ namespace Test
 
 	void SimdSpeedTest::ClearBlockSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(0);
-		std::vector<byte> buffer2(0);
+		std::vector<uint8_t> buffer1(0);
+		std::vector<uint8_t> buffer2(0);
 		uint64_t blkCtr = 0;
 		std::string glen = "";
 		uint64_t start = 0;
@@ -147,8 +147,8 @@ namespace Test
 #if defined(__AVX__)
 
 		glen = "SpeedTest: BLOCK CLEAR " + TESTSIZE;
-		// sequential clear: 512 byte buffers
-		OnProgress(glen + std::string(" using 512 byte buffers with sequential clear "));
+		// sequential clear: 512 uint8_t buffers
+		OnProgress(glen + std::string(" using 512 uint8_t buffers with sequential clear "));
 		buffer1.resize(B512, 0xFF);
 		start = TestUtils::GetTimeMs64();
 
@@ -166,7 +166,7 @@ namespace Test
 
 		// highest available simd clear
 		glen = "SpeedTest: CLEAR " + TESTSIZE;
-		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized clear "));
+		OnProgress(glen + std::string(" using 512 uint8_t buffers with SIMD vectorized clear "));
 		buffer2.resize(B512, 0xFF);
 		start = TestUtils::GetTimeMs64();
 
@@ -186,8 +186,8 @@ namespace Test
 
 	void SimdSpeedTest::ClearVectorSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(0);
-		std::vector<byte> buffer2(0);
+		std::vector<uint8_t> buffer1(0);
+		std::vector<uint8_t> buffer2(0);
 		uint64_t blkCtr = 0;
 		std::string glen = "";
 		uint64_t start = 0;
@@ -197,17 +197,17 @@ namespace Test
 		// Vector Aligned Clear
 #if defined(__AVX512__)
 
-		// sequential memset: 64 byte buffers
+		// sequential memset: 64 uint8_t buffers
 		glen = "SpeedTest: VECTOR CLEAR " + TESTSIZE;
-		OnProgress(glen + std::string(" using 64 byte buffers with sequential clear "));
-		buffer1.resize(64, (byte)0xff);
+		OnProgress(glen + std::string(" using 64 uint8_t buffers with sequential clear "));
+		buffer1.resize(64, (uint8_t)0xff);
 		start = TestUtils::GetTimeMs64();
 
 		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
-				std::memset(&buffer1[0], (byte)0x0, buffer1.size());
+				std::memset(&buffer1[0], (uint8_t)0x0, buffer1.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -217,8 +217,8 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Cleared "));
 
 		// simd256 memset
-		OnProgress(glen + std::string(" using 64 byte buffers with AVX512 vectorized clear "));
-		buffer2.resize(64, (byte)0xff);
+		OnProgress(glen + std::string(" using 64 uint8_t buffers with AVX512 vectorized clear "));
+		buffer2.resize(64, (uint8_t)0xff);
 		start = TestUtils::GetTimeMs64();
 
 		for (i = 0; i < Loops; ++i)
@@ -234,9 +234,9 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Cleared "));
 
 #elif defined(__AVX2__)
-		// sequential clear: 32 byte buffers
+		// sequential clear: 32 uint8_t buffers
 		glen = "SpeedTest: VECTOR CLEAR " + TESTSIZE;
-		OnProgress(glen + std::string(" using 32 byte buffers with sequential clear "));
+		OnProgress(glen + std::string(" using 32 uint8_t buffers with sequential clear "));
 		buffer1.resize(32, 0xFF);
 		start = TestUtils::GetTimeMs64();
 
@@ -254,7 +254,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Cleared "));
 
 		// simd256 clear
-		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized clear "));
+		OnProgress(glen + std::string(" using 32 uint8_t buffers with AVX2 vectorized clear "));
 		buffer2.resize(32, 0xFF);
 		start = TestUtils::GetTimeMs64();
 
@@ -273,16 +273,16 @@ namespace Test
 
 #elif defined(__AVX__)
 		glen = "SpeedTest: VECTOR CLEAR " + TESTSIZE;
-		// sequential memset: 16 byte buffers
-		OnProgress(glen + std::string(" using 16 byte buffers with sequential clear "));
-		buffer1.resize(16, (byte)0xff);
+		// sequential memset: 16 uint8_t buffers
+		OnProgress(glen + std::string(" using 16 uint8_t buffers with sequential clear "));
+		buffer1.resize(16, (uint8_t)0xff);
 		start = TestUtils::GetTimeMs64();
 
 		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
-				std::memset(&buffer1[0], (byte)0x0, buffer1.size());
+				std::memset(&buffer1[0], (uint8_t)0x0, buffer1.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -292,8 +292,8 @@ namespace Test
 
 		// simd128 clear
 		glen = "SpeedTest: simd128 clear " + TESTSIZE;
-		OnProgress(glen + std::string(" using 16 byte buffers with AVX vectorized clear "));
-		buffer2.resize(16, (byte)0xff);
+		OnProgress(glen + std::string(" using 16 uint8_t buffers with AVX vectorized clear "));
+		buffer2.resize(16, (uint8_t)0xff);
 		start = TestUtils::GetTimeMs64();
 
 		for (i = 0; i < Loops; ++i)
@@ -313,10 +313,10 @@ namespace Test
 
 	void SimdSpeedTest::CopyBlockSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(B512, 0xFF);
-		std::vector<byte> buffer2(B512);
-		std::vector<byte> buffer3(B512, 0xFF);
-		std::vector<byte> buffer4(B512);
+		std::vector<uint8_t> buffer1(B512, 0xFF);
+		std::vector<uint8_t> buffer2(B512);
+		std::vector<uint8_t> buffer3(B512, 0xFF);
+		std::vector<uint8_t> buffer4(B512);
 		uint64_t blkCtr = 0;
 		std::string glen = "SpeedTest: BLOCK COPY " + TESTSIZE;
 		uint64_t start = 0;
@@ -326,8 +326,8 @@ namespace Test
 		// Large Block Copy
 #if defined(CEX_AVX_INTRINSICS)
 
-		// sequential copy: 1KB byte buffers
-		OnProgress(glen + std::string(" using 512 byte buffers with sequential memcpy: "));
+		// sequential copy: 1KB uint8_t buffers
+		OnProgress(glen + std::string(" using 512 uint8_t buffers with sequential memcpy: "));
 		start = TestUtils::GetTimeMs64();
 
 		for (i = 0; i < Loops; ++i)
@@ -344,7 +344,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 		// highest available simd copy
-		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized memcpy "));
+		OnProgress(glen + std::string(" using 512 uint8_t buffers with SIMD vectorized memcpy "));
 		start = TestUtils::GetTimeMs64();
 
 		for (i = 0; i < Loops; ++i)
@@ -364,10 +364,10 @@ namespace Test
 
 	void SimdSpeedTest::CopyVectorSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(0);
-		std::vector<byte> buffer2(0);
-		std::vector<byte> buffer3(0);
-		std::vector<byte> buffer4(0);
+		std::vector<uint8_t> buffer1(0);
+		std::vector<uint8_t> buffer2(0);
+		std::vector<uint8_t> buffer3(0);
+		std::vector<uint8_t> buffer4(0);
 		uint64_t blkCtr = 0;
 		std::string glen = "SpeedTest: VECTOR COPY " + TESTSIZE;
 		uint64_t start = 0;
@@ -376,9 +376,9 @@ namespace Test
 
 		// Vector Aligned Copy
 #if defined(__AVX512__)
-		OnProgress(glen + std::string(" using 64 byte buffers with sequential copy "));
-		// sequential copy: 64 byte buffers
-		buffer1.resize(64, (byte)0xff);
+		OnProgress(glen + std::string(" using 64 uint8_t buffers with sequential copy "));
+		// sequential copy: 64 uint8_t buffers
+		buffer1.resize(64, (uint8_t)0xff);
 		buffer2.resize(64);
 		start = TestUtils::GetTimeMs64();
 
@@ -396,8 +396,8 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 		// simd512 memcpy
-		OnProgress(glen + std::string(" using 64 byte buffers with AVX512 vectorized copy "));
-		buffer3.resize(64, (byte)0xff);
+		OnProgress(glen + std::string(" using 64 uint8_t buffers with AVX512 vectorized copy "));
+		buffer3.resize(64, (uint8_t)0xff);
 		buffer4.resize(64);
 		start = TestUtils::GetTimeMs64();
 
@@ -415,8 +415,8 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 #elif defined(__AVX2__)
-		OnProgress(glen + std::string(" using 32 byte buffers with sequential copy "));
-		// sequential copy: 32 byte buffers
+		OnProgress(glen + std::string(" using 32 uint8_t buffers with sequential copy "));
+		// sequential copy: 32 uint8_t buffers
 		buffer1.resize(32, 0xFF);
 		buffer2.resize(32);
 		start = TestUtils::GetTimeMs64();
@@ -435,7 +435,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 		// simd256 memcpy
-		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized memcpy "));
+		OnProgress(glen + std::string(" using 32 uint8_t buffers with AVX2 vectorized memcpy "));
 		buffer3.resize(32, 0xFF);
 		buffer4.resize(32);
 		start = TestUtils::GetTimeMs64();
@@ -454,9 +454,9 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 #elif defined(__AVX__)
-		OnProgress(glen + std::string(" using 16 byte buffers with sequential memcpy: "));
-		// sequential copy: 16 byte buffers
-		buffer1.resize(16, (byte)0xff);
+		OnProgress(glen + std::string(" using 16 uint8_t buffers with sequential memcpy: "));
+		// sequential copy: 16 uint8_t buffers
+		buffer1.resize(16, (uint8_t)0xff);
 		buffer2.resize(16);
 		start = TestUtils::GetTimeMs64();
 
@@ -474,9 +474,9 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 		// simd128
-		OnProgress(glen + std::string(" using 16 byte buffers with AVX vectorized memcpy "));
+		OnProgress(glen + std::string(" using 16 uint8_t buffers with AVX vectorized memcpy "));
 		blkCtr = 0;
-		buffer3.resize(16, (byte)0xff);
+		buffer3.resize(16, (uint8_t)0xff);
 		buffer4.resize(16);
 		start = TestUtils::GetTimeMs64();
 
@@ -500,9 +500,9 @@ namespace Test
 		const size_t TSTCYCS = Loops;
 		const size_t TSTCYCL = TSTCYCS / 4;
 		size_t i;
-		uint A1 = 11111111;
-		uint B1 = 22222222;
-		uint C1 = 0;
+		uint32_t A1 = 11111111;
+		uint32_t B1 = 22222222;
+		uint32_t C1 = 0;
 
 		OnProgress(std::string("***Multiplication***"));
 		Tools::TimeStamp ts;
@@ -824,9 +824,9 @@ namespace Test
 		const size_t TSTCYCS = Loops;
 		const size_t TSTCYCL = TSTCYCS / 4;
 
-		ulong A1 = 11111111;
-		ulong B1 = 22222222;
-		ulong C1 = 0;
+		uint64_t A1 = 11111111;
+		uint64_t B1 = 22222222;
+		uint64_t C1 = 0;
 		size_t i;
 
 		OnProgress(std::string("***Multiplication***"));
@@ -1150,8 +1150,8 @@ namespace Test
 
 	void SimdSpeedTest::SetBlockSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(0);
-		std::vector<byte> buffer2(0);
+		std::vector<uint8_t> buffer1(0);
+		std::vector<uint8_t> buffer2(0);
 		uint64_t blkCtr = 0;
 		std::string glen = "SpeedTest: BLOCK SET " + TESTSIZE;
 		uint64_t start = 0;
@@ -1159,8 +1159,8 @@ namespace Test
 
 		// Large Block Memset
 #if defined(__AVX__)
-		OnProgress(glen + std::string(" using 512 byte buffers with sequential memset "));
-		// sequential memset: 512 byte buffers
+		OnProgress(glen + std::string(" using 512 uint8_t buffers with sequential memset "));
+		// sequential memset: 512 uint8_t buffers
 		buffer1.resize(B512);
 		start = TestUtils::GetTimeMs64();
 
@@ -1178,7 +1178,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Set "));
 
 		// highest available simd memset
-		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized memset "));
+		OnProgress(glen + std::string(" using 512 uint8_t buffers with SIMD vectorized memset "));
 		buffer2.resize(B512);
 		start = TestUtils::GetTimeMs64();
 
@@ -1199,8 +1199,8 @@ namespace Test
 
 	void SimdSpeedTest::SetVectorSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(0);
-		std::vector<byte> buffer2(0);
+		std::vector<uint8_t> buffer1(0);
+		std::vector<uint8_t> buffer2(0);
 		uint64_t blkCtr = 0;
 		std::string glen = "SpeedTest: VECTOR SET " + TESTSIZE;
 		uint64_t start = 0;
@@ -1208,8 +1208,8 @@ namespace Test
 
 		// Vector Aligned Memset
 #if defined(__AVX512__)
-		// sequential memset: 64 byte buffers
-		OnProgress(glen + std::string(" using 64 byte buffers with sequential memset "));
+		// sequential memset: 64 uint8_t buffers
+		OnProgress(glen + std::string(" using 64 uint8_t buffers with sequential memset "));
 		buffer1.resize(64);
 		start = TestUtils::GetTimeMs64();
 
@@ -1217,7 +1217,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				std::memset(&buffer1[0], (byte)0xff, buffer1.size());
+				std::memset(&buffer1[0], (uint8_t)0xff, buffer1.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -1227,7 +1227,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Set "));
 
 		// simd512 memset
-		OnProgress(glen + std::string(" using 64 byte buffers with AVX512 vectorized memset "));
+		OnProgress(glen + std::string(" using 64 uint8_t buffers with AVX512 vectorized memset "));
 		buffer2.resize(64);
 		start = TestUtils::GetTimeMs64();
 
@@ -1235,7 +1235,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				MemoryTools::SETVAL512(buffer2, 0, (byte)0xff);
+				MemoryTools::SETVAL512(buffer2, 0, (uint8_t)0xff);
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -1245,8 +1245,8 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Set "));
 
 #elif defined(__AVX2__)
-		// sequential memset: 32 byte buffers
-		OnProgress(glen + std::string(" using 32 byte buffers with sequential memset "));
+		// sequential memset: 32 uint8_t buffers
+		OnProgress(glen + std::string(" using 32 uint8_t buffers with sequential memset "));
 		buffer1.resize(32);
 		start = TestUtils::GetTimeMs64();
 
@@ -1264,7 +1264,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Set "));
 
 		// simd256 memset
-		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized memset "));
+		OnProgress(glen + std::string(" using 32 uint8_t buffers with AVX2 vectorized memset "));
 		buffer2.resize(32);
 		start = TestUtils::GetTimeMs64();
 
@@ -1282,8 +1282,8 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Set "));
 
 #elif defined(__AVX__)
-		// sequential memset: 16 byte buffers
-		OnProgress(glen + std::string(" using 16 byte buffers with sequential memset "));
+		// sequential memset: 16 uint8_t buffers
+		OnProgress(glen + std::string(" using 16 uint8_t buffers with sequential memset "));
 		buffer1.resize(16);
 		start = TestUtils::GetTimeMs64();
 
@@ -1291,7 +1291,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				std::memset(&buffer1[0], (byte)0xff, buffer1.size());
+				std::memset(&buffer1[0], (uint8_t)0xff, buffer1.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -1301,7 +1301,7 @@ namespace Test
 
 		// simd128 memset
 		glen = "SpeedTest: memset " + TESTSIZE;
-		OnProgress(glen + std::string(" using 16 byte buffers with AVX vectorized memset "));
+		OnProgress(glen + std::string(" using 16 uint8_t buffers with AVX vectorized memset "));
 		buffer2.resize(16);
 		start = TestUtils::GetTimeMs64();
 
@@ -1309,7 +1309,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				MemoryTools::SETVAL128(buffer2, 0, (byte)0xff);
+				MemoryTools::SETVAL128(buffer2, 0, (uint8_t)0xff);
 				blkCtr += buffer2.size();
 			}
 			blkCtr = 0;
@@ -1322,10 +1322,10 @@ namespace Test
 
 	void SimdSpeedTest::XorBlockSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(0);
-		std::vector<byte> buffer2(0);
-		std::vector<byte> buffer3(0);
-		std::vector<byte> buffer4(0);
+		std::vector<uint8_t> buffer1(0);
+		std::vector<uint8_t> buffer2(0);
+		std::vector<uint8_t> buffer3(0);
+		std::vector<uint8_t> buffer4(0);
 		uint64_t blkCtr = 0;
 		std::string glen = "SpeedTest: BLOCK XOR " + TESTSIZE;
 		uint64_t start = 0;
@@ -1333,8 +1333,8 @@ namespace Test
 
 		// Large Block XOR
 #if defined(__AVX__)
-		// sequential memset: 512 byte buffers
-		OnProgress(glen + std::string(" using 512 byte buffers with sequential XOR "));
+		// sequential memset: 512 uint8_t buffers
+		OnProgress(glen + std::string(" using 512 uint8_t buffers with sequential XOR "));
 		buffer1.resize(B512, 0x07);
 		buffer2.resize(B512, 0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1356,7 +1356,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 		// highest available simd xor
-		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized XOR "));
+		OnProgress(glen + std::string(" using 512 uint8_t buffers with SIMD vectorized XOR "));
 		buffer3.resize(B512, 0x07);
 		buffer4.resize(B512, 0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1378,10 +1378,10 @@ namespace Test
 
 	void SimdSpeedTest::XorVectorSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(0);
-		std::vector<byte> buffer2(0);
-		std::vector<byte> buffer3(0);
-		std::vector<byte> buffer4(0);
+		std::vector<uint8_t> buffer1(0);
+		std::vector<uint8_t> buffer2(0);
+		std::vector<uint8_t> buffer3(0);
+		std::vector<uint8_t> buffer4(0);
 		uint64_t blkCtr = 0;
 		std::string glen = "SpeedTest: VECTOR XOR " + TESTSIZE;
 		uint64_t start = 0;
@@ -1390,10 +1390,10 @@ namespace Test
 		// Vector Aligned XOR
 #if defined(__AVX512__)
 
-		// sequential xor: 64 byte buffers
-		OnProgress(glen + std::string(" using 64 byte buffers with sequential XOR "));
-		buffer1.resize(64, (byte)0x7);
-		buffer2.resize(64, (byte)0x11);
+		// sequential xor: 64 uint8_t buffers
+		OnProgress(glen + std::string(" using 64 uint8_t buffers with sequential XOR "));
+		buffer1.resize(64, (uint8_t)0x7);
+		buffer2.resize(64, (uint8_t)0x11);
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -1413,9 +1413,9 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 		// simd256 xor
-		OnProgress(glen + std::string(" using 64 byte buffers with AVX512 vectorized XOR "));
-		buffer3.resize(64, (byte)0x7);
-		buffer4.resize(64, (byte)0x11);
+		OnProgress(glen + std::string(" using 64 uint8_t buffers with AVX512 vectorized XOR "));
+		buffer3.resize(64, (uint8_t)0x7);
+		buffer4.resize(64, (uint8_t)0x11);
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -1432,8 +1432,8 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 #elif defined(__AVX2__)
-		// sequential xor: 32 byte buffers
-		OnProgress(glen + std::string(" using 32 byte buffers with sequential XOR "));
+		// sequential xor: 32 uint8_t buffers
+		OnProgress(glen + std::string(" using 32 uint8_t buffers with sequential XOR "));
 		buffer1.resize(32, 0x07);
 		buffer2.resize(32, 0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1454,7 +1454,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 		// simd256 xor
-		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized XOR "));
+		OnProgress(glen + std::string(" using 32 uint8_t buffers with AVX2 vectorized XOR "));
 		buffer3.resize(32, 0x07);
 		buffer4.resize(32, 0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1472,10 +1472,10 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 #elif defined(__AVX__)
-		// sequential memset: 16 byte buffers
-		OnProgress(glen + std::string(" using 16 byte buffers with sequential XOR "));
-		buffer1.resize(16, (byte)0x7);
-		buffer2.resize(16, (byte)0x11);
+		// sequential memset: 16 uint8_t buffers
+		OnProgress(glen + std::string(" using 16 uint8_t buffers with sequential XOR "));
+		buffer1.resize(16, (uint8_t)0x7);
+		buffer2.resize(16, (uint8_t)0x11);
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -1495,10 +1495,10 @@ namespace Test
 		dur = TestUtils::GetTimeMs64() - start;
 		PostPerfResult(dur, Length, std::string("XOR "));
 
-		// simd128 memset: 16 byte buffers
-		OnProgress(glen + std::string(" using 16 byte buffers with AVX vectorized XOR "));
-		buffer3.resize(16, (byte)0x7);
-		buffer4.resize(16, (byte)0x11);
+		// simd128 memset: 16 uint8_t buffers
+		OnProgress(glen + std::string(" using 16 uint8_t buffers with AVX vectorized XOR "));
+		buffer3.resize(16, (uint8_t)0x7);
+		buffer4.resize(16, (uint8_t)0x11);
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)

@@ -103,11 +103,6 @@ IMac* MacFromName::GetInstance(Macs MacType)
 				mptr = new KMAC(KmacModes::KMAC512);
 				break;
 			}
-			case Macs::KMAC1024:
-			{
-				mptr = new KMAC(KmacModes::KMAC1024);
-				break;
-			}
 			case Macs::KPA128:
 			{
 				mptr = new KPA(KpaModes::KPA128);
@@ -177,11 +172,6 @@ IMac* MacFromName::GetInstance(StreamAuthenticators AuthenticatorType)
 			case StreamAuthenticators::KMAC512:
 			{
 				mptr = new KMAC(KmacModes::KMAC512);
-				break;
-			}
-			case StreamAuthenticators::KMAC1024:
-			{
-				mptr = new KMAC(KmacModes::KMAC1024);
 				break;
 			}
 			case StreamAuthenticators::Poly1305:

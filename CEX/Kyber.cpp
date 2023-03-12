@@ -1,11 +1,11 @@
 #include "Kyber.h"
 #include "IntegerTools.h"
 #include "Keccak.h"
-#include "MLWEQ3329N256.h"
+#include "KyberBase.h"
 #include "PrngFromName.h"
 #include "SymmetricKey.h"
 
-NAMESPACE_MODULELWE
+NAMESPACE_KYBER
 
 using Enumeration::AsymmetricPrimitiveConvert;
 using Enumeration::ErrorCodes;
@@ -13,17 +13,17 @@ using Tools::IntegerTools;
 using Digest::Keccak;
 using Enumeration::KyberParameterConvert;
 
-class Kyber::MlweState
+class Kyber::KyberState
 {
 public:
 
-	std::vector<byte> DomainKey;
+	std::vector<uint8_t> DomainKey;
 	bool Destroyed;
 	bool Encryption;
 	bool Initialized;
 	KyberParameters Parameters;
 
-	MlweState(KyberParameters Params, bool Destroy)
+	KyberState(KyberParameters Params, bool Destroy)
 		:
 		DomainKey(0),
 		Destroyed(Destroy),
@@ -33,7 +33,7 @@ public:
 	{
 	}
 
-	~MlweState()
+	~KyberState()
 	{
 		IntegerTools::Clear(DomainKey);
 		Destroyed = false;
@@ -47,9 +47,9 @@ public:
 
 Kyber::Kyber(KyberParameters Parameters, Prngs PrngType)
 	:
-	m_mlweState(new MlweState(Parameters == KyberParameters::MLWES1Q3329N256 || 
-		Parameters == KyberParameters::MLWES2Q3329N256 || 
-		Parameters == KyberParameters::MLWES3Q3329N256 ? 
+	m_kyberState(new KyberState(Parameters == KyberParameters::KYBERS32400 || 
+		Parameters == KyberParameters::KYBERS53168 || 
+		Parameters == KyberParameters::KYBERS63936 ? 
 			Parameters :
 			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
@@ -62,9 +62,9 @@ Kyber::Kyber(KyberParameters Parameters, Prngs PrngType)
 
 Kyber::Kyber(KyberParameters Parameters, IPrng* Prng)
 	:
-	m_mlweState(new MlweState(Parameters == KyberParameters::MLWES1Q3329N256 ||
-		Parameters == KyberParameters::MLWES2Q3329N256 ||
-		Parameters == KyberParameters::MLWES3Q3329N256 ? 
+	m_kyberState(new KyberState(Parameters == KyberParameters::KYBERS32400 ||
+		Parameters == KyberParameters::KYBERS53168 ||
+		Parameters == KyberParameters::KYBERS63936 ? 
 			Parameters :
 			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
@@ -80,7 +80,7 @@ Kyber::~Kyber()
 	m_privateKey = nullptr;
 	m_publicKey = nullptr;
 
-	if (m_mlweState->Destroyed)
+	if (m_kyberState->Destroyed)
 	{
 		if (m_rndGenerator != nullptr)
 		{
@@ -104,21 +104,21 @@ const size_t Kyber::CipherTextSize()
 {
 	size_t clen;
 
-	switch (m_mlweState->Parameters)
+	switch (m_kyberState->Parameters)
 	{
-		case (KyberParameters::MLWES1Q3329N256):
+		case (KyberParameters::KYBERS32400):
 		{
-			clen = MLWEQ3329N256::CIPHERTEXTK2_SIZE;
+			clen = KyberBase::CIPHERTEXT_SIZE_K2400;
 			break;
 		}
-		case (KyberParameters::MLWES2Q3329N256):
+		case (KyberParameters::KYBERS53168):
 		{
-			clen = MLWEQ3329N256::CIPHERTEXTK3_SIZE;
+			clen = KyberBase::CIPHERTEXT_SIZE_K3168;
 			break;
 		}
-		case (KyberParameters::MLWES3Q3329N256):
+		case (KyberParameters::KYBERS63936):
 		{
-			clen = MLWEQ3329N256::CIPHERTEXTK4_SIZE;
+			clen = KyberBase::CIPHERTEXT_SIZE_K3936;
 			break;
 		}
 		default:
@@ -131,9 +131,9 @@ const size_t Kyber::CipherTextSize()
 	return clen;
 }
 
-std::vector<byte> &Kyber::DomainKey()
+std::vector<uint8_t> &Kyber::DomainKey()
 {
-	return m_mlweState->DomainKey;
+	return m_kyberState->DomainKey;
 }
 
 const AsymmetricPrimitives Kyber::Enumeral()
@@ -143,12 +143,12 @@ const AsymmetricPrimitives Kyber::Enumeral()
 
 const bool Kyber::IsEncryption()
 {
-	return m_mlweState->Encryption;
+	return m_kyberState->Encryption;
 }
 
 const bool Kyber::IsInitialized()
 {
-	return m_mlweState->Initialized;
+	return m_kyberState->Initialized;
 }
 
 const std::string Kyber::Name()
@@ -157,35 +157,35 @@ const std::string Kyber::Name()
 
 	ret = AsymmetricPrimitiveConvert::ToName(Enumeral()) +
 		std::string("-") +
-		KyberParameterConvert::ToName(m_mlweState->Parameters);
+		KyberParameterConvert::ToName(m_kyberState->Parameters);
 
 	return ret;
 }
 
 const KyberParameters Kyber::Parameters()
 {
-	return m_mlweState->Parameters;
+	return m_kyberState->Parameters;
 }
 
 const size_t Kyber::PrivateKeySize()
 {
 	size_t klen;
 
-	switch (m_mlweState->Parameters)
+	switch (m_kyberState->Parameters)
 	{
-		case (KyberParameters::MLWES1Q3329N256):
+		case (KyberParameters::KYBERS32400):
 		{
-			klen = MLWEQ3329N256::PRIVATEKEYK2_SIZE;
+			klen = KyberBase::PRIVATEKEY_SIZE_K2400;
 			break;
 		}
-		case (KyberParameters::MLWES2Q3329N256):
+		case (KyberParameters::KYBERS53168):
 		{
-			klen = MLWEQ3329N256::PRIVATEKEYK3_SIZE;
+			klen = KyberBase::PRIVATEKEY_SIZE_K3168;
 			break;
 		}
-		case (KyberParameters::MLWES3Q3329N256):
+		case (KyberParameters::KYBERS63936):
 		{
-			klen = MLWEQ3329N256::PRIVATEKEYK4_SIZE;
+			klen = KyberBase::CIPHERTEXT_SIZE_K3936;
 			break;
 		}
 		default:
@@ -202,21 +202,21 @@ const size_t Kyber::PublicKeySize()
 {
 	size_t klen;
 
-	switch (m_mlweState->Parameters)
+	switch (m_kyberState->Parameters)
 	{
-		case (KyberParameters::MLWES1Q3329N256):
+		case (KyberParameters::KYBERS32400):
 		{
-			klen = MLWEQ3329N256::PUBLICKEYK2_SIZE;
+			klen = KyberBase::PUBLICKEY_SIZE_K2400;
 			break;
 		}
-		case (KyberParameters::MLWES2Q3329N256):
+		case (KyberParameters::KYBERS53168):
 		{
-			klen = MLWEQ3329N256::PUBLICKEYK3_SIZE;
+			klen = KyberBase::PUBLICKEY_SIZE_K3168;
 			break;
 		}
-		case (KyberParameters::MLWES3Q3329N256):
+		case (KyberParameters::KYBERS63936):
 		{
-			klen = MLWEQ3329N256::PUBLICKEYK4_SIZE;
+			klen = KyberBase::PUBLICKEY_SIZE_K3936;
 			break;
 		}
 		default:
@@ -236,18 +236,43 @@ const size_t Kyber::SharedSecretSize()
 
 //~~~Public Functions~~~//
 
-bool Kyber::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+bool Kyber::Decapsulate(const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret)
 {
-	std::vector<byte> sec(SECRET_SIZE, 0x00);
+	std::vector<uint8_t> sec(SECRET_SIZE, 0x00);
+	uint32_t k;
 	bool res;
 
-	res = MLWEQ3329N256::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
+	switch (m_kyberState->Parameters)
+	{
+		case KyberParameters::KYBERS32400:
+		{
+			k = 3;
+			break;
+		}
+		case KyberParameters::KYBERS53168:
+		{
+			k = 4;
+			break;
+		}
+		case KyberParameters::KYBERS63936:
+		{
+			k = 5;
+			break;
+		}
+		default:
+		{
+			// invalid parameter
+			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	res = KyberBase::Decapsulate(m_privateKey->Polynomial(), CipherText, sec, k);
 
 	if (res == true)
 	{
-		if (m_mlweState->DomainKey.size() != 0)
+		if (m_kyberState->DomainKey.size() != 0)
 		{
-			CXOF(m_mlweState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
+			CXOF(m_kyberState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
 		}
 		else
 		{
@@ -259,28 +284,32 @@ bool Kyber::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &
 	return res;
 }
 
-void Kyber::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+void Kyber::Encapsulate(std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret)
 {
-	CEXASSERT(m_mlweState->Initialized, "The cipher has not been initialized");
+	CEXASSERT(m_kyberState->Initialized, "The cipher has not been initialized");
 	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
-	std::vector<byte> sec(SECRET_SIZE);
+	std::vector<uint8_t> sec(SECRET_SIZE);
+	uint32_t k;
 
-	switch (m_mlweState->Parameters)
+	switch (m_kyberState->Parameters)
 	{
-		case KyberParameters::MLWES1Q3329N256:
+		case KyberParameters::KYBERS32400:
 		{
-			CipherText.resize(MLWEQ3329N256::CIPHERTEXTK2_SIZE);
+			CipherText.resize(KyberBase::CIPHERTEXT_SIZE_K2400);
+			k = 3;
 			break;
 		}
-		case KyberParameters::MLWES2Q3329N256:
+		case KyberParameters::KYBERS53168:
 		{
-			CipherText.resize(MLWEQ3329N256::CIPHERTEXTK3_SIZE);
+			CipherText.resize(KyberBase::CIPHERTEXT_SIZE_K3168);
+			k = 4;
 			break;
 		}
-		case KyberParameters::MLWES3Q3329N256:
+		case KyberParameters::KYBERS63936:
 		{
-			CipherText.resize(MLWEQ3329N256::CIPHERTEXTK4_SIZE);
+			CipherText.resize(KyberBase::CIPHERTEXT_SIZE_K3936);
+			k = 5;
 			break;
 		}
 		default:
@@ -290,11 +319,11 @@ void Kyber::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shared
 		}
 	}
 
-	MLWEQ3329N256::Encapsulate(sec, CipherText, m_publicKey->Polynomial(), m_rndGenerator);
+	KyberBase::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator, k);
 
-	if (m_mlweState->DomainKey.size() != 0)
+	if (m_kyberState->DomainKey.size() != 0)
 	{
-		CXOF(m_mlweState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
+		CXOF(m_kyberState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
 	}
 	else
 	{
@@ -305,27 +334,31 @@ void Kyber::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shared
 
 AsymmetricKeyPair* Kyber::Generate()
 {
-	std::vector<byte> pk(0);
-	std::vector<byte> sk(0);
+	std::vector<uint8_t> pk(0);
+	std::vector<uint8_t> sk(0);
+	uint32_t k;
 
-	switch (m_mlweState->Parameters)
+	switch (m_kyberState->Parameters)
 	{
-		case KyberParameters::MLWES1Q3329N256:
+		case KyberParameters::KYBERS32400:
 		{
-			pk.resize(MLWEQ3329N256::PUBLICKEYK2_SIZE);
-			sk.resize(MLWEQ3329N256::PRIVATEKEYK2_SIZE);
+			pk.resize(KyberBase::PUBLICKEY_SIZE_K2400);
+			sk.resize(KyberBase::PRIVATEKEY_SIZE_K2400);
+			k = 3;
 			break;
 		}
-		case KyberParameters::MLWES2Q3329N256:
+		case KyberParameters::KYBERS53168:
 		{
-			pk.resize(MLWEQ3329N256::PUBLICKEYK3_SIZE);
-			sk.resize(MLWEQ3329N256::PRIVATEKEYK3_SIZE);
+			pk.resize(KyberBase::PUBLICKEY_SIZE_K3168);
+			sk.resize(KyberBase::PRIVATEKEY_SIZE_K3168);
+			k = 4;
 			break;
 		}
-		case KyberParameters::MLWES3Q3329N256:
+		case KyberParameters::KYBERS63936:
 		{
-			pk.resize(MLWEQ3329N256::PUBLICKEYK4_SIZE);
-			sk.resize(MLWEQ3329N256::PRIVATEKEYK4_SIZE);
+			pk.resize(KyberBase::PUBLICKEY_SIZE_K3936);
+			sk.resize(KyberBase::PRIVATEKEY_SIZE_K3936);
+			k = 5;
 			break;
 		}
 		default:
@@ -335,10 +368,10 @@ AsymmetricKeyPair* Kyber::Generate()
 		}
 	}
 
-	MLWEQ3329N256::Generate(pk, sk, m_rndGenerator);
+	KyberBase::Generate(pk, sk, m_rndGenerator, k);
 
-	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(m_mlweState->Parameters));
-	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricParameters>(m_mlweState->Parameters));
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(m_kyberState->Parameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricParameters>(m_kyberState->Parameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
@@ -357,23 +390,23 @@ void Kyber::Initialize(AsymmetricKey* Key)
 	if (Key->KeyClass() == AsymmetricKeyTypes::CipherPublicKey)
 	{
 		m_publicKey = Key;
-		m_mlweState->Parameters = static_cast<KyberParameters>(m_publicKey->Parameters());
-		m_mlweState->Encryption = true;
+		m_kyberState->Parameters = static_cast<KyberParameters>(m_publicKey->Parameters());
+		m_kyberState->Encryption = true;
 	}
 	else
 	{
 		m_privateKey = Key;
-		m_mlweState->Parameters = static_cast<KyberParameters>(m_privateKey->Parameters());
-		m_mlweState->Encryption = false;
+		m_kyberState->Parameters = static_cast<KyberParameters>(m_privateKey->Parameters());
+		m_kyberState->Encryption = false;
 	}
  
-	m_mlweState->Initialized = true;
+	m_kyberState->Initialized = true;
 }
 
-void Kyber::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
+void Kyber::CXOF(const std::vector<uint8_t> &Domain, const std::vector<uint8_t> &Key, std::vector<uint8_t> &Secret, size_t Rate)
 {
-	std::vector<byte> tmpn(Name().begin(), Name().end());
-	Keccak::CXOFR24P1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
+	std::vector<uint8_t> tmpn(Name().begin(), Name().end());
+	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
-NAMESPACE_MODULELWEEND
+NAMESPACE_KYBEREND

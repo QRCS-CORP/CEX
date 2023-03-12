@@ -14,12 +14,12 @@ class IAsyncResult
 public:
 
 	Socket Parent;
-	std::vector<byte> Data;
+	std::vector<uint8_t> Data;
 	std::string Address;
-	uint Flag;
-	uint Option;
+	uint32_t Flag;
+	uint32_t Option;
 
-	IAsyncResult(const Socket &Parent, uint Option)
+	IAsyncResult(const Socket &Parent, uint32_t Option)
 		:
 		Data(0),
 		Address(0),
@@ -29,7 +29,7 @@ public:
 	{
 	}
 
-	IAsyncResult(const Socket &Parent, uint Option, uint Flag)
+	IAsyncResult(const Socket &Parent, uint32_t Option, uint32_t Flag)
 		:
 		Data(0),
 		Address(0),
@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	IAsyncResult(const Socket &Parent, const std::vector<byte> Data, uint Option, uint Flag)
+	IAsyncResult(const Socket &Parent, const std::vector<uint8_t> Data, uint32_t Option, uint32_t Flag)
 		:
 		Data(Data),
 		Address(0),
@@ -49,7 +49,7 @@ public:
 	{
 	}
 
-	IAsyncResult(const Socket &Parent, const std::string &Address, uint Option)
+	IAsyncResult(const Socket &Parent, const std::string &Address, uint32_t Option)
 		:
 		Data(0),
 		Address(Address),

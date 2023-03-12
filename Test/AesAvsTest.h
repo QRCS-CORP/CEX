@@ -24,9 +24,7 @@ namespace Test
 		static const std::string KEY_TOKEN;
 		static const std::string PLAINTEXT_TOKEN;
 		static const std::string CIPHERTEXT_TOKEN;
-		static const bool HAS_AESNI;
 		TestEventHandler m_progressEvent;
-		bool m_aesniTest;
 
     public:
 
@@ -35,7 +33,7 @@ namespace Test
 		/// <summary>
 		/// NIST AESAVS known answer vector tests
 		/// </summary>
-		explicit AesAvsTest(bool TestAesNi = false);
+		explicit AesAvsTest();
 
 		/// <summary>
 		/// Destructor
@@ -67,7 +65,6 @@ namespace Test
 		void EbcKat(IBlockCipher* Cipher, const std::string &FilePath);
 		void EcbMct(IBlockCipher* Cipher, const std::string &FilePath);
 		void EcbMmt(IBlockCipher* Cipher, const std::string &FilePath);
-		static bool HasAESNI();
 		void OnProgress(const std::string &Data);
     };
 }

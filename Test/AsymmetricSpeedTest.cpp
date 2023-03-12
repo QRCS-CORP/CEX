@@ -52,69 +52,39 @@ namespace Test
 			OnProgress(std::string("### Asymmetric Cipher Speed Tests:"));
 			OnProgress(std::string(""));
 
-			// NewHope
-			OnProgress(std::string("***NewHope Generating " + TSTITRF + " Keypairs using parameter RLWES1Q12289N1024***"));
-			CipherGenerateLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024, TEST_ITERATIONSF);
-
-			OnProgress(std::string("***NewHope Encrypting " + TSTITRF + " messages using parameter RLWES1Q12289N1024***"));
-			CipherEncryptLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024, TEST_ITERATIONSF);
-
-			OnProgress(std::string("***NewHope Decrypting " + TSTITRF + " messages using parameter RLWES1Q12289N1024***"));
-			CipherDecryptLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024, TEST_ITERATIONSF);
-
 			// Kyber
-			OnProgress(std::string("***Kyber Generating " + TSTITRF + " Keypairs using parameter MLWES2Q3329N256***"));
-			CipherGenerateLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256, TEST_ITERATIONSF);
+			OnProgress(std::string("***Kyber Generating " + TSTITRF + " Keypairs using parameter KYBERS53168***"));
+			CipherGenerateLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS53168, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Kyber Encrypting " + TSTITRF + " messages using parameter MLWES2Q3329N256***"));
-			CipherEncryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256, TEST_ITERATIONSF);
+			OnProgress(std::string("***Kyber Encrypting " + TSTITRF + " messages using parameter KYBERS53168***"));
+			CipherEncryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS53168, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Kyber Decrypting " + TSTITRF + " messages using parameter MLWES2Q3329N256***"));
-			CipherDecryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256, TEST_ITERATIONSF);
-
-			// NTRU-Prime
-			OnProgress(std::string("***NTRU-SPrime Generating " + TSTITRL +" Keypairs using parameter NTRUS2SQ4591N761***"));
-			CipherGenerateLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653, TEST_ITERATIONSF);
-
-			OnProgress(std::string("***NTRU-SPrime Encrypting " + TSTITRL + " messages using parameter NTRUS2SQ4591N761***"));
-			CipherEncryptLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653, TEST_ITERATIONSF);
-
-			OnProgress(std::string("***NTRU-SPrime Decrypting " + TSTITRL + " messages using parameter NTRUS2SQ4591N761***"));
-			CipherDecryptLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653, TEST_ITERATIONSF);
+			OnProgress(std::string("***Kyber Decrypting " + TSTITRF + " messages using parameter KYBERS53168***"));
+			CipherDecryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS53168, TEST_ITERATIONSF);
 
 			// McEliece
-			OnProgress(std::string("***McEliece Generating " + TSTITRL + " Keypairs using parameter MPKCS2N6960T119***"));
-			CipherGenerateLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS2N6960T119, TEST_ITERATIONSL);
+			OnProgress(std::string("***McEliece Generating " + TSTITRL + " Keypairs using parameter MPKCS3N4608T96***"));
+			CipherGenerateLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS3N4608T96, TEST_ITERATIONSL);
 
-			OnProgress(std::string("***McEliece Encrypting " + TSTITRL + " messages using parameter MPKCS2N6960T119***"));
-			CipherEncryptLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS2N6960T119, TEST_ITERATIONSL);
+			OnProgress(std::string("***McEliece Encrypting " + TSTITRL + " messages using parameter MPKCS3N4608T96***"));
+			CipherEncryptLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS3N4608T96, TEST_ITERATIONSL);
 
-			OnProgress(std::string("***McEliece Decrypting " + TSTITRL + " messages using parameter MPKCS2N6960T119***"));
-			CipherDecryptLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS2N6960T119, TEST_ITERATIONSL);
+			OnProgress(std::string("***McEliece Decrypting " + TSTITRL + " messages using parameter MPKCS3N4608T96***"));
+			CipherDecryptLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS3N4608T96, TEST_ITERATIONSL);
 
 			// Signature schemes //
 			OnProgress(std::string("### Asymmetric Signature Scheme Speed Tests:"));
 			OnProgress(std::string(""));
 
 			// Dilithium
-			OnProgress(std::string("***Dilithium Generating " + TSTITRL + " Keypairs using parameter DLTMS2N256Q8380417***"));
-			SignerGenerateLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417, TEST_ITERATIONSF);
+			OnProgress(std::string("***Dilithium Generating " + TSTITRL + " Keypairs using parameter DLTMS3P4016***"));
+			SignerGenerateLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS3P4016, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Dilithium Signing " + TSTITRL + " messages using parameter DLTMS2N256Q8380417***"));
-			SignerSignLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417, TEST_ITERATIONSF);
+			OnProgress(std::string("***Dilithium Signing " + TSTITRL + " messages using parameter DLTMS3P4016***"));
+			SignerSignLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS3P4016, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Dilithium Verifying " + TSTITRL + " messages using parameter DLTMS2N256Q8380417***"));
-			SignerVerifyLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417, TEST_ITERATIONSF);
-
-			// Rainbow
-			OnProgress(std::string("***Rainbow Generating " + TSTITRF + " Keypairs using parameter RNBWS1S128SHAKE256***"));
-			SignerGenerateLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256, TEST_ITERATIONSF);
-
-			OnProgress(std::string("***Rainbow Signing " + TSTITRF + " messages using parameter RNBWS1S128SHAKE256***"));
-			SignerSignLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256, TEST_ITERATIONSF);
-
-			OnProgress(std::string("***Rainbow Verifying " + TSTITRF + " messages using parameter RNBWS1S128SHAKE256***"));
-			SignerVerifyLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256, TEST_ITERATIONSF);
+			OnProgress(std::string("***Dilithium Verifying " + TSTITRL + " messages using parameter DLTMS3P4016***"));
+			SignerVerifyLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS3P4016, TEST_ITERATIONSF);
 
 			// SPHINCS+
 			OnProgress(std::string("***SPHINCS+ Generating " + TSTITRL + " Keypairs using parameter SPXPS1S128SHAKE***"));
@@ -152,9 +122,9 @@ namespace Test
 
 	void AsymmetricSpeedTest::CipherDecryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters, size_t Iterations)
 	{
-		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(32);
-		std::vector<byte> sec2(32);
+		std::vector<uint8_t> cpt(0);
+		std::vector<uint8_t> sec1(32);
+		std::vector<uint8_t> sec2(32);
 		AsymmetricKeyPair* kp;
 		IAsymmetricCipher* pcpr;
 		std::string nlen;
@@ -191,8 +161,8 @@ namespace Test
 
 	void AsymmetricSpeedTest::CipherEncryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters, size_t Iterations)
 	{
-		std::vector<byte> cpt(0);
-		std::vector<byte> sec(32);
+		std::vector<uint8_t> cpt(0);
+		std::vector<uint8_t> sec(32);
 		AsymmetricKeyPair* kp;
 		IAsymmetricCipher* pcpr;
 		std::string nlen;
@@ -290,8 +260,8 @@ namespace Test
 
 	void AsymmetricSpeedTest::SignerSignLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters, size_t Iterations)
 	{
-		std::vector<byte> msg(32);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg(32);
+		std::vector<uint8_t> sig(0);
 		IAsymmetricSigner* psnr;
 		AsymmetricKeyPair* kp;
 		std::string nlen;
@@ -326,9 +296,9 @@ namespace Test
 
 	void AsymmetricSpeedTest::SignerVerifyLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters, size_t Iterations)
 	{
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 		IAsymmetricSigner* psnr;
 		AsymmetricKeyPair* kp;
 		std::string nlen;

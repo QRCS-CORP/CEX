@@ -12,17 +12,16 @@ class HKDF::HkdfState
 {
 public:
 
-	std::vector<byte> Info;
-	std::vector<byte> State;
+	std::vector<uint8_t> Info;
+	std::vector<uint8_t> State;
 	bool IsDestroyed;
-	bool IsInitialized;
+	bool IsInitialized = false;
 
 	HkdfState(size_t StateSize, size_t InfoSize, bool Destroyed)
 		:
 		Info(InfoSize),
 		State(StateSize),
-		IsDestroyed(Destroyed),
-		IsInitialized(false)
+		IsDestroyed(Destroyed)
 	{
 	}
 
@@ -61,7 +60,7 @@ HKDF::HKDF(SHA2Digests DigestType)
 			std::vector<SymmetricKeySize>(0))),
 	m_hkdfGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
 		throw CryptoKdfException(std::string("HKDF"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
-	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(byte), 0, true))
+	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(uint8_t), 0, true))
 {
 }
 
@@ -84,7 +83,7 @@ HKDF::HKDF(IDigest* Digest)
 			std::vector<SymmetricKeySize>(0))),
 	m_hkdfGenerator((Digest != nullptr && (Digest->Enumeral() == Digests::SHA2256 || Digest->Enumeral() == Digests::SHA2512)) ? new HMAC(Digest) :
 		throw CryptoKdfException(std::string("HKDF"), std::string("Constructor"), std::string("The digest instance is not supported!"), ErrorCodes::IllegalOperation)),
-	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(byte), 0, false))
+	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(uint8_t), 0, false))
 {
 }
 
@@ -110,7 +109,7 @@ HKDF::~HKDF()
 
 //~~~Accessors~~~//
 
-std::vector<byte> &HKDF::Info() 
+std::vector<uint8_t> &HKDF::Info() 
 { 
 	return m_hkdfState->Info;
 }
@@ -122,7 +121,7 @@ const bool HKDF::IsInitialized()
 
 //~~~Public Functions~~~//
 
-void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output)
+void HKDF::Extract(const std::vector<uint8_t> &Key, const std::vector<uint8_t> &Salt, std::vector<uint8_t> &Output)
 {
 	if (Salt.size() != 0)
 	{
@@ -131,7 +130,7 @@ void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, 
 	}
 	else
 	{
-		SymmetricKey kps(std::vector<byte>(m_hkdfGenerator->TagSize(), 0));
+		SymmetricKey kps(std::vector<uint8_t>(m_hkdfGenerator->TagSize(), 0));
 		m_hkdfGenerator->Initialize(kps);
 	}
 
@@ -139,7 +138,7 @@ void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, 
 	m_hkdfGenerator->Finalize(Output, 0);
 }
 
-void HKDF::Extract(const SecureVector<byte> &Key, const SecureVector<byte> &Salt, SecureVector<byte> &Output)
+void HKDF::Extract(const SecureVector<uint8_t> &Key, const SecureVector<uint8_t> &Salt, SecureVector<uint8_t> &Output)
 {
 	if (Salt.size() != 0)
 	{
@@ -148,7 +147,7 @@ void HKDF::Extract(const SecureVector<byte> &Key, const SecureVector<byte> &Salt
 	}
 	else
 	{
-		SymmetricKey kps(std::vector<byte>(m_hkdfGenerator->TagSize(), 0));
+		SymmetricKey kps(std::vector<uint8_t>(m_hkdfGenerator->TagSize(), 0));
 		m_hkdfGenerator->Initialize(kps);
 	}
 	
@@ -156,7 +155,7 @@ void HKDF::Extract(const SecureVector<byte> &Key, const SecureVector<byte> &Salt
 	m_hkdfGenerator->Finalize(Output, 0);
 }
 
-void HKDF::Generate(std::vector<byte> &Output)
+void HKDF::Generate(std::vector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -170,7 +169,7 @@ void HKDF::Generate(std::vector<byte> &Output)
 	Expand(Output, 0, Output.size(), m_hkdfState, m_hkdfGenerator);
 }
 
-void HKDF::Generate(SecureVector<byte> &Output)
+void HKDF::Generate(SecureVector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -184,7 +183,7 @@ void HKDF::Generate(SecureVector<byte> &Output)
 	Expand(Output, 0, Output.size(), m_hkdfState, m_hkdfGenerator);
 }
 
-void HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void HKDF::Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -196,13 +195,13 @@ void HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	Expand(Output, OutOffset, Length, m_hkdfState, m_hkdfGenerator);
 }
 
-void HKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
+void HKDF::Generate(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -214,7 +213,7 @@ void HKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	Expand(Output, OutOffset, Length, m_hkdfState, m_hkdfGenerator);
@@ -245,7 +244,7 @@ void HKDF::Initialize(ISymmetricKey &Parameters)
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
 
-		SecureVector<byte> prk(m_hkdfGenerator->TagSize());
+		SecureVector<uint8_t> prk(m_hkdfGenerator->TagSize());
 		Extract(Parameters.SecureKey(), Parameters.SecureIV(), prk);
 		SymmetricKey kp(prk);
 		m_hkdfGenerator->Initialize(kp);
@@ -268,7 +267,7 @@ void HKDF::Reset()
 
 //~~~Private Functions~~~//
 
-void HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator)
+void HKDF::Expand(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator)
 {
 	size_t plen;
 
@@ -279,7 +278,7 @@ void HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, st
 		// initialize the state on the first pass
 		if (State->State[Generator->TagSize()] != 0)
 		{
-			Generator->Update(State->State, 0, State->State.size() - sizeof(byte));
+			Generator->Update(State->State, 0, State->State.size() - sizeof(uint8_t));
 		}
 
 		// update the info string
@@ -290,7 +289,7 @@ void HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, st
 
 		// increment and update the state counter
 		++State->State[Generator->TagSize()];
-		Generator->Update(State->State, Generator->TagSize(), sizeof(byte));
+		Generator->Update(State->State, Generator->TagSize(), sizeof(uint8_t));
 		// finalize to new state
 		Generator->Finalize(State->State, 0);
 		// copy to output
@@ -301,9 +300,9 @@ void HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, st
 	}
 }
 
-void HKDF::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator)
+void HKDF::Expand(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator)
 {
-	std::vector<byte> tmps(Length);
+	std::vector<uint8_t> tmps(Length);
 	Expand(tmps, OutOffset, Length, State, Generator);
 	SecureMove(tmps, 0, Output, OutOffset, Length);
 }

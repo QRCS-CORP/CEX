@@ -76,7 +76,7 @@ public:
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	virtual const size_t ParallelBlockSize() = 0;
@@ -96,9 +96,9 @@ public:
 	/// <para>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Input">The input message uint8_t-vector</param>
 	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Finalize message processing and return the hash code.
@@ -107,7 +107,7 @@ public:
 	/// 
 	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
 	/// <param name="OutOffset">The starting offset within the output vector</param>
-	virtual void Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void Finalize(std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -130,31 +130,31 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The 8-bit integer added to process</param>
-	virtual void Update(byte Input) = 0;
+	virtual void Update(uint8_t Input) = 0;
 
 	/// <summary>
 	/// Update the message digest with a single unsigned 32-bit integer
 	/// </summary>
 	/// 
 	/// <param name="Input">The 32-bit integer to process</param>
-	virtual void Update(uint Input) = 0;
+	virtual void Update(uint32_t Input) = 0;
 
 	/// <summary>
 	/// Update the message digest with a single unsigned 64-bit integer
 	/// </summary>
 	/// 
 	/// <param name="Input">The 64-bit integer to process</param>
-	virtual void Update(ulong Input) = 0;
+	virtual void Update(uint64_t Input) = 0;
 
 	/// <summary>
 	/// Update the message digest with a vector using offset and length parameters.
 	/// <para>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Input">The input message uint8_t-vector</param>
 	/// <param name="InOffset">The starting offset within the input vector</param>
 	/// <param name="Length">The number of bytes to process</param>
-	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
+	virtual void Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length) = 0;
 };
 
 NAMESPACE_DIGESTEND

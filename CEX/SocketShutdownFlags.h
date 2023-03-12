@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The socket shutdown api flags
 /// </summary>
-enum class SocketShutdownFlags : int
+enum class SocketShutdownFlags : int32_t
 {
 	/// <summary>
 	/// Shut down the receiving channel SD_RECEIVE

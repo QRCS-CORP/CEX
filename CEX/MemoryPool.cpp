@@ -11,15 +11,15 @@ class MemoryPool::PoolState
 {
 public:
 
-	byte AlignBit;
+	uint8_t AlignBit;
 	std::vector<std::pair<size_t, size_t>> FreeList;
 	size_t MaxAlloc;
-	byte* MemPool;
+	uint8_t* MemPool;
 	size_t MinAlloc;
 	size_t PageSize;
 	size_t PoolSize;
 
-	PoolState(byte* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, byte AlignBit)
+	PoolState(uint8_t* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, uint8_t AlignBit)
 		:
 		AlignBit((AlignBit <= 6) ?
 			AlignBit : 
@@ -49,7 +49,7 @@ public:
 	}
 };
 
-MemoryPool::MemoryPool(byte* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, byte AlignBit)
+MemoryPool::MemoryPool(uint8_t* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, uint8_t AlignBit)
 	:
 	m_poolState(new PoolState(Pool, PoolSize, PageSize, MinAlloc, MaxAlloc, AlignBit))
 {
@@ -160,7 +160,7 @@ bool MemoryPool::Deallocate(void* Pointer, size_t Length)
 		status = true;
 		Clear(Pointer, 0, Length);
 
-		const size_t FSTPTR = static_cast<byte*>(Pointer) - m_poolState->MemPool;
+		const size_t FSTPTR = static_cast<uint8_t*>(Pointer) - m_poolState->MemPool;
 		itrl = std::lower_bound(m_poolState->FreeList.begin(), m_poolState->FreeList.end(), std::make_pair(FSTPTR, 0), [](std::pair<size_t, size_t> x, std::pair<size_t, size_t> y) { return x.first < y.first; });
 
 		if (itrl != m_poolState->FreeList.end() && FSTPTR + Length == itrl->first)
@@ -201,7 +201,7 @@ bool MemoryPool::Deallocate(void* Pointer, size_t Length)
 
 void MemoryPool::Clear(void* Pool, size_t Offset, size_t Length)
 {
-	std::memset(reinterpret_cast<byte*>(Pool) + Offset, 0x00, Length);
+	std::memset(reinterpret_cast<uint8_t*>(Pool) + Offset, 0x00, Length);
 }
 
 bool MemoryPool::InPool(const void* Pointer, size_t PoolSize, const void* Buffer, size_t BufferSize)

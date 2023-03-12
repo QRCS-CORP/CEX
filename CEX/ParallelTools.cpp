@@ -20,7 +20,7 @@ size_t ParallelTools::ProcessorCount()
 void ParallelTools::ParallelFor(size_t From, size_t To, const std::function<void(size_t)> &F)
 {
 #if defined(CEX_HAS_OPENMP)
-#	pragma omp parallel num_threads(static_cast<int>(To))
+#	pragma omp parallel num_threads(static_cast<int32_t>(To))
 	{
 		size_t i = From + static_cast<size_t>(omp_get_thread_num());
 		F(i);

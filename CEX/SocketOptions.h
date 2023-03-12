@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// TCP socket options
 /// </summary>
-enum class SocketOptions : int
+enum class SocketOptions : int32_t
 {
 	/// <summary>
 	/// No flag is used

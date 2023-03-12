@@ -64,14 +64,14 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="ADLength">The size of the AD</param>
 	/// <param name="TxtLength">The plain text size</param>
-	void Finalize(std::vector<byte> &Output, size_t ADLength, size_t TxtLength);
+	void Finalize(std::vector<uint8_t> &Output, size_t ADLength, size_t TxtLength);
 
 	/// <summary>
 	/// Initialize the hash key
 	/// </summary>
 	///
 	/// <param name="Key">The ghash key</param>
-	void Initialize(const std::vector<ulong> &Key);
+	void Initialize(const std::vector<uint64_t> &Key);
 
 	/// <summary>
 	/// Process one segment of data
@@ -80,7 +80,7 @@ public:
 	/// <param name="Input">The source array</param>
 	/// <param name="Output">The output array</param>
 	/// <param name="Length">The number of input bytes to process</param>
-	void Multiply(const std::vector<byte> &Input, std::vector<byte> &Output, size_t Length);
+	void Multiply(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output, size_t Length);
 
 	/// <summary>
 	/// Reset the hash function
@@ -100,11 +100,11 @@ public:
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The output array</param>
 	/// <param name="Length">The number of bytes to process</param>
-	void Update(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t Length);
+	void Update(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t Length);
 
 private:
 
-	static void Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::vector<byte> &Output);
+	static void Permute(std::array<uint64_t, CMUL::CMUL_STATE_SIZE> &State, std::vector<uint8_t> &Output);
 	static bool HasGmul();
 };
 

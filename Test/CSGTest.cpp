@@ -82,14 +82,6 @@ namespace Test
 			Kat(gen512, m_key[14], m_expected[14]);
 			OnProgress(std::string("CSGTest: Passed SHAKE512 KAT tests.."));
 
-			CSG* gen1024 = new CSG(Enumeration::ShakeModes::SHAKE1024, Enumeration::Providers::None);
-			Kat(gen1024, m_key[15], m_expected[15]);
-			Kat(gen1024, m_key[16], m_expected[16]);
-			Kat(gen1024, m_key[17], m_expected[17]);
-			Kat(gen1024, m_key[18], m_expected[18]);
-			Kat(gen1024, m_key[19], m_expected[19]);
-			OnProgress(std::string("CSGTest: Passed SHAKE1024 KAT tests.."));
-
 			OnProgress(std::string("CSGTest: Testing the custom cSHAKE implementations.."));
 			Kat(gen128, m_key[0], m_custom, m_info[0], m_expected[20]);
 			Kat(gen128, m_key[20], m_custom, m_info[0], m_expected[21]);
@@ -101,9 +93,6 @@ namespace Test
 
 			Kat(gen512, m_key[10], m_custom, m_info[0], m_expected[24]);
 			OnProgress(std::string("CSGTest: Passed customized cSHAKE-512 KAT test.."));
-
-			Kat(gen1024, m_key[15], m_custom, m_info[0], m_expected[25]);
-			OnProgress(std::string("CSGTest: Passed customized cSHAKE-1024 KAT test.."));
 
 			// TODO: load and store in order to match 512 to 256 intrinsics
 			//CSG* gen128w = new CSG(Enumeration::ShakeModes::SHAKE128, Enumeration::Providers::None, true);
@@ -143,8 +132,6 @@ namespace Test
 			OnProgress(std::string("CSGTest: Passed SHAKE256 random sample evaluation tests.."));
 			Evaluate(gen512);
 			OnProgress(std::string("CSGTest: Passed SHAKE512 random sample evaluation tests.."));
-			Evaluate(gen1024);
-			OnProgress(std::string("CSGTest: Passed SHAKE0124 random sample evaluation tests.."));
 			//Evaluate(gen128w);
 			//OnProgress(std::string("CSGTest: Passed SHAKE128W random sample evaluation tests.."));
 			//Evaluate(gen256w);
@@ -157,7 +144,6 @@ namespace Test
 			delete gen128;
 			delete gen256;
 			delete gen512;
-			delete gen1024;
 			//delete gen128w;
 			//delete gen256w;
 			//delete gen512w;
@@ -181,9 +167,9 @@ namespace Test
 
 	void CSGTest::Evaluate(IDrbg* Rng)
 	{
-		Cipher::SymmetricKeySize ks = Rng->LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> cust(ks.IVSize());
+		Cipher::SymmetricKeySize ks = Rng->LegalKeySizes()[0];
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> cust(ks.IVSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -195,7 +181,7 @@ namespace Test
 		try
 		{
 			const size_t SEGLEN = SAMPLE_SIZE / 8;
-			std::vector<byte> smp(SAMPLE_SIZE);
+			std::vector<uint8_t> smp(SAMPLE_SIZE);
 
 			for (i = 0; i < 8; ++i)
 			{
@@ -249,7 +235,7 @@ namespace Test
 		{
 			CSG gen(ShakeModes::SHAKE128, Providers::CSP);
 			// invalid key size
-			std::vector<byte> key(1);
+			std::vector<uint8_t> key(1);
 			SymmetricKey kp(key);
 			gen.Initialize(kp);
 
@@ -267,7 +253,7 @@ namespace Test
 		try
 		{
 			CSG gen(ShakeModes::SHAKE128, Providers::CSP);
-			std::vector<byte> m(16);
+			std::vector<uint8_t> m(16);
 			// cipher was not initialized
 			gen.Generate(m);
 
@@ -286,10 +272,10 @@ namespace Test
 		{
 			CSG gen(ShakeModes::SHAKE128, Providers::CSP);
 			SymmetricKeySize ks = gen.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize());
+			std::vector<uint8_t> key(ks.KeySize());
 			SymmetricKey kp(key);
 			gen.Initialize(kp);
-			std::vector<byte> m(16);
+			std::vector<uint8_t> m(16);
 			// array is too small
 			gen.Generate(m, 0, m.size() + 1);
 
@@ -308,8 +294,8 @@ namespace Test
 		{
 			CSG gen(ShakeModes::SHAKE128, Providers::CSP);
 			SymmetricKeySize ks = gen.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize(), 0x32);
-			std::vector<byte> nonce(ks.IVSize(), 0x64);
+			std::vector<uint8_t> key(ks.KeySize(), 0x32);
+			std::vector<uint8_t> nonce(ks.IVSize(), 0x64);
 			SymmetricKey kp(key, nonce);
 			gen.Initialize(kp);
 
@@ -329,10 +315,10 @@ namespace Test
 		}
 	}
 
-	void CSGTest::Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Expected)
+	void CSGTest::Kat(IDrbg* Rng, std::vector<uint8_t> &Key, std::vector<uint8_t> &Expected)
 	{
 		const size_t EXPLEN = Expected.size();
-		std::vector<byte> exp(EXPLEN);
+		std::vector<uint8_t> exp(EXPLEN);
 		SymmetricKey kp(Key);
 
 		// generate
@@ -345,10 +331,10 @@ namespace Test
 		}
 	}
 
-	void CSGTest::Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Custom, std::vector<byte> &Info, std::vector<byte> &Expected)
+	void CSGTest::Kat(IDrbg* Rng, std::vector<uint8_t> &Key, std::vector<uint8_t> &Custom, std::vector<uint8_t> &Info, std::vector<uint8_t> &Expected)
 	{
 		const size_t EXPLEN = Expected.size();
-		std::vector<byte> exp(EXPLEN);
+		std::vector<uint8_t> exp(EXPLEN);
 		SymmetricKey kp(Key, Custom, Info);
 
 		// generate
@@ -900,10 +886,10 @@ namespace Test
 		const size_t SMPCNK = 1024;
 
 		CSG gen(ShakeModes::SHAKE128, Providers::CSP, false);
-		Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize(), 0x32);
-		std::vector<byte> iv(ks.IVSize(), 0x64);
-		std::vector<byte> otp(SMPLEN);
+		Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[0];
+		std::vector<uint8_t> key(ks.KeySize(), 0x32);
+		std::vector<uint8_t> iv(ks.IVSize(), 0x64);
+		std::vector<uint8_t> otp(SMPLEN);
 		SymmetricKey kp(key, iv);
 		size_t i;
 		size_t j;
@@ -935,11 +921,11 @@ namespace Test
 	{
 		SHAKE kdf(ShakeModes::SHAKE256);
 		CSG gen(ShakeModes::SHAKE256, Providers::None);
-		Cipher::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
-		std::vector<byte> name(0);
-		std::vector<byte> otp1;
-		std::vector<byte> otp2;
-		std::vector<byte> key(ks.KeySize());
+		Cipher::SymmetricKeySize ks = kdf.LegalKeySizes()[0];
+		std::vector<uint8_t> name(0);
+		std::vector<uint8_t> otp1;
+		std::vector<uint8_t> otp2;
+		std::vector<uint8_t> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
 

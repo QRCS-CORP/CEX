@@ -1,393 +1,207 @@
 #include "MPKCN6960T119.h"
-#include "Keccak.h"
 #include "IntegerTools.h"
+#include "Keccak.h"
+#include "MemoryTools.h"
 #include "MPKCUtils.h"
 
 NAMESPACE_MCELIECE
 
-using Digest::Keccak;
 using Tools::IntegerTools;
+using Digest::Keccak;
+using Tools::MemoryTools;
 
-/// <summary>
-/// Decrypts the cipher-text and returns the shared secret
-/// </summary>
-/// 
-/// <param name="PrivateKey">The private-key vector</param>
-/// <param name="CipherText">The input cipher-text vector</param>
-/// <param name="SharedSecret">The output shared-secret (an array of MCELIECE_SECRET_SIZE bytes)</param>
-bool MPKCN6960T119::Decapsulate(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+static const int32_t MCELIECE_N6960T119_GFBITS = 13;
+static const int32_t MCELIECE_N6960T119_SYS_N = 6960;
+static const int32_t MCELIECE_N6960T119_SYS_T = 119;
+static const int32_t MCELIECE_N6960T119_COND_BYTES = ((1 << (MCELIECE_N6960T119_GFBITS - 4)) * (2 * MCELIECE_N6960T119_GFBITS - 1));
+static const int32_t MCELIECE_N6960T119_IRR_BYTES = (MCELIECE_N6960T119_SYS_T * 2);
+static const int32_t MCELIECE_N6960T119_PK_NROWS = (MCELIECE_N6960T119_SYS_T * MCELIECE_N6960T119_GFBITS);
+static const int32_t MCELIECE_N6960T119_PK_NCOLS = (MCELIECE_N6960T119_SYS_N - MCELIECE_N6960T119_PK_NROWS);
+static const int32_t MCELIECE_N6960T119_PK_ROW_BYTES = ((MCELIECE_N6960T119_PK_NCOLS + 7) / 8);
+static const int32_t MCELIECE_N6960T119_SYND_BYTES = ((MCELIECE_N6960T119_PK_NROWS + 7) / 8);
+static const int32_t MCELIECE_N6960T119_GFMASK((1 << MCELIECE_N6960T119_GFBITS) - 1);
+static const int32_t MCELIECE_N6960T119_GENITR_MAX = 100;
+
+void MPKCN6960T119::GfMul(uint16_t* Output, const uint16_t* Input0, const uint16_t* Input1)
 {
-	std::vector<byte> conf(32);
-	std::vector<byte> e2(1 + (MPKC_N / 8), 0x02);
-	std::vector<byte> preimage(1 + (MPKC_N / 8) + (SYND_BYTES + 32));
-	size_t pctr;
-	size_t i;
-	ushort m;
-	byte confirm;
-	byte derr;
+	// input: in0, in1 in GF((2^m)^t)
+	// output: out = in0*in1
 
-	pctr = 0;
-	confirm = 0;
-	derr = DecryptE(&e2[1], &PrivateKey[MPKC_N / 8], CipherText.data());
-	XOF(e2, 0, e2.size(), conf, 0, conf.size(), Keccak::KECCAK256_RATE_SIZE);
-
-	for (i = 0; i < MAC_SIZE; i++)
-	{
-		confirm |= conf[i] ^ CipherText[SYND_BYTES + i];
-	}
-
-	m = derr | confirm;
-	m -= 1;
-	m >>= 8;
-	preimage[pctr] = (~m & 0) | (m & 1);
-	++pctr;
-
-	for (i = 0; i < MPKC_N / 8; i++)
-	{
-		preimage[pctr] = (~m & PrivateKey[i]) | (m & e2[i + 1]);
-		++pctr;
-	}
-
-	for (i = 0; i < SYND_BYTES + 32; i++)
-	{
-		preimage[pctr] = CipherText[i];
-		++pctr;
-	}
-
-	XOF(preimage, 0, preimage.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
-
-	return static_cast<bool>(confirm == 0 && derr == 0);
-}
-
-/// <summary>
-/// Generates the cipher-text and shared-secret for a given public key
-/// </summary>
-/// 
-/// <param name="PublicKey">The public-key vector</param>
-/// <param name="CipherText">The output cipher-text vector</param>
-/// <param name="SharedSecret">The output shared-secret (an array of MCELIECE_SECRET_SIZE bytes)</param>
-/// <param name="Rng">The random generator instance</param>
-void MPKCN6960T119::Encapsulate(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng)
-{
-	std::vector<byte> e2(1 + (MPKC_N / 8), 0x02);
-	std::vector<byte> ec1(1 + (MPKC_N / 8) + (SYND_BYTES + MAC_SIZE), 0x01);
-
-	EncryptE(&CipherText[0], &PublicKey[0], &e2[1], Rng);
-	XOF(e2, 0, e2.size(), CipherText, SYND_BYTES, MAC_SIZE, Keccak::KECCAK256_RATE_SIZE);
-
-	std::memcpy(&ec1[1], &e2[1], MPKC_N / 8);
-	std::memcpy(&ec1[1 + (MPKC_N / 8)], CipherText.data(), SYND_BYTES + MAC_SIZE);
-	XOF(ec1, 0, ec1.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
-}
-
-/// <summary>
-/// Generate a public/private key-pair
-/// </summary>
-/// 
-/// <param name="PublicKey">The public-key vector</param>
-/// <param name="PrivateKey">The private-key vector</param>
-/// <param name="Rng">The random generator instance</param>
-/// 
-/// <returns>The key-pair was generated succesfully, or false for generation failure</returns>
-bool MPKCN6960T119::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Rng)
-{
-	size_t i;
-
-	for (i = 0; i < KEYGEN_RETRIES; ++i)
-	{
-		SkPartGen(PrivateKey.data(), Rng);
-
-		if (PkGen(PublicKey.data(), &PrivateKey[MPKC_N / 8]) == 0)
-		{
-			break;
-		}
-	}
-
-	Rng->Generate(PrivateKey, 0, MPKC_N / 8);
-
-	return static_cast<bool>(i < KEYGEN_RETRIES);
-}
-
-
-void MPKCN6960T119::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
-{
-	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-}
-
-// benes.c //
-
-void MPKCN6960T119::SupportGen(ushort* S, const byte* C)
-{
-	// input: condition bits c
-	// output: support s
-
-	byte L[GFBITS][(1 << GFBITS) / 8];
-	ushort bctr;
+	uint16_t prod[MCELIECE_N6960T119_SYS_T * 2 - 1] = { 0 };
 	size_t i;
 	size_t j;
-	ushort a;
 
-	for (i = 0; i < GFBITS; ++i)
+	for (i = 0; i < MCELIECE_N6960T119_SYS_T; ++i)
 	{
-		for (j = 0; j < (1 << GFBITS) / 8; ++j)
+		for (j = 0; j < MCELIECE_N6960T119_SYS_T; ++j)
 		{
-			L[i][j] = 0;
+			prod[i + j] ^= MPKCUtils::GfMultiply(Input0[i], Input1[j]);
 		}
 	}
 
-	for (bctr = 0; bctr < (1U << GFBITS); ++bctr)
+	for (i = (MCELIECE_N6960T119_SYS_T - 1) * 2; i >= MCELIECE_N6960T119_SYS_T; --i)
 	{
-		a = MPKCUtils::BitReverse(bctr);
+		prod[i - MCELIECE_N6960T119_SYS_T + 8] ^= prod[i];
+		prod[i - MCELIECE_N6960T119_SYS_T] ^= prod[i];
+	}
 
-		for (j = 0; j < GFBITS; ++j)
+	MemoryTools::CopyRaw((uint8_t*)prod, (uint8_t*)Output, MCELIECE_N6960T119_SYS_T * sizeof(uint16_t));
+}
+
+void MPKCN6960T119::SupportGen(uint16_t* S, const uint8_t* C)
+{
+	// input: condition bits c output: support s
+
+	uint8_t L[MCELIECE_N6960T119_GFBITS][(1 << MCELIECE_N6960T119_GFBITS) / 8] = { 0 };
+	size_t i;
+	size_t j;
+	uint16_t a;
+
+	for (i = 0; i < (1 << MCELIECE_N6960T119_GFBITS); ++i)
+	{
+		a = MPKCUtils::BitReverse((uint16_t)i);
+
+		for (j = 0; j < MCELIECE_N6960T119_GFBITS; ++j)
 		{
-			L[j][bctr / 8] |= ((a >> j) & 1) << (bctr % 8);
+			L[j][i / 8] |= ((a >> j) & 1) << (i % 8);
 		}
 	}
 
-	for (j = 0; j < GFBITS; ++j)
+	for (j = 0; j < MCELIECE_N6960T119_GFBITS; ++j)
 	{
-		MPKCUtils::ApplyBenes(L[j], C, false);
+		MPKCUtils::ApplyBenes(L[j], C, 0);
 	}
 
-	for (i = 0; i < MPKC_N; ++i)
+	for (i = 0; i < MCELIECE_N6960T119_SYS_N; ++i)
 	{
 		S[i] = 0;
-
-		j = GFBITS;
+		j = MCELIECE_N6960T119_GFBITS;
 
 		do
 		{
 			--j;
 			S[i] <<= 1;
 			S[i] |= (L[j][i / 8] >> (i % 8)) & 1;
-		}
-		while (j > 0);
+		} while (j != 0);
 	}
 }
 
-// bm.c //
-
-void MPKCN6960T119::BerlekampMassey(ushort* Output, const ushort* S)
+int32_t MPKCN6960T119::Decrypt(uint8_t* E, const uint8_t* Sk, const uint8_t* C)
 {
-	// the Berlekamp-Massey algorithm
-	// input: s, sequence of field elements
-	// output: out, minimal polynomial of s
+	// Niederreiter decryption with the Berlekamp decoder.
+	// input: sk, secret key c, ciphertext
+	// output: e, error vector
+	// return: 0 for success; 1 for failure
 
-	ushort T[MPKC_T + 1];
-	ushort C[MPKC_T + 1];
-	ushort B[MPKC_T + 1];
-	size_t i;
-	uint N;
-	ushort L;
-	ushort mle;
-	ushort mne;
-	ushort b;
-	ushort d;
-	ushort f;
-
-	b = 1;
-	L = 0;
-
-	for (i = 0; i < MPKC_T + 1; ++i)
-	{
-		B[i] = 0;
-		C[i] = 0;
-	}
-
-	B[1] = 1;
-	C[0] = 1;
-
-	for (N = 0; N < 2 * MPKC_T; ++N)
-	{
-		d = 0;
-
-		for (i = 0; i <= IntegerTools::Min(N, MPKC_T); ++i)
-		{
-			d ^= GF::Multiply(C[i], S[N - i]);
-		}
-
-		mne = d;
-		mne -= 1;
-		mne >>= 15;
-		mne -= 1;
-		mle = static_cast<ushort>(N);
-		mle -= 2U * L;
-		mle >>= 15;
-		mle -= 1;
-		mle &= mne;
-
-		for (i = 0; i <= MPKC_T; ++i)
-		{
-			T[i] = C[i];
-		}
-
-		f = GF::GfFrac(b, d);
-
-		for (i = 0; i <= MPKC_T; ++i)
-		{
-			C[i] ^= GF::Multiply(f, B[i]) & mne;
-		}
-
-		L = (L & ~mle) | ((N + 1 - L) & mle);
-
-		for (i = 0; i <= MPKC_T; ++i)
-		{
-			B[i] = (B[i] & ~mle) | (T[i] & mle);
-		}
-
-		b = (b & ~mle) | (d & mle);
-		i = MPKC_T;
-
-		do
-		{
-
-			B[i] = B[i - 1];
-			--i;
-		} 
-		while (i > 0);
-
-		B[0] = 0;
-	}
-
-	for (i = 0; i <= MPKC_T; ++i)
-	{
-		Output[i] = C[MPKC_T - i];
-	}
-}
-
-// controlbits.c //
-
-void MPKCN6960T119::ControlBits(byte* Output, const uint* Pi)
-{
-	// input: pi, a permutation
-	// output: out, control bits w.r.t. pi
-
-	byte c[(((2 * GFBITS) - 1) * (1 << GFBITS)) / 16] = { 0 };
-	size_t i;
-
-	MPKCUtils::PermuteBits(GFBITS, (1UL << GFBITS), 1UL, 0UL, c, Pi);
-
-	for (i = 0; i < sizeof(c); ++i)
-	{
-		Output[i] = c[i];
-	}
-}
-
-// decrypt.c //
-
-byte MPKCN6960T119::DecryptE(byte* E, const byte* Sk, const byte* C)
-{
-	ushort g[MPKC_T + 1];
-	ushort L[MPKC_N];
-	ushort s[MPKC_T * 2];
-	ushort scmp[MPKC_T * 2];
-	ushort locator[MPKC_T + 1];
-	ushort images[MPKC_N];
-	byte r[MPKC_N / 8];
-	size_t i;
+	uint16_t g[MCELIECE_N6960T119_SYS_T + 1] = { 0 };
+	uint16_t L[MCELIECE_N6960T119_SYS_N];
+	uint16_t s[MCELIECE_N6960T119_SYS_T * 2];
+	uint16_t s_cmp[MCELIECE_N6960T119_SYS_T * 2];
+	uint16_t locator[MCELIECE_N6960T119_SYS_T + 1];
+	uint16_t images[MCELIECE_N6960T119_SYS_N];
+	uint8_t r[MCELIECE_N6960T119_SYS_N / 8];
+	int32_t i;
 	int32_t w;
-	ushort check;
-	ushort t;
+	uint16_t check;
+	uint16_t t;
 
-	for (i = 0; i < SYND_BYTES; ++i)
+	w = 0;
+	MemoryTools::CopyRaw((uint8_t*)C, (uint8_t*)r, MCELIECE_N6960T119_SYND_BYTES);
+	MemoryTools::ClearRaw(r + MCELIECE_N6960T119_SYND_BYTES, (MCELIECE_N6960T119_SYS_N / 8) - MCELIECE_N6960T119_SYND_BYTES);
+
+	for (i = 0; i < MCELIECE_N6960T119_SYS_T; ++i)
 	{
-		r[i] = C[i];
-	}
-
-	r[i - 1] &= (1UL << ((GFBITS * MPKC_T) % 8)) - 1;
-
-	for (i = SYND_BYTES; i < MPKC_N / 8; ++i)
-	{
-		r[i] = 0;
-	}
-
-	for (i = 0; i < MPKC_T; ++i)
-	{
-		g[i] = MPKCUtils::Load16(Sk);
-		g[i] &= GFMASK;
+		g[i] = MPKCUtils::LoadGf(Sk);
 		Sk += 2;
 	}
 
-	g[MPKC_T] = 1U;
+	g[MCELIECE_N6960T119_SYS_T] = 1;
 	SupportGen(L, Sk);
-	Syndrome(s, g, L, r);
-	BerlekampMassey(locator, s);
-	Root(images, locator, L);
-	w = 0;
+	MPKCUtils::Synd(s, g, L, r, MCELIECE_N6960T119_SYS_N, MCELIECE_N6960T119_SYS_T);
+	MPKCUtils::Bm(locator, s, MCELIECE_N6960T119_SYS_T);
+	MPKCUtils::Root(images, locator, L, MCELIECE_N6960T119_SYS_N, MCELIECE_N6960T119_SYS_T);
 
-	for (i = 0; i < MPKC_N / 8; ++i)
-	{
-		E[i] = 0x00;
-	}
+	MemoryTools::ClearRaw(E, MCELIECE_N6960T119_SYS_N / 8);
 
-	for (i = 0; i < MPKC_N; ++i)
+	for (i = 0; i < MCELIECE_N6960T119_SYS_N; ++i)
 	{
-		t = GF::IsZero(images[i]) & 1U;
-		E[i / 8] |= static_cast<byte>(t << (i % 8));
+		t = MPKCUtils::GfIsZero(images[i]) & 1;
+		E[i / 8] |= t << (i % 8);
 		w += t;
-
 	}
 
-	Syndrome(scmp, g, L, E);
-	check = static_cast<ushort>(w);
-	check ^= MPKC_T;
+	MPKCUtils::Synd(s_cmp, g, L, E, MCELIECE_N6960T119_SYS_N, MCELIECE_N6960T119_SYS_T);
+	check = (uint16_t)w;
+	check ^= MCELIECE_N6960T119_SYS_T;
 
-	for (i = 0; i < MPKC_T * 2; ++i)
+	for (i = 0; i < MCELIECE_N6960T119_SYS_T * 2; ++i)
 	{
-		check |= s[i] ^ scmp[i];
+		check |= s[i] ^ s_cmp[i];
 	}
 
-	check -= 1U;
+	check -= 1;
 	check >>= 15;
-	check ^= 1U;
 
-	return static_cast<byte>(check);
+	return (check ^ 1);
 }
 
-// encrypt.c //
-
-void MPKCN6960T119::EncryptE(byte* SS, const byte* Pk, byte* E, std::unique_ptr<IPrng> &Rng)
-{
-	GenE(E, Rng);
-	Syndrome(SS, Pk, E);
-}
-
-void MPKCN6960T119::GenE(byte* E, std::unique_ptr<IPrng> &Rng)
+void MPKCN6960T119::GenE(uint8_t* E, std::unique_ptr<IPrng> &Rng)
 {
 	// output: e, an error vector of weight t
-	ulong e_int[(MPKC_N + 63) / 64];
-	ulong val[MPKC_T];
-	std::array<ushort, MPKC_T * 2> ind;
-	ulong mask;
-	int32_t eq;
-	int32_t i;
-	int32_t j;
+	uint16_t ind[MCELIECE_N6960T119_SYS_T] = { 0 };
+	uint8_t val[MCELIECE_N6960T119_SYS_T] = { 0 };
+	size_t eq;
+	size_t i;
+	size_t j;
+	uint8_t mask;
+	size_t count;
+	uint16_t nrnd[MCELIECE_N6960T119_SYS_T * 2] = { 0 };
+	std::vector<uint8_t> brnd(MCELIECE_N6960T119_SYS_T * 2 * sizeof(uint16_t));
 
-	for (;;)
+	while (true)
 	{
-		Rng->Fill(ind, 0, ind.size());
+		Rng->Fill(brnd, 0, brnd.size());
 
-		for (i = 0; i < MPKC_T * 2; ++i)
+		for (i = 0; i < MCELIECE_N6960T119_SYS_T * 2; ++i)
 		{
-			ind[i] &= GFMASK;
+			nrnd[i] = MPKCUtils::LoadGf(brnd.data() + (i * 2));
 		}
 
-		if (MovForward(reinterpret_cast<ushort*>(ind.data())) == 0)
+		// moving and counting indices in the correct range
+
+		count = 0;
+
+		for (i = 0; i < MCELIECE_N6960T119_SYS_T * 2; ++i)
+		{
+			if (nrnd[i] < MCELIECE_N6960T119_SYS_N)
+			{
+				ind[count] = nrnd[i];
+				++count;
+
+				if (count >= MCELIECE_N6960T119_SYS_T)
+				{
+					break;
+				}
+			}
+		}
+
+		if (count < MCELIECE_N6960T119_SYS_T)
 		{
 			continue;
 		}
 
 		// check for repetition
+
 		eq = 0;
 
-		for (i = 1; i < MPKC_T; ++i)
+		for (i = 1; i < MCELIECE_N6960T119_SYS_T; ++i)
 		{
 			for (j = 0; j < i; ++j)
 			{
 				if (ind[i] == ind[j])
 				{
 					eq = 1;
+					break;
 				}
 			}
 		}
@@ -398,109 +212,55 @@ void MPKCN6960T119::GenE(byte* E, std::unique_ptr<IPrng> &Rng)
 		}
 	}
 
-	for (j = 0; j < MPKC_T; ++j)
+	for (j = 0; j < MCELIECE_N6960T119_SYS_T; ++j)
 	{
-		val[j] = 1ULL << (ind[j] & 63);
+		val[j] = (uint8_t)(1 << (ind[j] & 7));
 	}
 
-	for (i = 0; i < (MPKC_N + 63) / 64; ++i)
+	for (i = 0; i < MCELIECE_N6960T119_SYS_N / 8; ++i)
 	{
-		e_int[i] = 0;
+		E[i] = 0;
 
-		for (j = 0; j < MPKC_T; ++j)
+		for (j = 0; j < MCELIECE_N6960T119_SYS_T; ++j)
 		{
-			mask = i ^ (ind[j] >> 6);
-			mask -= 1;
-			mask >>= 63;
-			mask = ~mask + 1;
-			e_int[i] |= val[j] & mask;
+			mask = MPKCUtils::SameMask((uint16_t)i, (ind[j] >> 3));
+			E[i] |= val[j] & mask;
 		}
-	}
-
-	for (i = 0; i < (MPKC_N + 63) / 64 - 1; ++i)
-	{
-		MPKCUtils::Store64(E, e_int[i]);
-		E += 8;
-	}
-
-	for (j = 0; j < (MPKC_N % 64); j += 8)
-	{
-		E[j / 8] = (e_int[i] >> j) & 0xFF;
 	}
 }
 
-int32_t MPKCN6960T119::MovForward(ushort* Ind)
-{
-	size_t i;
-	size_t j;
-	int32_t found;
-	ushort t;
-
-	for (i = 0; i < MPKC_T; ++i)
-	{
-		found = 0;
-
-		for (j = i; j < MPKC_T * 2; ++j)
-		{
-			if (Ind[j] < MPKC_N)
-			{
-				t = Ind[i];
-				Ind[i] = Ind[j];
-				Ind[j] = t;
-				found = 1;
-				break;
-			}
-		}
-
-		if (found == 0)
-		{
-			break;
-		}
-	}
-
-	return found;
-}
-
-void MPKCN6960T119::Syndrome(byte* S, const byte* Pk, const byte* E)
+void MPKCN6960T119::Syndrome(uint8_t* S, const uint8_t* Pk, const uint8_t* E)
 {
 	// input: public key pk, error vector e
 	// output: Syndrome s
 
-	const byte* pkptr = Pk;
-	byte row[MPKC_N / 8];
-	size_t i;
+	uint8_t row[MCELIECE_N6960T119_SYS_N / 8];
+	const uint8_t* pk_ptr = Pk;
 	size_t j;
-	uint tail;
-	byte b;
+	uint8_t b;
+	int32_t tail;
 
-	for (i = 0; i < SYND_BYTES; ++i)
+	tail = MCELIECE_N6960T119_PK_NROWS % 8;
+	MemoryTools::ClearRaw(S, MCELIECE_N6960T119_SYND_BYTES);
+
+	for (size_t i = 0; i < MCELIECE_N6960T119_PK_NROWS; ++i)
 	{
-		S[i] = 0;
-	}
+		MemoryTools::ClearRaw(row, MCELIECE_N6960T119_SYS_N / 8);
 
-	tail = PK_NROWS % 8;
-
-	for (i = 0; i < PK_NROWS; ++i)
-	{
-		for (j = 0; j < MPKC_N / 8; ++j)
+		for (j = 0; j < MCELIECE_N6960T119_PK_ROW_BYTES; ++j)
 		{
-			row[j] = 0;
+			row[MCELIECE_N6960T119_SYS_N / 8 - MCELIECE_N6960T119_PK_ROW_BYTES + j] = pk_ptr[j];
 		}
 
-		for (j = 0; j < PK_ROW_BYTES; ++j)
+		for (j = MCELIECE_N6960T119_SYS_N / 8 - 1; j >= MCELIECE_N6960T119_SYS_N / 8 - MCELIECE_N6960T119_PK_ROW_BYTES; --j)
 		{
-			row[((MPKC_N / 8) - PK_ROW_BYTES) + j] = pkptr[j];
-		}
-
-		for (j = (MPKC_N / 8) - 1; j >= (MPKC_N / 8) - PK_ROW_BYTES; --j)
-		{
-			row[j] = (row[j] << tail) | (row[j - 1] >> (8UL - tail));
+			row[j] = (uint8_t)((row[j] << tail) | (row[j - 1] >> (8 - tail)));
 		}
 
 		row[i / 8] |= 1 << (i % 8);
 		b = 0;
 
-		for (j = 0; j < MPKC_N / 8; ++j)
+		for (j = 0; j < MCELIECE_N6960T119_SYS_N / 8; ++j)
 		{
 			b ^= row[j] & E[j];
 		}
@@ -509,633 +269,532 @@ void MPKCN6960T119::Syndrome(byte* S, const byte* Pk, const byte* E)
 		b ^= b >> 2;
 		b ^= b >> 1;
 		b &= 1;
-
 		S[i / 8] |= (b << (i % 8));
-		pkptr += PK_ROW_BYTES;
+
+		pk_ptr += MCELIECE_N6960T119_PK_ROW_BYTES;
 	}
 }
 
-// pk_gen.c //
-
-int32_t MPKCN6960T119::PkGen(byte* Pk, const byte* Sk)
+void MPKCN6960T119::Encrypt(uint8_t* S, const uint8_t* Pk, uint8_t* E, std::unique_ptr<IPrng> &Rng)
 {
-	byte** mat = new byte*[GFBITS * SYS_T];
-	ushort g[SYS_T + 1];
-	ushort L[SYS_N];
-	ushort inv[SYS_N];
-	size_t c;
+	GenE(E, Rng);
+	Syndrome(S, Pk, E);
+}
+
+int32_t MPKCN6960T119::CheckCPadding(const uint8_t* C)
+{
+	// Note artifact, no longer used
+	// check if the padding bits of c are all zero
+	uint8_t b;
+	int32_t ret;
+
+	b = C[MCELIECE_N6960T119_SYND_BYTES - 1] >> (MCELIECE_N6960T119_PK_NROWS % 8);
+	b -= 1;
+	b >>= 7;
+	ret = b;
+
+	return (ret - 1);
+}
+
+int32_t MPKCN6960T119::CheckPkPadding(const uint8_t* Pk)
+{
+	// Note artifact, no longer used
+	uint8_t b;
+	int32_t ret;
+
+	b = 0;
+
+	for (size_t i = 0; i < MCELIECE_N6960T119_PK_NROWS; i++)
+	{
+		b |= Pk[i * MCELIECE_N6960T119_PK_ROW_BYTES + MCELIECE_N6960T119_PK_ROW_BYTES - 1];
+	}
+
+	b >>= (MCELIECE_N6960T119_PK_NCOLS % 8);
+	b -= 1;
+	b >>= 7;
+	ret = b;
+
+	return (ret - 1);
+}
+
+int32_t MPKCN6960T119::PkGen(uint8_t* Pk, const uint8_t* Sk, const uint32_t* Perm, int16_t* Pi)
+{
+	// input: secret key sk output: public key pk
+
+	uint64_t buf[1 << MCELIECE_N6960T119_GFBITS] = { 0 };
+	uint16_t g[MCELIECE_N6960T119_SYS_T + 1] = { 0 };	// Goppa polynomial
+	uint16_t L[MCELIECE_N6960T119_SYS_N] = { 0 };		// support
+	uint16_t inv[MCELIECE_N6960T119_SYS_N];
+	uint8_t** mat;
 	size_t i;
 	size_t j;
 	size_t k;
+	size_t col;
 	size_t row;
-	uint tail;
-	int32_t ret;
-	byte b;
-	byte mask;
+	int32_t res;
+	uint8_t b;
+	uint8_t mask;
+	bool balc;
+	uint8_t* pk_ptr = Pk;
+	int32_t tail;
 
-	g[SYS_T] = 1;
-	ret = 0;
-	
-	for (i = 0; i < SYS_T; i++)
+	res = -1;
+
+	mat = (uint8_t**)MemoryTools::Malloc(MCELIECE_N6960T119_PK_NROWS * sizeof(uint8_t*));
+
+	if (mat != NULL)
 	{
-		g[i] = MPKCUtils::Load16(Sk);
-		g[i] &= GFMASK;
-		Sk += 2;
-	}
+		balc = true;
 
-	SupportGen(L, Sk);
-	Root(inv, g, L);
-
-	for (i = 0; i < SYS_N; i++)
-	{
-		inv[i] = GF::Inverse(inv[i]);
-	}
-
-	for (i = 0; i < GFBITS * SYS_T; ++i)
-	{
-		mat[i] = new byte[SYS_N / 8];
-		std::memset(mat[i], 0, SYS_N / 8);
-	}
-
-	for (i = 0; i < SYS_T; i++)
-	{
-		for (j = 0; j < SYS_N; j += 8)
+		for (i = 0; i < MCELIECE_N6960T119_PK_NROWS; ++i)
 		{
-			for (k = 0; k < GFBITS; k++)
+			mat[i] = (uint8_t*)MemoryTools::Malloc(MCELIECE_N6960T119_SYS_N / 8);
+
+			if (mat[i] == NULL)
 			{
-				/* jgu: checked */
-				/*lint -save -e661, -e662 */
-				b = (inv[j + 7] >> k) & 1;
-				b <<= 1;
-				b |= (inv[j + 6] >> k) & 1;
-				b <<= 1;
-				b |= (inv[j + 5] >> k) & 1;
-				b <<= 1;
-				b |= (inv[j + 4] >> k) & 1;
-				b <<= 1;
-				b |= (inv[j + 3] >> k) & 1;
-				b <<= 1;
-				b |= (inv[j + 2] >> k) & 1;
-				b <<= 1;
-				b |= (inv[j + 1] >> k) & 1;
-				b <<= 1;
-				b |= (inv[j] >> k) & 1;
-				/*lint -restore */
-				mat[i * GFBITS + k][j / 8] = b;
-			}
-		}
-
-		for (j = 0; j < SYS_N; j++)
-		{
-			inv[j] = GF::Multiply(inv[j], L[j]);
-		}
-	}
-
-	for (i = 0; i < (GFBITS * SYS_T + 7) / 8; i++)
-	{
-		for (j = 0; j < 8; j++)
-		{
-			row = (i * 8) + j;
-
-			if (row >= GFBITS * SYS_T)
-			{
+				balc = false;
 				break;
 			}
+		}
 
-			for (k = row + 1; k < GFBITS * SYS_T; k++)
+		if (balc == true)
+		{
+			g[MCELIECE_N6960T119_SYS_T] = 1;
+
+			for (i = 0; i < MCELIECE_N6960T119_SYS_T; ++i)
 			{
-				mask = mat[row][i] ^ mat[k][i];
-				mask >>= j;
-				mask &= 1;
-				mask = ~mask + 1;
+				g[i] = MPKCUtils::LoadGf(Sk); Sk += 2;
+			}
 
-				for (c = 0; c < SYS_N / 8; c++)
+			for (i = 0; i < (1 << MCELIECE_N6960T119_GFBITS); i++)
+			{
+				buf[i] = Perm[i];
+				buf[i] <<= 31;
+				buf[i] |= i;
+			}
+
+			MPKCUtils::Sort64(buf, 1 << MCELIECE_N6960T119_GFBITS);
+
+			for (i = 1; i < (1 << MCELIECE_N6960T119_GFBITS); ++i)
+			{
+				if ((buf[i - 1] >> 31) == (buf[i] >> 31))
 				{
-					mat[row][c] ^= mat[k][c] & mask;
+					res = -2;
+					break;
 				}
 			}
 
-			// return if not systematic
-			if (((mat[row][i] >> j) & 1) == 0)
+			if (res != -2)
 			{
-				ret = -1;
-				break;
-			}
-
-			for (k = 0; k < GFBITS * SYS_T; k++)
-			{
-				if (k != row)
+				for (i = 0; i < (1 << MCELIECE_N6960T119_GFBITS); ++i)
 				{
-					mask = mat[k][i] >> j;
-					mask &= 1;
-					mask = ~mask + 1;
+					Pi[i] = buf[i] & MCELIECE_N6960T119_GFMASK;
+				}
 
-					for (c = 0; c < SYS_N / 8; c++)
+				for (i = 0; i < MCELIECE_N6960T119_SYS_N; ++i)
+				{
+					L[i] = MPKCUtils::BitReverse(Pi[i]);
+				}
+
+				// filling the matrix
+
+				MPKCUtils::Root(inv, g, L, MCELIECE_N6960T119_SYS_N, MCELIECE_N6960T119_SYS_T);
+
+				for (i = 0; i < MCELIECE_N6960T119_SYS_N; ++i)
+				{
+					inv[i] = MPKCUtils::GfInv(inv[i]);
+				}
+
+				for (i = 0; i < MCELIECE_N6960T119_PK_NROWS; ++i)
+				{
+					for (j = 0; j < MCELIECE_N6960T119_SYS_N / 8; ++j)
 					{
-						mat[k][c] ^= mat[row][c] & mask;
+						mat[i][j] = 0;
 					}
 				}
+
+				for (i = 0; i < MCELIECE_N6960T119_SYS_T; ++i)
+				{
+					for (j = 0; j < MCELIECE_N6960T119_SYS_N; j += 8)
+					{
+						for (k = 0; k < MCELIECE_N6960T119_GFBITS; ++k)
+						{
+							b = (inv[j + 7] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 6] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 5] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 4] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 3] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 2] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 1] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j] >> k) & 1;
+
+							mat[i * MCELIECE_N6960T119_GFBITS + k][j / 8] = b;
+						}
+					}
+
+					for (j = 0; j < MCELIECE_N6960T119_SYS_N; ++j)
+					{
+						inv[j] = MPKCUtils::GfMultiply(inv[j], L[j]);
+					}
+				}
+
+				// gaussian elimination
+
+				for (i = 0; i < (MCELIECE_N6960T119_PK_NROWS + 7) / 8; ++i)
+				{
+					for (j = 0; j < 8; ++j)
+					{
+						row = i * 8 + j;
+
+						if (row >= MCELIECE_N6960T119_PK_NROWS)
+						{
+							break;
+						}
+
+						for (k = row + 1; k < MCELIECE_N6960T119_PK_NROWS; ++k)
+						{
+							mask = mat[row][i] ^ mat[k][i];
+							mask >>= j;
+							mask &= 1;
+							mask = -mask;
+
+							for (col = 0; col < MCELIECE_N6960T119_SYS_N / 8; ++col)
+							{
+								mat[row][col] ^= mat[k][col] & mask;
+							}
+						}
+
+						if (((mat[row][i] >> j) & 1) == 0) // return if not systematic
+						{
+							for (i = 0; i < MCELIECE_N6960T119_PK_NROWS; ++i)
+							{
+								MemoryTools::MallocFree(mat[i]);
+							}
+
+							MemoryTools::MallocFree(mat);
+
+							return -1;
+						}
+
+						for (k = 0; k < MCELIECE_N6960T119_PK_NROWS; ++k)
+						{
+							if (k != row)
+							{
+								mask = mat[k][i] >> j;
+								mask &= 1;
+								mask = -mask;
+
+								for (col = 0; col < MCELIECE_N6960T119_SYS_N / 8; ++col)
+								{
+									mat[k][col] ^= mat[row][col] & mask;
+								}
+							}
+						}
+					}
+				}
+
+				tail = MCELIECE_N6960T119_PK_NROWS % 8;
+
+				for (i = 0; i < MCELIECE_N6960T119_PK_NROWS; ++i)
+				{
+					for (j = (MCELIECE_N6960T119_PK_NROWS - 1) / 8; j < MCELIECE_N6960T119_SYS_N / 8 - 1; ++j)
+					{
+						*pk_ptr = (uint8_t)((mat[i][j] >> tail) | (mat[i][j + 1] << (8 - tail)));
+						++pk_ptr;
+					}
+
+					*pk_ptr = (mat[i][j] >> tail);
+					++pk_ptr;
+				}
 			}
+
+			res = 0;
 		}
 
-		if (ret != 0)
+		for (i = 0; i < MCELIECE_N6960T119_PK_NROWS; ++i)
 		{
-			break;
-		}
-	}
-
-	tail = (GFBITS * SYS_T) % 8;
-	k = 0;
-
-	for (i = 0; i < GFBITS * SYS_T; i++)
-	{
-		for (j = ((GFBITS * SYS_T) - 1) / 8; j < (SYS_N / 8) - 1; j++)
-		{
-			Pk[k] = (mat[i][j] >> tail) | (mat[i][j + 1UL] << (8UL - tail));
-			++k;
+			MemoryTools::MallocFree(mat[i]);
 		}
 
-		Pk[k] = (mat[i][j] >> tail);
-		++k;
+		MemoryTools::MallocFree(mat);
 	}
 
-	for (i = 0; i < GFBITS * SYS_T; ++i)
-	{
-		if (mat[i] != nullptr)
-		{
-			delete[] mat[i];
-		}
-	}
-
-	if (mat[i] != nullptr)
-	{
-		delete[] mat;
-	}
-
-	return ret;
+	return res;
 }
 
-// root.c //
-
-ushort MPKCN6960T119::Evaluate(const ushort* F, ushort A)
+int32_t MPKCN6960T119::GenPolyGen(uint16_t* Output, const uint16_t* F)
 {
-	size_t i;
-	ushort r;
+	// input: f, element in GF((2^m)^t)
+	// output: out, minimal polynomial of f
+	// return: 0 for success and -1 for failure
 
-	r = F[MPKC_T];
-	i = MPKC_T;
-
-	do
-	{
-		--i;
-		r = GF::Multiply(r, A);
-		r = GF::Add(r, F[i]);
-	}
-	while (i != 0);
-
-	return r;
-}
-
-void MPKCN6960T119::Root(ushort* Output, const ushort* F, const ushort* L)
-{
-	// input: polynomial f and list of field elements L
-	// output: out = [ f(a) for a in L ]
-
-	size_t i;
-
-	for (i = 0; i < MPKC_N; ++i)
-	{
-		Output[i] = Evaluate(F, L[i]);
-	}
-}
-
-// sk_gen.c //
-
-int32_t MPKCN6960T119::IrrGen(ushort* Output, const ushort* F)
-{
-	// input: f, an element in GF((2^m)^t)
-	// output: out, the generating polynomial of f (first t coefficients only)
-	// return: 0 for success, -1 for failure
-
-	ushort mat[MPKC_T + 1][MPKC_T];
+	uint16_t mat[MCELIECE_N6960T119_SYS_T + 1][MCELIECE_N6960T119_SYS_T] = { 0 };
 	size_t c;
 	size_t i;
 	size_t j;
 	size_t k;
-	int32_t ret;
-	ushort mask;
-	ushort inv;
-	ushort t;
+	int32_t res;
+	uint16_t inv;
+	uint16_t mask;
+	uint16_t t;
 
-	ret = 0;
+	// fill matrix
+
+	res = 0;
 	mat[0][0] = 1;
 
-	for (i = 1; i < MPKC_T; ++i)
-	{
-		mat[0][i] = 0;
-	}
-
-	for (i = 0; i < MPKC_T; ++i)
+	for (i = 0; i < MCELIECE_N6960T119_SYS_T; ++i)
 	{
 		mat[1][i] = F[i];
 	}
 
-	for (j = 2; j <= MPKC_T; ++j)
+	for (j = 2; j <= MCELIECE_N6960T119_SYS_T; ++j)
 	{
-		GF::Multiply(mat[j], mat[j - 1], F);
+		GfMul(mat[j], mat[j - 1], F);
 	}
 
-	for (j = 0; j < MPKC_T; ++j)
-	{
-		for (k = j + 1; k < MPKC_T; ++k)
-		{
-			mask = GF::IsZero(mat[j][j]);
+	// gaussian
 
-			for (c = j; c < MPKC_T + 1; ++c)
+	for (j = 0; j < MCELIECE_N6960T119_SYS_T; ++j)
+	{
+		for (k = j + 1; k < MCELIECE_N6960T119_SYS_T; ++k)
+		{
+			mask = MPKCUtils::GfIsZero(mat[j][j]);
+
+			for (c = j; c < MCELIECE_N6960T119_SYS_T + 1; ++c)
 			{
 				mat[c][j] ^= mat[c][k] & mask;
 			}
 		}
 
-		// return if not systematic
-		if (mat[j][j] == 0)
+		if (mat[j][j] != 0)
 		{
-			ret = -1;
-			break;
-		}
+			inv = MPKCUtils::GfInv(mat[j][j]);
 
-		inv = GF::Inverse(mat[j][j]);
-
-		for (c = j; c < MPKC_T + 1; ++c)
-		{
-			mat[c][j] = GF::Multiply(mat[c][j], inv);
-		}
-
-		for (k = 0; k < MPKC_T; ++k)
-		{
-			if (k != j)
+			for (c = j; c < MCELIECE_N6960T119_SYS_T + 1; ++c)
 			{
-				t = mat[j][k];
+				mat[c][j] = MPKCUtils::GfMultiply(mat[c][j], inv);
+			}
 
-				for (c = j; c < MPKC_T + 1; ++c)
+			for (k = 0; k < MCELIECE_N6960T119_SYS_T; ++k)
+			{
+				if (k != j)
 				{
-					mat[c][k] ^= GF::Multiply(mat[c][j], t);
+					t = mat[j][k];
+
+					for (c = j; c < MCELIECE_N6960T119_SYS_T + 1; ++c)
+					{
+						mat[c][k] ^= MPKCUtils::GfMultiply(mat[c][j], t);
+					}
 				}
 			}
 		}
-	}
-
-	if (ret == 0)
-	{
-		for (i = 0; i < MPKC_T; ++i)
+		else
 		{
-			Output[i] = mat[MPKC_T][i];
-		}
-	}
-
-	return ret;
-}
-
-int32_t MPKCN6960T119::PermConversion(uint* Perm)
-{
-	// input: permutation represented by 32-bit integers
-	// output: an equivalent permutation represented by integers in {0, ..., 2^m-1}
-	// return  0 if no repeated intergers in the input
-	// return -1 if there are repeated intergers in the input
-
-	ulong L[1 << GFBITS];
-	size_t i;
-	int32_t ret;
-
-	for (i = 0; i < (1 << GFBITS); ++i)
-	{
-		L[i] = Perm[i];
-		L[i] <<= 31;
-		L[i] |= i;
-	}
-
-	MPKCUtils::Sort63b(1 << GFBITS, L);
-	ret = 0;
-
-	for (i = 1; i < (1 << GFBITS); ++i)
-	{
-		if ((L[i - 1] >> 31) == (L[i] >> 31))
-		{
-			ret = -1;
+			// return if not systematic
+			res = -1;
 			break;
 		}
-	}
 
-	if (ret == 0)
-	{
-		for (i = 0; i < (1 << GFBITS); ++i)
+		for (i = 0; i < MCELIECE_N6960T119_SYS_T; ++i)
 		{
-			Perm[i] = L[i] & GFMASK;
+			Output[i] = mat[MCELIECE_N6960T119_SYS_T][i];
 		}
 	}
 
-	return ret;
+	return res;
 }
 
-int32_t MPKCN6960T119::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
+bool MPKCN6960T119::Decapsulate(const std::vector<uint8_t> &PrivateKey, const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret)
 {
-	// random permutation
-	std::array<uint, 1 << GFBITS> perm;
-	// irreducible polynomial
-	ushort g[MPKC_T];
-	// random element in GF(2^mt)
-	std::array<ushort, MPKC_T> a;
+	std::vector<uint8_t> conf(32);
+	std::vector<uint8_t> preimage(1 + MCELIECE_N6960T119_SYS_N / 8 + (MCELIECE_N6960T119_SYND_BYTES + 32));
+	std::vector<uint8_t> twoe(1 + MCELIECE_N6960T119_SYS_N / 8);
+	const uint8_t* sk = PrivateKey.data();
+	const uint8_t* s = sk + 40 + MCELIECE_N6960T119_IRR_BYTES + MCELIECE_N6960T119_COND_BYTES;
 	size_t i;
+	uint16_t m;
+	uint8_t ret_confirm;
+	uint8_t ret_decrypt;
+	uint8_t* e = twoe.data() + 1;
+	uint8_t* x = preimage.data();
+	int32_t padding_ok;
+	uint8_t mask;
 
-	for (;;)
+	padding_ok = CheckCPadding(CipherText.data());
+
+	twoe[0] = 2;
+	ret_confirm = 0;
+	ret_decrypt = (uint8_t)Decrypt(e, (sk + 40), CipherText.data());
+	Keccak::XOFP1600(twoe, 0, twoe.size(), conf, 0, conf.size(), Keccak::KECCAK256_RATE_SIZE);
+
+	for (i = 0; i < 32; ++i)
 	{
-		Rng->Fill(a, 0, a.size());
+		ret_confirm |= conf[i] ^ CipherText[MCELIECE_N6960T119_SYND_BYTES + i];
+	}
 
-		for (i = 0; i < MPKC_T; ++i)
-		{
-			a[i] &= GFMASK;
-		}
+	m = ret_decrypt | ret_confirm;
+	m -= 1;
+	m >>= 8;
 
-		if (IrrGen(g, reinterpret_cast<ushort*>(a.data())) == 0)
+	*x = m & 1;
+	++x;
+
+	for (i = 0; i < MCELIECE_N6960T119_SYS_N / 8; ++i)
+	{
+		*x = (~m & s[i]) | (m & e[i]);
+		++x;
+	}
+
+	for (i = 0; i < MCELIECE_N6960T119_SYND_BYTES + 32; ++i)
+	{
+		*x = CipherText[i];
+		++x;
+	}
+
+	Keccak::XOFP1600(preimage, 0, preimage.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
+
+	// clear outputs (set to all 1's) if padding bits are not all zero
+	mask = (uint8_t)padding_ok;
+
+	for (i = 0; i < 32; ++i)
+	{
+		SharedSecret[i] |= mask;
+	}
+
+	return ((ret_decrypt + ret_confirm + padding_ok) == 0);
+}
+
+bool MPKCN6960T119::Encapsulate(const std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret, std::unique_ptr<IPrng> &Rng)
+{
+	std::vector<uint8_t> oneec(1 + MCELIECE_N6960T119_SYS_N / 8 + (MCELIECE_N6960T119_SYND_BYTES + 32));
+	std::vector<uint8_t> twoe(1 + MCELIECE_N6960T119_SYS_N / 8);
+	uint8_t* e = twoe.data() + 1;
+	uint8_t* c = CipherText.data();
+	const uint8_t* pk = PublicKey.data();
+	uint8_t mask;
+	int32_t i;
+	int32_t padding_ok;
+
+	padding_ok = CheckPkPadding(pk);
+
+	oneec[0] = 1;
+	twoe[0] = 2;
+	Encrypt(c, pk, e, Rng);
+
+	Keccak::XOFP1600(twoe, 0, twoe.size(), CipherText, MCELIECE_N6960T119_SYND_BYTES, 32, Keccak::KECCAK256_RATE_SIZE);
+	MemoryTools::CopyRaw(e, oneec.data() + 1, MCELIECE_N6960T119_SYS_N / 8);
+	MemoryTools::CopyRaw(c, oneec.data() + 1 + MCELIECE_N6960T119_SYS_N / 8, MCELIECE_N6960T119_SYND_BYTES + 32);
+	Keccak::XOFP1600(oneec, 0, oneec.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
+
+	mask = padding_ok;
+	mask ^= 0xFF;
+
+	for (i = 0; i < MCELIECE_N6960T119_SYND_BYTES + 32; ++i)
+	{
+		c[i] &= mask;
+	}
+
+	for (i = 0; i < 32; ++i)
+	{
+		SharedSecret[i] &= mask;
+	}
+
+	return (padding_ok == 0);
+}
+
+bool MPKCN6960T119::Generate(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &PrivateKey, std::unique_ptr<IPrng> &Rng)
+{
+	const size_t RLEN = (MCELIECE_N6960T119_SYS_N / 8) + ((1 << MCELIECE_N6960T119_GFBITS) * sizeof(uint32_t)) + (MCELIECE_N6960T119_SYS_T * 2) + 32;
+	uint32_t perm[1 << MCELIECE_N6960T119_GFBITS] = { 0 };	// random permutation as 32-bit integers
+	int16_t pi[1 << MCELIECE_N6960T119_GFBITS];	// random permutation
+	uint16_t f[MCELIECE_N6960T119_SYS_T] = { 0 };	// element in GF(2 ^ mt)
+	uint16_t irr[MCELIECE_N6960T119_SYS_T];		// Goppa polynomial
+	std::vector<uint8_t> r(RLEN);
+	uint8_t* seed;
+	std::vector<uint8_t> tmps(33);
+	uint8_t* skp;
+	int32_t i;
+	size_t idx;
+	size_t itr;
+
+	itr = 0;
+	tmps[0] = 64;
+	Rng->Generate(tmps, 1, 32);
+	seed = tmps.data();
+
+	while (true)
+	{
+		++itr;
+
+		if (itr > MCELIECE_N6960T119_GENITR_MAX)
 		{
 			break;
 		}
-	}
 
-	for (;;)
-	{
-		Rng->Fill(perm, 0, perm.size());
+		idx = r.size() - 32;
+		skp = PrivateKey.data();
 
-		if (PermConversion(reinterpret_cast<uint*>(perm.data())) == 0)
+		// expanding and updating the seed
+		Keccak::XOFP1600(tmps, 0, tmps.size(), r, 0, r.size(), Keccak::KECCAK256_RATE_SIZE);
+		MemoryTools::CopyRaw(seed + 1, skp, 32);
+		skp += 32 + 8;
+		MemoryTools::CopyRaw(r.data() + idx, seed + 1, 32);
+
+		// generating irreducible polynomial
+		idx -= sizeof(f);
+
+		for (i = 0; i < MCELIECE_N6960T119_SYS_T; ++i)
 		{
-			break;
+			f[i] = MPKCUtils::LoadGf(r.data() + idx + (size_t)i * 2);
 		}
-	}
 
-	for (i = 0; i < MPKC_T; ++i)
-	{
-		MPKCUtils::Store16(Sk + MPKC_N / 8 + i * 2, g[i]);
-	}
-
-	ControlBits(Sk + MPKC_N / 8 + IRR_BYTES, reinterpret_cast<uint*>(perm.data()));
-
-	return 0;
-}
-
-// syndrome.c //
-
-void MPKCN6960T119::Syndrome(ushort* Output, const ushort* F, const ushort* L, const byte* R)
-{
-	// input: Goppa polynomial f, support L, received word r
-	// output: out, the Syndrome of length 2t
-
-	size_t i;
-	size_t j;
-	ushort c;
-	ushort e;
-	ushort einv;
-
-	for (j = 0; j < 2 * MPKC_T; ++j)
-	{
-		Output[j] = 0;
-	}
-
-	for (i = 0; i < MPKC_N; ++i)
-	{
-		c = (R[i / 8] >> (i % 8)) & 1;
-		e = Evaluate(F, L[i]);
-		einv = GF::Inverse(GF::Multiply(e, e));
-
-		for (j = 0; j < 2 * MPKC_T; ++j)
+		if (GenPolyGen(irr, f) != 0)
 		{
-			Output[j] = GF::Add(Output[j], GF::Multiply(einv, c));
-			einv = GF::Multiply(einv, L[i]);
+			continue;
 		}
-	}
-}
 
-// gf.c //
-
-ushort MPKCN6960T119::GF::Add(ushort A, ushort B)
-{
-	return A ^ B;
-}
-
-ushort MPKCN6960T119::GF::GfFrac(ushort Den, ushort Num)
-{
-	// input: field element den, num
-	// return: (num/den)
-	ushort tmp11;
-	ushort tmp1111;
-	ushort out;
-
-	// ^11
-	tmp11 = SqMul(Den, Den);
-	// ^1111
-	tmp1111 = Sq2Mul(tmp11, tmp11);
-	out = Sq2(tmp1111);
-	// ^11111111
-	out = Sq2Mul(out, tmp1111);
-	out = Sq2(out);
-	// ^111111111111
-	out = Sq2Mul(out, tmp1111);
-
-	// ^1111111111110 = ^-1
-	return SqMul(out, Num);
-}
-
-ushort MPKCN6960T119::GF::IsZero(ushort A)
-{
-	uint t;
-
-	t = A;
-	t -= 1;
-	t >>= 19;
-
-	return static_cast<ushort>(t);
-}
-
-ushort MPKCN6960T119::GF::Inverse(ushort Den)
-{
-	return GfFrac(Den, 1U);
-}
-
-ushort MPKCN6960T119::GF::Multiply(ushort A, ushort B)
-{
-	ulong t;
-	ulong t0;
-	ulong t1;
-	ulong tmp;
-	size_t i;
-
-	t0 = A;
-	t1 = B;
-	tmp = t0 * (t1 & 1);
-
-	for (i = 1; i < GFBITS; ++i)
-	{
-		tmp ^= (t0 * (t1 & (1ULL << i)));
-	}
-
-	t = tmp & 0x0000000001FF0000ULL;
-	tmp ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-	t = tmp & 0x000000000000E000ULL;
-	tmp ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-
-	return static_cast<ushort>(tmp & GFMASK);
-}
-
-void MPKCN6960T119::GF::Multiply(ushort* Output, const ushort* X, const ushort* Y)
-{
-	// input: X, Y in GF((2^m)^t)
-	// output: out = X*Y
-
-	ushort prod[IRR_BYTES - 1];
-	size_t i;
-	size_t j;
-
-	for (i = 0; i < IRR_BYTES - 1; ++i)
-	{
-		prod[i] = 0;
-	}
-
-	for (i = 0; i < MPKC_T; ++i)
-	{
-		for (j = 0; j < MPKC_T; ++j)
+		for (i = 0; i < MCELIECE_N6960T119_SYS_T; ++i)
 		{
-			prod[i + j] ^= Multiply(X[i], Y[j]);
+			IntegerTools::Le16ToBytesRaw(irr[i], skp + ((size_t)i * 2));
 		}
+
+		skp += MCELIECE_N6960T119_IRR_BYTES;
+
+		// generating permutation
+		idx -= sizeof(perm);
+
+		for (i = 0; i < (1 << MCELIECE_N6960T119_GFBITS); ++i)
+		{
+			perm[i] = IntegerTools::LeBytesTo32Raw(r.data() + idx + ((size_t)i * 4));
+		}
+
+		if (PkGen(PublicKey.data(), skp - MCELIECE_N6960T119_IRR_BYTES, perm, pi) != 0)
+		{
+			continue;
+		}
+
+		MPKCUtils::ControlBitsFromPermutation(skp, pi, MCELIECE_N6960T119_GFBITS, 1 << MCELIECE_N6960T119_GFBITS);
+		skp += MCELIECE_N6960T119_COND_BYTES;
+
+		// storing the random string s
+		idx -= MCELIECE_N6960T119_SYS_N / 8;
+		MemoryTools::CopyRaw((uint8_t*)r.data() + idx, (uint8_t*)skp, MCELIECE_N6960T119_SYS_N / 8);
+
+		// storing positions of the 32 pivots
+		IntegerTools::Le64ToBytesRaw(0x00000000FFFFFFFFULL, PrivateKey.data() + 32);
+
+		break;
 	}
 
-	for (i = IRR_BYTES - 2; i >= MPKC_T; --i)
-	{
-		prod[i - (MPKC_T - 2)] ^= Multiply(prod[i], GF_MUL_FACTOR1);
-		prod[i - MPKC_T] ^= Multiply(prod[i], GF_MUL_FACTOR2);
-	}
-
-	for (i = 0; i < MPKC_T; ++i)
-	{
-		Output[i] = prod[i];
-	}
-}
-
-ushort MPKCN6960T119::GF::Sq2(ushort Input)
-{
-	// input: field element in
-	// return: (in^2)^2
-
-	ulong t;
-	ulong x;
-	size_t i;
-
-	const ulong B[] =
-	{
-		0x1111111111111111ULL,
-		0x0303030303030303ULL,
-		0x000F000F000F000FULL,
-		0x000000FF000000FFULL
-	};
-
-	const ulong M[] =
-	{
-		0x0001FF0000000000ULL,
-		0x000000FF80000000ULL,
-		0x000000007FC00000ULL,
-		0x00000000003FE000ULL
-	};
-
-	x = Input;
-	x = (x | (x << 24)) & B[3];
-	x = (x | (x << 12)) & B[2];
-	x = (x | (x << 6)) & B[1];
-	x = (x | (x << 3)) & B[0];
-
-	for (i = 0; i < 4; ++i)
-	{
-		t = x & M[i];
-		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-	}
-
-	return static_cast<ushort>(x & GFMASK);
-}
-
-ushort MPKCN6960T119::GF::SqMul(ushort Input, ushort M)
-{
-	// input: field element in, m
-	// return: (in^2)*m
-
-	ulong t;
-	ulong t0;
-	ulong t1;
-	ulong x;
-	size_t i;
-
-	const ulong MA[] =
-	{
-		0x0000001FF0000000ULL,
-		0x000000000FF80000ULL,
-		0x000000000007E000ULL
-	};
-
-	t0 = Input;
-	t1 = M;
-	x = (t1 << 6) * (t0 & (1 << 6));
-	t0 ^= (t0 << 7);
-
-	x ^= (t1 * (t0 & (0x0000000000004001ULL)));
-	x ^= (t1 * (t0 & (0x0000000000008002ULL))) << 1;
-	x ^= (t1 * (t0 & (0x0000000000010004ULL))) << 2;
-	x ^= (t1 * (t0 & (0x0000000000020008ULL))) << 3;
-	x ^= (t1 * (t0 & (0x0000000000040010ULL))) << 4;
-	x ^= (t1 * (t0 & (0x0000000000080020ULL))) << 5;
-
-	for (i = 0; i < 3; ++i)
-	{
-		t = x & MA[i];
-		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-	}
-
-	return static_cast<ushort>(x & GFMASK);
-}
-
-ushort MPKCN6960T119::GF::Sq2Mul(ushort Input, ushort M)
-{
-	// input: field element in, m
-	// return: ((in^2)^2)*m
-	ulong x;
-	ulong t0;
-	ulong t1;
-	ulong t;
-	size_t i;
-
-	const ulong MA[] =
-	{
-		0x1FF0000000000000ULL,
-		0x000FF80000000000ULL,
-		0x000007FC00000000ULL,
-		0x00000003FE000000ULL,
-		0x0000000001FE0000ULL,
-		0x000000000001E000ULL
-	};
-
-	t0 = Input;
-	t1 = M;
-	x = (t1 << 18) * (t0 & (1 << 6));
-	t0 ^= (t0 << 21);
-	x ^= (t1 * (t0 & (0x0000000010000001ULL)));
-	x ^= (t1 * (t0 & (0x0000000020000002ULL))) << 3;
-	x ^= (t1 * (t0 & (0x0000000040000004ULL))) << 6;
-	x ^= (t1 * (t0 & (0x0000000080000008ULL))) << 9;
-	x ^= (t1 * (t0 & (0x0000000100000010ULL))) << 12;
-	x ^= (t1 * (t0 & (0x0000000200000020ULL))) << 15;
-
-	for (i = 0; i < 6; ++i)
-	{
-		t = x & MA[i];
-		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-	}
-
-	return static_cast<ushort>(x & GFMASK);
+	return (itr <= MCELIECE_N6960T119_GENITR_MAX);
 }
 
 NAMESPACE_MCELIECEEND

@@ -37,7 +37,7 @@ public:
 	/// <param name="AlignBit">The alignment bit</param>
 	///
 	/// <exception cref="CryptoException">Thrown if invalid parameters are passed</exception>
-	MemoryPool(byte* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, byte AlignBit);
+	MemoryPool(uint8_t* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, uint8_t AlignBit);
 
 	/// <summary>
 	/// Class destructor

@@ -114,11 +114,11 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Output">The secure-vector to fill with pseudo-random bytes</param>
-	/// <param name="Offset">The starting offset within the output byte vector</param>
+	/// <param name="Offset">The starting offset within the output uint8_t vector</param>
 	/// <param name="Length">The length of the requested pseudo-random bytes allocation</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the request size is zero length or the output array is too small</exception>
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length);
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Return a secure-vector with pseudo-random bytes
@@ -129,11 +129,11 @@ public:
 	/// <returns>A secure-vector filled with pseudo-random bytes</returns>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the request size is zero length</exception>
-	SecureVector<byte> Generate(size_t Length);
+	SecureVector<uint8_t> Generate(size_t Length);
 
 private:
 
-	static void Generate(Providers Provider, SecurityPolicy Policy, SecureVector<byte> &Output, size_t Offset, size_t Length);
+	static void Generate(Providers Provider, SecurityPolicy Policy, SecureVector<uint8_t> &Output, size_t Offset, size_t Length);
 };
 
 NAMESPACE_CIPHEREND

@@ -14,21 +14,20 @@ class PBKDF2::Pbkdf2State
 {
 public:
 
-	std::vector<byte> Counter;
-	std::vector<byte> Salt;
-	std::vector<byte> State;
-	uint Iterations;
+	std::vector<uint8_t> Counter;
+	std::vector<uint8_t> Salt;
+	std::vector<uint8_t> State;
+	uint32_t Iterations;
 	bool IsDestroyed;
-	bool IsInitialized;
+	bool IsInitialized = false;
 
-	Pbkdf2State(size_t StateSize, size_t SaltSize, uint Cycles, bool Destroyed)
+	Pbkdf2State(size_t StateSize, size_t SaltSize, uint32_t Cycles, bool Destroyed)
 		:
 		Counter{ 0x00, 0x00, 0x00, 0x01 },
 		Salt(SaltSize),
 		State(StateSize),
 		Iterations(Cycles),
-		IsDestroyed(Destroyed),
-		IsInitialized(false)
+		IsDestroyed(Destroyed)
 	{
 	}
 
@@ -44,8 +43,8 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(Counter, 0, Counter.size() - sizeof(byte));
-		Counter[Counter.size() - sizeof(byte)] = 1;
+		MemoryTools::Clear(Counter, 0, Counter.size() - sizeof(uint8_t));
+		Counter[Counter.size() - sizeof(uint8_t)] = 1;
 		MemoryTools::Clear(Salt, 0, Salt.size());
 		MemoryTools::Clear(State, 0, State.size());
 		IsInitialized = false;
@@ -54,7 +53,7 @@ public:
 
 //~~~Constructor~~~//
 
-PBKDF2::PBKDF2(SHA2Digests DigestType, uint Iterations)
+PBKDF2::PBKDF2(SHA2Digests DigestType, uint32_t Iterations)
 	:
 	KdfBase(
 		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA2256 ? Kdfs::PBKDF2256 : Kdfs::PBKDF2512) : Kdfs::None),
@@ -77,7 +76,7 @@ PBKDF2::PBKDF2(SHA2Digests DigestType, uint Iterations)
 {
 }
 
-PBKDF2::PBKDF2(IDigest* Digest, uint Iterations)
+PBKDF2::PBKDF2(IDigest* Digest, uint32_t Iterations)
 	:
 	KdfBase(
 		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA2256 ? Kdfs::PBKDF2256 : Kdfs::PBKDF2512) :
@@ -128,14 +127,14 @@ const bool PBKDF2::IsInitialized()
 	return m_pbkdf2State->IsInitialized;
 }
 
-uint &PBKDF2::Iterations()
+uint32_t &PBKDF2::Iterations()
 {
 	return m_pbkdf2State->Iterations;
 }
 
 //~~~Public Functions~~~//
 
-void PBKDF2::Generate(std::vector<byte> &Output)
+void PBKDF2::Generate(std::vector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -149,7 +148,7 @@ void PBKDF2::Generate(std::vector<byte> &Output)
 	return Expand(Output, 0, Output.size(), m_pbkdf2State, m_pbkdf2Generator);
 }
 
-void PBKDF2::Generate(SecureVector<byte> &Output)
+void PBKDF2::Generate(SecureVector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -163,7 +162,7 @@ void PBKDF2::Generate(SecureVector<byte> &Output)
 	Expand(Output, 0, Output.size(), m_pbkdf2State, m_pbkdf2Generator);
 }
 
-void PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void PBKDF2::Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -171,7 +170,7 @@ void PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 	if (IntegerTools::BeBytesTo32(m_pbkdf2State->Counter, 0) + (Length / m_pbkdf2Generator->TagSize()) > MAXGEN_REQUESTS)
 	{
@@ -181,7 +180,7 @@ void PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	return Expand(Output, OutOffset, Length, m_pbkdf2State, m_pbkdf2Generator);
 }
 
-void PBKDF2::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
+void PBKDF2::Generate(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -189,7 +188,7 @@ void PBKDF2::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Lengt
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 	if (IntegerTools::BeBytesTo32(m_pbkdf2State->Counter, 0) + (Length / m_pbkdf2Generator->TagSize()) > MAXGEN_REQUESTS)
 	{
@@ -257,9 +256,9 @@ void PBKDF2::Reset()
 
 //~~~Private Functions~~~//
 
-void PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Pbkdf2State> &State, std::unique_ptr<HMAC> &Generator)
+void PBKDF2::Expand(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Pbkdf2State> &State, std::unique_ptr<HMAC> &Generator)
 {
-	std::vector<byte> tmps(Generator->TagSize());
+	std::vector<uint8_t> tmps(Generator->TagSize());
 	size_t i;
 
 	do
@@ -270,7 +269,7 @@ void PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, 
 		// update the mac with the salt
 		Generator->Update(State->Salt, 0, State->Salt.size());
 		// update the counter
-		Generator->Update(State->Counter, 0, sizeof(uint));
+		Generator->Update(State->Counter, 0, sizeof(uint32_t));
 		// store in temp state
 		Generator->Finalize(tmps, 0);
 		MemoryTools::Copy(tmps, 0, Output, OutOffset, PRCRMD);
@@ -287,14 +286,14 @@ void PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, 
 
 		Length -= PRCRMD;
 		OutOffset += PRCRMD;
-		IntegerTools::BeIncrement8(State->Counter, 0, sizeof(uint));
+		IntegerTools::BeIncrement8(State->Counter, 0, sizeof(uint32_t));
 	} 
 	while (Length != 0);
 }
 
-void PBKDF2::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Pbkdf2State> &State, std::unique_ptr<HMAC> &Generator)
+void PBKDF2::Expand(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Pbkdf2State> &State, std::unique_ptr<HMAC> &Generator)
 {
-	std::vector<byte> tmps(Length);
+	std::vector<uint8_t> tmps(Length);
 	Expand(tmps, OutOffset, Length, State, Generator);
 	SecureMove(tmps, 0, Output, OutOffset, tmps.size());
 }

@@ -57,13 +57,13 @@ namespace Test
 
 	private:
 
-		static std::vector<uint> Convert(std::vector<byte> &Input)
+		static std::vector<uint32_t> Convert(std::vector<uint8_t> &Input)
 		{
-			std::vector<uint> ret(Input.size() / sizeof(uint));
+			std::vector<uint32_t> ret(Input.size() / sizeof(uint32_t));
 
 			for (size_t i = 0; i < ret.size(); ++i)
 			{
-				ret[i] = Tools::IntegerTools::LeBytesTo32(Input, i * sizeof(uint));
+				ret[i] = Tools::IntegerTools::LeBytesTo32(Input, i * sizeof(uint32_t));
 			}
 
 			return ret;
@@ -90,11 +90,11 @@ namespace Test
 		{
 			T A, B, C, D, Q;
 			Prng::SecureRandom rnd;
-			std::vector<uint> tmpA(A.size() / sizeof(uint));
-			std::vector<uint> tmpB(tmpA.size());
-			std::vector<uint> tmpQ(tmpA.size());
-			std::vector<byte> tmpR1;
-			std::vector<byte> tmpR2;
+			std::vector<uint32_t> tmpA(A.size() / sizeof(uint32_t));
+			std::vector<uint32_t> tmpB(tmpA.size());
+			std::vector<uint32_t> tmpQ(tmpA.size());
+			std::vector<uint8_t> tmpR1;
+			std::vector<uint8_t> tmpR2;
 
 			for (size_t i = 0; i < 100; ++i)
 			{

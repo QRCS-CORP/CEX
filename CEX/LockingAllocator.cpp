@@ -20,7 +20,7 @@ LockingAllocator::LockingAllocator()
 
 	if (LCKLMT)
 	{
-		m_lockedPages = static_cast<byte*>(SecureMemory::Allocate(LCKLMT));
+		m_lockedPages = static_cast<uint8_t*>(SecureMemory::Allocate(LCKLMT));
 
 		if (m_lockedPages)
 		{

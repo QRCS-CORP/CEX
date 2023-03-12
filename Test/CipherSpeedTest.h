@@ -62,8 +62,8 @@ namespace Test
 		{
 			const size_t BLKLEN = Parallel ? Cipher->ParallelBlockSize() : 16;
 			const size_t ALNLEN = SampleSize - (SampleSize % BLKLEN);
-			std::vector<byte> buffer1(BLKLEN, 0x00);
-			std::vector<byte> buffer2(BLKLEN, 0x00);
+			std::vector<uint8_t> buffer1(BLKLEN, 0x00);
+			std::vector<uint8_t> buffer2(BLKLEN, 0x00);
 			std::string glen;
 			std::string mbps;
 			std::string resp;
@@ -94,7 +94,7 @@ namespace Test
 			}
 
 			dur = TestUtils::GetTimeMs64() - start;
-			len = static_cast<ulong>(Loops) * SampleSize;
+			len = static_cast<uint64_t>(Loops) * SampleSize;
 			rate = GetBytesPerSecond(dur, len);
 			glen = TestUtils::ToString(len / GB1);
 			mbps = TestUtils::ToString((rate / MB1));
@@ -109,8 +109,8 @@ namespace Test
 		void ParallelStreamLoop(T* Cipher, size_t KeySize, size_t IvSize, size_t Loops, TestEventHandler &Handler)
 		{
 			const size_t ALNLEN = DATA_SIZE - (DATA_SIZE % Cipher->ParallelBlockSize());
-			std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0x00);
-			std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0x00);
+			std::vector<uint8_t> buffer1(Cipher->ParallelBlockSize(), 0x00);
+			std::vector<uint8_t> buffer2(Cipher->ParallelBlockSize(), 0x00);
 			std::string mbps;
 			std::string resp;
 			std::string secs;
@@ -150,7 +150,6 @@ namespace Test
 			delete keyParam;
 		}
 
-		static bool HasAESNI();
 		void CBCSpeedTest(bool Encrypt, bool Parallel);
 		void CFBSpeedTest(bool Encrypt, bool Parallel);
 		void CTRSpeedTest(bool Encrypt, bool Parallel);

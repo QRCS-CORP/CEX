@@ -8,7 +8,7 @@ NAMESPACE_IO
 /// <summary>
 /// Seek origin position flags
 /// </summary>
-enum class SeekOrigin : uint
+enum class SeekOrigin : uint32_t
 {
 	/// <summary>
 	/// Start at the beginning of the stream

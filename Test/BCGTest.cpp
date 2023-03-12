@@ -95,9 +95,9 @@ namespace Test
 
 	void BCGTest::Evaluate(IDrbg* Rng)
 	{
-		Cipher::SymmetricKeySize ks = Rng->LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> cust(ks.IVSize());
+		Cipher::SymmetricKeySize ks = Rng->LegalKeySizes()[0];
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> cust(ks.IVSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -109,7 +109,7 @@ namespace Test
 		try
 		{
 			const size_t SEGLEN = SAMPLE_SIZE / 8;
-			std::vector<byte> smp(SAMPLE_SIZE);
+			std::vector<uint8_t> smp(SAMPLE_SIZE);
 
 			for (i = 0; i < 8; ++i)
 			{
@@ -131,7 +131,7 @@ namespace Test
 		{
 			BCG gen;
 			// invalid key size
-			std::vector<byte> key(1);
+			std::vector<uint8_t> key(1);
 			SymmetricKey kp(key);
 			gen.Initialize(kp);
 
@@ -149,7 +149,7 @@ namespace Test
 		try
 		{
 			BCG gen;
-			std::vector<byte> m(16);
+			std::vector<uint8_t> m(16);
 			// cipher was not initialized
 			gen.Generate(m);
 
@@ -168,11 +168,11 @@ namespace Test
 		{
 			BCG gen;			
 			SymmetricKeySize ks = gen.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.IVSize());
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 			gen.Initialize(kp);
-			std::vector<byte> m(16);
+			std::vector<uint8_t> m(16);
 			// array is too small
 			gen.Generate(m, 0, m.size() + 1);
 
@@ -191,8 +191,8 @@ namespace Test
 		{
 			BCG gen(Providers::CSP);
 			SymmetricKeySize ks = gen.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize(), 0x32);
-			std::vector<byte> nonce(ks.IVSize(), 0x64);
+			std::vector<uint8_t> key(ks.KeySize(), 0x32);
+			std::vector<uint8_t> nonce(ks.IVSize(), 0x64);
 			SymmetricKey kp(key, nonce);
 			gen.Initialize(kp);
 			
@@ -270,10 +270,10 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void BCGTest::Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void BCGTest::Kat(IDrbg* Rng, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected)
 	{
 		const size_t EXPLEN = Expected.size();
-		std::vector<byte> exp(EXPLEN);
+		std::vector<uint8_t> exp(EXPLEN);
 		SymmetricKey kp(Key, Nonce);
 
 		// generate
@@ -297,10 +297,10 @@ namespace Test
 		const size_t SMPCNK = 1024;
 
 		BCG gen(Providers::CSP);
-		Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize(), 0x32);
-		std::vector<byte> iv(ks.IVSize(), 0x64);
-		std::vector<byte> otp(SMPLEN);
+		Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[0];
+		std::vector<uint8_t> key(ks.KeySize(), 0x32);
+		std::vector<uint8_t> iv(ks.IVSize(), 0x64);
+		std::vector<uint8_t> otp(SMPLEN);
 		SymmetricKey kp(key, iv);
 		size_t i;
 		size_t j;
@@ -332,16 +332,16 @@ namespace Test
 	{
 		BCG gen1(Providers::None);
 		BCG gen2(Providers::None);
-		std::vector<byte> inp;
-		std::vector<byte> key(32);
-		std::vector<byte> iv(32);
-		std::vector<byte> otp1;
-		std::vector<byte> otp2;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> key(32);
+		std::vector<uint8_t> iv(32);
+		std::vector<uint8_t> otp1;
+		std::vector<uint8_t> otp2;
 		SecureRandom rnd;
 		size_t i;
 
-		const uint MINPRL = 1;
-		const uint MAXPRL = 10240;
+		const uint32_t MINPRL = 1;
+		const uint32_t MAXPRL = 10240;
 
 		inp.reserve(SAMPLE_SIZE);
 		otp1.reserve(SAMPLE_SIZE);

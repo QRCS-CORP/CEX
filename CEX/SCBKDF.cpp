@@ -12,14 +12,14 @@ class SCBKDF::ScbkdfState
 {
 public:
 
-	std::array<ulong, Keccak::KECCAK_STATE_SIZE> State = { 0 };
-	std::vector<byte> Cache;
+	std::array<uint64_t, Keccak::KECCAK_STATE_SIZE> State = { 0 };
+	std::vector<uint8_t> Cache;
 	size_t CpuCost;
 	size_t MemoryCost;
 	size_t Rate;
 	ShakeModes ShakeMode;
-	byte Domain;
-	bool IsInitialized;
+	uint8_t Domain;
+	bool IsInitialized = false;
 
 	ScbkdfState(ShakeModes Mode, size_t Iterations, size_t Memory)
 		:
@@ -32,14 +32,13 @@ public:
 			Mode == ShakeModes::SHAKE512 ? Keccak::KECCAK512_RATE_SIZE :
 			Keccak::KECCAK1024_RATE_SIZE),
 		ShakeMode(Mode),
-		Domain(0x24),
-		IsInitialized(false)
+		Domain(0x24)
 	{
 	}
 
 	~ScbkdfState()
 	{
-		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+		MemoryTools::Clear(State, 0, State.size() * sizeof(uint64_t));
 		MemoryTools::Clear(Cache, 0, Cache.size());
 		Cache.clear();
 		CpuCost = 0;
@@ -52,7 +51,7 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+		MemoryTools::Clear(State, 0, State.size() * sizeof(uint64_t));
 		MemoryTools::Clear(Cache, 0, Cache.size());
 		Cache.clear();
 		IsInitialized = false;
@@ -66,7 +65,6 @@ SCBKDF::SCBKDF(ShakeModes ShakeMode, size_t CpuCost, size_t MemoryCost)
 	KdfBase(ShakeMode == ShakeModes::SHAKE128 ? Kdfs::SCBKDF128 :
 		ShakeMode == ShakeModes::SHAKE256 ? Kdfs::SCBKDF256 :
 		ShakeMode == ShakeModes::SHAKE512 ? Kdfs::SCBKDF512 : 
-		ShakeMode == ShakeModes::SHAKE1024 ? Kdfs::SCBKDF1024 :
 		throw CryptoKdfException(std::string("SCBKDF"), std::string("Constructor"), std::string("The shake mode type is not supported!"), ErrorCodes::InvalidParam),
 		16, 0, KdfConvert::ToName(ShakeMode == ShakeModes::SHAKE128 ? Kdfs::SCBKDF128 :
 			ShakeMode == ShakeModes::SHAKE256 ? Kdfs::SCBKDF256 :
@@ -107,7 +105,7 @@ size_t &SCBKDF::MemoryCost()
 
 //~~~Public Functions~~~//
 
-void SCBKDF::Generate(std::vector<byte> &Output)
+void SCBKDF::Generate(std::vector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -117,7 +115,7 @@ void SCBKDF::Generate(std::vector<byte> &Output)
 	Generate(Output, 0, Output.size());
 }
 
-void SCBKDF::Generate(SecureVector<byte> &Output)
+void SCBKDF::Generate(SecureVector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -127,7 +125,7 @@ void SCBKDF::Generate(SecureVector<byte> &Output)
 	Generate(Output, 0, Output.size());
 }
 
-void SCBKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void SCBKDF::Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -135,14 +133,14 @@ void SCBKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 			
 
 	Extract(Output, OutOffset, Length, m_scbkdfState);
 }
 
-void SCBKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
+void SCBKDF::Generate(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -150,10 +148,10 @@ void SCBKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Lengt
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 	
-	std::vector<byte> tmpr(Length);
+	std::vector<uint8_t> tmpr(Length);
 	Generate(tmpr, 0, tmpr.size());
 	SecureMove(tmpr, 0, Output, OutOffset, tmpr.size());
 }
@@ -222,7 +220,7 @@ void SCBKDF::Expand(std::unique_ptr<ScbkdfState> &State)
 	}
 }
 
-void SCBKDF::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ScbkdfState> &State)
+void SCBKDF::Extract(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ScbkdfState> &State)
 {
 	Expand(State);
 
@@ -245,7 +243,7 @@ void SCBKDF::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length,
 
 void SCBKDF::Permute(std::unique_ptr<ScbkdfState> &State)
 {
-	Keccak::Permute(State->State, State->Rate);
+	Keccak::Permute(State->State);
 }
 
 NAMESPACE_KDFEND

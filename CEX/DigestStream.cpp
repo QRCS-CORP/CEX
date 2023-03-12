@@ -81,9 +81,9 @@ ParallelOptions &DigestStream::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-std::vector<byte> DigestStream::Compute(IByteStream* InStream)
+std::vector<uint8_t> DigestStream::Compute(IByteStream* InStream)
 {
-	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The input stream is too short");
+	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The input stream is too int16_t");
 	CEXASSERT(InStream->CanRead(), "The input stream is set to write only!");
 
 	size_t plen = InStream->Length() - InStream->Position();
@@ -93,9 +93,9 @@ std::vector<byte> DigestStream::Compute(IByteStream* InStream)
 	return Process(InStream, plen);
 }
 
-std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+std::vector<uint8_t> DigestStream::Compute(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "The input array is too short");
+	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "The input array is too int16_t");
 
 	CalculateInterval(Length);
 	m_digestEngine->Reset();
@@ -145,7 +145,7 @@ void DigestStream::CalculateProgress(size_t Length, size_t Processed)
 
 		if (m_streamState->Parallel)
 		{
-			ProgressPercent(static_cast<int>(prg));
+			ProgressPercent(static_cast<int32_t>(prg));
 		}
 		else
 		{
@@ -153,11 +153,11 @@ void DigestStream::CalculateProgress(size_t Length, size_t Processed)
 
 			if (blk == 0)
 			{
-				ProgressPercent(static_cast<int>(prg));
+				ProgressPercent(static_cast<int32_t>(prg));
 			}
 			else if (Processed % blk == 0)
 			{
-				ProgressPercent(static_cast<int>(prg));
+				ProgressPercent(static_cast<int32_t>(prg));
 			}
 			else
 			{
@@ -167,14 +167,14 @@ void DigestStream::CalculateProgress(size_t Length, size_t Processed)
 	}
 }
 
-std::vector<byte> DigestStream::Process(IByteStream* InStream, size_t Length)
+std::vector<uint8_t> DigestStream::Process(IByteStream* InStream, size_t Length)
 {
 	const size_t BLKLEN = m_digestEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
 	size_t plen;
 	size_t pread;
-	std::vector<byte> inp;
-	std::vector<byte> tmph;
+	std::vector<uint8_t> inp;
+	std::vector<uint8_t> tmph;
 
 	plen = 0;
 	pread = 0;
@@ -226,11 +226,11 @@ std::vector<byte> DigestStream::Process(IByteStream* InStream, size_t Length)
 	return tmph;
 }
 
-std::vector<byte> DigestStream::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+std::vector<uint8_t> DigestStream::Process(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
 	const size_t BLKLEN = m_digestEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
-	std::vector<byte> tmph;
+	std::vector<uint8_t> tmph;
 	size_t plen;
 
 	plen = 0;

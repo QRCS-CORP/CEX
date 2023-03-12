@@ -14,7 +14,7 @@ AsymmetricKeyPair::AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* P
 {
 }
 
-AsymmetricKeyPair::AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey, std::vector<byte> &Tag)
+AsymmetricKeyPair::AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey, std::vector<uint8_t> &Tag)
 	:
 	m_keyTag(Tag),
 	m_privateKey(PrivateKey),
@@ -39,7 +39,7 @@ AsymmetricKey* AsymmetricKeyPair::PublicKey()
 	return m_publicKey;
 }
 
-std::vector<byte> &AsymmetricKeyPair::Tag()
+std::vector<uint8_t> &AsymmetricKeyPair::Tag()
 {
 	return m_keyTag;
 }

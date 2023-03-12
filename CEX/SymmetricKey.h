@@ -42,7 +42,7 @@ public:
 	/// <param name="Key">The primary cryptographic key</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	explicit SymmetricKey(const std::vector<byte> &Key);
+	explicit SymmetricKey(const std::vector<uint8_t> &Key);
 
 	/// <summary>
 	/// Constructor: instantiate this class with an cryptographic key, and nonce parameters
@@ -52,7 +52,7 @@ public:
 	/// <param name="IV">The salt, iv, or nonce array</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &IV);
+	SymmetricKey(const std::vector<uint8_t> &Key, const std::vector<uint8_t> &IV);
 
 	/// <summary>
 	/// Constructor: instantiate this class with an cryptographic key, nonce, and info parameters
@@ -63,7 +63,7 @@ public:
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &IV, const std::vector<byte> &Info);
+	SymmetricKey(const std::vector<uint8_t> &Key, const std::vector<uint8_t> &IV, const std::vector<uint8_t> &Info);
 
 	/// <summary>
 	/// Constructor: instantiate this class with a secure-vector cryptographic key
@@ -72,7 +72,7 @@ public:
 	/// <param name="Key">The primary cryptographic key</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	explicit SymmetricKey(const SecureVector<byte> &Key);
+	explicit SymmetricKey(const SecureVector<uint8_t> &Key);
 
 	/// <summary>
 	/// Constructor: instantiate this class with a secure-vector cryptographic key, and nonce parameters
@@ -82,7 +82,7 @@ public:
 	/// <param name="IV">The salt, iv, or nonce array</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV);
+	SymmetricKey(const SecureVector<uint8_t> &Key, const SecureVector<uint8_t> &IV);
 
 	/// <summary>
 	/// Constructor: instantiate this class with a secure-vector cryptographic key, nonce, and info parameters
@@ -93,7 +93,7 @@ public:
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV, const SecureVector<byte> &Info);
+	SymmetricKey(const SecureVector<uint8_t> &Key, const SecureVector<uint8_t> &IV, const SecureVector<uint8_t> &Info);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -105,37 +105,37 @@ public:
 	/// <summary>
 	/// Read/Write: Return a standard-vector copy of the personalization string; can also used as an additional source of entropy in some constructions
 	/// </summary>
-	const std::vector<byte> Info() override;
+	const std::vector<uint8_t> Info() override;
 
 	/// <summary>
 	/// Read Only: Return a standard-vector copy of the primary key
 	/// </summary>
-	const std::vector<byte> Key() override;
+	const std::vector<uint8_t> Key() override;
 
 	/// <summary>
-	/// Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
+	/// Read Only: The SymmetricKeySize containing the uint8_t sizes of the key, nonce, and info state members
 	/// </summary>
 	SymmetricKeySize &KeySizes() const override;
 
 	/// <summary>
 	/// Read Only: Return a standard-vector copy of the initialization vector; can also be used as the nonce, salt, or iv
 	/// </summary>
-	const std::vector<byte> IV() override;
+	const std::vector<uint8_t> IV() override;
 
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the personalization string; can used as an optional source of entropy
 	/// </summary>
-	const SecureVector<byte> SecureInfo() override;
+	const SecureVector<uint8_t> SecureInfo() override;
 
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the primary cryptographic key
 	/// </summary>
-	const SecureVector<byte> SecureKey() override;
+	const SecureVector<uint8_t> SecureKey() override;
 
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the initialization vector; can also be used as the nonce, salt, or iv
 	/// </summary>
-	const SecureVector<byte> SecureIV() override;
+	const SecureVector<uint8_t> SecureIV() override;
 
 	//~~~Public Functions~~~//
 
@@ -158,7 +158,7 @@ public:
 	/// <param name="KeyStream">Stream containing the SymmetricKey data</param>
 	/// 
 	/// <returns>A pointer to a populated SymmetricSecureKey container</returns>
-	static SymmetricKey* DeSerialize(SecureVector<byte> &KeyStream);
+	static SymmetricKey* DeSerialize(SecureVector<uint8_t> &KeyStream);
 
 	/// <summary>
 	/// Serialize a SymmetricKey to a secure-vector stream
@@ -167,7 +167,7 @@ public:
 	/// <param name="KeyParams">A SymmetricKey container</param>
 	/// 
 	/// <returns>A secure-vector containing the serialized SymmetricKey data</returns>
-	static SecureVector<byte> Serialize(SymmetricKey &KeyParams);
+	static SecureVector<uint8_t> Serialize(SymmetricKey &KeyParams);
 };
 
 NAMESPACE_CIPHEREND

@@ -16,11 +16,11 @@ class Skein512::Skein512State
 public:
 
 	// state
-	std::array<ulong, 8> S = { 0 };
+	std::array<uint64_t, 8> S = { 0 };
 	// config
-	std::array<ulong, 8> V = { 0 };
+	std::array<uint64_t, 8> V = { 0 };
 	// tweak
-	std::array<ulong, 2> T = { 0 };
+	std::array<uint64_t, 2> T = { 0 };
 
 	Skein512State()
 	{
@@ -38,9 +38,9 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(S, 0, S.size() * sizeof(ulong));
-		MemoryTools::Clear(T, 0, T.size() * sizeof(ulong));
-		MemoryTools::Clear(V, 0, V.size() * sizeof(ulong));
+		MemoryTools::Clear(S, 0, S.size() * sizeof(uint64_t));
+		MemoryTools::Clear(T, 0, T.size() * sizeof(uint64_t));
+		MemoryTools::Clear(V, 0, V.size() * sizeof(uint64_t));
 	}
 };
 
@@ -57,7 +57,7 @@ Skein512::Skein512(bool Parallel)
 	m_msgLength(0),
 	m_parallelProfile(Skein::SKEIN512_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
 	m_treeParams(Parallel ? 
-		SkeinParams(Skein::SKEIN512_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN512_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) : 
+		SkeinParams(Skein::SKEIN512_DIGEST_SIZE, static_cast<uint8_t>(Skein::SKEIN512_RATE_SIZE), static_cast<uint8_t>(DEF_PRLDEGREE)) : 
 		SkeinParams(Skein::SKEIN512_DIGEST_SIZE, 0x00, 0x00))
 {
 	Initialize(m_dgtState, m_treeParams);
@@ -133,7 +133,7 @@ ParallelOptions &Skein512::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void Skein512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void Skein512::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (Output.size() < Skein::SKEIN512_DIGEST_SIZE)
 	{
@@ -144,7 +144,7 @@ void Skein512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 	Finalize(Output, 0);
 }
 
-void Skein512::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void Skein512::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (Output.size() - OutOffset < Skein::SKEIN512_DIGEST_SIZE)
 	{
@@ -179,8 +179,8 @@ void Skein512::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		// initialize a linear-mode hash config
 		Skein512State proot;
 		SkeinParams rparam{ Skein::SKEIN512_DIGEST_SIZE };
-		std::vector<ulong> tmp = rparam.GetConfig();
-		std::array<ulong, 8> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7] };
+		std::vector<uint64_t> tmp = rparam.GetConfig();
+		std::array<uint64_t, 8> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7] };
 		// load the initial state
 		LoadState(proot, cfg);
 
@@ -223,7 +223,7 @@ void Skein512::ParallelMaxDegree(size_t Degree)
 	m_dgtState.resize(Degree);
 	m_msgBuffer.clear();
 	m_msgBuffer.resize(Degree * Skein::SKEIN512_RATE_SIZE);
-	m_treeParams = { Skein::SKEIN512_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN512_RATE_SIZE), static_cast<byte>(Degree) };
+	m_treeParams = { Skein::SKEIN512_DIGEST_SIZE, static_cast<uint8_t>(Skein::SKEIN512_RATE_SIZE), static_cast<uint8_t>(Degree) };
 
 	Initialize(m_dgtState, m_treeParams);
 }
@@ -244,29 +244,29 @@ void Skein512::Reset()
 	m_msgLength = 0;
 }
 
-void Skein512::Update(byte Input)
+void Skein512::Update(uint8_t Input)
 {
-	std::vector<byte> one(1, Input);
+	std::vector<uint8_t> one(1, Input);
 	Update(one, 0, 1);
 }
 
-void Skein512::Update(uint Input)
+void Skein512::Update(uint32_t Input)
 {
-	std::vector<byte> tmp(sizeof(uint));
+	std::vector<uint8_t> tmp(sizeof(uint32_t));
 	IntegerTools::Le32ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void Skein512::Update(ulong Input)
+void Skein512::Update(uint64_t Input)
 {
-	std::vector<byte> tmp(sizeof(ulong));
+	std::vector<uint8_t> tmp(sizeof(uint64_t));
 	IntegerTools::Le64ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void Skein512::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too int16_t!");
 
 	if (Length != 0)
 	{
@@ -356,7 +356,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-void Skein512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Skein512State &State)
+void Skein512::HashFinal(std::vector<uint8_t> &Input, size_t InOffset, size_t Length, Skein512State &State)
 {
 	// process message block
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
@@ -379,14 +379,14 @@ void Skein512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Lengt
 	// finalize block
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Out);
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
-	std::vector<byte> tmp(Skein::SKEIN512_RATE_SIZE);
+	std::vector<uint8_t> tmp(Skein::SKEIN512_RATE_SIZE);
 	ProcessBlock(tmp, 0, State, 8);
 }
 
 void Skein512::Initialize(std::vector<Skein512State> &State, SkeinParams &Params)
 {
-	std::vector<ulong> tmp = Params.GetConfig();
-	std::array<ulong, 8> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7] };
+	std::vector<uint64_t> tmp = Params.GetConfig();
+	std::array<uint64_t, 8> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7] };
 	size_t i;
 
 	LoadState(State[0], cfg);
@@ -400,7 +400,7 @@ void Skein512::Initialize(std::vector<Skein512State> &State, SkeinParams &Params
 		// compress previous state
 		Permute(State[i - 1].V, State[i]);
 		// store the new state in V for reset
-		MemoryTools::Copy(State[i].S, 0, State[i].V, 0, State[i].V.size() * sizeof(ulong));
+		MemoryTools::Copy(State[i].S, 0, State[i].V, 0, State[i].V.size() * sizeof(uint64_t));
 		// mix config with state
 		MemoryTools::XOR512(cfg, 0, State[i].V, 0);
 	}
@@ -413,7 +413,7 @@ void Skein512::Initialize(std::vector<Skein512State> &State, SkeinParams &Params
 	}
 }
 
-void Skein512::LoadState(Skein512State &State, std::array<ulong, 8> &Config)
+void Skein512::LoadState(Skein512State &State, std::array<uint64_t, 8> &Config)
 {
 	// initialize the tweak value
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Config);
@@ -421,12 +421,12 @@ void Skein512::LoadState(Skein512State &State, std::array<ulong, 8> &Config)
 	State.Increase(32);
 	Permute(Config, State);
 	// store the initial state for reset
-	MemoryTools::Copy(State.S, 0, State.V, 0, State.V.size() * sizeof(ulong));
+	MemoryTools::Copy(State.S, 0, State.V, 0, State.V.size() * sizeof(uint64_t));
 	// add the config string
 	MemoryTools::XOR512(Config, 0, State.V, 0);
 }
 
-void Skein512::Permute(std::array<ulong, 8> &Message, Skein512State &State)
+void Skein512::Permute(std::array<uint64_t, 8> &Message, Skein512State &State)
 {
 #if defined(CEX_HAS_AVX2)
 	Skein::PemuteR72P512V(Message, State.T, State.S);
@@ -439,9 +439,9 @@ void Skein512::Permute(std::array<ulong, 8> &Message, Skein512State &State)
 #endif
 }
 
-void Skein512::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, Skein512State &State, size_t Length)
+void Skein512::ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Skein512State &State, size_t Length)
 {
-	std::array<ulong, 8> msg;
+	std::array<uint64_t, 8> msg;
 
 	// update length
 	State.Increase(Length);
@@ -459,7 +459,7 @@ void Skein512::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, Ske
 	}
 }
 
-void Skein512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Skein512State &State, ulong Length)
+void Skein512::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Skein512State &State, uint64_t Length)
 {
 	do
 	{

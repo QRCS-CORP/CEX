@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The socket transmission type
 /// </summary>
-enum class SocketTransports : int
+enum class SocketTransports : int32_t
 {
 	/// <summary>
 	/// No flag is used

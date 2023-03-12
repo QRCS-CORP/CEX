@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -83,7 +83,7 @@ public:
 	/// Initialize with an integer array
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 128 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 128 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
 	explicit UInt128(const Array &Input, size_t Offset)
@@ -95,11 +95,11 @@ public:
 	/// Initialize with 4 * 32bit unsigned integers
 	/// </summary>
 	///
-	/// <param name="X0">uint 0</param>
-	/// <param name="X1">uint 1</param>
-	/// <param name="X2">uint 2</param>
-	/// <param name="X3">uint 3</param>
-	explicit UInt128(uint X0, uint X1, uint X2, uint X3)
+	/// <param name="X0">uint32_t 0</param>
+	/// <param name="X1">uint32_t 1</param>
+	/// <param name="X2">uint32_t 2</param>
+	/// <param name="X3">uint32_t 3</param>
+	explicit UInt128(uint32_t X0, uint32_t X1, uint32_t X2, uint32_t X3)
 	{
 		xmm = _mm_set_epi32(X0, X1, X2, X3);
 	}
@@ -108,8 +108,8 @@ public:
 	/// Initialize with 1 * 32bit unsigned integer; copied to every register
 	/// </summary>
 	///
-	/// <param name="X">The uint to add</param>
-	explicit UInt128(uint X)
+	/// <param name="X">The uint32_t to add</param>
+	explicit UInt128(uint32_t X)
 	{
 		xmm = _mm_set1_epi32(X);
 	}
@@ -129,7 +129,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="X">Set all uint32 integers to this value</param>
-	inline void Load(uint X)
+	inline void Load(uint32_t X)
 	{
 		xmm = _mm_set1_epi32(X);
 	}
@@ -142,7 +142,7 @@ public:
 	/// <param name="X1">uint32 1</param>
 	/// <param name="X2">uint32 2</param>
 	/// <param name="X3">uint32 3</param>
-	inline void Load(uint X0, uint X1, uint X2, uint X3)
+	inline void Load(uint32_t X0, uint32_t X1, uint32_t X2, uint32_t X3)
 	{
 		xmm = _mm_set_epi32(X0, X1, X2, X3);
 	}
@@ -169,7 +169,7 @@ public:
 	template <typename Array>
 	inline void LoadUL(const Array &Input, size_t Offset)
 	{
-		xmm = _mm_set_epi32(static_cast<uint>(Input[Offset]), static_cast<uint>(Input[Offset + 1]), static_cast<uint>(Input[Offset + 2]), static_cast<uint>(Input[Offset + 3]));
+		xmm = _mm_set_epi32(static_cast<uint32_t>(Input[Offset]), static_cast<uint32_t>(Input[Offset + 1]), static_cast<uint32_t>(Input[Offset + 2]), static_cast<uint32_t>(Input[Offset + 3]));
 	}
 
 	/// <summary>
@@ -267,10 +267,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotL32(int Shift)
+	inline void RotL32(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
-		xmm = _mm_or_si128(_mm_slli_epi32(xmm, static_cast<int>(Shift)), _mm_srli_epi32(xmm, static_cast<int>(32 - Shift)));
+		xmm = _mm_or_si128(_mm_slli_epi32(xmm, static_cast<int32_t>(Shift)), _mm_srli_epi32(xmm, static_cast<int32_t>(32 - Shift)));
 	}
 
 	/// <summary>
@@ -281,10 +281,10 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt128</returns>
-	inline static UInt128 RotL32(const UInt128 &Value, const int Shift)
+	inline static UInt128 RotL32(const UInt128 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
-		return UInt128(_mm_or_si128(_mm_slli_epi32(Value.xmm, static_cast<int>(Shift)), _mm_srli_epi32(Value.xmm, static_cast<int>(32 - Shift))));
+		return UInt128(_mm_or_si128(_mm_slli_epi32(Value.xmm, static_cast<int32_t>(Shift)), _mm_srli_epi32(Value.xmm, static_cast<int32_t>(32 - Shift))));
 	}
 
 	/// <summary>
@@ -292,7 +292,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotR32(int Shift)
+	inline void RotR32(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
@@ -306,7 +306,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt128</returns>
-	inline static UInt128 RotR32(const UInt128 &Value, const int Shift)
+	inline static UInt128 RotR32(const UInt128 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return RotL32(Value, 32 - Shift);
@@ -320,7 +320,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt128</returns>
-	inline static UInt128 ShiftRA(const UInt128 &Value, const int Shift)
+	inline static UInt128 ShiftRA(const UInt128 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt128(_mm_sra_epi32(Value, _mm_set1_epi32(Shift)));
@@ -334,17 +334,17 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt128</returns>
-	inline static UInt128 ShiftRL(const UInt128 &Value, const int Shift)
+	inline static UInt128 ShiftRL(const UInt128 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt128(_mm_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 4 unsigned integers
+	/// Performs a uint8_t swap on 4 unsigned integers
 	/// </summary>
 	/// 
-	/// <returns>The byte swapped UInt128</returns>
+	/// <returns>The uint8_t swapped UInt128</returns>
 	inline UInt128 Swap() const
 	{
 		__m128i tmpX = xmm;
@@ -356,12 +356,12 @@ public:
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 4 unsigned integers
+	/// Performs a uint8_t swap on 4 unsigned integers
 	/// </summary>
 	/// 		
 	/// <param name="X">The UInt128 to process</param>
 	/// 
-	/// <returns>The byte swapped UInt128</returns>
+	/// <returns>The uint8_t swapped UInt128</returns>
 	inline static UInt128 Swap(UInt128 &X)
 	{
 		__m128i tmpX = X.xmm;
@@ -443,7 +443,7 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	inline UInt128 operator ++ (int)
+	inline UInt128 operator ++ (int32_t)
 	{
 		return UInt128(xmm) + UInt128::ONE();
 	}
@@ -479,7 +479,7 @@ public:
 	/// <summary>
 	/// Decrease postfix operator
 	/// </summary>
-	inline UInt128 operator -- (int)
+	inline UInt128 operator -- (int32_t)
 	{
 		return UInt128(xmm) - UInt128::ONE();
 	}
@@ -511,8 +511,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline UInt128 operator / (const UInt128 &X) const
 	{
-		std::array<uint, 4> tmpa;
-		std::array<uint, 4> tmpb;
+		std::array<uint32_t, 4> tmpa;
+		std::array<uint32_t, 4> tmpb;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(tmpa.data()), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(tmpb.data()), X.xmm);
 		CEXASSERT(tmpb[0] != 0 && tmpb[1] != 0 && tmpb[2] != 0 && tmpb[3] != 0, "Division by zero");
@@ -529,8 +529,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UInt128 &X)
 	{
-		std::array<uint, 4> tmpa;
-		std::array<uint, 4> tmpb;
+		std::array<uint32_t, 4> tmpa;
+		std::array<uint32_t, 4> tmpb;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(tmpa.data()), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(tmpb.data()), X.xmm);
 		CEXASSERT(tmpb[0] != 0 && tmpb[1] != 0 && tmpb[2] != 0 && tmpb[3] != 0, "Division by zero");
@@ -683,9 +683,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UInt128 operator << (int Shift) const
+	inline UInt128 operator << (int32_t Shift) const
 	{
-		return UInt128(_mm_slli_epi32(xmm, static_cast<int>(Shift)));
+		return UInt128(_mm_slli_epi32(xmm, static_cast<int32_t>(Shift)));
 	}
 
 	/// <summary>
@@ -693,7 +693,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator <<= (int Shift)
+	inline void operator <<= (int32_t Shift)
 	{
 		xmm = _mm_slli_epi32(xmm, Shift);
 	}
@@ -703,9 +703,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UInt128 operator >> (int Shift) const
+	inline UInt128 operator >> (int32_t Shift) const
 	{
-		return UInt128(_mm_srli_epi32(xmm, static_cast<int>(Shift)));
+		return UInt128(_mm_srli_epi32(xmm, static_cast<int32_t>(Shift)));
 	}
 
 	/// <summary>
@@ -713,7 +713,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator >>= (int Shift)
+	inline void operator >>= (int32_t Shift)
 	{
 		xmm = _mm_srli_epi32(xmm, Shift);
 	}

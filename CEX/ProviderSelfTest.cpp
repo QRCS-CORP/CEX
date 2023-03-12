@@ -20,10 +20,10 @@ ProviderSelfTest::~ProviderSelfTest()
 
 //~~~Public Functions~~~//
 
-bool ProviderSelfTest::SelfTest(SecureVector<byte> &Sample)
+bool ProviderSelfTest::SelfTest(SecureVector<uint8_t> &Sample)
 {
-	ulong rl1;
-	ulong rl2;
+	uint64_t rl1;
+	uint64_t rl2;
 	bool fail;
 
 	rl1 = 0;

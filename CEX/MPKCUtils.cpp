@@ -1,23 +1,716 @@
 #include "MPKCUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 
 NAMESPACE_MCELIECE
 
-//~~~N6090T13 and N8192T13~~~//
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
-// benes.c //
+static const int32_t MCELIECE_GFBITS = 13;
+static const int32_t MCELIECE_GFMASK = ((1 << MCELIECE_GFBITS) - 1);
 
-void MPKCUtils::LayerIn(ulong Data[2][64], const ulong* Bits, uint Lgs)
+void MPKCUtils::ApplyBenes(uint8_t* R, const uint8_t* Bits, bool Reverse)
+{
+	// input: r, sequence of bits to be permuted
+	// bits, condition bits of the Benes network
+	// rev, 0 for normal application; !0 for inverse
+	// output: r, permuted bits
+
+	uint64_t riv[2][64];
+	uint64_t rih[2][64];
+	uint64_t biv[64];
+	uint64_t bih[64];
+	size_t i;
+	int32_t inc;
+	uint32_t iter;
+	const uint8_t* bptr;
+	uint8_t* rptr;
+
+	rptr = R;
+
+	if (Reverse)
+	{
+		bptr = Bits + 12288;
+		inc = -1024;
+	}
+	else
+	{
+		bptr = Bits;
+		inc = 0;
+	}
+
+	for (i = 0; i < 64; ++i)
+	{
+		riv[0][i] = IntegerTools::LeBytesTo64Raw(rptr + i * 16);
+		riv[1][i] = IntegerTools::LeBytesTo64Raw(rptr + i * 16 + 8);
+	}
+
+	Transpose64x64(rih[0], riv[0]);
+	Transpose64x64(rih[1], riv[1]);
+
+	for (iter = 0; iter <= 6; iter++)
+	{
+		for (i = 0; i < 64; ++i)
+		{
+			biv[i] = IntegerTools::LeBytesTo64Raw(bptr);
+			bptr += 8;
+		}
+
+		bptr += inc;
+		Transpose64x64(bih, biv);
+		LayerEx(rih[0], bih, iter);
+	}
+
+	Transpose64x64(riv[0], rih[0]);
+	Transpose64x64(riv[1], rih[1]);
+
+	for (iter = 0; iter <= 5; iter++)
+	{
+		for (i = 0; i < 64; ++i)
+		{
+			biv[i] = IntegerTools::LeBytesTo64Raw(bptr);
+			bptr += 8;
+		}
+
+		bptr += inc;
+		LayerIn(riv, biv, iter);
+	}
+
+	iter = 5;
+
+	do
+	{
+		--iter;
+		for (i = 0; i < 64; ++i)
+		{
+			biv[i] = IntegerTools::LeBytesTo64Raw(bptr);
+			bptr += 8;
+		}
+
+		bptr += inc;
+		LayerIn(riv, biv, iter);
+	} while (iter != 0);
+
+	Transpose64x64(rih[0], riv[0]);
+	Transpose64x64(rih[1], riv[1]);
+
+	iter = 7;
+
+	do
+	{
+		--iter;
+		for (i = 0; i < 64; ++i)
+		{
+			biv[i] = IntegerTools::LeBytesTo64Raw(bptr);
+			bptr += 8;
+		}
+
+		bptr += inc;
+		Transpose64x64(bih, biv);
+		LayerEx(rih[0], bih, iter);
+	} while (iter != 0);
+
+	Transpose64x64(riv[0], rih[0]);
+	Transpose64x64(riv[1], rih[1]);
+
+	for (i = 0; i < 64; ++i)
+	{
+		IntegerTools::Le64ToBytesRaw(riv[0][i], rptr + i * 16);
+		IntegerTools::Le64ToBytesRaw(riv[1][i], rptr + i * 16 + 8);
+	}
+}
+
+uint16_t MPKCUtils::BitReverse(uint16_t A)
+{
+	A = ((A & 0x00FFU) << 8) | ((A & 0xFF00U) >> 8);
+	A = ((A & 0x0F0FU) << 4) | ((A & 0xF0F0U) >> 4);
+	A = ((A & 0x3333U) << 2) | ((A & 0xCCCCU) >> 2);
+	A = ((A & 0x5555U) << 1) | ((A & 0xAAAAU) >> 1);
+
+	return A >> 3;
+}
+
+void MPKCUtils::Bm(uint16_t* Output, const uint16_t* S, uint32_t SysT)
+{
+	// the Berlekamp-Massey algorithm.
+	// input: s, sequence of field elements
+	// output: out, minimal polynomial of s
+
+	std::vector<uint16_t> T(SysT + 1);
+	std::vector<uint16_t> C(SysT + 1);
+	std::vector<uint16_t> B(SysT + 1);
+	size_t i;
+	uint16_t b;
+	uint16_t d;
+	uint16_t f;
+	uint16_t N;
+	uint16_t L;
+	uint16_t mle;
+	uint16_t mne;
+
+	b = 1;
+	L = 0;
+	B[1] = 1;
+	C[0] = 1;
+
+	for (N = 0; N < 2 * SysT; ++N)
+	{
+		d = 0;
+
+		for (i = 0; i <= IntegerTools::Min((uint32_t)N, (uint32_t)SysT); ++i)
+		{
+			d ^= MPKCUtils::GfMultiply(C[i], S[N - i]);
+		}
+
+		mne = d;
+		mne -= 1;
+		mne >>= 15;
+		mne -= 1;
+		mle = N;
+		mle -= 2 * L;
+		mle >>= 15;
+		mle -= 1;
+		mle &= mne;
+
+		MemoryTools::Copy(C, 0, T, 0, SysT * sizeof(uint16_t));
+
+		f = MPKCUtils::GfFrac(b, d);
+
+		for (i = 0; i <= SysT; ++i)
+		{
+			C[i] ^= MPKCUtils::GfMultiply(f, B[i]) & mne;
+		}
+
+		L = (L & ~mle) | ((N + 1 - L) & mle);
+
+		for (i = 0; i <= SysT; ++i)
+		{
+			B[i] = (B[i] & ~mle) | (T[i] & mle);
+		}
+
+		b = (b & ~mle) | (d & mle);
+
+		for (i = SysT; i >= 1; --i)
+		{
+			B[i] = B[i - 1];
+		}
+
+		B[0] = 0;
+	}
+
+	for (i = 0; i <= SysT; ++i)
+	{
+		Output[i] = C[SysT - i];
+	}
+}
+
+void MPKCUtils::CbRecursion(uint8_t* Output, int64_t Position, int64_t Step, const int16_t* Pi, int64_t W, int64_t N, int32_t* Temp)
+{
+	// parameters: 1 <= w <= 14; n = 2^w.
+	// input: permutation pi of {0,1,...,n-1}
+	// output: (2m-1)n/2 control bits at positions pos,pos+step,...
+	// output position pos is by definition 1&(out[pos/8]>>(pos&7))
+	// caller must 0-initialize positions first, temp must have space for int32_t[2*n]
+
+	int32_t* A = Temp;
+	int32_t* B = (Temp + N);
+	// q can start anywhere between temp+n and temp+n/2
+	int16_t* q = ((int16_t*)(Temp + N + N / 4));
+	int64_t i;
+	int64_t j;
+	int64_t x;
+
+	if (W != 1)
+	{
+		for (x = 0; x < N; ++x)
+		{
+			A[x] = ((Pi[x] ^ 1) << 16) | Pi[x ^ 1];
+		}
+
+		MPKCUtils::Sort32(A, N); // A = (id<<16)+pibar
+
+		for (x = 0; x < N; ++x)
+		{
+			int32_t Ax = A[x];
+			int32_t px = Ax & 0x0000FFFFL;
+			int32_t cx = px;
+
+			if ((int32_t)x < cx)
+			{
+				cx = (int32_t)x;
+			}
+
+			B[x] = (px << 16) | cx;
+		}
+
+		// B = (p<<16)+c
+
+		for (x = 0; x < N; ++x)
+		{
+			A[x] = (A[x] << 16) | (int32_t)x; // A = (pibar<<16)+id
+		}
+
+		MPKCUtils::Sort32(A, N); // A = (id<<16)+pibar^-1
+
+		for (x = 0; x < N; ++x)
+		{
+			A[x] = (A[x] << 16) + (B[x] >> 16); // A = (pibar^(-1)<<16)+pibar
+		}
+
+		MPKCUtils::Sort32(A, N); // A = (id<<16)+pibar^2
+
+		if (W <= 10)
+		{
+			for (x = 0; x < N; ++x)
+			{
+				B[x] = ((A[x] & 0x0000FFFFL) << 10) | (B[x] & 0x000003FFL);
+			}
+
+			for (i = 1; i < W - 1; ++i)
+			{
+				// B = (p<<10)+c
+
+				for (x = 0; x < N; ++x)
+				{
+					A[x] = ((B[x] & ~0x000003FFL) << 6) | (int32_t)x; // A = (p<<16)+id
+				}
+
+				MPKCUtils::Sort32(A, N); // A = (id<<16)+p^{-1}
+
+				for (x = 0; x < N; ++x)
+				{
+					A[x] = (A[x] << 20) | B[x]; // A = (p^{-1}<<20)+(p<<10)+c
+				}
+
+				MPKCUtils::Sort32(A, N); // A = (id<<20)+(pp<<10)+cp
+
+				for (x = 0; x < N; ++x)
+				{
+					int32_t ppcpx = A[x] & 0x000FFFFFL;
+					int32_t ppcx = (A[x] & 0x000FFC00L) | (B[x] & 0x000003FFL);
+
+					if (ppcpx < ppcx)
+					{
+						ppcx = ppcpx;
+					}
+
+					B[x] = ppcx;
+				}
+			}
+
+			for (x = 0; x < N; ++x)
+			{
+				B[x] &= 0x000003FFL;
+			}
+		}
+		else
+		{
+			for (x = 0; x < N; ++x)
+			{
+				B[x] = (A[x] << 16) | (B[x] & 0x0000FFFFL);
+			}
+
+			for (i = 1; i < W - 1; ++i)
+			{
+				// B = (p<<16)+c
+
+				for (x = 0; x < N; ++x)
+				{
+					A[x] = (B[x] & ~0x0000FFFFL) | (int32_t)x;
+				}
+
+				MPKCUtils::Sort32(A, N); // A = (id<<16)+p^(-1)
+
+				for (x = 0; x < N; ++x)
+				{
+					A[x] = (A[x] << 16) | (B[x] & 0x0000FFFFL);
+				}
+
+				// A = p^(-1)<<16+c
+
+				if (i < W - 2)
+				{
+					for (x = 0; x < N; ++x)
+					{
+						B[x] = (A[x] & ~0x0000FFFFL) | (B[x] >> 16);
+					}
+
+					// B = (p^(-1)<<16)+p
+
+					MPKCUtils::Sort32(B, N); // B = (id<<16)+p^(-2)
+
+					for (x = 0; x < N; ++x)
+					{
+						B[x] = (B[x] << 16) | (A[x] & 0x0000FFFFL);
+					}
+					// B = (p^(-2)<<16)+c
+				}
+
+				MPKCUtils::Sort32(A, N);
+
+				// A = id<<16+cp
+				for (x = 0; x < N; ++x)
+				{
+					int32_t cpx = (B[x] & ~0x0000FFFF) | (A[x] & 0x0000FFFF);
+
+					if (cpx < B[x])
+					{
+						B[x] = cpx;
+					}
+				}
+			}
+
+			for (x = 0; x < N; ++x)
+			{
+				B[x] &= 0x0000FFFF;
+			}
+		}
+
+		for (x = 0; x < N; ++x)
+		{
+			A[x] = (((int32_t)Pi[x]) << 16) + (int32_t)x;
+		}
+
+		MPKCUtils::Sort32(A, N); // A = (id<<16)+pi^(-1)
+
+		for (j = 0; j < N / 2; ++j)
+		{
+			x = 2 * j;
+			int32_t fj = B[x] & 1;		// f[j]
+			int32_t Fx = (int32_t)x + fj;	// F[x]
+			int32_t Fx1 = Fx ^ 1;		// F[x+1]
+
+			Output[Position >> 3] ^= fj << (Position & 7);
+			Position += Step;
+
+			B[x] = (A[x] << 16) | Fx;
+			B[x + 1] = (A[x + 1] << 16) | Fx1;
+		}
+
+		// B = (pi^(-1)<<16)+F 
+		MPKCUtils::Sort32(B, N);
+		// B = (id<<16)+F(pi) 
+		Position += (2 * W - 3) * Step * (N / 2);
+
+		for (int64_t k = 0; k < N / 2; ++k)
+		{
+			int64_t y = 2 * k;
+			int32_t lk = B[y] & 1;		// l[k] 
+			int32_t Ly = (int32_t)y + lk;	// L[y] 
+			int32_t Ly1 = Ly ^ 1;		// L[y+1] 
+
+			Output[Position >> 3] ^= lk << (Position & 7);
+			Position += Step;
+			A[y] = (Ly << 16) | (B[y] & 0x0000FFFFL);
+			A[y + 1] = (Ly1 << 16) | (B[y + 1] & 0x0000FFFFL);
+		}
+
+		// A = (L<<16)+F(pi) 
+		MPKCUtils::Sort32(A, N); // A = (id<<16)+F(pi(L)) = (id<<16)+M 
+		Position -= (2 * W - 2) * Step * (N / 2);
+
+		for (j = 0; j < N / 2; ++j)
+		{
+			q[j] = (A[2 * j] & 0x0000FFFFL) >> 1;
+			q[j + N / 2] = (A[2 * j + 1] & 0x0000FFFFL) >> 1;
+		}
+
+		CbRecursion(Output, Position, Step * 2, q, W - 1, N / 2, Temp);
+		CbRecursion(Output, Position + Step, Step * 2, q + N / 2, W - 1, N / 2, Temp);
+	}
+	else
+	{
+		Output[Position >> 3] ^= Pi[0] << (Position & 7);
+	}
+}
+
+void MPKCUtils::ControlBitsFromPermutation(uint8_t* Output, const int16_t* Pi, int64_t W, int64_t N)
+{
+	// parameters: 1 <= w <= 14; n = 2^w
+	// input: permutation pi of {0,1,...,n-1}
+	// output: (2m-1)n/2 control bits at positions 0,1,...
+	// output position pos is by definition 1&(out[pos/8]>>(pos&7)) 
+
+	int32_t* temp;
+	int16_t* pi_test;
+	int32_t i;
+	int16_t diff;
+	const uint8_t* ptr;
+
+	temp = (int32_t*)MemoryTools::Malloc((size_t)N * 2 * sizeof(int32_t));
+	pi_test = (int16_t*)MemoryTools::Malloc((size_t)N * sizeof(int16_t));
+
+	if (temp != NULL && pi_test != NULL)
+	{
+		while (true)
+		{
+			MemoryTools::ClearRaw(Output, (size_t)(((2 * W - 1) * N / 2) + 7) / 8);
+			MPKCUtils::CbRecursion(Output, 0, 1, Pi, W, N, temp);
+
+			// check for correctness
+
+			for (i = 0; i < N; ++i)
+			{
+				pi_test[i] = (int16_t)i;
+			}
+
+			ptr = Output;
+
+			for (i = 0; i < W; ++i)
+			{
+				MPKCUtils::Layer(pi_test, ptr, i, (int32_t)N);
+				ptr += N >> 4;
+			}
+
+			for (i = (int32_t)W - 2; i >= 0; --i)
+			{
+				MPKCUtils::Layer(pi_test, ptr, i, (int32_t)N);
+				ptr += N >> 4;
+			}
+
+			diff = 0;
+
+			for (i = 0; i < N; ++i)
+			{
+				diff |= Pi[i] ^ pi_test[i];
+			}
+
+			if (diff == 0)
+			{
+				break;
+			}
+		}
+
+		MemoryTools::MallocFree(pi_test);
+		MemoryTools::MallocFree(temp);
+	}
+}
+
+uint16_t MPKCUtils::Eval(const uint16_t* F, uint16_t A, uint32_t SysT)
+{
+	// input: polynomial f and field element a
+	// return: f(a)
+
+	size_t i;
+	uint16_t r;
+
+	r = F[SysT];
+	i = SysT;
+
+	do
+	{
+		--i;
+		r = MPKCUtils::GfMultiply(r, A);
+		r = MPKCUtils::GfAdd(r, F[i]);
+	} 
+	while (i > 0);
+
+	return r;
+}
+
+uint16_t MPKCUtils::GfAdd(uint16_t Input0, uint16_t Input1)
+{
+	return (Input0 ^ Input1);
+}
+
+uint16_t MPKCUtils::GfIsZero(uint16_t A)
+{
+	uint32_t t;
+
+	t = A;
+	t -= 1;
+	t >>= 19;
+
+	return (uint16_t)t;
+}
+
+uint16_t MPKCUtils::GfMultiply(uint16_t Input0, uint16_t Input1)
+{
+	uint64_t t;
+	uint64_t t0;
+	uint64_t t1;
+	uint64_t tmp;
+	size_t i;
+
+	t0 = Input0;
+	t1 = Input1;
+	tmp = t0 * (t1 & 1);
+
+	for (i = 1; i < MCELIECE_GFBITS; ++i)
+	{
+		tmp ^= (t0 * (t1 & (1ULL << i)));
+	}
+
+	t = tmp & 0x0000000001FF0000ULL;
+	tmp ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
+	t = tmp & 0x000000000000E000ULL;
+	tmp ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
+
+	return (tmp & MCELIECE_GFMASK);
+}
+
+uint16_t MPKCUtils::GfSq2(uint16_t Input)
+{
+
+	// input: field element in
+	// return: (in^2)^2 
+
+	const uint64_t Bf[] = { 0x1111111111111111ULL, 0x0303030303030303ULL, 0x000F000F000F000FULL, 0x000000FF000000FFULL };
+	const uint64_t MA[] = { 0x0001FF0000000000ULL, 0x000000FF80000000ULL, 0x000000007FC00000ULL, 0x00000000003FE000ULL };
+	uint64_t t;
+	uint64_t x;
+	size_t i;
+
+	x = Input;
+	x = (x | (x << 24)) & Bf[3];
+	x = (x | (x << 12)) & Bf[2];
+	x = (x | (x << 6)) & Bf[1];
+	x = (x | (x << 3)) & Bf[0];
+
+	for (i = 0; i < 4; ++i)
+	{
+		t = x & MA[i];
+		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
+	}
+
+	return (x & MCELIECE_GFMASK);
+}
+
+uint16_t MPKCUtils::GfSqMul(uint16_t Input, uint16_t M)
+{
+	// input: field element in, m
+	// return: (in^2)*m 
+
+	const uint64_t MA[] = { 0x0000001FF0000000ULL, 0x000000000FF80000ULL, 0x000000000007E000ULL };
+	uint64_t t;
+	uint64_t t0;
+	uint64_t t1;
+	uint64_t x;
+	size_t i;
+
+	t0 = Input;
+	t1 = M;
+	x = (t1 << 6) * (t0 & (1 << 6));
+	t0 ^= (t0 << 7);
+
+	x ^= (t1 * (t0 & 0x0000000000004001ULL));
+	x ^= (t1 * (t0 & 0x0000000000008002ULL)) << 1;
+	x ^= (t1 * (t0 & 0x0000000000010004ULL)) << 2;
+	x ^= (t1 * (t0 & 0x0000000000020008ULL)) << 3;
+	x ^= (t1 * (t0 & 0x0000000000040010ULL)) << 4;
+	x ^= (t1 * (t0 & 0x0000000000080020ULL)) << 5;
+
+	for (i = 0; i < 3; ++i)
+	{
+		t = x & MA[i];
+		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
+	}
+
+	return (x & MCELIECE_GFMASK);
+}
+
+uint16_t MPKCUtils::GfSq2Mul(uint16_t Input, uint16_t M)
+{
+	// input: field element in, m
+	// return: ((in^2)^2)*m
+	const uint64_t MA[] = { 0x1FF0000000000000ULL, 0x000FF80000000000ULL, 0x000007FC00000000ULL,
+		0x00000003FE000000ULL, 0x0000000001FE0000ULL, 0x000000000001E000ULL };
+	uint64_t x;
+	uint64_t t0;
+	uint64_t t1;
+	uint64_t t;
+	size_t i;
+
+	t0 = Input;
+	t1 = M;
+	x = (t1 << 18) * (t0 & (1 << 6));
+	t0 ^= (t0 << 21);
+
+	x ^= (t1 * (t0 & 0x0000000010000001ULL));
+	x ^= (t1 * (t0 & 0x0000000020000002ULL)) << 3;
+	x ^= (t1 * (t0 & 0x0000000040000004ULL)) << 6;
+	x ^= (t1 * (t0 & 0x0000000080000008ULL)) << 9;
+	x ^= (t1 * (t0 & 0x0000000100000010ULL)) << 12;
+	x ^= (t1 * (t0 & 0x0000000200000020ULL)) << 15;
+
+	for (i = 0; i < 6; ++i)
+	{
+		t = x & MA[i];
+		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
+	}
+
+	return (x & MCELIECE_GFMASK);
+}
+
+uint16_t MPKCUtils::GfFrac(uint16_t Den, uint16_t Num)
+{
+	// input: field element den, num 
+	// return: (num/den) 
+
+	uint16_t tmp_11;
+	uint16_t tmp_1111;
+	uint16_t out;
+
+	tmp_11 = GfSqMul(Den, Den);				// ^ 11 
+	tmp_1111 = GfSq2Mul(tmp_11, tmp_11);	// ^ 1111 
+	out = GfSq2(tmp_1111);
+	out = GfSq2Mul(out, tmp_1111);			// ^ 11111111 
+	out = GfSq2(out);
+	out = GfSq2Mul(out, tmp_1111);			// ^ 111111111111 
+
+	return GfSqMul(out, Num);				// ^ 1111111111110 = ^ -1 
+}
+
+uint16_t MPKCUtils::GfInv(uint16_t Den)
+{
+	return GfFrac(Den, ((uint16_t)1));
+}
+
+void MPKCUtils::Layer(int16_t* P, const uint8_t* Cb, int32_t S, int32_t N)
+{
+	// input: p, an array of int16_t
+	// input: n, length of p
+	// input: s, meaning that stride-2^s cswaps are performed
+	// input: cb, the control bits
+	// output: the result of apply the control bits to p 
+
+	size_t i;
+	size_t j;
+	const int32_t stride = 1 << S;
+	int32_t index;
+	int16_t d;
+	int16_t m;
+
+	index = 0;
+
+	for (i = 0; i < (size_t)N; i += stride * 2)
+	{
+		for (j = 0; j < (size_t)stride; ++j)
+		{
+			d = P[i + j] ^ P[i + j + stride];
+			m = (Cb[index >> 3] >> (index & 7)) & 1;
+			m = -m;
+			d &= m;
+			P[i + j] ^= d;
+			P[i + j + stride] ^= d;
+			++index;
+		}
+	}
+}
+
+void MPKCUtils::LayerIn(uint64_t Data[2][64], const uint64_t* Bits, uint32_t Lgs)
 {
 	// middle layers of the benes network
 
-	ulong d;
+	uint64_t d;
 	size_t i;
 	size_t j;
 	size_t k;
 	size_t s;
 
 	k = 0;
-	s = 1UL << Lgs;
+	s = static_cast<size_t>(1ULL << Lgs);
 
 	for (i = 0; i < 64; i += s * 2)
 	{
@@ -38,15 +731,15 @@ void MPKCUtils::LayerIn(ulong Data[2][64], const ulong* Bits, uint Lgs)
 	}
 }
 
-void MPKCUtils::LayerEx(ulong* Data, const ulong* Bits, uint Lgs)
+void MPKCUtils::LayerEx(uint64_t* Data, const uint64_t* Bits, uint32_t Lgs)
 {
 	// first and last layers of the benes network
 
-	ulong d;
+	uint64_t d;
 	size_t i;
 	size_t j;
 	size_t k;
-	uint s;
+	uint32_t s;
 
 	k = 0;
 	s = 1UL << Lgs;
@@ -64,482 +757,206 @@ void MPKCUtils::LayerEx(ulong* Data, const ulong* Bits, uint Lgs)
 	}
 }
 
-void MPKCUtils::ApplyBenes(byte* R, const byte* Bits, bool Reverse)
+uint16_t MPKCUtils::LoadGf(const uint8_t* Source)
 {
-	// input: r, sequence of bits to be permuted
-	// bits, condition bits of the Benes network
-	// rev, 0 for normal application; !0 for inverse
-	// output: r, permuted bits
+	uint16_t a;
 
-	ulong riv[2][64];
-	ulong rih[2][64];
-	ulong biv[64];
-	ulong bih[64];
-	size_t i;
-	int32_t inc;
-	uint iter;
-	const byte* bptr;
-	byte* rptr;
+	a = IntegerTools::LeBytesTo16Raw(Source);
 
-	rptr = R;
+	return (a & MCELIECE_GFMASK);
+}
 
-	if (Reverse)
+void MPKCUtils::MinMax32(int32_t* A, int32_t* B)
+{
+	int32_t ab;
+	int32_t c;
+
+	ab = *B ^ *A;
+	c = *B - *A;
+	c ^= ab & (c ^ *B);
+	c >>= 31;
+	c &= ab;
+	*A ^= c;
+	*B ^= c;
+}
+
+void MPKCUtils::MinMax64(uint64_t* A, uint64_t* B)
+{
+	uint64_t c;
+
+	c = *B - *A;
+	c >>= 63;
+	c = ~c + 1;
+	c &= *A ^ *B;
+	*A ^= c;
+	*B ^= c;
+}
+
+void MPKCUtils::Root(uint16_t* Output, const uint16_t* F, const uint16_t* L, uint32_t N, uint32_t SysT)
+{
+	// input: polynomial f and list of field elements L
+	// output: out = [ f(a) for a in L ]
+
+	for (size_t i = 0; i < N; ++i)
 	{
-		bptr = Bits + 12288;
-		inc = -1024;
-	}
-	else
-	{
-		bptr = Bits;
-		inc = 0;
-	}
-
-	for (i = 0; i < 64; ++i)
-	{
-		riv[0][i] = Load64(rptr + i * 16);
-		riv[1][i] = Load64(rptr + i * 16 + 8);
-	}
-
-	Transpose64x64(rih[0], riv[0]);
-	Transpose64x64(rih[1], riv[1]);
-
-	for (iter = 0; iter <= 6; iter++)
-	{
-		for (i = 0; i < 64; ++i)
-		{
-			biv[i] = Load64(bptr);
-			bptr += 8;
-		}
-
-		bptr += inc;
-		Transpose64x64(bih, biv);
-		LayerEx(rih[0], bih, iter);
-	}
-
-	Transpose64x64(riv[0], rih[0]);
-	Transpose64x64(riv[1], rih[1]);
-
-	for (iter = 0; iter <= 5; iter++)
-	{
-		for (i = 0; i < 64; ++i)
-		{
-			biv[i] = Load64(bptr);
-			bptr += 8;
-		}
-
-		bptr += inc;
-		LayerIn(riv, biv, iter);
-	}
-
-	iter = 5;
-
-	do
-	{
-		--iter;
-		for (i = 0; i < 64; ++i)
-		{
-			biv[i] = Load64(bptr);
-			bptr += 8;
-		}
-
-		bptr += inc;
-		LayerIn(riv, biv, iter);
-	} 
-	while (iter != 0);
-
-	Transpose64x64(rih[0], riv[0]);
-	Transpose64x64(rih[1], riv[1]);
-
-	iter = 7;
-
-	do
-	{
-		--iter;
-		for (i = 0; i < 64; ++i)
-		{
-			biv[i] = Load64(bptr);
-			bptr += 8;
-		}
-
-		bptr += inc;
-		Transpose64x64(bih, biv);
-		LayerEx(rih[0], bih, iter);
-	}
-	while (iter != 0);
-
-	Transpose64x64(riv[0], rih[0]);
-	Transpose64x64(riv[1], rih[1]);
-
-	for (i = 0; i < 64; ++i)
-	{
-		Store64(rptr + i * 16 + 0, riv[0][i]);
-		Store64(rptr + i * 16 + 8, riv[1][i]);
+		Output[i] = Eval(F, L[i], SysT);
 	}
 }
 
-// controlbits.c //
-
-void MPKCUtils::Compose(uint W, uint N, const uint* Pi, uint* P)
+uint8_t MPKCUtils::SameMask(uint16_t X, uint16_t Y)
 {
-	uint* I = new uint[2 * N];
-	uint* Ip = new uint[N];
-	size_t i;
-	uint c;
-	uint t;
+	uint32_t mask;
 
-	if (I != nullptr && Ip != nullptr)
+	mask = (uint32_t)(X ^ Y);
+	mask -= 1;
+	mask >>= 31;
+	mask = ~mask + 1;
+
+	return (mask & 0x000000FFUL);
+}
+
+void MPKCUtils::Sort32(int32_t* X, int64_t N)
+{
+	int64_t i;
+	int64_t p;
+	int64_t r;
+	int64_t q;
+	int64_t top;
+	int32_t a;
+
+	if (N >= 2)
 	{
-		Invert(N, Ip, Pi);
+		top = 1;
 
-		for (i = 0; i < N; ++i)
+		while (top < N - top)
 		{
-			I[i] = Ip[i] | (1UL << W);
-			I[N + i] = Pi[i];
+			top += top;
 		}
 
-		// end Ip
-		for (c = 0; c < 2 * N; ++c)
+		for (p = top; p > 0; p >>= 1)
 		{
-			P[c] = (c >> W) + (c & ((1UL << W) - 2)) + ((c & 1UL) << W);
-		}
-
-		uint* PI = new uint[2 * N];
-		uint* T = new uint[2 * N];
-
-		if (PI != nullptr && T != nullptr)
-		{
-			for (t = 0; t < W; ++t)
+			for (i = 0; i < N - p; ++i)
 			{
-				ComposeInv(2 * N, PI, P, I);
-
-				for (i = 0; i < 2 * N; ++i)
+				if ((i & p) == 0)
 				{
-					Flow(W, P[i], PI[i], t);
+					MinMax32(&X[i], &X[i + p]);
 				}
+			}
 
-				for (i = 0; i < 2 * N; ++i)
+			i = 0;
+
+			for (q = top; q > p; q >>= 1)
+			{
+				for (; i < N - q; ++i)
 				{
-					T[i] = I[i ^ 1];
-				}
+					if ((i & p) == 0)
+					{
+						a = X[i + p];
 
-				ComposeInv(2 * N, I, I, T);
+						for (r = q; r > p; r >>= 1)
+						{
+							MinMax32(&a, &X[i + r]);
+						}
 
-				for (i = 0; i < 2 * N; ++i)
-				{
-					T[i] = P[i ^ 1];
-				}
-
-				for (i = 0; i < 2 * N; ++i)
-				{
-					Flow(W, P[i], T[i], 1);
+						X[i + p] = a;
+					}
 				}
 			}
 		}
-
-		if (PI != nullptr)
-		{
-			delete[] PI;
-		}
-		if (T != nullptr)
-		{
-			delete[] T;
-		}
-	}
-
-	if (I != nullptr)
-	{
-		delete[] I;
-	}
-	if (Ip != nullptr)
-	{
-		delete[] Ip;
 	}
 }
 
-void MPKCUtils::ComposeInv(uint N, uint* Y, const uint* X, const uint* Pi)
+void MPKCUtils::Sort64(uint64_t* X, int64_t N)
 {
-	// y[pi[i]] = x[i]
-	// requires n = 2^w
-	// requires pi to be a permutation
+	uint64_t a;
+	int64_t i;
+	int64_t p;
+	int64_t q;
+	int64_t r;
+	int64_t top;
 
-	uint* t = new uint[N];
-	size_t i;
-
-	if (t != NULL)
+	if (N >= 2)
 	{
-		for (i = 0; i < N; ++i)
+		top = 1;
+
+		while (top < N - top)
 		{
-			t[i] = X[i] | (Pi[i] << 16);
+			top += top;
 		}
 
-		Sort(N, t);
-
-		for (i = 0; i < N; ++i)
+		for (p = top; p > 0; p >>= 1)
 		{
-			Y[i] = t[i] & 0x0000FFFFUL;
-		}
+			for (i = 0; i < N - p; ++i)
+			{
+				if ((i & p) == 0)
+				{
+					MinMax64(&X[i], &X[i + p]);
+				}
+			}
 
-		delete[] t;
-	}
-}
+			i = 0;
 
-void MPKCUtils::CSwap(uint &X, uint &Y, byte Swap)
-{
-	uint m;
-	uint d;
+			for (q = top; q > p; q >>= 1)
+			{
+				for (; i < N - q; ++i)
+				{
+					if ((i & p) == 0)
+					{
+						a = X[i + p];
 
-	m = static_cast<uint>(Swap);
-	m = 0 - m;
-	d = (X ^ Y);
-	d &= m;
-	X ^= d;
-	Y ^= d;
-}
+						for (r = q; r > p; r >>= 1)
+						{
+							MinMax64(&a, &X[i + r]);
+						}
 
-void MPKCUtils::CSwap63b(ulong &X, ulong &Y, byte Swap)
-{
-	ulong m;
-	ulong d;
-
-	m = static_cast<uint>(Swap);
-	m = 0 - m;
-	d = (X ^ Y);
-	d &= m;
-	X ^= d;
-	Y ^= d;
-}
-
-void MPKCUtils::Flow(uint W, uint &X, const uint &Y, const uint T)
-{
-	uint b;
-	uint ycopy;
-	byte m0;
-	byte m1;
-
-	ycopy = Y;
-	m0 = IsSmaller(Y & ((1UL << W) - 1), X & ((1UL << W) - 1));
-	m1 = IsSmaller(0UL, T);
-
-	CSwap(X, ycopy, m0);
-	b = m0 & m1;
-	X ^= (b << W);
-}
-
-void MPKCUtils::Invert(uint N, uint* Ip, const uint* Pi)
-{
-	// ip[i] = j iff pi[i] = j
-	// requires n = 2^w
-	// requires pi to be a permutation
-
-	uint i;
-
-	for (i = 0; i < N; ++i)
-	{
-		Ip[i] = i;
-	}
-
-	ComposeInv(N, Ip, Ip, Pi);
-}
-
-byte MPKCUtils::IsSmaller(uint A, uint B)
-{
-	uint ret;
-
-	ret = A - B;
-	ret >>= 31;
-
-	return static_cast<byte>(ret);
-}
-
-byte MPKCUtils::IsSmaller63b(ulong A, ulong B)
-{
-	ulong ret;
-
-	ret = A - B;
-	ret >>= 63;
-
-	return static_cast<byte>(ret);
-}
-
-void MPKCUtils::Merge(uint N, uint* X, uint Step)
-{
-	// Merge first half of x[0],x[step],...,x[(2*n-1)*step] with second half
-	// requires n to be a power of 2
-
-	size_t i;
-
-	if (N == 1)
-	{
-		MinMax(X[0], X[Step]);
-	}
-	else
-	{
-		Merge(N / 2, X, Step * 2);
-		Merge(N / 2, X + Step, Step * 2);
-
-		for (i = 1; i < (2 * N) - 1; i += 2)
-		{
-			MinMax(X[i * Step], X[(i + 1) * Step]);
+						X[i + p] = a;
+					}
+				}
+			}
 		}
 	}
 }
 
-void MPKCUtils::Merge63b(uint N, ulong* X, uint Step)
+void MPKCUtils::Synd(uint16_t* Output, const uint16_t* F, const uint16_t* L, const uint8_t* R, uint32_t N, uint32_t SysT)
 {
-	size_t i;
+	// input: Goppa polynomial f, support L, received word r
+	// output: out, the Syndrome of length 2t
 
-	if (N == 1)
-	{
-		MinMax63b(X[0], X[Step]);
-	}
-	else
-	{
-		Merge63b(N / 2, X, Step * 2);
-		Merge63b(N / 2, X + Step, Step * 2);
-
-		for (i = 1; i < 2 * N - 1; i += 2)
-		{
-			MinMax63b(X[i * Step], X[(i + 1) * Step]);
-		}
-	}
-}
-
-void MPKCUtils::MinMax(uint &X, uint &Y)
-{
-	byte m;
-
-	m = IsSmaller(Y, X);
-	CSwap(X, Y, m);
-}
-
-void MPKCUtils::MinMax63b(ulong &X, ulong &Y)
-{
-	byte m;
-
-	m = IsSmaller63b(Y, X);
-	CSwap63b(X, Y, m);
-}
-
-void MPKCUtils::Permute(uint W, uint N, uint Offset, uint Step, const uint* P, const uint* Pi, byte* C, uint* PiFlip)
-{
 	size_t i;
 	size_t j;
+	uint16_t c;
+	uint16_t e;
+	uint16_t einv;
+
+	MemoryTools::ClearRaw((uint8_t*)Output, 2 * SysT * sizeof(uint16_t));
 
 	for (i = 0; i < N; ++i)
 	{
-		for (j = 0; j < W; ++j)
+		c = (R[i / 8] >> (i % 8)) & 1;
+		e = Eval(F, L[i], SysT);
+		einv = MPKCUtils::GfInv(MPKCUtils::GfMultiply(e, e));
+
+		for (j = 0; j < 2 * SysT; ++j)
 		{
-			PiFlip[i] = Pi[i];
-		}
-	}
-
-	for (i = 0; i < N / 2; ++i)
-	{
-		C[(Offset + i * Step) / 8] |= ((P[i * 2] >> W) & 1) << ((Offset + i * Step) % 8);
-	}
-
-	for (i = 0; i < N / 2; ++i)
-	{
-		C[(Offset + ((W - 1)*N + i) * Step) / 8] |= ((P[N + i * 2] >> W) & 1) << ((Offset + ((W - 1) * N + i) * Step) % 8);
-	}
-
-	for (i = 0; i < N / 2; ++i)
-	{
-		CSwap(PiFlip[i * 2], PiFlip[i * 2 + 1], (P[N + i * 2] >> W) & 1);
-	}
-}
-
-void MPKCUtils::PermuteBits(uint W, uint N, uint Step, uint Offset, byte* C, const uint* Pi)
-{
-	// input: permutation pi
-	// output: (2w-1)n/2 (or 0 if n==1) control bits c[0],c[step],c[2*step],...
-	// requires n = 2^w
-
-	size_t i;
-
-	if (W == 1)
-	{
-		C[Offset / 8] |= (Pi[0] & 1) << (Offset % 8);
-	}
-
-	if (W > 1)
-	{
-		uint* piflip = new uint[N];
-
-		if (piflip != nullptr)
-		{
-			uint* P = new uint[2 * N];
-
-			if (P != nullptr)
-			{
-				Compose(W, N, Pi, P);
-				Permute(W, N, Offset, Step, P, Pi, C, piflip);
-				delete[] P;
-			}
-
-			uint* subpi = new uint[N];
-
-			if (subpi != NULL)
-			{
-				for (i = 0; i < N / 2; ++i)
-				{
-					subpi[i] = piflip[i * 2] >> 1;
-				}
-
-				for (i = 0; i < N / 2; ++i)
-				{
-					subpi[i + N / 2] = piflip[(i * 2) + 1] >> 1;
-				}
-
-				delete[] piflip;
-
-				PermuteBits(W - 1, N / 2, Step * 2, Offset + Step * (N / 2), C, subpi);
-				PermuteBits(W - 1, N / 2, Step * 2, Offset + Step * ((N / 2) + 1), C, &subpi[N / 2]);
-
-				delete[] subpi;
-			}
+			Output[j] = MPKCUtils::GfAdd(Output[j], MPKCUtils::GfMultiply(einv, c));
+			einv = MPKCUtils::GfMultiply(einv, L[i]);
 		}
 	}
 }
 
-void MPKCUtils::Sort(uint N, uint* X)
-{
-	// Sort x[0],x[1],...,x[n-1] in place
-	// requires n to be a power of 2
-
-	if (N > 1)
-	{
-		Sort(N / 2, X);
-		Sort(N / 2, X + (N / 2));
-		Merge(N / 2, X, 1UL);
-	}
-}
-
-void MPKCUtils::Sort63b(uint N, ulong* X)
-{
-	if (N > 1)
-	{
-		Sort63b(N / 2, X);
-		Sort63b(N / 2, X + (N / 2));
-		Merge63b(N / 2, X, 1UL);
-	}
-}
-
-// transpose.c //
-
-void MPKCUtils::Transpose64x64(ulong* Output, const ulong* Input)
+void MPKCUtils::Transpose64x64(uint64_t* Output, const uint64_t* Input)
 {
 	// input: in, a 64x64 matrix over GF(2)
 	// output: out, transpose of in
 
-	ulong x;
-	ulong y;
+	uint64_t x;
+	uint64_t y;
 	size_t i;
 	size_t j;
 	size_t d;
 	size_t s;
 
-	const ulong masks[6][2] =
+	const uint64_t masks[6][2] =
 	{
 		{0x5555555555555555ULL, 0xAAAAAAAAAAAAAAAAULL},
 		{0x3333333333333333ULL, 0xCCCCCCCCCCCCCCCCULL},
@@ -573,291 +990,6 @@ void MPKCUtils::Transpose64x64(ulong* Output, const ulong* Input)
 		}
 	} 
 	while (d != 0);
-}
-
-// util.c //
-
-ushort MPKCUtils::BitReverse(ushort A)
-{
-	A = ((A & 0x00FFU) << 8) | ((A & 0xFF00U) >> 8);
-	A = ((A & 0x0F0FU) << 4) | ((A & 0xF0F0U) >> 4);
-	A = ((A & 0x3333U) << 2) | ((A & 0xCCCCU) >> 2);
-	A = ((A & 0x5555U) << 1) | ((A & 0xAAAAU) >> 1);
-
-	return A >> 3;
-}
-
-void MPKCUtils::Clear8(byte* A, size_t Count)
-{
-	size_t i;
-
-	for (i = 0; i < Count; ++i)
-	{
-		A[i] = 0;
-	}
-}
-
-void MPKCUtils::Clear32(uint* A, size_t Count)
-{
-	size_t i;
-
-	for (i = 0; i < Count; ++i)
-	{
-		A[i] = 0;
-	}
-}
-
-void MPKCUtils::Clear64(ulong* A, size_t Count)
-{
-	size_t i;
-
-	for (i = 0; i < Count; ++i)
-	{
-		A[i] = 0;
-	}
-}
-
-uint MPKCUtils::Le8To32(const byte* Input)
-{
-	return (static_cast<ulong>(Input[0])) |
-		(static_cast<ulong>(Input[1]) << 8) |
-		(static_cast<ulong>(Input[2]) << 16) |
-		(static_cast<ulong>(Input[3]) << 24);
-}
-
-ulong MPKCUtils::Le8To64(const byte* Input)
-{
-	return (static_cast<ulong>(Input[0])) |
-		(static_cast<ulong>(Input[1]) << 8) |
-		(static_cast<ulong>(Input[2]) << 16) |
-		(static_cast<ulong>(Input[3]) << 24) |
-		(static_cast<ulong>(Input[4]) << 32) |
-		(static_cast<ulong>(Input[5]) << 40) |
-		(static_cast<ulong>(Input[6]) << 48) |
-		(static_cast<ulong>(Input[7]) << 56);
-}
-
-void MPKCUtils::Le32To8(byte* Output, uint Value)
-{
-	Output[0] = Value & 0xFF;
-	Output[1] = (Value >> 8) & 0xFF;
-	Output[2] = (Value >> 16) & 0xFF;
-	Output[3] = (Value >> 24) & 0xFF;
-}
-
-void MPKCUtils::Le64To8(byte* Output, ulong Value)
-{
-	Output[0] = Value & 0xFF;
-	Output[1] = (Value >> 8) & 0xFF;
-	Output[2] = (Value >> 16) & 0xFF;
-	Output[3] = (Value >> 24) & 0xFF;
-	Output[4] = (Value >> 32) & 0xFF;
-	Output[5] = (Value >> 40) & 0xFF;
-	Output[6] = (Value >> 48) & 0xFF;
-	Output[7] = (Value >> 56) & 0xFF;
-}
-
-ushort MPKCUtils::Load16(const byte* Input)
-{
-	ushort a;
-
-	a = Input[1];
-	a <<= 8;
-	a |= Input[0];
-
-	return a;
-}
-
-ulong MPKCUtils::Load64(const byte* Input)
-{
-	int32_t i;
-	ulong ret;
-
-	ret = Input[7];
-
-	for (i = 6; i >= 0; i--)
-	{
-		ret <<= 8;
-		ret |= Input[i];
-	}
-
-	return ret;
-}
-
-uint MPKCUtils::Rotl32(uint Value, uint Shift)
-{
-	return (Value << Shift) | (Value >> ((sizeof(uint) * 8) - Shift));
-}
-
-ulong MPKCUtils::Rotl64(ulong Value, uint Shift)
-{
-	return (Value << Shift) | (Value >> ((sizeof(ulong) * 8) - Shift));
-}
-
-uint MPKCUtils::Rotr32(uint Value, uint Shift)
-{
-	return (Value >> Shift) | (Value << ((sizeof(uint) * 8) - Shift));
-}
-
-ulong MPKCUtils::Rotr64(ulong Value, uint Shift)
-{
-	return (Value >> Shift) | (Value << ((sizeof(ulong) * 8) - Shift));
-}
-
-void MPKCUtils::Store16(byte* Output, ushort A)
-{
-	Output[0] = A & 0xFF;
-	Output[1] = A >> 8;
-}
-
-void MPKCUtils::Store64(byte* Output, ulong Input)
-{
-	Output[0] = Input & 0xFF;
-	Output[1] = (Input >> 0x08) & 0xFF;
-	Output[2] = (Input >> 0x10) & 0xFF;
-	Output[3] = (Input >> 0x18) & 0xFF;
-	Output[4] = (Input >> 0x20) & 0xFF;
-	Output[5] = (Input >> 0x28) & 0xFF;
-	Output[6] = (Input >> 0x30) & 0xFF;
-	Output[7] = (Input >> 0x38) & 0xFF;
-}
-
-int32_t MPKCUtils::Verify(const byte* A, const byte* B, size_t Length)
-{
-	size_t i;
-	ushort d;
-
-	d = 0;
-
-	for (i = 0; i < Length; i++)
-	{
-		d |= A[i] ^ B[i];
-	}
-
-	return static_cast<int>(1 & ((d - 1) >> 8)) - 1;
-}
-
-//~~~N4096T12~~~//
-
-ushort MPKCUtils::Diff(ushort X, ushort Y)
-{
-	uint t;
-	
-	t = static_cast<uint>(X ^ Y);
-	t = ((t - 1) >> 20) ^ 0xFFFUL;
-
-	return static_cast<ushort>(t);
-}
-
-ushort MPKCUtils::Invert(ushort X, size_t Degree)
-{
-	ushort out;
-	ushort tmpa;
-	ushort tmpb;
-
-	out = X;
-	out = Square(out, Degree);
-	tmpa = Multiply(out, X, Degree);
-	out = Square(tmpa, Degree);
-	out = Square(out, Degree);
-	tmpb = Multiply(out, tmpa, Degree);
-	out = Square(tmpb, Degree);
-	out = Square(out, Degree);
-	out = Square(out, Degree);
-	out = Square(out, Degree);
-	out = Multiply(out, tmpb, Degree);
-	out = Square(out, Degree);
-	out = Square(out, Degree);
-	out = Multiply(out, tmpa, Degree);
-	out = Square(out, Degree);
-	out = Multiply(out, X, Degree);
-
-	return Square(out, Degree);
-}
-
-ulong MPKCUtils::MaskNonZero64(ushort X)
-{
-	ulong ret;
-
-	ret = X;
-	ret -= 1;
-	ret >>= 63;
-	ret -= 1;
-
-	return ret;
-}
-
-ulong MPKCUtils::MaskLeq64(ushort X, ushort Y)
-{
-	ulong ret;
-	ulong tmpa;
-	ulong tmpb;
-
-	tmpa = X;
-	tmpb = Y;
-	ret = tmpb - tmpa;
-	ret >>= 63;
-	ret -= 1;
-
-	return ret;
-}
-
-ushort MPKCUtils::Multiply(ushort X, ushort Y, size_t Degree)
-{
-	size_t i;
-	uint t;
-	uint t0;
-	uint t1;
-	uint tmp;
-
-	t0 = X;
-	t1 = Y;
-	tmp = t0 * (t1 & 1);
-
-	for (i = 1; i < Degree; ++i)
-	{
-		tmp ^= (t0 * (t1 & (1UL << i)));
-	}
-
-	t = tmp & 0x7FC000UL;
-	tmp ^= t >> 9;
-	tmp ^= t >> 12;
-
-	t = tmp & 0x3000UL;
-	tmp ^= t >> 9;
-	tmp ^= t >> 12;
-
-	return static_cast<ushort>(tmp & ((1UL << Degree) - 1));
-}
-
-ushort MPKCUtils::Square(ushort X, size_t Degree)
-{
-	static const std::array<uint, 4> B =
-	{
-		0x55555555UL, 
-		0x33333333UL, 
-		0x0F0F0F0FUL, 
-		0x00FF00FFUL
-	};
-
-	uint t;
-	uint y;
-
-	y = X;
-	y = (y | (y << 8)) & B[3];
-	y = (y | (y << 4)) & B[2];
-	y = (y | (y << 2)) & B[1];
-	y = (y | (y << 1)) & B[0];
-
-	t = y & 0x7FC000UL;
-	y ^= t >> 9;
-	y ^= t >> 12;
-
-	t = y & 0x3000UL;
-	y ^= t >> 9;
-	y ^= t >> 12;
-
-	return static_cast<ushort>(y & ((1 << Degree) - 1));
 }
 
 NAMESPACE_MCELIECEEND

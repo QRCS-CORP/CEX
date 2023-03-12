@@ -11,14 +11,14 @@ class ECDSABase
 {
 public:
 
-	static void GenerateKeyPair(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::vector<byte> &Seed, std::unique_ptr<IDigest> &Digest);
-	static bool Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<IDigest> &Digest);
-	static bool Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, std::unique_ptr<IDigest> &Digest);
+	static void GenerateKeyPair(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &PrivateKey, std::vector<uint8_t> &Seed, std::unique_ptr<IDigest> &Digest);
+	static bool Sign(std::vector<uint8_t> &Signature, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &PrivateKey, std::unique_ptr<IDigest> &Digest);
+	static bool Verify(std::vector<uint8_t> &Message, const std::vector<uint8_t> &Signature, const std::vector<uint8_t> &PublicKey, std::unique_ptr<IDigest> &Digest);
 
 private:
 
-	static bool Ed25519Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<IDigest> &Digest);
-	static bool Ed25519Verify(const std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PublicKey, std::unique_ptr<IDigest> &Digest);
+	static bool Ed25519Sign(std::vector<uint8_t> &Signature, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &PrivateKey, std::unique_ptr<IDigest> &Digest);
+	static bool Ed25519Verify(const std::vector<uint8_t> &Signature, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &PublicKey, std::unique_ptr<IDigest> &Digest);
 };
 
 NAMESPACE_ECDSAEND

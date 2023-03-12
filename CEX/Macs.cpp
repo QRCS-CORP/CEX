@@ -62,9 +62,6 @@ std::string MacConvert::ToName(Macs Enumeral)
 		case Macs::KMAC512:
 			name = std::string("KMAC512");
 			break;
-		case Macs::KMAC1024:
-			name = std::string("KMAC1024");
-			break;
 		case Macs::Poly1305:
 			name = std::string("Poly1305");
 			break;
@@ -151,10 +148,6 @@ Macs MacConvert::FromName(std::string &Name)
 	else if (Name == std::string("KMAC512"))
 	{
 		tname = Macs::KMAC512;
-	}
-	else if (Name == std::string("KMAC1024"))
-	{
-		tname = Macs::KMAC1024;
 	}
 	else if (Name == std::string("Poly1305"))
 	{

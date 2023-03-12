@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -93,15 +93,15 @@ public:
 	/// Initialize with 8 * 16bit unsigned integers
 	/// </summary>
 	///
-	/// <param name="X0">ushort 0</param>
-	/// <param name="X1">ushort 1</param>
-	/// <param name="X2">ushort 2</param>
-	/// <param name="X3">ushort 3</param>
-	/// <param name="X4">ushort 4</param>
-	/// <param name="X5">ushort 5</param>
-	/// <param name="X6">ushort 6</param>
-	/// <param name="X7">ushort 7</param>
-	explicit UShort128(ushort X0, ushort X1, ushort X2, ushort X3, ushort X4, ushort X5, ushort X6, ushort X7)
+	/// <param name="X0">uint16_t 0</param>
+	/// <param name="X1">uint16_t 1</param>
+	/// <param name="X2">uint16_t 2</param>
+	/// <param name="X3">uint16_t 3</param>
+	/// <param name="X4">uint16_t 4</param>
+	/// <param name="X5">uint16_t 5</param>
+	/// <param name="X6">uint16_t 6</param>
+	/// <param name="X7">uint16_t 7</param>
+	explicit UShort128(uint16_t X0, uint16_t X1, uint16_t X2, uint16_t X3, uint16_t X4, uint16_t X5, uint16_t X6, uint16_t X7)
 	{
 		xmm = _mm_set_epi16(X0, X1, X2, X3, X4, X5, X6, X7);
 	}
@@ -110,8 +110,8 @@ public:
 	/// Initialize with 1 * 16bit unsigned integer; copied to every register
 	/// </summary>
 	///
-	/// <param name="X">The uint to add</param>
-	explicit UShort128(ushort X)
+	/// <param name="X">The uint32_t to add</param>
+	explicit UShort128(uint16_t X)
 	{
 		xmm = _mm_set1_epi16(X);
 	}
@@ -131,7 +131,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="X">Set all uint16 integers to this value</param>
-	inline void Load(ushort X)
+	inline void Load(uint16_t X)
 	{
 		xmm = _mm_set1_epi16(X);
 	}
@@ -152,15 +152,15 @@ public:
 	/// Load with 8 * 16bit unsigned integers in Little Endian format
 	/// </summary>
 	///
-	/// <param name="X0">ushort 0</param>
-	/// <param name="X1">ushort 1</param>
-	/// <param name="X2">ushort 2</param>
-	/// <param name="X3">ushort 3</param>
-	/// <param name="X4">ushort 4</param>
-	/// <param name="X5">ushort 5</param>
-	/// <param name="X6">ushort 6</param>
-	/// <param name="X7">ushort 7</param>
-	inline void Load(ushort X0, ushort X1, ushort X2, ushort X3, ushort X4, ushort X5, ushort X6, ushort X7)
+	/// <param name="X0">uint16_t 0</param>
+	/// <param name="X1">uint16_t 1</param>
+	/// <param name="X2">uint16_t 2</param>
+	/// <param name="X3">uint16_t 3</param>
+	/// <param name="X4">uint16_t 4</param>
+	/// <param name="X5">uint16_t 5</param>
+	/// <param name="X6">uint16_t 6</param>
+	/// <param name="X7">uint16_t 7</param>
+	inline void Load(uint16_t X0, uint16_t X1, uint16_t X2, uint16_t X3, uint16_t X4, uint16_t X5, uint16_t X6, uint16_t X7)
 	{
 		xmm = _mm_set_epi16(X0, X1, X2, X3, X4, X5, X6, X7);
 	}
@@ -220,10 +220,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 16</param>
-	inline void RotL16(int Shift)
+	inline void RotL16(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 16, "Shift size is too large");
-		xmm = _mm_or_si128(_mm_slli_epi16(xmm, static_cast<int>(Shift)), _mm_srli_epi16(xmm, static_cast<int>(16 - Shift)));
+		xmm = _mm_or_si128(_mm_slli_epi16(xmm, static_cast<int32_t>(Shift)), _mm_srli_epi16(xmm, static_cast<int32_t>(16 - Shift)));
 	}
 
 	/// <summary>
@@ -234,10 +234,10 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 16</param>
 	/// 
 	/// <returns>The rotated UShort128</returns>
-	inline static UShort128 RotL16(const UShort128 &Value, const int Shift)
+	inline static UShort128 RotL16(const UShort128 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 16, "Shift size is too large");
-		return UShort128(_mm_or_si128(_mm_slli_epi16(Value.xmm, static_cast<int>(Shift)), _mm_srli_epi16(Value.xmm, static_cast<int>(16 - Shift))));
+		return UShort128(_mm_or_si128(_mm_slli_epi16(Value.xmm, static_cast<int32_t>(Shift)), _mm_srli_epi16(Value.xmm, static_cast<int32_t>(16 - Shift))));
 	}
 
 	/// <summary>
@@ -245,7 +245,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 16</param>
-	inline void RotR16(int Shift)
+	inline void RotR16(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 16, "Shift size is too large");
 		RotL16(16 - Shift);
@@ -259,17 +259,17 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 16</param>
 	/// 
 	/// <returns>The rotated UShort128</returns>
-	inline static UShort128 RotR16(const UShort128 &Value, const int Shift)
+	inline static UShort128 RotR16(const UShort128 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 16, "Shift size is too large");
 		return RotL16(Value, 16 - Shift);
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 8 unsigned integers
+	/// Performs a uint8_t swap on 8 unsigned integers
 	/// </summary>
 	/// 
-	/// <returns>The byte swapped UShort128</returns>
+	/// <returns>The uint8_t swapped UShort128</returns>
 	inline UShort128 Swap() const
 	{
 		__m128i tmpX = xmm;
@@ -281,12 +281,12 @@ public:
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 8 unsigned integers
+	/// Performs a uint8_t swap on 8 unsigned integers
 	/// </summary>
 	/// 		
 	/// <param name="X">The UShort128 to process</param>
 	/// 
-	/// <returns>The byte swapped UShort128</returns>
+	/// <returns>The uint8_t swapped UShort128</returns>
 	inline static UShort128 Swap(UShort128 &X)
 	{
 		__m128i tmpX = X.xmm;
@@ -390,7 +390,7 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	inline UShort128 operator ++ (int)
+	inline UShort128 operator ++ (int32_t)
 	{
 		return UShort128(xmm) + ONE();
 	}
@@ -426,7 +426,7 @@ public:
 	/// <summary>
 	/// Decrease postfix operator
 	/// </summary>
-	inline UShort128 operator -- (int)
+	inline UShort128 operator -- (int32_t)
 	{
 		return UShort128(xmm) - ONE();
 	}
@@ -458,8 +458,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline UShort128 operator / (const UShort128 &X) const
 	{
-		std::array<ushort, 8> tmpA;
-		std::array<ushort, 8> tmpB;
+		std::array<uint16_t, 8> tmpA;
+		std::array<uint16_t, 8> tmpB;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
 		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
@@ -474,8 +474,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UShort128 &X)
 	{
-		std::array<ushort, 8> tmpA;
-		std::array<ushort, 8> tmpB;
+		std::array<uint16_t, 8> tmpA;
+		std::array<uint16_t, 8> tmpB;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
 		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
@@ -628,9 +628,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UShort128 operator << (int Shift) const
+	inline UShort128 operator << (int32_t Shift) const
 	{
-		return UShort128(_mm_slli_epi16(xmm, static_cast<int>(Shift)));
+		return UShort128(_mm_slli_epi16(xmm, static_cast<int32_t>(Shift)));
 	}
 
 	/// <summary>
@@ -638,7 +638,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator <<= (int Shift)
+	inline void operator <<= (int32_t Shift)
 	{
 		xmm = _mm_slli_epi16(xmm, Shift);
 	}
@@ -648,9 +648,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UShort128 operator >> (int Shift) const
+	inline UShort128 operator >> (int32_t Shift) const
 	{
-		return UShort128(_mm_srli_epi16(xmm, static_cast<int>(Shift)));
+		return UShort128(_mm_srli_epi16(xmm, static_cast<int32_t>(Shift)));
 	}
 
 	/// <summary>
@@ -658,7 +658,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator >>= (int Shift)
+	inline void operator >>= (int32_t Shift)
 	{
 		xmm = _mm_srli_epi16(xmm, Shift);
 	}

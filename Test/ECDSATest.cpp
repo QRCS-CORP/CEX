@@ -9,16 +9,16 @@
 
 namespace Test
 {
-	using Asymmetric::AsymmetricKey;
-	using Asymmetric::AsymmetricKeyPair;
-	using Enumeration::AsymmetricKeyTypes;
-	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricParameters;
-	using Exception::CryptoAsymmetricException;
-	using Asymmetric::Sign::ECDSA::ECDSA;
-	using Enumeration::ECDSAParameters;
-	using Tools::IntegerTools;
-	using Prng::SecureRandom;
+	using CEX::Asymmetric::AsymmetricKey;
+	using CEX::Asymmetric::AsymmetricKeyPair;
+	using CEX::Asymmetric::Sign::ECDSA::ECDSA;
+	using CEX::Enumeration::AsymmetricKeyTypes;
+	using CEX::Enumeration::AsymmetricPrimitives;
+	using CEX::Enumeration::AsymmetricParameters;
+	using CEX::Enumeration::ECDSAParameters;
+	using CEX::Exception::CryptoAsymmetricException;
+	using CEX::Prng::SecureRandom;
+	using CEX::Tools::IntegerTools;
 
 	const std::string ECDSATest::CLASSNAME = "ECDSATest";
 	const std::string ECDSATest::DESCRIPTION = "ECDSATest key generation, signature generation, and verification tests..";
@@ -99,9 +99,9 @@ namespace Test
 	{
 		ECDSA sgn1(ECDSAParameters::ECDSAS2ED25519S);
 		ECDSA sgn2(ECDSAParameters::ECDSAS2ED25519S);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 		SecureRandom rnd;
 		bool ret;
 
@@ -173,8 +173,8 @@ namespace Test
 		// test sign without initialization
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
 			ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
 			sgn.Sign(msg, sig);
 
@@ -191,8 +191,8 @@ namespace Test
 		// test verify without initialization
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
 			ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
 			sgn.Verify(sig, msg);
 
@@ -228,8 +228,8 @@ namespace Test
 		// test initialization with wrong key
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
 			ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
 			AsymmetricKeyPair* kp = sgn.Generate();
 			sgn.Initialize(kp->PublicKey());
@@ -248,8 +248,8 @@ namespace Test
 
 	void ECDSATest::Integrity()
 	{
-		std::vector<byte> msg(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg(0);
+		std::vector<uint8_t> sig(0);
 
 		ECDSA sgn1(ECDSAParameters::ECDSAS2ED25519S);
 
@@ -272,9 +272,9 @@ namespace Test
 
 	void ECDSATest::Kat()
 	{
-		std::vector<byte> cpt(0);
-		std::vector<byte> msg(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> cpt(0);
+		std::vector<uint8_t> msg(0);
+		std::vector<uint8_t> sig(0);
 		size_t i;
 
 		ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
@@ -331,9 +331,9 @@ namespace Test
 	{
 		SecureRandom gen;
 		ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 		size_t i;
 
 		for (i = 0; i < TEST_CYCLES; ++i)
@@ -344,7 +344,7 @@ namespace Test
 			AsymmetricKeyPair* kp = sgn.Generate();
 
 			// alter the private key
-			std::vector<byte> skv = kp->PrivateKey()->Polynomial();
+			std::vector<uint8_t> skv = kp->PrivateKey()->Polynomial();
 			skv[skv.size() - 1] ^= 1U;
 
 			AsymmetricKey* sk = new AsymmetricKey(skv, AsymmetricPrimitives::ECDSA, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(ECDSAParameters::ECDSAS2ED25519S));
@@ -370,10 +370,10 @@ namespace Test
 	{
 		SecureRandom gen;
 		ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> seed(32);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> seed(32);
+		std::vector<uint8_t> sig(0);
 		size_t i;
 
 		for (i = 0; i < TEST_CYCLES; ++i)
@@ -384,7 +384,7 @@ namespace Test
 			AsymmetricKeyPair* kp = sgn.Generate();
 
 			// alter public key
-			std::vector<byte> pkv = kp->PublicKey()->Polynomial();
+			std::vector<uint8_t> pkv = kp->PublicKey()->Polynomial();
 			pkv[pkv.size() - 1] ^= 1U;
 
 			AsymmetricKey* pk = new AsymmetricKey(pkv, AsymmetricPrimitives::ECDSA, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(ECDSAParameters::ECDSAS2ED25519S));
@@ -410,7 +410,7 @@ namespace Test
 	void ECDSATest::Serialization()
 	{
 		ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
-		SecureVector<byte> skey(0);
+		SecureVector<uint8_t> skey(0);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -448,9 +448,9 @@ namespace Test
 	{
 		SecureRandom gen;
 		ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 
 		AsymmetricKeyPair* kp = sgn.Generate();
 
@@ -473,9 +473,9 @@ namespace Test
 	{
 		SecureRandom gen;
 		ECDSA sgn1(ECDSAParameters::ECDSAS2ED25519S);
-		std::vector<byte> msg1(0);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> msg1(0);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 		size_t msglen;
 		bool status;
 

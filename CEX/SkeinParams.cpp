@@ -24,7 +24,7 @@ SkeinParams::SkeinParams()
 {
 }
 
-SkeinParams::SkeinParams(ulong OutputSize, byte LeafSize, byte Fanout)
+SkeinParams::SkeinParams(uint64_t OutputSize, uint8_t LeafSize, uint8_t Fanout)
 	:
 	m_treeSchema{ 83, 72, 65, 51 },
 	m_treeVersion(1),
@@ -52,7 +52,7 @@ SkeinParams::SkeinParams(ulong OutputSize, byte LeafSize, byte Fanout)
 	m_dstCode.resize(DistributionCodeMax());
 }
 
-SkeinParams::SkeinParams(const std::vector<byte> &TreeArray)
+SkeinParams::SkeinParams(const std::vector<uint8_t> &TreeArray)
 	:
 	m_treeSchema(4),
 	m_treeVersion(0),
@@ -83,7 +83,7 @@ SkeinParams::SkeinParams(const std::vector<byte> &TreeArray)
 	std::memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 }
 
-SkeinParams::SkeinParams(const std::vector<byte> &Schema, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &DistributionCode)
+SkeinParams::SkeinParams(const std::vector<uint8_t> &Schema, uint64_t OutputSize, uint16_t Version, uint32_t LeafSize, uint8_t Fanout, uint8_t TreeDepth, std::vector<uint8_t> &DistributionCode)
 	:
 	m_treeSchema(Schema),
 	m_treeVersion(Version),
@@ -106,37 +106,37 @@ SkeinParams::SkeinParams(const std::vector<byte> &Schema, ulong OutputSize, usho
 
 //~~~Accessors~~~//
 
-byte &SkeinParams::FanOut()
+uint8_t &SkeinParams::FanOut()
 {
 	return m_treeFanout;
 }
 
-byte &SkeinParams::LeafSize()
+uint8_t &SkeinParams::LeafSize()
 {
 	return m_leafSize;
 }
 
-ulong &SkeinParams::OutputSize() 
+uint64_t &SkeinParams::OutputSize() 
 { 
 	return m_outputSize;
 }
 
-ushort &SkeinParams::Reserved1() 
+uint16_t &SkeinParams::Reserved1() 
 { 
 	return m_reserved1;
 }
 
-byte &SkeinParams::Reserved2() 
+uint8_t &SkeinParams::Reserved2() 
 { 
 	return m_reserved2; 
 }
 
-uint &SkeinParams::Reserved3() 
+uint32_t &SkeinParams::Reserved3() 
 { 
 	return m_reserved3; 
 }
 
-std::vector<byte> &SkeinParams::DistributionCode() 
+std::vector<uint8_t> &SkeinParams::DistributionCode() 
 { 
 	return m_dstCode;
 }
@@ -146,40 +146,40 @@ const size_t SkeinParams::DistributionCodeMax()
 	return (m_outputSize - HDR_SIZE);
 }
 
-std::vector<byte> &SkeinParams::Schema() 
+std::vector<uint8_t> &SkeinParams::Schema() 
 { 
 	return m_treeSchema;
 }
 
-ushort &SkeinParams::Version() 
+uint16_t &SkeinParams::Version() 
 { 
 	return m_treeVersion; 
 }
 
 //~~~Public Functions~~~//
 
-std::vector<ulong> SkeinParams::GetConfig()
+std::vector<uint64_t> SkeinParams::GetConfig()
 {
-	std::vector<ulong> config(m_outputSize / sizeof(ulong));
+	std::vector<uint64_t> config(m_outputSize / sizeof(uint64_t));
 
 	// set schema bytes
 	config[0] = IntegerTools::LeBytesTo32(m_treeSchema, 0);
 	// version and key size
-	config[0] |= (static_cast<ulong>(m_treeVersion) << 32);
-	config[0] |= (static_cast<ulong>(m_reserved1) << 48);
+	config[0] |= (static_cast<uint64_t>(m_treeVersion) << 32);
+	config[0] |= (static_cast<uint64_t>(m_reserved1) << 48);
 	// output size
-	config[1] = m_outputSize * sizeof(ulong);
+	config[1] = m_outputSize * sizeof(uint64_t);
 	// leaf size and fanout
-	config[2] |= (static_cast<ulong>(m_leafSize));
-	config[2] |= (static_cast<ulong>(m_treeFanout) << 8);
-	config[2] |= (static_cast<ulong>(m_treeDepth) << 16);
-	config[2] |= (static_cast<ulong>(m_reserved2) << 24);
-	config[2] |= (static_cast<ulong>(m_reserved3) << 32);
+	config[2] |= (static_cast<uint64_t>(m_leafSize));
+	config[2] |= (static_cast<uint64_t>(m_treeFanout) << 8);
+	config[2] |= (static_cast<uint64_t>(m_treeDepth) << 16);
+	config[2] |= (static_cast<uint64_t>(m_reserved2) << 24);
+	config[2] |= (static_cast<uint64_t>(m_reserved3) << 32);
 
 	// distribution code
 	for (size_t i = 3; i < config.size(); ++i)
 	{
-		config[i] = IntegerTools::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
+		config[i] = IntegerTools::LeBytesTo64(m_dstCode, (i - 3) * sizeof(uint64_t));
 	}
 
 	return config;
@@ -200,9 +200,9 @@ bool SkeinParams::Equals(SkeinParams &Input)
 	return (this->GetHashCode() == Input.GetHashCode());
 }
 
-int SkeinParams::GetHashCode()
+int32_t SkeinParams::GetHashCode()
 {
-	int result = 31 * m_treeVersion;
+	int32_t result = 31 * m_treeVersion;
 	result += 31 * m_reserved1;
 	result += 31 * m_leafSize;
 	result += 31 * m_outputSize;
@@ -242,9 +242,9 @@ void SkeinParams::Reset()
 	m_dstCode.clear();
 }
 
-std::vector<byte> SkeinParams::ToBytes()
+std::vector<uint8_t> SkeinParams::ToBytes()
 {
-	std::vector<byte> trs(GetHeaderSize(), 0);
+	std::vector<uint8_t> trs(GetHeaderSize(), 0);
 
 	std::memcpy(&trs[0], &m_treeSchema[0], 4);
 	IntegerTools::Le16ToBytes(m_treeVersion, trs, 4);

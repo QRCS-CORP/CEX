@@ -69,8 +69,8 @@ namespace Test
 
 	void SymmetricKeyGeneratorTest::Evaluate()
 	{
-		SecureVector<byte> tmps(SAMPLE_SIZE);
-		std::vector<byte> tmpv;
+		SecureVector<uint8_t> tmps(SAMPLE_SIZE);
+		std::vector<uint8_t> tmpv;
 		SymmetricKeyGenerator kgen256(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
 		OnProgress(std::string("Testing pseudo-random generation with a 256-bit security policy using the system provider"));
 		kgen256.Generate(tmps, 0, tmps.size());
@@ -163,7 +163,7 @@ namespace Test
 		// test allocating to an empty vector
 		try
 		{
-			SecureVector<byte> tmpr(0);
+			SecureVector<uint8_t> tmpr(0);
 			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
 			kgen.Generate(tmpr, 0, tmpr.size());
 
@@ -181,7 +181,7 @@ namespace Test
 		try
 		{
 			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
-			SecureVector<byte> tmpr = kgen.Generate(0);
+			SecureVector<uint8_t> tmpr = kgen.Generate(0);
 
 			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE7"));
 		}
@@ -196,7 +196,7 @@ namespace Test
 		// test a mismatched length request
 		try
 		{
-			SecureVector<byte> tmpr(1);
+			SecureVector<uint8_t> tmpr(1);
 			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
 			kgen.Generate(tmpr, 0, tmpr.size() + 1);
 
@@ -213,7 +213,7 @@ namespace Test
 
 	void SymmetricKeyGeneratorTest::Stress()
 	{
-		SecureVector<byte> otp;
+		SecureVector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 		SymmetricKeyGenerator kgen256(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
@@ -257,7 +257,7 @@ namespace Test
 		}
 	}
 
-	void SymmetricKeyGeneratorTest::Evaluate(const std::string &Name, std::vector<byte> &Sample)
+	void SymmetricKeyGeneratorTest::Evaluate(const std::string &Name, std::vector<uint8_t> &Sample)
 	{
 		RandomUtils::Evaluate(Name, Sample);
 	}

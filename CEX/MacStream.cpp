@@ -72,10 +72,10 @@ const std::vector<SymmetricKeySize> MacStream::LegalKeySizes()
 
 //~~~Public Functions~~~//
 
-std::vector<byte> MacStream::Compute(IByteStream* InStream)
+std::vector<uint8_t> MacStream::Compute(IByteStream* InStream)
 {
 	CEXASSERT(m_streamState->Initialized, "The mac has not been initialized");
-	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The input stream is too short");
+	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The input stream is too int16_t");
 	CEXASSERT(InStream->CanRead(), "The input stream is set to write only!");
 
 	size_t plen;
@@ -86,10 +86,10 @@ std::vector<byte> MacStream::Compute(IByteStream* InStream)
 	return Process(InStream, plen);
 }
 
-std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+std::vector<uint8_t> MacStream::Compute(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
 	CEXASSERT(m_streamState->Initialized, "The mac has not been initialized");
-	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "The input array is too short");
+	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "The input array is too int16_t");
 
 	size_t plen;
 
@@ -161,11 +161,11 @@ void MacStream::CalculateProgress(size_t Length, size_t Processed)
 
 		if (blk == 0)
 		{
-			ProgressPercent(static_cast<int>(prg));
+			ProgressPercent(static_cast<int32_t>(prg));
 		}
 		else if (Processed % blk == 0)
 		{
-			ProgressPercent(static_cast<int>(prg));
+			ProgressPercent(static_cast<int32_t>(prg));
 		}
 		else
 		{
@@ -174,15 +174,15 @@ void MacStream::CalculateProgress(size_t Length, size_t Processed)
 	}
 }
 
-std::vector<byte> MacStream::Process(IByteStream* InStream, size_t Length)
+std::vector<uint8_t> MacStream::Process(IByteStream* InStream, size_t Length)
 {
 	const size_t BLKLEN = m_macEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
-	std::vector<byte> tmph;
+	std::vector<uint8_t> tmph;
 	size_t plen;
 	size_t pread;
 
-	std::vector<byte> inpBuffer(BLKLEN);
+	std::vector<uint8_t> inpBuffer(BLKLEN);
 
 	plen = 0;
 	pread = 0;
@@ -213,11 +213,11 @@ std::vector<byte> MacStream::Process(IByteStream* InStream, size_t Length)
 	return tmph;
 }
 
-std::vector<byte> MacStream::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+std::vector<uint8_t> MacStream::Process(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
 	const size_t BLKLEN = m_macEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
-	std::vector<byte> tmph;
+	std::vector<uint8_t> tmph;
 	size_t plen;
 
 	plen = 0;

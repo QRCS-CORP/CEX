@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by September 06, 2020
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_ECDH_H
 #define CEX_ECDH_H
@@ -124,7 +124,7 @@ public:
 	/// For best security, the key should be random, secret, and shared only between hosts within a secure domain.
 	/// This property is used by the Shared Trust Model secure communications protocol.</para>
 	/// </summary>
-	std::vector<byte> &DomainKey() override;
+	std::vector<uint8_t> &DomainKey() override;
 
 	/// <summary>
 	/// Read Only: The cipher type-name
@@ -171,7 +171,7 @@ public:
 	/// <param name="SharedSecret">The shared secret key</param>
 	/// 
 	/// <returns>Returns true if decryption is sucesssful</returns>
-	bool KeyExchange(AsymmetricKey* PublicKey, AsymmetricKey* PrivateKey, std::vector<byte> &SharedSecret) override;
+	bool KeyExchange(AsymmetricKey* PublicKey, AsymmetricKey* PrivateKey, std::vector<uint8_t> &SharedSecret) override;
 
 	/// <summary>
 	/// Generate a public/private key-pair
@@ -190,11 +190,11 @@ public:
 	/// <returns>A public/private key pair</returns>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid seed size is used</exception>
-	AsymmetricKeyPair* Generate(std::vector<byte> &Seed) override;
+	AsymmetricKeyPair* Generate(std::vector<uint8_t> &Seed) override;
 
 private:
 
-	void CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate);
+	void CXOF(const std::vector<uint8_t> &Domain, const std::vector<uint8_t> &Key, std::vector<uint8_t> &Secret, size_t Rate);
 };
 
 NAMESPACE_ECDHEND

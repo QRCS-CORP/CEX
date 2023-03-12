@@ -13,8 +13,8 @@ class CMAC::CmacState
 {
 public:
 
-	std::vector<byte> Buffer;
-	std::vector<byte> State;
+	std::vector<uint8_t> Buffer;
+	std::vector<uint8_t> State;
 	size_t Position;
 	bool IsInitialized;
 	std::unique_ptr<SymmetricKey> LuKey;
@@ -53,9 +53,8 @@ CMAC::CMAC(BlockCiphers CipherType)
 		Macs::CMAC,
 		(MacConvert::ToName(Macs::CMAC) + std::string("-") + BlockCipherConvert::ToName(CipherType)),
 		std::vector<SymmetricKeySize> {
-			SymmetricKeySize(32, 0, 32),
-			SymmetricKeySize(64, 0, 64),
-			SymmetricKeySize(128, 0, 128)},
+			SymmetricKeySize(32, 0, 0),
+			SymmetricKeySize(64, 0, 0)},
 #if defined(CEX_ENFORCE_LEGALKEY)
 		32,
 		32,
@@ -80,9 +79,8 @@ CMAC::CMAC(IBlockCipher* Cipher)
 			MacConvert::ToName(Macs::CMAC) + std::string("-") + BlockCipherConvert::ToName(Cipher->Enumeral()) :
 			std::string("")),
 		std::vector<SymmetricKeySize> {
-			SymmetricKeySize(32, 0, 32),
-			SymmetricKeySize(64, 0, 64),
-			SymmetricKeySize(128, 0, 128)},
+			SymmetricKeySize(32, 0, 0),
+			SymmetricKeySize(64, 0, 0)},
 #if defined(CEX_ENFORCE_LEGALKEY)
 		32,
 		32,
@@ -131,7 +129,7 @@ void CMAC::Clear()
 	m_cmacState->Reset();
 }
 
-void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void CMAC::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -139,7 +137,7 @@ void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 	}
 	if (Output.size() < TagSize())
 	{
-		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Output.size() != TagSize())
@@ -151,7 +149,7 @@ void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Finalize(Output, 0);
 }
 
-size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
+size_t CMAC::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (IsInitialized() == false)
 	{
@@ -159,7 +157,7 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 	if ((Output.size() - OutOffset) < TagSize())
 	{
-		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	Pad(m_cmacState->Buffer, m_cmacState->Position, m_cmacState->Buffer.size());
@@ -179,9 +177,9 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
-size_t CMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+size_t CMAC::Finalize(SecureVector<uint8_t> &Output, size_t OutOffset)
 {
-	std::vector<byte> tag(TagSize());
+	std::vector<uint8_t> tag(TagSize());
 
 	Finalize(tag, 0);
 	SecureMove(tag, 0, Output, OutOffset, tag.size());
@@ -192,11 +190,11 @@ size_t CMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 
 void CMAC::Initialize(ISymmetricKey &Parameters)
 {
-	std::vector<byte> k1(BLOCK_SIZE);
-	std::vector<byte> k2(BLOCK_SIZE);
-	std::vector<byte> lu(BLOCK_SIZE);
-	std::vector<byte> tmpv(BLOCK_SIZE);
-	std::vector<byte> tmpz(BLOCK_SIZE);
+	std::vector<uint8_t> k1(BLOCK_SIZE);
+	std::vector<uint8_t> k2(BLOCK_SIZE);
+	std::vector<uint8_t> lu(BLOCK_SIZE);
+	std::vector<uint8_t> tmpv(BLOCK_SIZE);
+	std::vector<uint8_t> tmpz(BLOCK_SIZE);
 
 #if defined(CEX_ENFORCE_LEGALKEY)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
@@ -245,7 +243,7 @@ void CMAC::Reset()
 	m_cmacState->IsInitialized = false;
 }
 
-void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void CMAC::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -253,7 +251,7 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)
@@ -292,16 +290,16 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 //~~~Private Functions~~~//
 
-void CMAC::DoubleLu(const std::vector<byte> &Input, std::vector<byte> &Output)
+void CMAC::DoubleLu(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
-	uint carry;
+	uint32_t carry;
 
 	carry = ShiftLeft(Input, Output);
 	// fixed on const 128; all implemented block ciphers are 128-bit
-	Output[Input.size() - 1] ^= static_cast<byte>(MIX_C128 >> ((1 - carry) << 3));
+	Output[Input.size() - 1] ^= static_cast<uint8_t>(MIX_C128 >> ((1 - carry) << 3));
 }
 
-void CMAC::Pad(std::vector<byte> &Input, size_t Offset, size_t Length)
+void CMAC::Pad(std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (Offset != Length)
 	{
@@ -316,12 +314,12 @@ void CMAC::Pad(std::vector<byte> &Input, size_t Offset, size_t Length)
 	}
 }
 
-uint CMAC::ShiftLeft(const std::vector<byte> &Input, std::vector<byte> &Output)
+uint32_t CMAC::ShiftLeft(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	// TODO: worth vectorizing in IntegerTools?
 	size_t ctr;
-	uint bit;
-	uint tmpb;
+	uint32_t bit;
+	uint32_t tmpb;
 
 	bit = 0;
 	ctr = Input.size();
@@ -330,7 +328,7 @@ uint CMAC::ShiftLeft(const std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		--ctr;
 		tmpb = Input[ctr];
-		Output[ctr] = static_cast<byte>((tmpb << 1) | bit);
+		Output[ctr] = static_cast<uint8_t>((tmpb << 1) | bit);
 		bit = (tmpb >> 7) & 1;
 	} 
 	while (ctr != 0);

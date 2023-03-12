@@ -25,14 +25,14 @@ const std::string ESP::Name()
 	return CLASS_NAME; 
 }
 
-void ESP::AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length)
+void ESP::AddPadding(std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (Length > Input.size())
 	{
 		throw CryptoPaddingException(Name(), std::string("AddPadding"), std::string("The length is longer than the array!"), ErrorCodes::InvalidSize);
 	}
 
-	byte pad;
+	uint8_t pad;
 	size_t i;
 
 	pad = 0x01;
@@ -44,7 +44,7 @@ void ESP::AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length)
 	}
 }
 
-size_t ESP::GetBlockLength(const std::vector<byte> &Input)
+size_t ESP::GetBlockLength(const std::vector<uint8_t> &Input)
 {
 	const size_t BLKLEN = Input.size();
 	const size_t FNLPAD = Input[BLKLEN - 1];
@@ -68,7 +68,7 @@ size_t ESP::GetBlockLength(const std::vector<byte> &Input)
 	return pos;
 }
 
-size_t ESP::GetBlockLength(const std::vector<byte> &Input, size_t Offset, size_t Length)
+size_t ESP::GetBlockLength(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (Length > Input.size())
 	{

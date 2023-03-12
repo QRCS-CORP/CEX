@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The Dilithium parameter sets enumeration
 /// </summary>
-enum class DilithiumParameters : byte
+enum class DilithiumParameters : uint8_t
 {
 	/// <summary>
 	/// No parameter set is specified
@@ -18,15 +18,15 @@ enum class DilithiumParameters : byte
 	/// <summary>
 	/// The S1 parameters; (Medium Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLTMS1N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLTMS1N256Q8380417),
+	DLTMS1P2544 = static_cast<uint8_t>(AsymmetricParameters::DLTMS1P2544),
 	/// <summary>
 	/// The S2 parameters; (High Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLTMS2N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLTMS2N256Q8380417),
+	DLTMS3P4016 = static_cast<uint8_t>(AsymmetricParameters::DLTMS3P4016),
 	/// <summary>
 	/// The S3 parameters; (Highest Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLTMS3N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLTMS3N256Q8380417),
+	DLTMS5P4880 = static_cast<uint8_t>(AsymmetricParameters::DLTMS5P4880),
 };
 
 class DilithiumParameterConvert

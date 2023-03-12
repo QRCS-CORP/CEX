@@ -1,345 +1,184 @@
 #include "MPKCN8192T128.h"
-#include "Keccak.h"
 #include "IntegerTools.h"
+#include "Keccak.h"
+#include "MemoryTools.h"
 #include "MPKCUtils.h"
 
 NAMESPACE_MCELIECE
 
-using Digest::Keccak;
 using Tools::IntegerTools;
+using Digest::Keccak;
+using Tools::MemoryTools;
 
-bool MPKCN8192T128::Decapsulate(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+static const int32_t MCELIECE_N8192T128_GFBITS = 13;
+static const int32_t MCELIECE_N8192T128_SYS_N = 8192;
+static const int32_t MCELIECE_N8192T128_SYS_T = 128;
+static const int32_t MCELIECE_N8192T128_COND_BYTES = ((1 << (MCELIECE_N8192T128_GFBITS - 4)) * (2 * MCELIECE_N8192T128_GFBITS - 1));
+static const int32_t MCELIECE_N8192T128_IRR_BYTES = (MCELIECE_N8192T128_SYS_T * 2);
+static const int32_t MCELIECE_N8192T128_PK_NROWS = (MCELIECE_N8192T128_SYS_T * MCELIECE_N8192T128_GFBITS);
+static const int32_t MCELIECE_N8192T128_PK_NCOLS = (MCELIECE_N8192T128_SYS_N - MCELIECE_N8192T128_PK_NROWS);
+static const int32_t MCELIECE_N8192T128_PK_ROW_BYTES = ((MCELIECE_N8192T128_PK_NCOLS + 7) / 8);
+static const int32_t MCELIECE_N8192T128_SYND_BYTES = ((MCELIECE_N8192T128_PK_NROWS + 7) / 8);
+static const int32_t MCELIECE_N8192T128_GFMASK((1 << MCELIECE_N8192T128_GFBITS) - 1);
+static const int32_t MCELIECE_N8192T128_GENITR_MAX = 100;
+
+void MPKCN8192T128::GfMul(uint16_t* Output, const uint16_t* Input0, const uint16_t* Input1)
 {
-	std::vector<byte> conf(SECRET_SIZE);
-	std::vector<byte> e2(1 + (MPKC_N / 8), 0x02);
-	std::vector<byte> preimage(1 + (MPKC_N / 8) + SYND_BYTES + SECRET_SIZE);
-	size_t pctr;
-	size_t i;
-	ushort m;
-	byte confirm;
-	byte derr;
+	// input: in0, in1 in GF((2^m)^t)
+	// output: out = in0*in1
 
-	pctr = 0;
-	confirm = 0;
-	derr = DecryptE(e2.data() + 1, PrivateKey.data() + (MPKC_N / 8), CipherText.data());
-
-	XOF(e2, 0, e2.size(), conf, 0, conf.size(), Keccak::KECCAK256_RATE_SIZE);
-
-	for (i = 0; i < SECRET_SIZE; ++i)
-	{
-		confirm |= conf[i] ^ CipherText[SYND_BYTES + i];
-	}
-
-	m = derr | confirm;
-	m -= 1;
-	m >>= 8;
-	preimage[pctr] = (~m & 0) | (m & 1);
-	++pctr;
-
-	for (i = 0; i < MPKC_N / 8; ++i)
-	{
-		preimage[pctr] = (~m & PrivateKey[i]) | (m & e2[i + 1]);
-		++pctr;
-	}
-
-	for (i = 0; i < SYND_BYTES + SECRET_SIZE; ++i)
-	{
-		preimage[pctr] = CipherText[i];
-		++pctr;
-	}
-
-	XOF(preimage, 0, preimage.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
-
-	return static_cast<bool>(confirm == 0 && derr == 0);
-}
-
-void MPKCN8192T128::Encapsulate(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng)
-{
-	std::vector<byte> e2(1 + (MPKC_N / 8), 0x02);
-	std::vector<byte> ec1(1 + (MPKC_N / 8) + SYND_BYTES + SECRET_SIZE, 0x01);
-
-	EncryptE(CipherText.data(), PublicKey.data(), e2.data() + 1, Rng);
-	XOF(e2, 0, e2.size(), CipherText, SYND_BYTES, MAC_SIZE, Keccak::KECCAK256_RATE_SIZE);
-
-	std::memcpy(ec1.data() + 1, e2.data() + 1, MPKC_N / 8);
-	std::memcpy(ec1.data() + 1 + (MPKC_N / 8), CipherText.data(), SYND_BYTES + MAC_SIZE);
-
-	XOF(ec1, 0, ec1.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
-}
-
-bool MPKCN8192T128::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Rng)
-{
-	size_t i;
-
-	for (i = 0; i < KEYGEN_RETRIES; ++i)
-	{
-		SkPartGen(PrivateKey.data(), Rng);
-
-		if (PkGen(PublicKey.data(), PrivateKey.data() + MPKC_N / 8) == 0)
-		{
-			break;
-		}
-	}
-
-	Rng->Generate(PrivateKey, 0, MPKC_N / 8);
-
-	return static_cast<bool>(i < KEYGEN_RETRIES);
-}
-
-void MPKCN8192T128::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
-{
-	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-}
-
-// benes.c //
-
-void MPKCN8192T128::SupportGen(ushort* S, const byte* C)
-{
-	byte L[GFBITS][(1 << GFBITS) / 8];
-	ushort bctr;
+	uint16_t prod[MCELIECE_N8192T128_SYS_T * 2 - 1] = { 0 };
 	size_t i;
 	size_t j;
-	ushort a;
 
-	for (i = 0; i < GFBITS; ++i)
+	for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
 	{
-		for (j = 0; j < (1 << GFBITS) / 8; ++j)
+		for (j = 0; j < MCELIECE_N8192T128_SYS_T; ++j)
 		{
-			L[i][j] = 0;
+			prod[i + j] ^= MPKCUtils::GfMultiply(Input0[i], Input1[j]);
 		}
 	}
 
-	for (bctr = 0; bctr < (1 << GFBITS); ++bctr)
+	for (i = (MCELIECE_N8192T128_SYS_T - 1) * 2; i >= MCELIECE_N8192T128_SYS_T; --i)
 	{
-		a = MPKCUtils::BitReverse(bctr);
+		prod[i - MCELIECE_N8192T128_SYS_T + 7] ^= prod[i];
+		prod[i - MCELIECE_N8192T128_SYS_T + 2] ^= prod[i];
+		prod[i - MCELIECE_N8192T128_SYS_T + 1] ^= prod[i];
+		prod[i - MCELIECE_N8192T128_SYS_T] ^= prod[i];
+	}
 
-		for (j = 0; j < GFBITS; ++j)
+	MemoryTools::CopyRaw((uint8_t*)prod, (uint8_t*)Output, MCELIECE_N8192T128_SYS_T * sizeof(uint16_t));
+}
+
+void MPKCN8192T128::SupportGen(uint16_t* S, const uint8_t* C)
+{
+	// input: condition bits c output: support s
+
+	uint8_t L[MCELIECE_N8192T128_GFBITS][(1 << MCELIECE_N8192T128_GFBITS) / 8] = { 0 };
+	size_t i;
+	size_t j;
+	uint16_t a;
+
+	for (i = 0; i < (1 << MCELIECE_N8192T128_GFBITS); ++i)
+	{
+		a = MPKCUtils::BitReverse((uint16_t)i);
+
+		for (j = 0; j < MCELIECE_N8192T128_GFBITS; ++j)
 		{
-			L[j][bctr / 8] |= ((a >> j) & 1) << (bctr % 8);
+			L[j][i / 8] |= ((a >> j) & 1) << (i % 8);
 		}
 	}
 
-	for (j = 0; j < GFBITS; ++j)
+	for (j = 0; j < MCELIECE_N8192T128_GFBITS; ++j)
 	{
-		MPKCUtils::ApplyBenes(L[j], C, false);
+		MPKCUtils::ApplyBenes(L[j], C, 0);
 	}
 
-	for (i = 0; i < SYS_N; ++i)
+	for (i = 0; i < MCELIECE_N8192T128_SYS_N; ++i)
 	{
 		S[i] = 0;
-		j = GFBITS;
+		j = MCELIECE_N8192T128_GFBITS;
 
 		do
 		{
 			--j;
 			S[i] <<= 1;
 			S[i] |= (L[j][i / 8] >> (i % 8)) & 1;
-		} 
-		while (j > 0);
+		} while (j != 0);
 	}
 }
 
-// bm.c //
-
-void MPKCN8192T128::BerlekampMassey(ushort* Output, const ushort* S)
+int32_t MPKCN8192T128::Decrypt(uint8_t* E, const uint8_t* Sk, const uint8_t* C)
 {
-	ushort T[SYS_T + 1];
-	ushort C[SYS_T + 1];
-	ushort B[SYS_T + 1];
-	size_t i;
-	uint N;
-	ushort L;
-	ushort mle;
-	ushort mne;
-	ushort b;
-	ushort d;
-	ushort f;
+	// Niederreiter decryption with the Berlekamp decoder.
+	// input: sk, secret key c, ciphertext
+	// output: e, error vector
+	// return: 0 for success; 1 for failure
 
-	b = 1;
-	L = 0;
+	uint16_t g[MCELIECE_N8192T128_SYS_T + 1] = { 0 };
+	uint16_t L[MCELIECE_N8192T128_SYS_N];
+	uint16_t s[MCELIECE_N8192T128_SYS_T * 2];
+	uint16_t s_cmp[MCELIECE_N8192T128_SYS_T * 2];
+	uint16_t locator[MCELIECE_N8192T128_SYS_T + 1];
+	uint16_t images[MCELIECE_N8192T128_SYS_N];
+	uint8_t r[MCELIECE_N8192T128_SYS_N / 8];
+	int32_t i;
+	int32_t w;
+	uint16_t check;
+	uint16_t t;
 
-	for (i = 0; i < SYS_T + 1; ++i)
+	w = 0;
+	MemoryTools::CopyRaw((uint8_t*)C, (uint8_t*)r, MCELIECE_N8192T128_SYND_BYTES);
+	MemoryTools::ClearRaw(r + MCELIECE_N8192T128_SYND_BYTES, (MCELIECE_N8192T128_SYS_N / 8) - MCELIECE_N8192T128_SYND_BYTES);
+
+	for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
 	{
-		B[i] = 0;
-		C[i] = 0;
-	}
-
-	B[1] = 1;
-	C[0] = 1;
-
-	for (N = 0; N < 2 * SYS_T; N++)
-	{
-		d = 0;
-
-		for (i = 0; i <= IntegerTools::Min(N, SYS_T); ++i)
-		{
-			d ^= GF::Multiply(C[i], S[N - i]);
-		}
-
-		mne = d;
-		mne -= 1;
-		mne >>= 15;
-		mne -= 1;
-		mle = static_cast<ushort>(N);
-		mle -= 2U * L;
-		mle >>= 15;
-		mle -= 1;
-		mle &= mne;
-
-		for (i = 0; i <= SYS_T; ++i)
-		{
-			T[i] = C[i];
-		}
-
-		f = GF::Fractional(b, d);
-
-		for (i = 0; i <= SYS_T; ++i)
-		{
-			C[i] ^= GF::Multiply(f, B[i]) & mne;
-		}
-
-		L = (L & ~mle) | ((N + 1 - L) & mle);
-
-		for (i = 0; i <= SYS_T; ++i)
-		{
-			B[i] = (B[i] & ~mle) | (T[i] & mle);
-		}
-
-		b = (b & ~mle) | (d & mle);
-		i = SYS_T;
-
-		do
-		{
-			B[i] = B[i - 1];
-			--i;
-		} while (i > 0);
-
-		B[0] = 0;
-	}
-
-	for (i = 0; i <= SYS_T; ++i)
-	{
-		Output[i] = C[SYS_T - i];
-	}
-}
-
-// controlbits.c //
-
-void MPKCN8192T128::ControlBits(byte* Output, const uint* Pi)
-{
-	byte c[(((2 * GFBITS) - 1) * (1 << GFBITS)) / 16] = { 0 };
-	size_t i;
-
-	MPKCUtils::PermuteBits(GFBITS, (1UL << GFBITS), 1UL, 0UL, c, Pi);
-
-	for (i = 0; i < sizeof(c); ++i)
-	{
-		Output[i] = c[i];
-	}
-}
-
-// decrypt.c //
-
-byte MPKCN8192T128::DecryptE(byte* E, const byte* Sk, const byte* C)
-{
-	ushort g[SYS_T + 1];
-	ushort L[SYS_N];
-	ushort s[SYS_T * 2];
-	ushort s_cmp[SYS_T * 2];
-	ushort locator[SYS_T + 1];
-	ushort images[SYS_N];
-	byte r[SYS_N / 8];
-	size_t i;
-	ushort check;
-	ushort t;
-	ushort w;
-
-	for (i = 0; i < SYND_BYTES; ++i)
-	{
-		r[i] = C[i];
-	}
-
-	for (i = SYND_BYTES; i < SYS_N / 8; ++i)
-	{
-		r[i] = 0;
-	}
-
-	for (i = 0; i < SYS_T; ++i)
-	{
-		g[i] = MPKCUtils::Load16(Sk);
-		g[i] &= GFMASK;
+		g[i] = MPKCUtils::LoadGf(Sk);
 		Sk += 2;
 	}
 
-	g[SYS_T] = 1;
+	g[MCELIECE_N8192T128_SYS_T] = 1;
 	SupportGen(L, Sk);
-	Syndrome(s, g, L, r);
-	BerlekampMassey(locator, s);
-	Root(images, locator, L);
+	MPKCUtils::Synd(s, g, L, r, MCELIECE_N8192T128_SYS_N, MCELIECE_N8192T128_SYS_T);
+	MPKCUtils::Bm(locator, s, MCELIECE_N8192T128_SYS_T);
+	MPKCUtils::Root(images, locator, L, MCELIECE_N8192T128_SYS_N, MCELIECE_N8192T128_SYS_T);
 
-	for (i = 0; i < SYS_N / 8; ++i)
+	MemoryTools::ClearRaw(E, MCELIECE_N8192T128_SYS_N / 8);
+
+	for (i = 0; i < MCELIECE_N8192T128_SYS_N; ++i)
 	{
-		E[i] = 0;
-	}
-
-	w = 0;
-
-	for (i = 0; i < SYS_N; ++i)
-	{
-		t = GF::IsZero(images[i]) & 1;
+		t = MPKCUtils::GfIsZero(images[i]) & 1;
 		E[i / 8] |= t << (i % 8);
 		w += t;
 	}
 
-	Syndrome(s_cmp, g, L, E);
-	check = w;
-	check ^= SYS_T;
+	MPKCUtils::Synd(s_cmp, g, L, E, MCELIECE_N8192T128_SYS_N, MCELIECE_N8192T128_SYS_T);
+	check = (uint16_t)w;
+	check ^= MCELIECE_N8192T128_SYS_T;
 
-	for (i = 0; i < SYS_T * 2; ++i)
+	for (i = 0; i < MCELIECE_N8192T128_SYS_T * 2; ++i)
 	{
 		check |= s[i] ^ s_cmp[i];
 	}
 
 	check -= 1;
 	check >>= 15;
-	check ^= 1;
 
-	return static_cast<byte>(check);
+	return (check ^ 1);
 }
 
-// encrypt.c //
-
-void MPKCN8192T128::GenE(byte* E, std::unique_ptr<IPrng> &Rng)
+void MPKCN8192T128::GenE(uint8_t* E, std::unique_ptr<IPrng> &Rng)
 {
-	std::array<ushort, SYS_T> ind;
-	ulong eint[SYS_N / 64];
-	ulong val[SYS_T];
-	ulong mask;
-	ulong one;
+	// output: e, an error vector of weight t
+	uint16_t ind[MCELIECE_N8192T128_SYS_T] = { 0 };
+	uint8_t val[MCELIECE_N8192T128_SYS_T] = { 0 };
 	size_t eq;
 	size_t i;
 	size_t j;
+	uint8_t mask;
+	std::vector<uint8_t> brnd(MCELIECE_N8192T128_SYS_T * sizeof(uint16_t));
 
-	one = 1;
-
-	for (;;)
+	while (true)
 	{
-		Rng->Fill(ind, 0, ind.size());
+		Rng->Fill(brnd, 0, brnd.size());
 
-		for (i = 0; i < SYS_T; ++i)
+		for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
 		{
-			ind[i] &= GFMASK;
+			ind[i] = MPKCUtils::LoadGf(brnd.data() + i * 2);
 		}
+
+		// check for repetition
 
 		eq = 0;
 
-		for (i = 1; i < SYS_T; ++i)
+		for (i = 1; i < MCELIECE_N8192T128_SYS_T; ++i)
 		{
 			for (j = 0; j < i; ++j)
 			{
 				if (ind[i] == ind[j])
 				{
 					eq = 1;
+					break;
 				}
 			}
 		}
@@ -350,62 +189,48 @@ void MPKCN8192T128::GenE(byte* E, std::unique_ptr<IPrng> &Rng)
 		}
 	}
 
-	for (j = 0; j < SYS_T; ++j)
+	for (j = 0; j < MCELIECE_N8192T128_SYS_T; ++j)
 	{
-		val[j] = one << (ind[j] & 63);
+		val[j] = (uint8_t)(1 << (ind[j] & 7));
 	}
 
-	for (i = 0; i < SYS_N / 64; ++i)
+	for (i = 0; i < MCELIECE_N8192T128_SYS_N / 8; ++i)
 	{
-		eint[i] = 0;
+		E[i] = 0;
 
-		for (j = 0; j < SYS_T; ++j)
+		for (j = 0; j < MCELIECE_N8192T128_SYS_T; ++j)
 		{
-			mask = i ^ (ind[j] >> 6);
-			mask -= 1;
-			mask >>= 63;
-			mask = ~mask + 1;
-			eint[i] |= val[j] & mask;
+			mask = MPKCUtils::SameMask((uint16_t)i, (ind[j] >> 3));
+			E[i] |= val[j] & mask;
 		}
-	}
-
-	for (i = 0; i < SYS_N / 64; ++i)
-	{
-		MPKCUtils::Store64(E + i * 8, eint[i]);
 	}
 }
 
-void MPKCN8192T128::Syndrome(byte* S, const byte* Pk, const byte* E)
+void MPKCN8192T128::Syndrome(uint8_t* S, const uint8_t* Pk, const uint8_t* E)
 {
-	byte row[SYS_N / 8];
-	size_t i;
+	// input: public key pk, error vector e
+	// output: Syndrome s
+
+	uint8_t row[MCELIECE_N8192T128_SYS_N / 8];
+	const uint8_t* pk_ptr = Pk;
 	size_t j;
-	size_t poft;
-	byte b;
+	uint8_t b;
 
-	for (i = 0; i < SYND_BYTES; ++i)
+	MemoryTools::ClearRaw(S, MCELIECE_N8192T128_SYND_BYTES);
+
+	for (size_t i = 0; i < MCELIECE_N8192T128_PK_NROWS; ++i)
 	{
-		S[i] = 0;
-	}
+		MemoryTools::ClearRaw(row, MCELIECE_N8192T128_SYS_N / 8);
 
-	poft = 0;
-
-	for (i = 0; i < PK_NROWS; ++i)
-	{
-		for (j = 0; j < SYS_N / 8; ++j)
+		for (j = 0; j < MCELIECE_N8192T128_PK_ROW_BYTES; ++j)
 		{
-			row[j] = 0;
-		}
-
-		for (j = 0; j < PK_ROW_BYTES; ++j)
-		{
-			row[SYS_N / 8 - PK_ROW_BYTES + j] = Pk[poft + j];
+			row[MCELIECE_N8192T128_SYS_N / 8 - MCELIECE_N8192T128_PK_ROW_BYTES + j] = pk_ptr[j];
 		}
 
 		row[i / 8] |= 1 << (i % 8);
 		b = 0;
 
-		for (j = 0; j < SYS_N / 8; ++j)
+		for (j = 0; j < MCELIECE_N8192T128_SYS_N / 8; ++j)
 		{
 			b ^= row[j] & E[j];
 		}
@@ -416,585 +241,450 @@ void MPKCN8192T128::Syndrome(byte* S, const byte* Pk, const byte* E)
 		b &= 1;
 		S[i / 8] |= (b << (i % 8));
 
-		poft += PK_ROW_BYTES;
+		pk_ptr += MCELIECE_N8192T128_PK_ROW_BYTES;
 	}
 }
 
-void MPKCN8192T128::EncryptE(byte* S, const byte* Pk, byte* E, std::unique_ptr<IPrng> &Rng)
+void MPKCN8192T128::Encrypt(uint8_t* S, const uint8_t* Pk, uint8_t* E, std::unique_ptr<IPrng> &Rng)
 {
 	GenE(E, Rng);
 	Syndrome(S, Pk, E);
 }
 
-// pk_gen.c //
-
-int32_t MPKCN8192T128::PkGen(byte* Pk, const byte* Sk)
+int32_t MPKCN8192T128::PkGen(uint8_t* Pk, const uint8_t* Sk, const uint32_t* Perm, int16_t* Pi)
 {
-	byte** mat = new byte*[GFBITS * SYS_T];
-	ushort g[SYS_T + 1];
-	ushort L[SYS_N];
-	ushort inv[SYS_N];
-	int32_t ret;
-	size_t c;
+	// input: secret key sk output: public key pk
+
+	uint64_t buf[1 << MCELIECE_N8192T128_GFBITS] = { 0 };
+	uint16_t g[MCELIECE_N8192T128_SYS_T + 1] = { 0 };	// Goppa polynomial
+	uint16_t L[MCELIECE_N8192T128_SYS_N] = { 0 };		// support
+	uint16_t inv[MCELIECE_N8192T128_SYS_N];
+	uint8_t** mat;
 	size_t i;
 	size_t j;
 	size_t k;
+	size_t col;
 	size_t row;
+	int32_t res;
 	uint8_t b;
 	uint8_t mask;
+	bool balc;
 
-	g[SYS_T] = 1;
-	ret = 0;
+	res = -1;
+	mat = (uint8_t**)MemoryTools::Malloc(MCELIECE_N8192T128_PK_NROWS * sizeof(uint8_t*));
 
-	for (i = 0; i < SYS_T; i++)
+	if (mat != NULL)
 	{
-		g[i] = MPKCUtils::Load16(Sk);
-		g[i] &= GFMASK;
-		Sk += 2;
-	}
+		balc = true;
 
-	SupportGen(L, Sk);
-	Root(inv, g, L);
-
-	for (i = 0; i < SYS_N; i++)
-	{
-		inv[i] = GF::Inverse(inv[i]);
-	}
-
-	for (i = 0; i < GFBITS * SYS_T; ++i)
-	{
-		mat[i] = new byte[SYS_N / 8];
-		std::memset(mat[i], 0, SYS_N / 8);
-	}
-
-	for (i = 0; i < SYS_T; i++)
-	{
-		for (j = 0; j < SYS_N; j += 8)
+		for (i = 0; i < MCELIECE_N8192T128_PK_NROWS; ++i)
 		{
-			for (k = 0; k < GFBITS; k++)
+			mat[i] = (uint8_t*)MemoryTools::Malloc(MCELIECE_N8192T128_SYS_N / 8);
+
+			if (mat[i] == NULL)
 			{
-				b = (inv[j + 7] >> k) & 1; b <<= 1;
-				b |= (inv[j + 6] >> k) & 1; b <<= 1;
-				b |= (inv[j + 5] >> k) & 1; b <<= 1;
-				b |= (inv[j + 4] >> k) & 1; b <<= 1;
-				b |= (inv[j + 3] >> k) & 1; b <<= 1;
-				b |= (inv[j + 2] >> k) & 1; b <<= 1;
-				b |= (inv[j + 1] >> k) & 1; b <<= 1;
-				b |= (inv[j + 0] >> k) & 1;
-
-				mat[i * GFBITS + k][j / 8] = b;
-			}
-		}
-
-		for (j = 0; j < SYS_N; j++)
-		{
-			inv[j] = GF::Multiply(inv[j], L[j]);
-		}
-	}
-
-	for (i = 0; i < (GFBITS * SYS_T + 7) / 8; i++)
-	{
-		for (j = 0; j < 8; j++)
-		{
-			row = i * 8 + j;
-
-			if (row >= (GFBITS * SYS_T))
-			{
+				balc = false;
 				break;
 			}
+		}
 
-			for (k = row + 1; k < GFBITS * SYS_T; k++)
+		if (balc == true)
+		{
+			g[MCELIECE_N8192T128_SYS_T] = 1;
+
+			for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
 			{
-				mask = mat[row][i] ^ mat[k][i];
-				mask >>= j;
-				mask &= 1;
-				mask = ~mask + 1;
+				g[i] = MPKCUtils::LoadGf(Sk); Sk += 2;
+			}
 
-				for (c = 0; c < SYS_N / 8; c++)
+			for (i = 0; i < (1 << MCELIECE_N8192T128_GFBITS); i++)
+			{
+				buf[i] = Perm[i];
+				buf[i] <<= 31;
+				buf[i] |= i;
+			}
+
+			MPKCUtils::Sort64(buf, 1 << MCELIECE_N8192T128_GFBITS);
+
+			for (i = 1; i < (1 << MCELIECE_N8192T128_GFBITS); ++i)
+			{
+				if ((buf[i - 1] >> 31) == (buf[i] >> 31))
 				{
-					mat[row][c] ^= mat[k][c] & mask;
+					res = -2;
+					break;
 				}
 			}
 
-			// return if not systematic
-			if (((mat[row][i] >> j) & 1) == 0)
+			if (res != -2)
 			{
-				return -1;
-			}
-
-			for (k = 0; k < GFBITS * SYS_T; k++)
-			{
-				if (k != row)
+				for (i = 0; i < (1 << MCELIECE_N8192T128_GFBITS); ++i)
 				{
-					mask = mat[k][i] >> j;
-					mask &= 1;
-					mask = ~mask + 1;
+					Pi[i] = buf[i] & MCELIECE_N8192T128_GFMASK;
+				}
 
-					for (c = 0; c < SYS_N / 8; c++)
+				for (i = 0; i < MCELIECE_N8192T128_SYS_N; ++i)
+				{
+					L[i] = MPKCUtils::BitReverse(Pi[i]);
+				}
+
+				// filling the matrix
+
+				MPKCUtils::Root(inv, g, L, MCELIECE_N8192T128_SYS_N, MCELIECE_N8192T128_SYS_T);
+
+				for (i = 0; i < MCELIECE_N8192T128_SYS_N; ++i)
+				{
+					inv[i] = MPKCUtils::GfInv(inv[i]);
+				}
+
+				for (i = 0; i < MCELIECE_N8192T128_PK_NROWS; ++i)
+				{
+					for (j = 0; j < MCELIECE_N8192T128_SYS_N / 8; ++j)
 					{
-						mat[k][c] ^= mat[row][c] & mask;
+						mat[i][j] = 0;
 					}
 				}
+
+				for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
+				{
+					for (j = 0; j < MCELIECE_N8192T128_SYS_N; j += 8)
+					{
+						for (k = 0; k < MCELIECE_N8192T128_GFBITS; ++k)
+						{
+							b = (inv[j + 7] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 6] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 5] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 4] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 3] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 2] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j + 1] >> k) & 1;
+							b <<= 1;
+							b |= (inv[j] >> k) & 1;
+
+							mat[i * MCELIECE_N8192T128_GFBITS + k][j / 8] = b;
+						}
+					}
+
+					for (j = 0; j < MCELIECE_N8192T128_SYS_N; ++j)
+					{
+						inv[j] = MPKCUtils::GfMultiply(inv[j], L[j]);
+					}
+				}
+
+				// gaussian elimination
+
+				for (i = 0; i < (MCELIECE_N8192T128_PK_NROWS + 7) / 8; ++i)
+				{
+					for (j = 0; j < 8; ++j)
+					{
+						row = i * 8 + j;
+
+						if (row >= MCELIECE_N8192T128_PK_NROWS)
+						{
+							break;
+						}
+
+						for (k = row + 1; k < MCELIECE_N8192T128_PK_NROWS; ++k)
+						{
+							mask = mat[row][i] ^ mat[k][i];
+							mask >>= j;
+							mask &= 1;
+							mask = -mask;
+
+							for (col = 0; col < MCELIECE_N8192T128_SYS_N / 8; ++col)
+							{
+								mat[row][col] ^= mat[k][col] & mask;
+							}
+						}
+
+						if (((mat[row][i] >> j) & 1) == 0) // return if not systematic
+						{
+							for (i = 0; i < MCELIECE_N8192T128_PK_NROWS; ++i)
+							{
+								MemoryTools::MallocFree(mat[i]);
+							}
+
+							MemoryTools::MallocFree(mat);
+
+							return -1;
+						}
+
+						for (k = 0; k < MCELIECE_N8192T128_PK_NROWS; ++k)
+						{
+							if (k != row)
+							{
+								mask = mat[k][i] >> j;
+								mask &= 1;
+								mask = -mask;
+
+								for (col = 0; col < MCELIECE_N8192T128_SYS_N / 8; ++col)
+								{
+									mat[k][col] ^= mat[row][col] & mask;
+								}
+							}
+						}
+					}
+				}
+
+				for (i = 0; i < MCELIECE_N8192T128_PK_NROWS; ++i)
+				{
+					MemoryTools::CopyRaw((uint8_t*)mat[i] + MCELIECE_N8192T128_PK_NROWS / 8, (uint8_t*)Pk + i * MCELIECE_N8192T128_PK_ROW_BYTES, MCELIECE_N8192T128_PK_ROW_BYTES);
+				}
 			}
+
+			res = 0;
 		}
-	}
 
-	for (i = 0; i < PK_NROWS; i++)
-	{
-		std::memcpy(Pk + i * PK_ROW_BYTES, mat[i] + PK_NROWS / 8, PK_ROW_BYTES);
-	}
-
-	for (i = 0; i < GFBITS * SYS_T; ++i)
-	{
-		if (mat[i] != nullptr)
+		for (i = 0; i < MCELIECE_N8192T128_PK_NROWS; ++i)
 		{
-			delete[] mat[i];
+			MemoryTools::MallocFree(mat[i]);
 		}
+
+		MemoryTools::MallocFree(mat);
 	}
 
-	if (mat != nullptr)
-	{
-		delete[] mat;
-	}
-
-	return ret;
+	return res;
 }
 
-// sk_gen.c //
-
-int32_t MPKCN8192T128::IrrGen(ushort* Output, const ushort* F)
+int32_t MPKCN8192T128::GenPolyGen(uint16_t* Output, const uint16_t* F)
 {
-	ushort mat[SYS_T + 1][SYS_T];
+	// input: f, element in GF((2^m)^t)
+	// output: out, minimal polynomial of f
+	// return: 0 for success and -1 for failure
+
+	uint16_t mat[MCELIECE_N8192T128_SYS_T + 1][MCELIECE_N8192T128_SYS_T] = { 0 };
 	size_t c;
 	size_t i;
 	size_t j;
 	size_t k;
-	int32_t ret;
-	ushort mask;
-	ushort inv;
-	ushort t;
+	int32_t res;
+	uint16_t inv;
+	uint16_t mask;
+	uint16_t t;
 
-	ret = 0;
+	// fill matrix
+
+	res = 0;
 	mat[0][0] = 1;
 
-	for (i = 1; i < SYS_T; ++i)
-	{
-		mat[0][i] = 0;
-	}
-
-	for (i = 0; i < SYS_T; ++i)
+	for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
 	{
 		mat[1][i] = F[i];
 	}
 
-	for (j = 2; j <= SYS_T; ++j)
+	for (j = 2; j <= MCELIECE_N8192T128_SYS_T; ++j)
 	{
-		GF::Multiply(mat[j], mat[j - 1], F);
+		GfMul(mat[j], mat[j - 1], F);
 	}
 
-	for (j = 0; j < SYS_T; ++j)
-	{
-		for (k = j + 1; k < SYS_T; k++)
-		{
-			mask = GF::IsZero(mat[j][j]);
+	// gaussian
 
-			for (c = j; c < SYS_T + 1; c++)
+	for (j = 0; j < MCELIECE_N8192T128_SYS_T; ++j)
+	{
+		for (k = j + 1; k < MCELIECE_N8192T128_SYS_T; ++k)
+		{
+			mask = MPKCUtils::GfIsZero(mat[j][j]);
+
+			for (c = j; c < MCELIECE_N8192T128_SYS_T + 1; ++c)
 			{
 				mat[c][j] ^= mat[c][k] & mask;
 			}
 		}
 
-		// return if not systematic
-		if (mat[j][j] == 0)
+		if (mat[j][j] != 0)
 		{
-			ret = -1;
-			break;
-		}
+			inv = MPKCUtils::GfInv(mat[j][j]);
 
-		inv = GF::Inverse(mat[j][j]);
-
-		for (c = j; c < SYS_T + 1; c++)
-		{
-			mat[c][j] = GF::Multiply(mat[c][j], inv);
-		}
-
-		for (k = 0; k < SYS_T; k++)
-		{
-			if (k != j)
+			for (c = j; c < MCELIECE_N8192T128_SYS_T + 1; ++c)
 			{
-				t = mat[j][k];
+				mat[c][j] = MPKCUtils::GfMultiply(mat[c][j], inv);
+			}
 
-				for (c = j; c < SYS_T + 1; c++)
+			for (k = 0; k < MCELIECE_N8192T128_SYS_T; ++k)
+			{
+				if (k != j)
 				{
-					mat[c][k] ^= GF::Multiply(mat[c][j], t);
+					t = mat[j][k];
+
+					for (c = j; c < MCELIECE_N8192T128_SYS_T + 1; ++c)
+					{
+						mat[c][k] ^= MPKCUtils::GfMultiply(mat[c][j], t);
+					}
 				}
 			}
 		}
-	}
-
-	if (ret == 0)
-	{
-		for (i = 0; i < SYS_T; ++i)
+		else
 		{
-			Output[i] = mat[SYS_T][i];
-		}
-	}
-
-	return ret;
-}
-
-int32_t MPKCN8192T128::PermConversion(uint* Perm)
-{
-	ulong L[1 << GFBITS];
-	size_t i;
-	int32_t ret;
-
-	ret = 0;
-
-	for (i = 0; i < (1 << GFBITS); ++i)
-	{
-		L[i] = Perm[i];
-		L[i] <<= 31;
-		L[i] |= i;
-	}
-
-	MPKCUtils::Sort63b(1 << GFBITS, L);
-
-	for (i = 1; i < (1 << GFBITS); ++i)
-	{
-		if ((L[i - 1] >> 31) == (L[i] >> 31))
-		{
-			ret = -1;
+			// return if not systematic
+			res = -1;
 			break;
 		}
-	}
 
-	if (ret == 0)
-	{
-		for (i = 0; i < (1 << GFBITS); ++i)
+		for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
 		{
-			Perm[i] = L[i] & GFMASK;
+			Output[i] = mat[MCELIECE_N8192T128_SYS_T][i];
 		}
 	}
 
-	return ret;
+	return res;
 }
 
-int32_t MPKCN8192T128::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
+bool MPKCN8192T128::Decapsulate(const std::vector<uint8_t> &PrivateKey, const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret)
 {
-	// random permutation
-	std::array<uint, 1 << GFBITS> perm;
-	// irreducible polynomial
-	ushort g[SYS_T];
-	// random element in GF(2^mt)
-	std::array<ushort, SYS_T> a;
+	std::vector<uint8_t> conf(32);
+	std::vector<uint8_t> preimage(1 + MCELIECE_N8192T128_SYS_N / 8 + (MCELIECE_N8192T128_SYND_BYTES + 32));
+	std::vector<uint8_t> twoe(1 + MCELIECE_N8192T128_SYS_N / 8);
+	const uint8_t* sk = PrivateKey.data();
+	const uint8_t* s = sk + 40 + MCELIECE_N8192T128_IRR_BYTES + MCELIECE_N8192T128_COND_BYTES;
 	size_t i;
+	uint16_t m;
+	uint8_t ret_confirm;
+	uint8_t ret_decrypt;
+	uint8_t* e = twoe.data() + 1;
+	uint8_t* x = preimage.data();
 
-	for (;;)
+	twoe[0] = 2;
+	ret_confirm = 0;
+	ret_decrypt = (uint8_t)Decrypt(e, (sk + 40), CipherText.data());
+	Keccak::XOFP1600(twoe, 0, twoe.size(), conf, 0, conf.size(), Keccak::KECCAK256_RATE_SIZE);
+
+	for (i = 0; i < 32; ++i)
 	{
-		Rng->Fill(a, 0, a.size());
+		ret_confirm |= conf[i] ^ CipherText[MCELIECE_N8192T128_SYND_BYTES + i];
+	}
 
-		for (i = 0; i < SYS_T; ++i)
-		{
-			a[i] &= GFMASK;
-		}
+	m = ret_decrypt | ret_confirm;
+	m -= 1;
+	m >>= 8;
 
-		if (IrrGen(g, reinterpret_cast<ushort*>(a.data())) == 0)
+	*x = m & 1;
+	++x;
+
+	for (i = 0; i < MCELIECE_N8192T128_SYS_N / 8; ++i)
+	{
+		*x = (~m & s[i]) | (m & e[i]);
+		++x;
+	}
+
+	for (i = 0; i < MCELIECE_N8192T128_SYND_BYTES + 32; ++i)
+	{
+		*x = CipherText[i];
+		++x;
+	}
+
+	Keccak::XOFP1600(preimage, 0, preimage.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
+
+	return (ret_decrypt + ret_confirm) == 0;
+}
+
+void MPKCN8192T128::Encapsulate(const std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret, std::unique_ptr<IPrng> &Rng)
+{
+	std::vector<uint8_t> oneec(1 + MCELIECE_N8192T128_SYS_N / 8 + (MCELIECE_N8192T128_SYND_BYTES + 32));
+	std::vector<uint8_t> twoe(1 + MCELIECE_N8192T128_SYS_N / 8);
+	uint8_t* e = twoe.data() + 1;
+	uint8_t* c = CipherText.data();
+	const uint8_t* pk = PublicKey.data();
+
+	oneec[0] = 1;
+	twoe[0] = 2;
+	Encrypt(c, pk, e, Rng);
+
+	Keccak::XOFP1600(twoe, 0, twoe.size(), CipherText, MCELIECE_N8192T128_SYND_BYTES, 32, Keccak::KECCAK256_RATE_SIZE);
+	MemoryTools::CopyRaw(e, oneec.data() + 1, MCELIECE_N8192T128_SYS_N / 8);
+	MemoryTools::CopyRaw(c, oneec.data() + 1 + MCELIECE_N8192T128_SYS_N / 8, MCELIECE_N8192T128_SYND_BYTES + 32);
+	Keccak::XOFP1600(oneec, 0, oneec.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
+}
+
+bool MPKCN8192T128::Generate(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &PrivateKey, std::unique_ptr<IPrng> &Rng)
+{
+	const size_t RLEN = (MCELIECE_N8192T128_SYS_N / 8) + ((1 << MCELIECE_N8192T128_GFBITS) * sizeof(uint32_t)) + (MCELIECE_N8192T128_SYS_T * 2) + 32;
+	uint32_t perm[1 << MCELIECE_N8192T128_GFBITS] = { 0 };	// random permutation as 32-bit integers
+	int16_t pi[1 << MCELIECE_N8192T128_GFBITS];	// random permutation
+	uint16_t f[MCELIECE_N8192T128_SYS_T] = { 0 };	// element in GF(2 ^ mt)
+	uint16_t irr[MCELIECE_N8192T128_SYS_T];		// Goppa polynomial
+	std::vector<uint8_t> r(RLEN);
+	uint8_t* seed;
+	std::vector<uint8_t> tmps(33);
+	uint8_t* skp;
+	int32_t i;
+	size_t idx;
+	size_t itr;
+
+	itr = 0;
+	tmps[0] = 64;
+	Rng->Generate(tmps, 1, 32);
+	seed = tmps.data();
+
+	while (true)
+	{
+		++itr;
+
+		if (itr > MCELIECE_N8192T128_GENITR_MAX)
 		{
 			break;
 		}
-	}
 
-	for (;;)
-	{
-		Rng->Fill(perm, 0, perm.size());
+		idx = r.size() - 32;
+		skp = PrivateKey.data();
 
-		if (PermConversion(reinterpret_cast<uint*>(perm.data())) == 0)
+		// expanding and updating the seed
+		Keccak::XOFP1600(tmps, 0, tmps.size(), r, 0, r.size(), Keccak::KECCAK256_RATE_SIZE);
+		MemoryTools::CopyRaw(seed + 1, skp, 32);
+		skp += 32 + 8;
+		MemoryTools::CopyRaw(r.data() + idx, seed + 1, 32);
+
+		// generating irreducible polynomial
+		idx -= sizeof(f);
+
+		for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
 		{
-			break;
+			f[i] = MPKCUtils::LoadGf(r.data() + idx + (size_t)i * 2);
 		}
-	}
 
-	for (i = 0; i < SYS_T; ++i)
-	{
-		MPKCUtils::Store16(Sk + SYS_N / 8 + i * 2, g[i]);
-	}
-
-	ControlBits(Sk + SYS_N / 8 + IRR_BYTES, reinterpret_cast<uint*>(perm.data()));
-
-	return 0;
-}
-
-// root.c //
-
-ushort MPKCN8192T128::Evaluate(const ushort* F, ushort A)
-{
-	size_t i;
-	ushort r;
-
-	r = F[SYS_T];
-	i = SYS_T;
-
-	do
-	{
-		--i;
-		r = GF::Multiply(r, A);
-		r = GF::Add(r, F[i]);
-	} 
-	while (i != 0);
-
-	return r;
-}
-
-void MPKCN8192T128::Root(ushort* Output, const ushort* F, const ushort* L)
-{
-	size_t i;
-
-	for (i = 0; i < SYS_N; ++i)
-	{
-		Output[i] = Evaluate(F, L[i]);
-	}
-}
-
-// syndrome.c //
-
-void MPKCN8192T128::Syndrome(ushort* Output, const ushort* F, const ushort* L, const byte* R)
-{
-	size_t i;
-	size_t j;
-	ushort c;
-	ushort e;
-	ushort einv;
-
-	for (j = 0; j < 2 * SYS_T; ++j)
-	{
-		Output[j] = 0;
-	}
-
-	for (i = 0; i < SYS_N; ++i)
-	{
-		c = (R[i / 8] >> (i % 8)) & 1;
-		e = Evaluate(F, L[i]);
-		einv = GF::Inverse(GF::Multiply(e, e));
-
-		for (j = 0; j < 2 * SYS_T; ++j)
+		if (GenPolyGen(irr, f) != 0)
 		{
-			Output[j] = GF::Add(Output[j], GF::Multiply(einv, c));
-			einv = GF::Multiply(einv, L[i]);
+			continue;
 		}
-	}
-}
 
-// gf.c //
-
-ushort MPKCN8192T128::GF::Sq2(ushort Input)
-{
-	ulong x;
-	ulong t;
-	size_t i;
-
-	const ulong B[] =
-	{
-		0x1111111111111111ULL,
-		0x0303030303030303ULL,
-		0x000F000F000F000FULL,
-		0x000000FF000000FFULL
-	};
-
-	const ulong M[] =
-	{
-		0x0001FF0000000000ULL,
-		0x000000FF80000000ULL,
-		0x000000007FC00000ULL,
-		0x00000000003FE000ULL
-	};
-
-	x = Input;
-	x = (x | (x << 24)) & B[3];
-	x = (x | (x << 12)) & B[2];
-	x = (x | (x << 6)) & B[1];
-	x = (x | (x << 3)) & B[0];
-
-	for (i = 0; i < 4; ++i)
-	{
-		t = x & M[i];
-		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-	}
-
-	return static_cast<ushort>(x & GFMASK);
-}
-
-ushort MPKCN8192T128::GF::SqMul(ushort Input, ushort M)
-{
-	ulong x;
-	ulong t0;
-	ulong t1;
-	ulong t;
-	size_t i;
-
-	const ulong MA[] =
-	{
-		0x0000001FF0000000ULL,
-		0x000000000FF80000ULL,
-		0x000000000007E000ULL
-	};
-
-	t0 = Input;
-	t1 = M;
-	x = (t1 << 6) * (t0 & (1 << 6));
-	t0 ^= (t0 << 7);
-
-	x ^= (t1 * (t0 & (0x04001)));
-	x ^= (t1 * (t0 & (0x08002))) << 1;
-	x ^= (t1 * (t0 & (0x10004))) << 2;
-	x ^= (t1 * (t0 & (0x20008))) << 3;
-	x ^= (t1 * (t0 & (0x40010))) << 4;
-	x ^= (t1 * (t0 & (0x80020))) << 5;
-
-	for (i = 0; i < 3; ++i)
-	{
-		t = x & MA[i];
-		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-	}
-
-	return static_cast<ushort>(x & GFMASK);
-}
-
-ushort MPKCN8192T128::GF::Sq2Mul(ushort Input, ushort M)
-{
-	ulong x;
-	ulong t0;
-	ulong t1;
-	ulong t;
-	size_t i;
-
-	const ulong MA[] =
-	{
-		0x1FF0000000000000ULL,
-		0x000FF80000000000ULL,
-		0x000007FC00000000ULL,
-		0x00000003FE000000ULL,
-		0x0000000001FE0000ULL,
-		0x000000000001E000ULL
-	};
-
-	t0 = Input;
-	t1 = M;
-	x = (t1 << 18) * (t0 & (1 << 6));
-	t0 ^= (t0 << 21);
-
-	x ^= (t1 * (t0 & (0x010000001)));
-	x ^= (t1 * (t0 & (0x020000002))) << 3;
-	x ^= (t1 * (t0 & (0x040000004))) << 6;
-	x ^= (t1 * (t0 & (0x080000008))) << 9;
-	x ^= (t1 * (t0 & (0x100000010))) << 12;
-	x ^= (t1 * (t0 & (0x200000020))) << 15;
-
-	for (i = 0; i < 6; ++i)
-	{
-		t = x & MA[i];
-		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-	}
-
-	return static_cast<ushort>(x & GFMASK);
-}
-
-ushort MPKCN8192T128::GF::Add(ushort A, ushort B)
-{
-	return A ^ B;
-}
-
-ushort MPKCN8192T128::GF::Fractional(ushort Den, ushort Num)
-{
-	ushort tmp11;
-	ushort tmp1111;
-	ushort out;
-
-	// ^11
-	tmp11 = SqMul(Den, Den);
-	// ^1111
-	tmp1111 = Sq2Mul(tmp11, tmp11);
-	out = Sq2(tmp1111);
-	// ^11111111
-	out = Sq2Mul(out, tmp1111);
-	out = Sq2(out);
-	// ^111111111111
-	out = Sq2Mul(out, tmp1111);
-	// ^1111111111110 = ^-1
-	return SqMul(out, Num);
-}
-
-ushort MPKCN8192T128::GF::Inverse(ushort Den)
-{
-	return Fractional(Den, 1U);
-}
-
-ushort MPKCN8192T128::GF::IsZero(ushort A)
-{
-	uint t;
-
-	t = A;
-	t -= 1;
-	t >>= 19;
-
-	return static_cast<ushort>(t);
-}
-
-ushort MPKCN8192T128::GF::Multiply(ushort A, ushort B)
-{
-	ulong t;
-	ulong t0;
-	ulong t1;
-	ulong tmp;
-	size_t i;
-
-	t0 = A;
-	t1 = B;
-	tmp = t0 * (t1 & 1);
-
-	for (i = 1; i < GFBITS; ++i)
-	{
-		tmp ^= (t0 * (t1 & (1ULL << i)));
-	}
-
-	t = tmp & 0x0000000001FF0000ULL;
-	tmp ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-	t = tmp & 0x000000000000E000ULL;
-	tmp ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
-
-	return static_cast<ushort>(tmp & GFMASK);
-}
-
-void MPKCN8192T128::GF::Multiply(ushort* Output, const ushort* X, const ushort* Y)
-{
-	ushort prod[255];
-	size_t i;
-	size_t j;
-
-	for (i = 0; i < 255; ++i)
-	{
-		prod[i] = 0;
-	}
-
-	for (i = 0; i < 128; ++i)
-	{
-		for (j = 0; j < 128; ++j)
+		for (i = 0; i < MCELIECE_N8192T128_SYS_T; ++i)
 		{
-			prod[i + j] ^= Multiply(X[i], Y[j]);
+			IntegerTools::Le16ToBytesRaw(irr[i], skp + ((size_t)i * 2));
 		}
+
+		skp += MCELIECE_N8192T128_IRR_BYTES;
+
+		// generating permutation
+		idx -= sizeof(perm);
+
+		for (i = 0; i < (1 << MCELIECE_N8192T128_GFBITS); ++i)
+		{
+			perm[i] = IntegerTools::LeBytesTo32Raw(r.data() + idx + ((size_t)i * 4));
+		}
+
+		if (PkGen(PublicKey.data(), skp - MCELIECE_N8192T128_IRR_BYTES, perm, pi) != 0)
+		{
+			continue;
+		}
+
+		MPKCUtils::ControlBitsFromPermutation(skp, pi, MCELIECE_N8192T128_GFBITS, 1 << MCELIECE_N8192T128_GFBITS);
+		skp += MCELIECE_N8192T128_COND_BYTES;
+
+		// storing the random string s
+		idx -= MCELIECE_N8192T128_SYS_N / 8;
+		MemoryTools::CopyRaw((uint8_t*)r.data() + idx, (uint8_t*)skp, MCELIECE_N8192T128_SYS_N / 8);
+
+		// storing positions of the 32 pivots
+		IntegerTools::Le64ToBytesRaw(0x00000000FFFFFFFFULL, PrivateKey.data() + 32);
+
+		break;
 	}
 
-	for (i = 254; i >= 128; i--)
-	{
-		prod[i - 123] ^= Multiply(prod[i], GF_MUL_FACTOR1);
-		prod[i - 125] ^= Multiply(prod[i], GF_MUL_FACTOR2);
-		prod[i - 128] ^= Multiply(prod[i], GF_MUL_FACTOR3);
-	}
-
-	for (i = 0; i < 128; ++i)
-	{
-		Output[i] = prod[i];
-	}
+	return (itr <= MCELIECE_N8192T128_GENITR_MAX);
 }
 
 NAMESPACE_MCELIECEEND

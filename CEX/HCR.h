@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by September 24, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_HCR_H
 #define CEX_HCR_H
@@ -42,7 +42,7 @@ using Enumeration::SHA2Digests;
 /// <description>Example of generating a pseudo-random integer:</description>
 /// <code>
 /// HCR rnd([SHA2Digests], [Providers], [Buffer Size]);
-/// int num = rnd.NextUInt32([Minimum], [Maximum]);
+/// int32_t num = rnd.NextUInt32([Minimum], [Maximum]);
 /// </code>
 /// </example>
 /// 
@@ -110,14 +110,14 @@ public:
 	/// </summary>
 	///
 	/// <param name="Output">The destination standard-vector to fill</param>
-	void Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The destination standard-vector to fill</param>
-	void Generate(SecureVector<byte> &Output) override;
+	void Generate(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
@@ -128,7 +128,7 @@ public:
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the output array is too small</exception>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes using offset and length parameters
@@ -139,7 +139,7 @@ public:
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the output array is too small</exception>
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the generator instance
@@ -150,7 +150,7 @@ public:
 
 private:
 
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
 };
 
 NAMESPACE_PRNGEND

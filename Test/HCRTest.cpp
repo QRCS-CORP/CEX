@@ -70,7 +70,7 @@ namespace Test
 	{
 		try
 		{
-			std::vector<byte> smp(SAMPLE_SIZE);
+			std::vector<uint8_t> smp(SAMPLE_SIZE);
 			Rng->Generate(smp, 0, smp.size());
 			RandomUtils::Evaluate(Rng->Name(), smp);
 		}
@@ -86,7 +86,7 @@ namespace Test
 		try
 		{
 			HCR gen;
-			std::vector<byte> smp(16);
+			std::vector<uint8_t> smp(16);
 			// generator was not initialized
 			gen.Generate(smp, 0, smp.size() + 1);
 
@@ -108,7 +108,7 @@ namespace Test
 
 	void HCRTest::Stress()
 	{
-		std::vector<byte> msg;
+		std::vector<uint8_t> msg;
 		SecureRandom rnd;
 		HCR gen;
 		size_t i;

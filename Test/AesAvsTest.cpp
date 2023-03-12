@@ -1,7 +1,5 @@
 #include "AesAvsTest.h"
 #include "TestFiles.h"
-#include "../CEX/AHX.h"
-#include "../CEX/CpuDetect.h"
 #include "../CEX/RHX.h"
 #include "../CEX/CBC.h"
 #include "../CEX/ECB.h"
@@ -25,20 +23,17 @@ namespace Test
 	const std::string AesAvsTest::KEY_TOKEN = "KEY = ";
 	const std::string AesAvsTest::PLAINTEXT_TOKEN = "PLAINTEXT = ";
 	const std::string AesAvsTest::CIPHERTEXT_TOKEN = "CIPHERTEXT = ";
-	const bool AesAvsTest::HAS_AESNI = HasAESNI();
 
 	//~~~Constructor~~~//
 
-	AesAvsTest::AesAvsTest(bool TestAesNi)
+	AesAvsTest::AesAvsTest()
 		:
-		m_progressEvent(),
-		m_aesniTest(TestAesNi && HAS_AESNI)
+		m_progressEvent()
 	{
 	}
 
 	AesAvsTest::~AesAvsTest()
 	{
-		m_aesniTest = false;
 	}
 
 	//~~~Accessors~~~//
@@ -95,45 +90,6 @@ namespace Test
 			EcbMmt(cprr, AESECB256_MMT);
 			OnProgress(std::string("AESAVSTest: Passed standard ECB AES-128/256 AESAVS Multi-block Message tests.."));
 
-			if (m_aesniTest)
-			{
-				AHX* cpra = new AHX();
-
-				// AESAVS varrkey and vartxt KAT tests
-				CbcKat(cpra, AESCBC128_VARKEY);
-				CbcKat(cpra, AESCBC256_VARKEY);
-				OnProgress(std::string("AESAVSTest: Passed AES-NI CBC AES-128/256 AESAVS KAT key tests.."));
-
-				CbcKat(cpra, AESCBC128_VARTXT);
-				CbcKat(cpra, AESCBC256_VARTXT);
-				OnProgress(std::string("AESAVSTest: Passed AES-NI CBC AES-128/256 AESAVS KAT text tests.."));
-
-				EbcKat(cpra, AESECB128_VARKEY);
-				EbcKat(cpra, AESECB256_VARKEY);
-				OnProgress(std::string("AESAVSTest: Passed AES-NI ECB AES-128/256 AESAVS KAT key tests.."));
-
-				EbcKat(cpra, AESECB128_VARTXT);
-				EbcKat(cpra, AESECB256_VARTXT);
-				OnProgress(std::string("AESAVSTest: Passed AES-NI ECB AES-128/256 AESAVS KAT text tests.."));
-
-				// AESAVS monte carlo tests
-				CbcMct(cpra, AESCBC128_MCT);
-				CbcMct(cpra, AESCBC256_MCT);
-				OnProgress(std::string("AESAVSTest: Passed AES-NI CBC AES-128/256 AESAVS Monte Carlo tests.."));
-
-				EcbMct(cpra, AESECB128_MCT);
-				EcbMct(cpra, AESECB256_MCT);
-				OnProgress(std::string("AESAVSTest: Passed AES-NI ECB AES-128/256 AESAVS Monte Carlo tests.."));
-
-				CbcMmt(cpra, AESCBC128_MMT);
-				CbcMmt(cpra, AESCBC256_MMT);
-				OnProgress(std::string("AESAVSTest: Passed standard CBC AES-128/256 AESAVS Multi-block Message tests.."));
-
-				EcbMmt(cpra, AESECB128_MMT);
-				EcbMmt(cpra, AESECB256_MMT);
-				OnProgress(std::string("AESAVSTest: Passed standard ECB AES-128/256 AESAVS Multi-block Message tests.."));
-			}
-
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
@@ -156,13 +112,13 @@ namespace Test
 	{
 		std::string line;
 		std::string tmpl;
-		std::vector<byte> dec;
-		std::vector<byte> enc;
-		std::vector<byte> exp;
-		std::vector<byte> iv;
-		std::vector<byte> ivc;
-		std::vector<byte> key;
-		std::vector<byte> pln;
+		std::vector<uint8_t> dec;
+		std::vector<uint8_t> enc;
+		std::vector<uint8_t> exp;
+		std::vector<uint8_t> iv;
+		std::vector<uint8_t> ivc;
+		std::vector<uint8_t> key;
+		std::vector<uint8_t> pln;
 		size_t i;
 
 		std::ifstream ifs(FilePath);
@@ -232,11 +188,11 @@ namespace Test
 	{
 		std::string line;
 		std::string tmpl;
-		std::vector<byte> dec;
-		std::vector<byte> enc;
-		std::vector<byte> exp;
-		std::vector<byte> key;
-		std::vector<byte> pln;
+		std::vector<uint8_t> dec;
+		std::vector<uint8_t> enc;
+		std::vector<uint8_t> exp;
+		std::vector<uint8_t> key;
+		std::vector<uint8_t> pln;
 		size_t i;
 
 		std::ifstream ifs(FilePath);
@@ -298,16 +254,16 @@ namespace Test
 	{
 		std::string line;
 		std::string tmpl;
-		std::vector<byte> dec;
-		std::vector<byte> decc;
-		std::vector<byte> enc;
-		std::vector<byte> encc;
-		std::vector<byte> exp;
-		std::vector<byte> iv;
-		std::vector<byte> ivc;
-		std::vector<byte> key;
-		std::vector<byte> pln;
-		std::vector<byte> plnc;
+		std::vector<uint8_t> dec;
+		std::vector<uint8_t> decc;
+		std::vector<uint8_t> enc;
+		std::vector<uint8_t> encc;
+		std::vector<uint8_t> exp;
+		std::vector<uint8_t> iv;
+		std::vector<uint8_t> ivc;
+		std::vector<uint8_t> key;
+		std::vector<uint8_t> pln;
+		std::vector<uint8_t> plnc;
 		size_t count;
 		size_t i;
 
@@ -422,12 +378,12 @@ namespace Test
 	{
 		std::string line;
 		std::string tmpl;
-		std::vector<byte> dec;
-		std::vector<byte> enc;
-		std::vector<byte> exp;
-		std::vector<byte> key;
-		std::vector<byte> pln;
-		std::vector<byte> plnc;
+		std::vector<uint8_t> dec;
+		std::vector<uint8_t> enc;
+		std::vector<uint8_t> exp;
+		std::vector<uint8_t> key;
+		std::vector<uint8_t> pln;
+		std::vector<uint8_t> plnc;
 		size_t i;
 
 		std::ifstream ifs(FilePath);
@@ -503,12 +459,12 @@ namespace Test
 		const size_t BLOCK_SIZE = 16;
 		std::string line;
 		std::string tmpl;
-		std::vector<byte> dec;
-		std::vector<byte> enc;
-		std::vector<byte> exp;
-		std::vector<byte> iv;
-		std::vector<byte> key;
-		std::vector<byte> pln;
+		std::vector<uint8_t> dec;
+		std::vector<uint8_t> enc;
+		std::vector<uint8_t> exp;
+		std::vector<uint8_t> iv;
+		std::vector<uint8_t> key;
+		std::vector<uint8_t> pln;
 		size_t count;
 		size_t i;
 
@@ -595,11 +551,11 @@ namespace Test
 		const size_t BLOCK_SIZE = 16;
 		std::string line;
 		std::string tmpl;
-		std::vector<byte> dec;
-		std::vector<byte> enc;
-		std::vector<byte> exp;
-		std::vector<byte> key;
-		std::vector<byte> pln;
+		std::vector<uint8_t> dec;
+		std::vector<uint8_t> enc;
+		std::vector<uint8_t> exp;
+		std::vector<uint8_t> key;
+		std::vector<uint8_t> pln;
 		size_t count;
 		size_t i;
 
@@ -674,17 +630,6 @@ namespace Test
 				}
 			}
 		}
-	}
-
-	bool AesAvsTest::HasAESNI()
-	{
-#if defined(__AVX__)
-		CpuDetect dtc;
-
-		return dtc.AVX() && dtc.AESNI();
-#else
-		return false;
-#endif
 	}
 
 	void AesAvsTest::OnProgress(const std::string &Data)

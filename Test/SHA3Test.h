@@ -21,8 +21,8 @@ namespace Test
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t TEST_CYCLES = 25;
 
-		std::vector<std::vector<byte>> m_message;
-		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<uint8_t>> m_message;
+		std::vector<std::vector<uint8_t>> m_expected;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -83,7 +83,7 @@ namespace Test
 		/// ref(1600) : <see href = "https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-512_1600.pdf"/>
 		/// ref(24, 448) : <see href = "https://www.di-mgt.com.au/sha_testvectors.html" / >
 		/// </remarks>
-		void Kat(IDigest* Digest, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void Kat(IDigest* Digest, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compares synchronous to parallel random-sized, pseudo-random arrays in a looping [TEST_CYCLES] stress-test

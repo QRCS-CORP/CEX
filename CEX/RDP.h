@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by January 28, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_RDP_H
 #define CEX_RDP_H
@@ -36,7 +36,7 @@ using Enumeration::DrandEngines;
 /// <example>
 /// <description>Example of getting a seed value:</description>
 /// <code>
-/// std::vector&lt;byte&gt; output(32);
+/// std::vector&lt;uint8_t&gt; output(32);
 /// RDP gen;
 /// gen.Generate(output);
 /// </code>
@@ -115,7 +115,7 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes
@@ -124,7 +124,7 @@ public:
 	/// <param name="Output">The destination SecureVector to fill</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(SecureVector<byte> &Output) override;
+	void Generate(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
@@ -135,7 +135,7 @@ public:
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes using offset and length parameters
@@ -146,7 +146,7 @@ public:
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the internal state
@@ -157,7 +157,7 @@ private:
 
 	static DrandEngines Capability();
 	bool FipsTest();
-	static void Generate(byte* Output, size_t Length, DrandEngines DrandType);
+	static void Generate(uint8_t* Output, size_t Length, DrandEngines DrandType);
 };
 
 NAMESPACE_PROVIDEREND

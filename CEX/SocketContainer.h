@@ -13,9 +13,9 @@ class SocketContainer
 public:
 
 	Socket* Instance;
-	ulong Interval;
+	uint64_t Interval;
 
-	SocketContainer(Socket* Instance, ulong Interval)
+	SocketContainer(Socket* Instance, uint64_t Interval)
 		:
 		Instance(Instance),
 		Interval(Interval)

@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The Intel DRNG providers engine configuration type
 /// </summary>
-enum class DrandEngines : byte
+enum class DrandEngines : uint8_t
 {
 	/// <summary>
 	/// The random provider is available

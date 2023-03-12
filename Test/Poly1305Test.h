@@ -32,9 +32,9 @@ namespace Test
 		static const size_t MINM_ALLOC = 1024;
 		static const size_t TEST_CYCLES = 100;
 
-		std::vector<std::vector<byte>> m_expected;
-		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_message;
+		std::vector<std::vector<uint8_t>> m_expected;
+		std::vector<std::vector<uint8_t>> m_key;
+		std::vector<std::vector<uint8_t>> m_message;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -77,7 +77,7 @@ namespace Test
 		/// <param name="Key">The mac key</param>
 		/// <param name="Message">The input test message</param>
 		/// <param name="Expected">The expected output vector</param>
-		void Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void Kat(IMac* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Test the different initialization options

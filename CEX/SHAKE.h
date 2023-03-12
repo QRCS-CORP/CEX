@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by January 28, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_SHAKE_H
 #define CEX_SHAKE_H
@@ -143,7 +143,7 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes
@@ -152,7 +152,7 @@ public:
 	/// <param name="Output">The destination secure-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(SecureVector<byte> &Output) override;
+	void Generate(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes, using offset and length parameters
@@ -163,7 +163,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes, using offset and length parameters
@@ -174,7 +174,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional customization, and information strings
@@ -192,7 +192,7 @@ public:
 	/// <param name="Key">The standard-vector key used to initialize the generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is illegaly sized</exception>
-	void Initialize(const std::vector<byte> &Key);
+	void Initialize(const std::vector<uint8_t> &Key);
 
 	/// <summary>
 	/// Initialize the SHAKE generator with a secure-vector key
@@ -201,7 +201,7 @@ public:
 	/// <param name="Key">The secure-vector key used to initialize the generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is illegaly sized</exception>
-	void Initialize(const SecureVector<byte> &Key);
+	void Initialize(const SecureVector<uint8_t> &Key);
 
 	/// <summary>
 	/// Initialize the SHAKE generator with a standard-vector key, using length and offset parameters
@@ -212,7 +212,7 @@ public:
 	/// <param name="Length">The number of key bytes to use</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
-	void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length);
+	void Initialize(const std::vector<uint8_t> &Key, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Initialize the SHAKE generator with a secure-vector key, using length and offset parameters
@@ -223,7 +223,7 @@ public:
 	/// <param name="Length">The number of key bytes to use</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
-	void Initialize(const SecureVector<byte> &Key, size_t Offset, size_t Length);
+	void Initialize(const SecureVector<uint8_t> &Key, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Initialize the SHAKE generator with standard-vector key and customization arrays.
@@ -234,7 +234,7 @@ public:
 	/// <param name="Customization">The customization standard-vector used to create a unique generator output</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key or customization array is illegaly sized</exception>
-	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization);
+	void Initialize(const std::vector<uint8_t> &Key, const std::vector<uint8_t> &Customization);
 
 	/// <summary>
 	/// Initialize the SHAKE generator with secure-vector key and customization arrays.
@@ -245,7 +245,7 @@ public:
 	/// <param name="Customization">The customization secure-vector used to create a unique generator output</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key or customization array is illegaly sized</exception>
-	void Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &Customization);
+	void Initialize(const SecureVector<uint8_t> &Key, const SecureVector<uint8_t> &Customization);
 
 	/// <summary>
 	/// Initialize the cSHAKE generator with key, customization, and name standard vectors.
@@ -257,7 +257,7 @@ public:
 	/// <param name="Information">The information (cSHAKE name parameter) standard-vector</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key, customization, or name array is illegaly sized</exception>
-	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization, const std::vector<byte> &Information);
+	void Initialize(const std::vector<uint8_t> &Key, const std::vector<uint8_t> &Customization, const std::vector<uint8_t> &Information);
 
 	/// <summary>
 	/// Initialize the cSHAKE generator with key, customization, and information secure vectors.
@@ -269,7 +269,7 @@ public:
 	/// <param name="Information">The information (cSHAKE name parameter) secure-vector</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key, customization, or name array is illegaly sized</exception>
-	void Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &Customization, const SecureVector<byte> &Information);
+	void Initialize(const SecureVector<uint8_t> &Key, const SecureVector<uint8_t> &Customization, const SecureVector<uint8_t> &Information);
 
 	/// <summary>
 	/// Reset the internal state; SHAKE must be initialized before it can be used again
@@ -278,9 +278,9 @@ public:
 
 private:
 
-	static void Absorb(const SecureVector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<ShakeState> &State);
-	static void Customize(const SecureVector<byte> &Customization, const SecureVector<byte> &Information, std::unique_ptr<ShakeState> &State);
-	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ShakeState> &State);
+	static void Absorb(const SecureVector<uint8_t> &Input, size_t InOffset, size_t Length, std::unique_ptr<ShakeState> &State);
+	static void Customize(const SecureVector<uint8_t> &Customization, const SecureVector<uint8_t> &Information, std::unique_ptr<ShakeState> &State);
+	static void Expand(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ShakeState> &State);
 	static void Permute(std::unique_ptr<ShakeState> &State);
 };
 

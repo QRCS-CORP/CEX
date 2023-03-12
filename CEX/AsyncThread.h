@@ -14,9 +14,9 @@ class AsyncThread
 public:
 
 	std::thread* Instance;
-	uint Identity;
+	uint32_t Identity;
 
-	AsyncThread(std::thread* Instance, uint Identity)
+	AsyncThread(std::thread* Instance, uint32_t Identity)
 		:
 		Instance(Instance),
 		Identity(Identity)

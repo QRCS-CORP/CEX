@@ -9,22 +9,22 @@ NAMESPACE_DILITHIUM
 using Digest::Keccak;
 using Tools::MemoryTools;
 
-void DLTMK5Q8380417N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
+void DLTMK5Q8380417N256::Generate(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
-	std::vector<byte> key(DILITHIUM_SEED_SIZE);
-	std::vector<byte> rho(DILITHIUM_SEED_SIZE);
-	std::vector<byte> rhoprime(DILITHIUM_SEED_SIZE);
-	std::vector<byte> sbuf(3 * DILITHIUM_SEED_SIZE);
-	std::vector<byte> tr(DILITHIUM_CRH_SIZE);
-	std::vector<std::vector<std::array<uint, 256>>> mat(DILITHIUM_K, std::vector<std::array<uint, 256>>(DILITHIUM_L));
-	std::vector<std::array<uint, 256>> s1(DILITHIUM_L);
-	std::vector<std::array<uint, 256>> s1hat(DILITHIUM_L);
-	std::vector<std::array<uint, 256>> s2(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> t(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> t0(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> t1(DILITHIUM_K);
+	std::vector<uint8_t> key(DILITHIUM_SEED_SIZE);
+	std::vector<uint8_t> rho(DILITHIUM_SEED_SIZE);
+	std::vector<uint8_t> rhoprime(DILITHIUM_SEED_SIZE);
+	std::vector<uint8_t> sbuf(3 * DILITHIUM_SEED_SIZE);
+	std::vector<uint8_t> tr(DILITHIUM_CRH_SIZE);
+	std::vector<std::vector<std::array<uint32_t, 256>>> mat(DILITHIUM_K, std::vector<std::array<uint32_t, 256>>(DILITHIUM_L));
+	std::vector<std::array<uint32_t, 256>> s1(DILITHIUM_L);
+	std::vector<std::array<uint32_t, 256>> s1hat(DILITHIUM_L);
+	std::vector<std::array<uint32_t, 256>> s2(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> t(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> t0(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> t1(DILITHIUM_K);
 	size_t i;
-	ushort nonce;
+	uint16_t nonce;
 
 	// expand 32 bytes of randomness into rho, rhoprime and key 
 	Rng->Generate(sbuf, 0, 3 * DILITHIUM_SEED_SIZE);
@@ -74,32 +74,32 @@ void DLTMK5Q8380417N256::Generate(std::vector<byte> &PublicKey, std::vector<byte
 	DLTMPolyMath::PackSk(PrivateKey, rho, key, tr, s1, s2, t0, DILITHIUM_ETA, DILITHIUM_POLETA_SIZE_PACKED, DILITHIUM_POLT0_SIZE_PACKED);
 }
 
-void DLTMK5Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
+void DLTMK5Q8380417N256::Sign(std::vector<uint8_t> &Signature, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
-	std::vector<byte> rho(DILITHIUM_SEED_SIZE);
-	std::vector<byte> tr(DILITHIUM_CRH_SIZE);
-	std::vector<byte> key(DILITHIUM_SEED_SIZE);
-	std::vector<byte> mu(DILITHIUM_CRH_SIZE);
-	std::vector<byte> rhoprime(DILITHIUM_CRH_SIZE);
-	std::vector<byte> sbuf(0);
-	std::array<uint, 256> c;
-	std::array<uint, 256> chat;
-	std::vector<std::vector<std::array<uint, 256>>> mat(DILITHIUM_K, std::vector<std::array<uint, 256>>(DILITHIUM_L));
-	std::vector<std::array<uint, 256>> s1(DILITHIUM_L);
-	std::vector<std::array<uint, 256>> y(DILITHIUM_L);
-	std::vector<std::array<uint, 256>> yhat(DILITHIUM_L);
-	std::vector<std::array<uint, 256>> z(DILITHIUM_L);
-	std::vector<std::array<uint, 256>> t0(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> s2(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> w(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> w0(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> w1(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> h(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> cs2(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> ct0(DILITHIUM_K);
+	std::vector<uint8_t> rho(DILITHIUM_SEED_SIZE);
+	std::vector<uint8_t> tr(DILITHIUM_CRH_SIZE);
+	std::vector<uint8_t> key(DILITHIUM_SEED_SIZE);
+	std::vector<uint8_t> mu(DILITHIUM_CRH_SIZE);
+	std::vector<uint8_t> rhoprime(DILITHIUM_CRH_SIZE);
+	std::vector<uint8_t> sbuf(0);
+	std::array<uint32_t, 256> c = { 0 };
+	std::array<uint32_t, 256> chat = { 0 };
+	std::vector<std::vector<std::array<uint32_t, 256>>> mat(DILITHIUM_K, std::vector<std::array<uint32_t, 256>>(DILITHIUM_L));
+	std::vector<std::array<uint32_t, 256>> s1(DILITHIUM_L);
+	std::vector<std::array<uint32_t, 256>> y(DILITHIUM_L);
+	std::vector<std::array<uint32_t, 256>> yhat(DILITHIUM_L);
+	std::vector<std::array<uint32_t, 256>> z(DILITHIUM_L);
+	std::vector<std::array<uint32_t, 256>> t0(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> s2(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> w(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> w0(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> w1(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> h(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> cs2(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> ct0(DILITHIUM_K);
 	size_t i;
-	uint n;
-	ushort nonce;
+	uint32_t n;
+	uint16_t nonce;
 
 	nonce = 0;
 	DLTMPolyMath::UnpackSk(rho, key, tr, s1, s2, t0, PrivateKey, DILITHIUM_ETA, DILITHIUM_POLETA_SIZE_PACKED, DILITHIUM_POLT0_SIZE_PACKED);
@@ -223,17 +223,17 @@ void DLTMK5Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<by
 	}
 }
 
-bool DLTMK5Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey)
+bool DLTMK5Q8380417N256::Verify(std::vector<uint8_t> &Message, const std::vector<uint8_t> &Signature, const std::vector<uint8_t> &PublicKey)
 {
-	std::vector<std::vector<std::array<uint, 256>>> mat(DILITHIUM_K, std::vector<std::array<uint, 256>>(DILITHIUM_L));
-	std::vector<std::array<uint, 256>> t1(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> w1(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> h(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> tmp1(DILITHIUM_K);
-	std::vector<std::array<uint, 256>> tmp2(DILITHIUM_K);
-	std::array<uint, 256> c;
-	std::array<uint, 256> chat;
-	std::array<uint, 256> cp;
+	std::vector<std::vector<std::array<uint32_t, 256>>> mat(DILITHIUM_K, std::vector<std::array<uint32_t, 256>>(DILITHIUM_L));
+	std::vector<std::array<uint32_t, 256>> t1(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> w1(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> h(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> tmp1(DILITHIUM_K);
+	std::vector<std::array<uint32_t, 256>> tmp2(DILITHIUM_K);
+	std::array<uint32_t, 256> c = { 0 };
+	std::array<uint32_t, 256> chat = { 0 };
+	std::array<uint32_t, 256> cp = { 0 };
 	size_t i;
 	int32_t bsig;
 	size_t msglen;
@@ -247,8 +247,8 @@ bool DLTMK5Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<by
 
 	if (bsig == 0)
 	{
-		std::vector<byte> rho(DILITHIUM_SEED_SIZE);
-		std::vector<std::array<uint, 256>> z(DILITHIUM_L);
+		std::vector<uint8_t> rho(DILITHIUM_SEED_SIZE);
+		std::vector<std::array<uint32_t, 256>> z(DILITHIUM_L);
 
 		msglen = Signature.size() - DILITHIUM_SIGNATURE_SIZE;
 		DLTMPolyMath::UnpackPk(rho, t1, PublicKey, DILITHIUM_POLT1_SIZE_PACKED);
@@ -267,7 +267,7 @@ bool DLTMK5Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<by
 
 			if (bsig == 0)
 			{
-				std::vector<byte> mu(DILITHIUM_CRH_SIZE);
+				std::vector<uint8_t> mu(DILITHIUM_CRH_SIZE);
 
 				// compute CRH(CRH(rho, t1), msg) using message as "playground" buffer 
 				if (Signature != Message)
@@ -345,9 +345,9 @@ bool DLTMK5Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<by
 	return (bsig == 0);
 }
 
-void DLTMK5Q8380417N256::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+void DLTMK5Q8380417N256::XOF(const std::vector<uint8_t> &Input, size_t InOffset, size_t InLength, std::vector<uint8_t> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 {
-	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+	Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 }
 
 NAMESPACE_DILITHIUMEND

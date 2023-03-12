@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Key Derivation Functions enumeration names
 /// </summary>
-enum class Kdfs : byte
+enum class Kdfs : uint8_t
 {
 	/// <summary>
 	/// No kdf is specified
@@ -46,19 +46,15 @@ enum class Kdfs : byte
 	/// <summary>
 	/// An implementation of the SHAKE-128 XOF function
 	/// </summary>
-	SHAKE128 = static_cast<byte>(Digests::SHAKE128),
+	SHAKE128 = static_cast<uint8_t>(Digests::SHAKE128),
 	/// <summary>
 	/// An implementation of the SHAKE-256 XOF function
 	/// </summary>
-	SHAKE256 = static_cast<byte>(Digests::SHAKE256),
+	SHAKE256 = static_cast<uint8_t>(Digests::SHAKE256),
 	/// <summary>
 	/// An implementation of the SHAKE-512 XOF function
 	/// </summary>
-	SHAKE512 = static_cast<byte>(Digests::SHAKE512),
-	/// <summary>
-	/// An implementation of the SHAKE-1024 XOF function
-	/// </summary>
-	SHAKE1024 = static_cast<byte>(Digests::SHAKE1024),
+	SHAKE512 = static_cast<uint8_t>(Digests::SHAKE512),
 	/// <summary>
 	/// An implementation of SHAKE Cost Based Key Derivation Function SCBKDF(SHAKE128)
 	/// </summary>

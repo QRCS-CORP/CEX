@@ -49,37 +49,37 @@ public:
 	/// <summary>
 	/// Read/Write: Return a standard-vector copy of the personalization string; can also used as an additional source of entropy in some constructions
 	/// </summary>
-	virtual const std::vector<byte> Info() = 0;
+	virtual const std::vector<uint8_t> Info() = 0;
 
 	/// <summary>
 	/// Read Only: Return a standard-vector copy of the primary key
 	/// </summary>
-	virtual const std::vector<byte> Key() = 0;
+	virtual const std::vector<uint8_t> Key() = 0;
 
 	/// <summary>
-	/// Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
+	/// Read Only: The SymmetricKeySize containing the uint8_t sizes of the key, nonce, and info state members
 	/// </summary>
 	virtual SymmetricKeySize &KeySizes() const = 0;
 
 	/// <summary>
 	/// Read Only: Return a standard-vector copy of the initialization vector; can also be used as the nonce, salt, or iv
 	/// </summary>
-	virtual const std::vector<byte> IV() = 0;
+	virtual const std::vector<uint8_t> IV() = 0;
 
 	/// <summary>
 	/// Read/Write: Return a secure-vector copy of the personalization string; can also used as an additional source of entropy in some constructions
 	/// </summary>
-	virtual const SecureVector<byte> SecureInfo() = 0;
+	virtual const SecureVector<uint8_t> SecureInfo() = 0;
 
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the primary key
 	/// </summary>
-	virtual const SecureVector<byte> SecureKey() = 0;
+	virtual const SecureVector<uint8_t> SecureKey() = 0;
 
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the initialization vector; can also be used as the nonce, salt, or iv
 	/// </summary>
-	virtual const SecureVector<byte> SecureIV() = 0;
+	virtual const SecureVector<uint8_t> SecureIV() = 0;
 
 	//~~~Public Functions~~~//
 

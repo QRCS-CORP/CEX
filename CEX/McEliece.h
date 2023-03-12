@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// Updated by September 24, 2019
-// Contact: develop@vtdev.com
+// Updated by January 19, 2023
+// Contact: develop@qscs.ca
 
 #ifndef CEX_MCELIECE_H
 #define CEX_MCELIECE_H
@@ -41,14 +41,14 @@ using Enumeration::McElieceParameters;
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// // serialize the public key
 /// IAsymmetricKey* pubk = kp->PublicKey();
-/// std::vector&lt;byte&gt; skey = pubk->ToBytes();
+/// std::vector&lt;uint8_t&gt; skey = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
 /// create the shared secret
-/// std::vector&lt;byte&gt; cpt(0);
-/// std::vector&lt;byte&gt; ssk(0);
+/// std::vector&lt;uint8_t&gt; cpt(0);
+/// std::vector&lt;uint8_t&gt; ssk(0);
 ///
 /// // initialize the cipher
 /// McEliece cpr(McElieceParameters::MPKCS2N6960T119, [PrngType]);
@@ -59,7 +59,7 @@ using Enumeration::McElieceParameters;
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// std::vector&lt;byte&gt; ssk(0);
+/// std::vector&lt;uint8_t&gt; ssk(0);
 /// bool status;
 ///
 /// McEliece cpr(McElieceParameters::MPKCS2N6960T119, [PrngType]);
@@ -74,9 +74,9 @@ using Enumeration::McElieceParameters;
 /// <description>Implementation Notes:</description>
 /// <para>.</para>
 ///
-/// <para>This implementation was written by Daniel Bernstien, Tung Chou, and Peter Schwabe: as the NIST PQ Round 2 submission (using the recommended version contained in the SUPERCOP package). \n
+/// <para>This implementation was originally written in C by Daniel Bernstien, Tung Chou, and Peter Schwabe: as the NIST PQ Round 3 submission (using the recommended version contained in the SUPERCOP package). \n
 /// The McElieceParameters enumeration member is passed to the constructor along with the Prng enum type value (required: the default is BCR), or an initialized instance of a Prng through the secondary advanced constructor option. \n
-/// The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key-tag byte array. \n
+/// The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key-tag uint8_t array. \n
 /// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
 ///
 /// <description>Domain Key:</description>
@@ -92,7 +92,7 @@ using Enumeration::McElieceParameters;
 ///
 /// <list type="bullet">
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MPKCPublicKey, or MPKCPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>There are two parameters available: MPKCS2N6960T119 with medium-high security, and MPKCS3N8192T128 with high-security</description></item>
+/// <item><description>There are four parameters available: the medium-high security MPKCS3N4608T96 and MPKCS3N6960T119 sets, and the MPKCS4N6688T128 and MPKCS5N8192T128 high-security parameter sets</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The default prng used to generate the public key and private keys (default is BCR), is an auto-seeded AES256/CTR-BE construction</description></item>
 /// </list>
@@ -141,7 +141,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	McEliece(McElieceParameters Parameters = McElieceParameters::MPKCS2N6960T119, Prngs PrngType = Prngs::BCR);
+	McEliece(McElieceParameters Parameters = McElieceParameters::MPKCS3N4608T96, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances
@@ -173,7 +173,7 @@ public:
 	/// For best security, the key should be random, secret, and shared only between hosts within a secure domain.
 	/// This property is used by the Shared Trust Model secure communications protocol.</para>
 	/// </summary>
-	std::vector<byte> &DomainKey();
+	std::vector<uint8_t> &DomainKey();
 
 	/// <summary>
 	/// Read Only: The cipher type-name
@@ -228,7 +228,7 @@ public:
 	/// <param name="SharedSecret">The shared secret key</param>
 	/// 
 	/// <returns>Returns true if decryption is sucesssful</returns>
-	bool Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
+	bool Decapsulate(const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret) override;
 
 	/// <summary>
 	/// Generate a shared secret and ciphertext
@@ -236,7 +236,7 @@ public:
 	/// 
 	/// <param name="CipherText">The output cipher-text</param>
 	/// <param name="SharedSecret">The shared secret key</param>
-	void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
+	void Encapsulate(std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret) override;
 
 	/// <summary>
 	/// Generate a public/private key-pair
@@ -258,7 +258,7 @@ public:
 
 private:
 
-	void CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate);
+	void CXOF(const std::vector<uint8_t> &Domain, const std::vector<uint8_t> &Key, std::vector<uint8_t> &Secret, size_t Rate);
 
 };
 

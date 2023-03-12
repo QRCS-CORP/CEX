@@ -24,11 +24,11 @@ class HBA::HbaState
 {
 public:
 
-	SecureVector<byte> Custom;
-	SecureVector<byte> MacKey;
-	SecureVector<byte> MacTag;
-	SecureVector<byte> Name;
-	ulong Counter;
+	SecureVector<uint8_t> Custom;
+	SecureVector<uint8_t> MacKey;
+	SecureVector<uint8_t> MacTag;
+	SecureVector<uint8_t> Name;
+	uint64_t Counter;
 	StreamAuthenticators Authenticator;
 	SHA2Digests Digest;
 	ShakeModes Mode;
@@ -167,12 +167,12 @@ ParallelOptions &HBA::ParallelProfile()
 	return m_cipherMode->ParallelProfile();
 }
 
-const std::vector<byte> HBA::Tag()
+const std::vector<uint8_t> HBA::Tag()
 {
 	return SecureUnlock(m_hbaState->MacTag);
 }
 
-const void HBA::Tag(SecureVector<byte> &Output)
+const void HBA::Tag(SecureVector<uint8_t> &Output)
 {
 	SecureCopy(m_hbaState->MacTag, 0, Output, 0, m_hbaState->MacTag.size());
 }
@@ -186,8 +186,8 @@ const size_t HBA::TagSize()
 
 void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	SecureVector<byte> tmpk(Parameters.KeySizes().KeySize());
-	ushort kbits;
+	SecureVector<uint8_t> tmpk(Parameters.KeySizes().KeySize());
+	uint16_t kbits;
 
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
@@ -237,30 +237,26 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	// create the HBA name string 
 	std::string tmpn = Name();
 	// add mac counter, key-size bits, and algorithm name to name string
-	m_hbaState->Name.resize(sizeof(ulong) + sizeof(ushort) + tmpn.size());
+	m_hbaState->Name.resize(sizeof(uint64_t) + sizeof(uint16_t) + tmpn.size());
 	// mac nonce is always first 8 bytes of name
 	IntegerTools::Le64ToBytes(m_hbaState->Counter, m_hbaState->Name, 0);
-	// add the cipher key size in bits as an unsigned short integer
-	kbits = static_cast<ushort>(Parameters.KeySizes().KeySize() * 8);
-	IntegerTools::Le16ToBytes(kbits, m_hbaState->Name, sizeof(ulong));
+	// add the cipher key size in bits as an unsigned int16_t integer
+	kbits = static_cast<uint16_t>(Parameters.KeySizes().KeySize() * 8);
+	IntegerTools::Le16ToBytes(kbits, m_hbaState->Name, sizeof(uint64_t));
 	// copy the name string to state
-	MemoryTools::CopyFromObject(tmpn.data(), m_hbaState->Name, sizeof(ulong) + sizeof(ushort), tmpn.size());
+	MemoryTools::CopyFromObject(tmpn.data(), m_hbaState->Name, sizeof(uint64_t) + sizeof(uint16_t), tmpn.size());
 
 	if (m_hbaState->Authenticator != StreamAuthenticators::HMACSHA2256 && m_hbaState->Authenticator != StreamAuthenticators::HMACSHA2512)
 	{
 		// SHA3 Mode //
 		// cipher authenticator size determines key expansion function and Mac generator type; 256, 512, or 1024-bit
 		m_hbaState->Mode = (m_hbaState->Authenticator == StreamAuthenticators::KMAC512) ?
-			ShakeModes::SHAKE512 : (m_hbaState->Authenticator == StreamAuthenticators::KMAC256) ? 
-			ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
+			ShakeModes::SHAKE512 : ShakeModes::SHAKE256;
 
 		const size_t KEYLEN = (m_hbaState->Mode == ShakeModes::SHAKE512) ? 
-			64 : 
-			(m_hbaState->Mode == ShakeModes::SHAKE256) ? 
-				32 :
-				128;
+			64 : 32;
 
-		SecureVector<byte> mack(KEYLEN);
+		SecureVector<uint8_t> mack(KEYLEN);
 
 		SHAKE gen(m_hbaState->Mode);
 
@@ -296,9 +292,9 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 			64 : 
 			32;
 
-		SecureVector<byte> mack(KEYLEN);
-		SecureVector<byte> tmpk(KEYLEN);
-		SecureVector<byte> zero(0);
+		SecureVector<uint8_t> mack(KEYLEN);
+		SecureVector<uint8_t> tmpk(KEYLEN);
+		SecureVector<uint8_t> zero(0);
 
 		Kdf::HKDF gen(m_hbaState->Digest);
 
@@ -341,7 +337,7 @@ void HBA::ParallelMaxDegree(size_t Degree)
 	ParallelProfile().SetMaxDegree(Degree);
 }
 
-void HBA::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
+void HBA::SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -356,16 +352,16 @@ void HBA::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 	// add the additional data
 	if (Length != 0)
 	{
-		std::vector<byte> actr(sizeof(uint));
+		std::vector<uint8_t> actr(sizeof(uint32_t));
 		m_macAuthenticator->Update(Input, Offset, Length);
 		// seperate encoding for associated data v1.1a
-		IntegerTools::Le32ToBytes(static_cast<uint>(Length), actr, 0);
+		IntegerTools::Le32ToBytes(static_cast<uint32_t>(Length), actr, 0);
 		// the counter terminates the mac update stream
 		m_macAuthenticator->Update(actr, 0, actr.size());
 	}
 }
 
-void HBA::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length)
+void HBA::SetAssociatedData(const SecureVector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -380,16 +376,16 @@ void HBA::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size
 	// add the additional data
 	if (Length != 0)
 	{
-		std::vector<byte> actr(sizeof(uint));
+		std::vector<uint8_t> actr(sizeof(uint32_t));
 		m_macAuthenticator->Update(SecureUnlock(Input), Offset, Length);
 		// seperate encoding for associated data v1.1a
-		IntegerTools::Le32ToBytes(static_cast<uint>(Length), actr, 0);
+		IntegerTools::Le32ToBytes(static_cast<uint32_t>(Length), actr, 0);
 		// the counter terminates the mac update stream
 		m_macAuthenticator->Update(actr, 0, actr.size());
 	}
 }
 
-void HBA::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void HBA::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -440,10 +436,10 @@ void HBA::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 //~~~Private Functions~~~//
 
-void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void HBA::Finalize(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
-	std::vector<byte> pctr(sizeof(ulong));
-	SecureVector<byte> mack(0);
+	std::vector<uint8_t> pctr(sizeof(uint64_t));
+	SecureVector<uint8_t> mack(0);
 	uint64_t mctr;
 
 	// 1.1a: add the number of message bytes processed by the mac, including counter and this encoding string
@@ -459,8 +455,8 @@ void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	MemoryTools::Copy(m_hbaState->MacTag, 0, Output, OutOffset, Length);
 
 	// create the new mac-key: KDF(k,c,n)
-	// name string is an unsigned 64-bit bytes counter + key-size + cipher-name
-	// the generator counter is the number of bytes processed by the cipher; 
+	// name string is an unsigned 64-bit bytes counter + key-size + cipher-name.
+	// The generator counter is the number of bytes processed by the cipher; 
 	// does not include nonce and Associated lengths processed by the mac, 
 	// only the number of bytes processed by the cipher
 	IntegerTools::Le64ToBytes(m_hbaState->Counter, m_hbaState->Name, 0);
@@ -473,8 +469,7 @@ void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		// bytes counter provides cSHAKE domain seperation in the stream; will generate a unique mac-key each time
 		gen.Initialize(m_hbaState->MacKey, m_hbaState->Custom, m_hbaState->Name);
 
-		// use the second key parameter of legal keys to set the mac key length, the stronger [recommended] setting
-		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[1];
+		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[0];
 
 		// generate the new mac key
 		mack.resize(ks.KeySize());
@@ -482,12 +477,12 @@ void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 	else
 	{
-		SecureVector<byte> zero(0);
+		SecureVector<uint8_t> zero(0);
 		const size_t KEYLEN = (m_hbaState->Digest == SHA2Digests::SHA2512) ? 
 			64 : 
 			32;
 
-		SecureVector<byte> tmpk(KEYLEN);
+		SecureVector<uint8_t> tmpk(KEYLEN);
 
 		// generate the new mac key
 		Kdf::HKDF gen(m_hbaState->Digest);
@@ -512,9 +507,9 @@ void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	SecureMove(mack, 0, m_hbaState->MacKey, 0, mack.size());
 }
 
-bool HBA::Verify(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+bool HBA::Verify(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
-	std::vector<byte> code(m_macAuthenticator->TagSize());
+	std::vector<uint8_t> code(m_macAuthenticator->TagSize());
 	bool ret;
 
 	// finalize the mac-code

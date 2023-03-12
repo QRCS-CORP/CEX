@@ -22,10 +22,10 @@ namespace Test
 		static const size_t TEST_CYCLES = 100;
 #endif
 
-		std::vector<std::vector<byte>> m_pubexp;
-		std::vector<std::vector<byte>> m_priexp;
-		std::vector<std::vector<byte>> m_rngseed;
-		std::vector<std::vector<byte>> m_sskexp;
+		std::vector<std::vector<uint8_t>> m_pubexp;
+		std::vector<std::vector<uint8_t>> m_priexp;
+		std::vector<std::vector<uint8_t>> m_rngseed;
+		std::vector<std::vector<uint8_t>> m_sskexp;
 		TestEventHandler m_progressEvent;
 
 	public:

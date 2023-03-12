@@ -12,7 +12,7 @@ NAMESPACE_ENUMERATION
 /// Core counts used by ParallelOptions api.
 /// <para>The maximum number of CPU cores used by a mutithreaded function.</para>
 /// </summary>
-enum class CpuCores : byte
+enum class CpuCores : uint8_t
 {
 	/// <summary>
 	/// All Cpu cores are used (default)

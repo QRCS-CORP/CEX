@@ -146,9 +146,9 @@ const size_t ECDSA::SignatureSize()
 
 AsymmetricKeyPair* ECDSA::Generate()
 {
-	std::vector<byte> pk(EC25519::EC25519_PUBLICKEY_SIZE);
-	std::vector<byte> sk(EC25519::EC25519_PRIVATEKEY_SIZE);
-	std::vector<byte> seed(EC25519::EC25519_SEED_SIZE);
+	std::vector<uint8_t> pk(EC25519::EC25519_PUBLICKEY_SIZE);
+	std::vector<uint8_t> sk(EC25519::EC25519_PRIVATEKEY_SIZE);
+	std::vector<uint8_t> seed(EC25519::EC25519_SEED_SIZE);
 
 	m_rndGenerator->Generate(seed);
 	ECDSABase::GenerateKeyPair(pk, sk, seed, m_rndDigest);
@@ -159,7 +159,7 @@ AsymmetricKeyPair* ECDSA::Generate()
 	return new AsymmetricKeyPair(ask, apk);
 }
 
-AsymmetricKeyPair* ECDSA::Generate(std::vector<byte> &Seed)
+AsymmetricKeyPair* ECDSA::Generate(std::vector<uint8_t> &Seed)
 {
 	if (Seed.size() != EC25519::EC25519_SEED_SIZE)
 	{
@@ -167,8 +167,8 @@ AsymmetricKeyPair* ECDSA::Generate(std::vector<byte> &Seed)
 		throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The key size is invalid!"), ErrorCodes::InvalidKey);
 	}
 
-	std::vector<byte> pk(EC25519::EC25519_PUBLICKEY_SIZE);
-	std::vector<byte> sk(EC25519::EC25519_PRIVATEKEY_SIZE);
+	std::vector<uint8_t> pk(EC25519::EC25519_PUBLICKEY_SIZE);
+	std::vector<uint8_t> sk(EC25519::EC25519_PRIVATEKEY_SIZE);
 
 	ECDSABase::GenerateKeyPair(pk, sk, Seed, m_rndDigest);
 
@@ -208,7 +208,7 @@ const void ECDSA::Initialize(AsymmetricKey* Key)
 	m_ecdsaState->Initialized = true;
 }
 
-size_t ECDSA::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature)
+size_t ECDSA::Sign(const std::vector<uint8_t> &Message, std::vector<uint8_t> &Signature)
 {
 	if (!m_ecdsaState->Initialized)
 	{
@@ -246,7 +246,7 @@ size_t ECDSA::Sign(const std::vector<byte> &Message, std::vector<byte> &Signatur
 	return Signature.size();
 }
 
-bool ECDSA::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message)
+bool ECDSA::Verify(const std::vector<uint8_t> &Signature, std::vector<uint8_t> &Message)
 {
 	bool res;
 

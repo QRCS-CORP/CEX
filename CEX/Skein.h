@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -63,17 +63,17 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x4>
 	static void PemuteP256C(const ArrayU64x4 &Input, const ArrayU64x2 &Tweak, ArrayU64x4 &State, size_t Rounds)
 	{
-		std::array<ulong, 4> B;
-		std::array<ulong, 5> K;
-		std::array<ulong, 3> T;
+		std::array<uint64_t, 4> B;
+		std::array<uint64_t, 5> K;
+		std::array<uint64_t, 3> T;
 		size_t i;
 		size_t r;
 		size_t x;
 		size_t y;
 
-		MemoryTools::Copy(Input, 0, B, 0, 4 * sizeof(ulong));
-		MemoryTools::Copy(State, 0, K, 0, 4 * sizeof(ulong));
-		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		MemoryTools::Copy(Input, 0, B, 0, 4 * sizeof(uint64_t));
+		MemoryTools::Copy(State, 0, K, 0, 4 * sizeof(uint64_t));
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(uint64_t));
 
 		r = Rounds / 8;
 		x = 1;
@@ -138,7 +138,7 @@ public:
 		B[2] += K[0] + T[1];
 		B[3] += K[1] + (Rounds / 4);
 
-		MemoryTools::Copy(B, 0, State, 0, 4 * sizeof(ulong));
+		MemoryTools::Copy(B, 0, State, 0, 4 * sizeof(uint64_t));
 	}
 
 	/// <summary>
@@ -153,18 +153,18 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x4>
 	static void PemuteR72P256U(const ArrayU64x4 &Input, const ArrayU64x2 &Tweak, ArrayU64x4 &State)
 	{
-		ulong B0;
-		ulong B1;
-		ulong B2;
-		ulong B3;
-		ulong K0;
-		ulong K1;
-		ulong K2;
-		ulong K3;
-		ulong K4;
-		ulong T0;
-		ulong T1;
-		ulong T2;
+		uint64_t B0;
+		uint64_t B1;
+		uint64_t B2;
+		uint64_t B3;
+		uint64_t K0;
+		uint64_t K1;
+		uint64_t K2;
+		uint64_t K3;
+		uint64_t K4;
+		uint64_t T0;
+		uint64_t T1;
+		uint64_t T2;
 
 		B0 = Input[0];
 		B1 = Input[1];
@@ -537,17 +537,17 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x8>
 	static void PemuteP512C(const ArrayU64x8 &Input, const ArrayU64x2 &Tweak, ArrayU64x8 &State, size_t Rounds)
 	{
-		std::array<ulong, 8> B;
-		std::array<ulong, 9> K;
-		std::array<ulong, 3> T;
+		std::array<uint64_t, 8> B;
+		std::array<uint64_t, 9> K;
+		std::array<uint64_t, 3> T;
 		size_t i;
 		size_t r;
 		size_t x;
 		size_t y;
 
-		MemoryTools::Copy(Input, 0, B, 0, 8 * sizeof(ulong));
-		MemoryTools::Copy(State, 0, K, 0, 8 * sizeof(ulong));
-		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		MemoryTools::Copy(Input, 0, B, 0, 8 * sizeof(uint64_t));
+		MemoryTools::Copy(State, 0, K, 0, 8 * sizeof(uint64_t));
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(uint64_t));
 
 		r = Rounds / 8;
 		x = 1;
@@ -675,26 +675,26 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x8>
 	static void PemuteR72P512U(const ArrayU64x8 &Input, const ArrayU64x2 &Tweak, ArrayU64x8 &State)
 	{
-		ulong B0;
-		ulong B1;
-		ulong B2;
-		ulong B3;
-		ulong B4;
-		ulong B5;
-		ulong B6;
-		ulong B7;
-		ulong K0;
-		ulong K1;
-		ulong K2;
-		ulong K3;
-		ulong K4;
-		ulong K5;
-		ulong K6;
-		ulong K7;
-		ulong K8;
-		ulong T0;
-		ulong T1;
-		ulong T2;
+		uint64_t B0;
+		uint64_t B1;
+		uint64_t B2;
+		uint64_t B3;
+		uint64_t B4;
+		uint64_t B5;
+		uint64_t B6;
+		uint64_t B7;
+		uint64_t K0;
+		uint64_t K1;
+		uint64_t K2;
+		uint64_t K3;
+		uint64_t K4;
+		uint64_t K5;
+		uint64_t K6;
+		uint64_t K7;
+		uint64_t K8;
+		uint64_t T0;
+		uint64_t T1;
+		uint64_t T2;
 
 		B0 = Input[0];
 		B1 = Input[1];
@@ -1400,26 +1400,26 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x8>
 	static void PemuteR96P512U(const ArrayU64x8 &Input, const ArrayU64x2 &Tweak, ArrayU64x8 &State)
 	{
-		ulong B0;
-		ulong B1;
-		ulong B2;
-		ulong B3;
-		ulong B4;
-		ulong B5;
-		ulong B6;
-		ulong B7;
-		ulong K0;
-		ulong K1;
-		ulong K2;
-		ulong K3;
-		ulong K4;
-		ulong K5;
-		ulong K6;
-		ulong K7;
-		ulong K8;
-		ulong T0;
-		ulong T1;
-		ulong T2;
+		uint64_t B0;
+		uint64_t B1;
+		uint64_t B2;
+		uint64_t B3;
+		uint64_t B4;
+		uint64_t B5;
+		uint64_t B6;
+		uint64_t B7;
+		uint64_t K0;
+		uint64_t K1;
+		uint64_t K2;
+		uint64_t K3;
+		uint64_t K4;
+		uint64_t K5;
+		uint64_t K6;
+		uint64_t K7;
+		uint64_t K8;
+		uint64_t T0;
+		uint64_t T1;
+		uint64_t T2;
 
 		B0 = Input[0];
 		B1 = Input[1];
@@ -2353,7 +2353,7 @@ public:
 		const __m256i R7 = _mm256_set_epi64x(43, 39, 29, 25);
 		const __m256i R8 = _mm256_set_epi64x(22, 56, 35, 8);
 		const __m256i RFN = _mm256_set_epi64x(1, 0, 0, 0);
-		const ulong KS = State[0] ^ State[1] ^ State[2] ^ State[3] ^ State[4] ^ State[5] ^ State[6] ^ State[7] ^ 0x1BD11BDAA9FC1A22ULL;
+		const uint64_t KS = State[0] ^ State[1] ^ State[2] ^ State[3] ^ State[4] ^ State[5] ^ State[6] ^ State[7] ^ 0x1BD11BDAA9FC1A22ULL;
 		const __m256i K0 = _mm256_set_epi64x(State[6], State[4], State[2], State[0]);
 		const __m256i K1 = _mm256_set_epi64x(State[7], State[5], State[3], State[1]);
 		const __m256i K2 = _mm256_set_epi64x(KS, State[6], State[4], State[2]);
@@ -2990,17 +2990,17 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x16>
 	static void PemuteP1024C(const ArrayU64x16 &Input, const ArrayU64x2 &Tweak, ArrayU64x16 &State, size_t Rounds)
 	{
-		std::array<ulong, 16> B;
-		std::array<ulong, 17> K;
-		std::array<ulong, 3> T;
+		std::array<uint64_t, 16> B;
+		std::array<uint64_t, 17> K;
+		std::array<uint64_t, 3> T;
 		size_t i;
 		size_t r;
 		size_t x;
 		size_t y;
 
-		MemoryTools::Copy(Input, 0, B, 0, 16 * sizeof(ulong));
-		MemoryTools::Copy(State, 0, K, 0, 16 * sizeof(ulong));
-		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		MemoryTools::Copy(Input, 0, B, 0, 16 * sizeof(uint64_t));
+		MemoryTools::Copy(State, 0, K, 0, 16 * sizeof(uint64_t));
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(uint64_t));
 
 		r = Rounds / 8;
 		x = 1;
@@ -3224,42 +3224,42 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x16>
 	static void PemuteR80P1024U(const ArrayU64x16 &Input, const ArrayU64x2 &Tweak, ArrayU64x16 &State)
 	{
-		ulong B0;
-		ulong B1;
-		ulong B2;
-		ulong B3;
-		ulong B4;
-		ulong B5;
-		ulong B6;
-		ulong B7;
-		ulong B8;
-		ulong B9;
-		ulong B10;
-		ulong B11;
-		ulong B12;
-		ulong B13;
-		ulong B14;
-		ulong B15;
-		ulong K0;
-		ulong K1;
-		ulong K2;
-		ulong K3;
-		ulong K4;
-		ulong K5;
-		ulong K6;
-		ulong K7;
-		ulong K8;
-		ulong K9;
-		ulong K10;
-		ulong K11;
-		ulong K12;
-		ulong K13;
-		ulong K14;
-		ulong K15;
-		ulong K16;
-		ulong T0;
-		ulong T1;
-		ulong T2;
+		uint64_t B0;
+		uint64_t B1;
+		uint64_t B2;
+		uint64_t B3;
+		uint64_t B4;
+		uint64_t B5;
+		uint64_t B6;
+		uint64_t B7;
+		uint64_t B8;
+		uint64_t B9;
+		uint64_t B10;
+		uint64_t B11;
+		uint64_t B12;
+		uint64_t B13;
+		uint64_t B14;
+		uint64_t B15;
+		uint64_t K0;
+		uint64_t K1;
+		uint64_t K2;
+		uint64_t K3;
+		uint64_t K4;
+		uint64_t K5;
+		uint64_t K6;
+		uint64_t K7;
+		uint64_t K8;
+		uint64_t K9;
+		uint64_t K10;
+		uint64_t K11;
+		uint64_t K12;
+		uint64_t K13;
+		uint64_t K14;
+		uint64_t K15;
+		uint64_t K16;
+		uint64_t T0;
+		uint64_t T1;
+		uint64_t T2;
 
 		B0 = Input[0];
 		B1 = Input[1];
@@ -4783,42 +4783,42 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x16>
 	static void PemuteR120P1024U(const ArrayU64x16 &Input, const ArrayU64x2 &Tweak, ArrayU64x16 &State)
 	{
-		ulong B0;
-		ulong B1;
-		ulong B2;
-		ulong B3;
-		ulong B4;
-		ulong B5;
-		ulong B6;
-		ulong B7;
-		ulong B8;
-		ulong B9;
-		ulong B10;
-		ulong B11;
-		ulong B12;
-		ulong B13;
-		ulong B14;
-		ulong B15;
-		ulong K0;
-		ulong K1;
-		ulong K2;
-		ulong K3;
-		ulong K4;
-		ulong K5;
-		ulong K6;
-		ulong K7;
-		ulong K8;
-		ulong K9;
-		ulong K10;
-		ulong K11;
-		ulong K12;
-		ulong K13;
-		ulong K14;
-		ulong K15;
-		ulong K16;
-		ulong T0;
-		ulong T1;
-		ulong T2;
+		uint64_t B0;
+		uint64_t B1;
+		uint64_t B2;
+		uint64_t B3;
+		uint64_t B4;
+		uint64_t B5;
+		uint64_t B6;
+		uint64_t B7;
+		uint64_t B8;
+		uint64_t B9;
+		uint64_t B10;
+		uint64_t B11;
+		uint64_t B12;
+		uint64_t B13;
+		uint64_t B14;
+		uint64_t B15;
+		uint64_t K0;
+		uint64_t K1;
+		uint64_t K2;
+		uint64_t K3;
+		uint64_t K4;
+		uint64_t K5;
+		uint64_t K6;
+		uint64_t K7;
+		uint64_t K8;
+		uint64_t K9;
+		uint64_t K10;
+		uint64_t K11;
+		uint64_t K12;
+		uint64_t K13;
+		uint64_t K14;
+		uint64_t K15;
+		uint64_t K16;
+		uint64_t T0;
+		uint64_t T1;
+		uint64_t T2;
 
 		B0 = Input[0];
 		B1 = Input[1];

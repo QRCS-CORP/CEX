@@ -17,12 +17,12 @@ class AsymmetricKey::AsymmetricKeyState
 {
 public:
 
-	SecureVector<byte> Polynomial;
+	SecureVector<uint8_t> Polynomial;
 	AsymmetricKeyTypes KeyClass;
 	AsymmetricPrimitives Primitive;
 	AsymmetricParameters Parameters;
 
-	AsymmetricKeyState(const std::vector<byte> &Poly, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricParameters ParameterType)
+	AsymmetricKeyState(const std::vector<uint8_t> &Poly, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricParameters ParameterType)
 		:
 		Polynomial(SecureLock(Poly)),
 		Primitive(PrimitiveType),
@@ -31,7 +31,7 @@ public:
 	{
 	}
 
-	AsymmetricKeyState(const SecureVector<byte> &Poly, AsymmetricPrimitives AsymmetricType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricParameters ParameterType)
+	AsymmetricKeyState(const SecureVector<uint8_t> &Poly, AsymmetricPrimitives AsymmetricType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricParameters ParameterType)
 		:
 		Polynomial(Poly),
 		Primitive(AsymmetricType),
@@ -40,7 +40,7 @@ public:
 	{
 	}
 
-	AsymmetricKeyState(const std::vector<byte> &KeyStream)
+	AsymmetricKeyState(const std::vector<uint8_t> &KeyStream)
 		:
 		KeyClass(static_cast<AsymmetricKeyTypes>(KeyStream[0])),
 		Parameters(static_cast<AsymmetricParameters>(KeyStream[1])),
@@ -49,7 +49,7 @@ public:
 	{
 	}
 
-	AsymmetricKeyState(const SecureVector<byte> &KeyStream)
+	AsymmetricKeyState(const SecureVector<uint8_t> &KeyStream)
 		:
 		KeyClass(static_cast<AsymmetricKeyTypes>(KeyStream[0])),
 		Parameters(static_cast<AsymmetricParameters>(KeyStream[1])),
@@ -74,7 +74,7 @@ public:
 
 //~~~Constructors~~~//
 
-AsymmetricKey::AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricParameters ParameterType)
+AsymmetricKey::AsymmetricKey(const std::vector<uint8_t> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricParameters ParameterType)
 	:
 	m_keyState((Polynomial.size() != 0 && PrimitiveType != AsymmetricPrimitives::None && CipherKeyType != AsymmetricKeyTypes::None && ParameterType != AsymmetricParameters::None) ?
 		new AsymmetricKeyState(Polynomial, PrimitiveType, CipherKeyType, ParameterType) :
@@ -82,7 +82,7 @@ AsymmetricKey::AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrim
 {
 }
 
-AsymmetricKey::AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricParameters ParameterType)
+AsymmetricKey::AsymmetricKey(const SecureVector<uint8_t> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricParameters ParameterType)
 	:
 	m_keyState((Polynomial.size() != 0 && PrimitiveType != AsymmetricPrimitives::None && CipherKeyType != AsymmetricKeyTypes::None && ParameterType != AsymmetricParameters::None) ?
 		new AsymmetricKeyState(Polynomial, PrimitiveType, CipherKeyType, ParameterType) :
@@ -111,13 +111,13 @@ const AsymmetricParameters AsymmetricKey::Parameters()
 	return m_keyState->Parameters;
 }
 
-const std::vector<byte> AsymmetricKey::Polynomial()
+const std::vector<uint8_t> AsymmetricKey::Polynomial()
 {
-	std::vector<byte> tmp = SecureUnlock(m_keyState->Polynomial);
+	std::vector<uint8_t> tmp = SecureUnlock(m_keyState->Polynomial);
 	return tmp;
 }
 
-const SecureVector<byte> &AsymmetricKey::SecurePolynomial()
+const SecureVector<uint8_t> &AsymmetricKey::SecurePolynomial()
 {
 	return m_keyState->Polynomial;
 }
@@ -131,9 +131,9 @@ void AsymmetricKey::Reset()
 
 //~~~Static Functions~~~//
 
-AsymmetricKey* AsymmetricKey::DeSerialize(SecureVector<byte> &KeyStream)
+AsymmetricKey* AsymmetricKey::DeSerialize(SecureVector<uint8_t> &KeyStream)
 {
-	AsymmetricKey* tmpk = new AsymmetricKey(SecureVector<byte>(KeyStream.begin() + 3, KeyStream.end()), 
+	AsymmetricKey* tmpk = new AsymmetricKey(SecureVector<uint8_t>(KeyStream.begin() + 3, KeyStream.end()), 
 		static_cast<AsymmetricPrimitives>(KeyStream[2]),
 		static_cast<AsymmetricKeyTypes>(KeyStream[0]),
 		static_cast<AsymmetricParameters>(KeyStream[1]));
@@ -141,13 +141,13 @@ AsymmetricKey* AsymmetricKey::DeSerialize(SecureVector<byte> &KeyStream)
 	return tmpk;
 }
 
-SecureVector<byte> AsymmetricKey::Serialize(AsymmetricKey &KeyParams)
+SecureVector<uint8_t> AsymmetricKey::Serialize(AsymmetricKey &KeyParams)
 {
-	SecureVector<byte> tmpr(0);
+	SecureVector<uint8_t> tmpr(0);
 
-	ArrayTools::AppendValue(static_cast<byte>(KeyParams.KeyClass()), tmpr);
-	ArrayTools::AppendValue(static_cast<byte>(KeyParams.Parameters()), tmpr);
-	ArrayTools::AppendValue(static_cast<byte>(KeyParams.PrimitiveType()), tmpr);
+	ArrayTools::AppendValue(static_cast<uint8_t>(KeyParams.KeyClass()), tmpr);
+	ArrayTools::AppendValue(static_cast<uint8_t>(KeyParams.Parameters()), tmpr);
+	ArrayTools::AppendValue(static_cast<uint8_t>(KeyParams.PrimitiveType()), tmpr);
 	ArrayTools::AppendVector(KeyParams.Polynomial(), tmpr);
 
 	return tmpr;

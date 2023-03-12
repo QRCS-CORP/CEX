@@ -16,7 +16,7 @@ class CFB::CfbState
 {
 public:
 
-	std::vector<byte> IV;
+	std::vector<uint8_t> IV;
 	size_t RegisterSize;
 	bool Destroyed;
 	bool Encryption;
@@ -150,7 +150,7 @@ ParallelOptions &CFB::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void CFB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+void CFB::DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(!IsEncryption(), "The cipher mode has been initialized for encryption!");
@@ -158,7 +158,7 @@ void CFB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Decrypt128(Input, 0, Output, 0);
 }
 
-void CFB::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CFB::DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(!IsEncryption(), "The cipher mode has been initialized for encryption!");
@@ -166,7 +166,7 @@ void CFB::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vec
 	Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void CFB::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+void CFB::EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IsEncryption(), "The cipher mode has been initialized for decryption!");
@@ -174,7 +174,7 @@ void CFB::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt128(Input, 0, Output, 0);
 }
 
-void CFB::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CFB::EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IsEncryption(), "The cipher mode has been initialized for decryption!");
@@ -186,7 +186,7 @@ void CFB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
 	if (Parameters.KeySizes().IVSize() < 1)
 	{
-		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of Nonce!"), ErrorCodes::InvalidNonce);
+		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 uint8_t of Nonce!"), ErrorCodes::InvalidNonce);
 	}
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
@@ -224,7 +224,7 @@ void CFB::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void CFB::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CFB::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
@@ -233,9 +233,9 @@ void CFB::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 //~~~Private Functions~~~//
 
-void CFB::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CFB::Decrypt128(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
-	std::vector<byte> tmpr(BLOCK_SIZE);
+	std::vector<uint8_t> tmpr(BLOCK_SIZE);
 	size_t i;
 
 	m_blockCipher->Transform(m_cfbState->IV, 0, tmpr, 0);
@@ -257,15 +257,15 @@ void CFB::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	}
 }
 
-void CFB::DecryptParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CFB::DecryptParallel(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	const size_t SEGLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t BLKCNT = (SEGLEN / BLOCK_SIZE);
-	std::vector<byte> tmpv(BLOCK_SIZE);
+	std::vector<uint8_t> tmpv(BLOCK_SIZE);
 
 	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpv, SEGLEN, BLKCNT](size_t i)
 	{
-		std::vector<byte> thdv(BLOCK_SIZE);
+		std::vector<uint8_t> thdv(BLOCK_SIZE);
 
 		if (i != 0)
 		{
@@ -287,7 +287,7 @@ void CFB::DecryptParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	MemoryTools::Copy(tmpv, 0, m_cfbState->IV, 0, m_cfbState->RegisterSize);
 }
 
-void CFB::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, size_t BlockCount)
+void CFB::DecryptSegment(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, std::vector<uint8_t> &Iv, size_t BlockCount)
 {
 	size_t i;
 	size_t j;
@@ -316,9 +316,9 @@ void CFB::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 	}
 }
 
-void CFB::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CFB::Encrypt128(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
-	std::vector<byte> tmpr(BLOCK_SIZE);
+	std::vector<uint8_t> tmpr(BLOCK_SIZE);
 	size_t i;
 
 	// encrypt the register
@@ -341,7 +341,7 @@ void CFB::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	MemoryTools::Copy(Output, OutOffset, m_cfbState->IV, m_cfbState->IV.size() - m_cfbState->RegisterSize, m_cfbState->RegisterSize);
 }
 
-void CFB::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CFB::Process(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 

@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Asymmetric cipher and signature-scheme enumeration names
 /// </summary>
-enum class AsymmetricPrimitives : byte
+enum class AsymmetricPrimitives : uint8_t
 {
 	/// <summary>
 	/// No asymmetric cipher is specified
@@ -27,10 +27,6 @@ enum class AsymmetricPrimitives : byte
 	/// </summary>
 	McEliece = 3,
 	/// <summary>
-	/// An NTRUPrime cipher implementation
-	/// </summary>
-	NTRUPrime = 4,
-	/// <summary>
 	/// The Dilithium asymmetric signature scheme
 	/// </summary>
 	Dilithium = 5,
@@ -38,14 +34,6 @@ enum class AsymmetricPrimitives : byte
 	/// An Elliptic Curve Digital Signature Algorithm signature scheme
 	/// </summary>
 	ECDSA = 6,
-	/// <summary>
-	/// A Rainbow multivariate asymmetric signature scheme
-	/// </summary>
-	Rainbow = 7,
-	/// <summary>
-	/// A Ring-LWE cipher implementation
-	/// </summary>
-	NewHope = 8,
 	/// <summary>
 	/// The SphincsPlus asymmetric signature scheme
 	/// </summary>

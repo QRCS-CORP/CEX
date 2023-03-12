@@ -11,14 +11,14 @@ using Tools::IntegerTools;
 using Tools::MemoryTools;
 
 /// <summary>
-/// Write integer values to a byte array
+/// Write integer values to a uint8_t array
 /// </summary>
 class StreamWriter
 {
 private:
 
 	size_t m_streamPosition;
-	std::vector<byte> m_streamState;
+	std::vector<uint8_t> m_streamState;
 
 public:
 
@@ -47,11 +47,11 @@ public:
 	explicit StreamWriter(size_t Length);
 
 	/// <summary>
-	/// Constructor: instantiate this class with a byte array
+	/// Constructor: instantiate this class with a uint8_t array
 	/// </summary>
 	///
-	/// <param name="DataArray">The byte array to write data to</param>
-	explicit StreamWriter(const std::vector<byte> &DataArray);
+	/// <param name="DataArray">The uint8_t array to write data to</param>
+	explicit StreamWriter(const std::vector<uint8_t> &DataArray);
 
 	/// <summary>
 	/// Constructor: instantiate this class with a MemoryStream
@@ -71,7 +71,7 @@ public:
 	/// Read/Write: Returns the entire array of raw bytes from the stream
 	/// </summary>
 	/// <returns>The array of bytes</returns>
-	std::vector<byte> &Generate();
+	std::vector<uint8_t> &Generate();
 
 	/// <summary>
 	/// Read/Write: Returns the base MemoryStream object

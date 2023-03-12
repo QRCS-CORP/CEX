@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The Elliptic Curve Diffie Hellman parameter sets enumeration
 /// </summary>
-enum class ECDHParameters : byte
+enum class ECDHParameters : uint8_t
 {
 	/// <summary>
 	/// No parameter set is specified
@@ -18,11 +18,11 @@ enum class ECDHParameters : byte
 	/// <summary>
 	/// The ECDH S1 parameter; elliptic 25519 curve using the SHA3-512 digest (Keccak)
 	/// </summary>
-	ECDHS1EC25519K = static_cast<byte>(AsymmetricParameters::ECDHS1EC25519K),
+	ECDHS1EC25519K = static_cast<uint8_t>(AsymmetricParameters::ECDHS1EC25519K),
 	/// <summary>
 	/// The ECDH S2 parameter; elliptic 25519 curve using the SHA2-512 digest
 	/// </summary>
-	ECDHS2EC25519S = static_cast<byte>(AsymmetricParameters::ECDHS2EC25519S)
+	ECDHS2EC25519S = static_cast<uint8_t>(AsymmetricParameters::ECDHS2EC25519S)
 };
 
 class ECDHParameterConvert

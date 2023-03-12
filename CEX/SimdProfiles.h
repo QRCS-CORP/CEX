@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// SIMD support flags
 /// </summary>
-enum class SimdProfiles : byte
+enum class SimdProfiles : uint8_t
 {
 	/// <summary>
 	/// The system does not support SIMD instructions

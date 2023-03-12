@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Asymmetric signature-scheme enumeration names
 /// </summary>
-enum class AsymmetricSigners : byte
+enum class AsymmetricSigners : uint8_t
 {
 	/// <summary>
 	/// No asymmetric cipher is specified
@@ -18,23 +18,23 @@ enum class AsymmetricSigners : byte
 	/// <summary>
 	/// The Dilithium asymmetric signature scheme
 	/// </summary>
-	Dilithium = static_cast<byte>(AsymmetricPrimitives::Dilithium),
+	Dilithium = static_cast<uint8_t>(AsymmetricPrimitives::Dilithium),
 	/// <summary>
-	/// A Rainbow multivariate asymmetric signature scheme
+	/// An elliptic curve asymmetric signature scheme
 	/// </summary>
-	Rainbow = static_cast<byte>(AsymmetricPrimitives::Rainbow),
+	ECDSA = static_cast<uint8_t>(AsymmetricPrimitives::ECDSA),
 	/// <summary>
 	/// The SphincsPlus asymmetric signature scheme
 	/// </summary>
-	SphincsPlus = static_cast<byte>(AsymmetricPrimitives::SphincsPlus),
+	SphincsPlus = static_cast<uint8_t>(AsymmetricPrimitives::SphincsPlus),
 	/// <summary>
 	/// The eXtended Merkle Signature Scheme
 	/// </summary>
-	XMSS = static_cast<byte>(AsymmetricPrimitives::XMSS),
+	XMSS = static_cast<uint8_t>(AsymmetricPrimitives::XMSS),
 	/// <summary>
 	/// The eXtended Merkle Signature Scheme Multi-Tree
 	/// </summary>
-	XMSSMT = static_cast<byte>(AsymmetricPrimitives::XMSSMT)
+	XMSSMT = static_cast<uint8_t>(AsymmetricPrimitives::XMSSMT)
 };
 
 class AsymmetricSignerConvert

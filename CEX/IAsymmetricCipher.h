@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -87,7 +87,7 @@ public:
 	/// The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation.
 	/// For best security, the key should be random, secret, and shared only between hosts within a secure domain.</para>
 	/// </summary>
-	virtual std::vector<byte> &DomainKey() = 0;
+	virtual std::vector<uint8_t> &DomainKey() = 0;
 
 	/// <summary>
 	/// Read Only: The cipher type-name
@@ -137,7 +137,7 @@ public:
 	/// <param name="SharedSecret">The shared secret key</param>
 	/// 
 	/// <returns>Returns true if decryption is sucesssful</returns>
-	virtual bool Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) = 0;
+	virtual bool Decapsulate(const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret) = 0;
 
 	/// <summary>
 	/// Generate a shared secret and ciphertext
@@ -145,7 +145,7 @@ public:
 	/// 
 	/// <param name="CipherText">The output cipher-text</param>
 	/// <param name="SharedSecret">The shared secret key</param>
-	virtual void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) = 0;
+	virtual void Encapsulate(std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret) = 0;
 
 	/// <summary>
 	/// Generate a public/private key-pair

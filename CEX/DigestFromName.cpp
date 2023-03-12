@@ -4,7 +4,6 @@
 #include "CryptoDigestException.h"
 #include "SHA3256.h"
 #include "SHA3512.h"
-#include "SHA31024.h"
 #include "SHA2256.h"
 #include "SHA2512.h"
 #include "Skein256.h"
@@ -48,11 +47,6 @@ IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 			case Digests::SHA3512:
 			{
 				dptr = new SHA3512(Parallel);
-				break;
-			}
-			case Digests::SHA31024:
-			{
-				dptr = new SHA31024(Parallel);
 				break;
 			}
 			case Digests::SHA2256:
@@ -132,7 +126,6 @@ size_t DigestFromName::GetBlockSize(Digests DigestType)
 			break;
 		}
 		case Digests::SHA3512:
-		case Digests::SHA31024:
 		{
 			blen = 72;
 			break;
@@ -176,7 +169,6 @@ size_t DigestFromName::GetDigestSize(Digests DigestType)
 			dlen = 64;
 			break;
 		}
-		case Digests::SHA31024:
 		case Digests::Skein1024:
 		{
 			dlen = 128;
@@ -209,7 +201,6 @@ size_t DigestFromName::GetPaddingSize(Digests DigestType)
 		case Digests::Blake512:
 		case Digests::SHA3256:
 		case Digests::SHA3512:
-		case Digests::SHA31024:
 		case Digests::Skein256:
 		case Digests::Skein512:
 		case Digests::Skein1024:

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 // Updated January 09, 2020
 // Updated July 31, 2020
 // Updated August 17, 2020
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_RWS_H
 #define CEX_RWS_H
@@ -129,6 +129,7 @@ class RWS final : public IStreamCipher
 private:
 
 	static const size_t BLOCK_SIZE = 64;
+	static const size_t IK128_SIZE = 16;
 	static const size_t IK256_SIZE = 32;
 	static const size_t IK512_SIZE = 64;
 	static const size_t IK1024_SIZE = 128;
@@ -138,12 +139,12 @@ private:
 	// modifying these values will increase the rounds processed by the cipher.
 	// These are the minimum sizes, changes will cause test failures,
 	// and incompatibility with standard the version.
+	static const size_t RK128_COUNT = 20;
 	static const size_t RK256_COUNT = 40;
 	static const size_t RK512_COUNT = 80;
-	static const size_t RK1024_COUNT = 120;
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_THRESHOLD = 838;
-	static const byte UPDATE_PREFIX = 0x80;
+	static const uint8_t UPDATE_PREFIX = 0x80;
 
 	class RwsState;
 	std::unique_ptr<RwsState> m_rwsState;
@@ -183,7 +184,7 @@ public:
 	/// <param name="State">The serialized state, created by the Serialize() function</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid state array is used</exception>
-	explicit RWS(SecureVector<byte> &State);
+	explicit RWS(SecureVector<uint8_t> &State);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -232,10 +233,10 @@ public:
 	/// <summary>
 	/// Read Only: The current value of the nonce counter array.
 	/// </summary>
-	const std::vector<byte> Nonce() override;
+	const std::vector<uint8_t> Nonce() override;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class, but must be a multiple of the ParallelMinimumSize().</para>
 	/// </summary>
 	const size_t ParallelBlockSize() override;
@@ -251,14 +252,14 @@ public:
 	/// <summary>
 	/// Read Only: The current standard-vector MAC tag value
 	/// </summary>
-	const std::vector<byte> Tag() override;
+	const std::vector<uint8_t> Tag() override;
 
 	/// <summary>
 	/// Copies the internal MAC tag to a secure-vector
 	/// </summary>
 	/// 
 	/// <param name="Output">The secure-vector receiving the MAC code</param>
-	const void Tag(SecureVector<byte> &Output) override;
+	const void Tag(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Read Only: The legal MAC tag length in bytes
@@ -299,7 +300,7 @@ public:
 	/// </summary>
 	///
 	/// <returns>The serialized cipher state</returns>
-	SecureVector<byte> Serialize();
+	SecureVector<uint8_t> Serialize();
 
 	/// <summary>
 	/// Add additional data to the message authentication code generator.  
@@ -311,12 +312,12 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if the cipher is not initialized</exception>
-	void SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
+	void SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Encrypt/Decrypt a vector of bytes with offset and length parameters.
 	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used. 
-	///	In authenticated encryption mode, the MAC code is automatically appended to the output stream at the end of the cipher-text, the output array must be long enough to accommodate this TagSize() code.
+	///	In authenticated encryption mode, the MAC code is automatically appended to the output stream at the end of the cipher-text, the output array must be int64_t enough to accommodate this TagSize() code.
 	/// In decryption mode, this code is checked before the stream is decrypted, if the authentication fails a CryptoAuthenticationFailure exception is thrown.</para>
 	/// </summary>
 	/// 
@@ -327,21 +328,21 @@ public:
 	/// <param name="Length">Number of bytes to process</param>
 	///
 	/// <exception cref="CryptoAuthenticationFailure">Thrown during decryption if the the ciphertext fails authentication</exception>
-	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 private:
 
 	static void Finalize(std::unique_ptr<RwsState> &State, std::unique_ptr<IMac> &Authenticator);
 	static void PrefetchSbox();
-	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter);
-	void Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	void Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::vector<uint8_t> &Counter);
+	void Process(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
+	void ProcessParallel(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
+	void ProcessSequential(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
 	void Reset();
-	void Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Transform4096(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Transform8192(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void Transform512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Transform2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Transform4096(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Transform8192(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
 };
 
 NAMESPACE_STREAMEND

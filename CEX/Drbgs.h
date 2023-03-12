@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Pseudo Random Generator enumeration names
 /// </summary>
-enum class Drbgs : byte
+enum class Drbgs : uint8_t
 {
 	/// <summary>
 	/// No generator is specified

@@ -3,7 +3,6 @@
 #include "../CEX/Keccak.h"
 #include "../CEX/SHA3256.h"
 #include "../CEX/SHA3512.h"
-#include "../CEX/SHA31024.h"
 #include "../CEX/MemoryTools.h"
 #include "../CEX/SecureRandom.h"
 #if defined(__AVX512__)
@@ -90,25 +89,14 @@ namespace Test
 			Kat(dgt512s, m_message[3], m_expected[7]);
 			OnProgress(std::string("SHA3Test: Passed SHA3-512 bit digest vector tests.."));
 
-			SHA31024* dgt1024s = new SHA31024(false);
-			Kat(dgt1024s, m_message[0], m_expected[8]);
-			Kat(dgt1024s, m_message[1], m_expected[9]);
-			Kat(dgt1024s, m_message[2], m_expected[10]);
-			Kat(dgt1024s, m_message[3], m_expected[11]);
-			OnProgress(std::string("SHA3Test: Passed Keccak-1024 bit digest vector tests.."));
-
 			Stress(dgt256s);
 			OnProgress(std::string("SHA3Test: Passed SHA3-256 sequential stress tests.."));
 
 			Stress(dgt512s);
 			OnProgress(std::string("SHA3Test: Passed SHA3-512 sequential stress tests.."));
 
-			Stress(dgt1024s);
-			OnProgress(std::string("SHA3Test: Passed Keccak-1024 sequential stress tests.."));
-
 			delete dgt256s;
 			delete dgt512s;
-			delete dgt1024s;
 
 			SHA3256* dgt256p = new SHA3256(true);
 			Stress(dgt256p);
@@ -118,22 +106,14 @@ namespace Test
 			Stress(dgt512p);
 			OnProgress(std::string("SHA3Test: Passed SHA3-512 parallel stress tests.."));
 
-			SHA31024* dgt1024p = new SHA31024(true);
-			Stress(dgt1024p);
-			OnProgress(std::string("SHA3Test: Passed Keccak-1024 parallel stress tests.."));
-
 			Parallel(dgt256p);
 			OnProgress(std::string("SHA3Test: Passed SHA3-256 parallel tests.."));
 
 			Parallel(dgt512p);
 			OnProgress(std::string("SHA3Test: Passed SHA3-512 parallel tests.."));
 
-			Parallel(dgt1024p);
-			OnProgress(std::string("SHA3Test: Passed Keccak-1024 parallel tests.."));
-
 			delete dgt256p;
 			delete dgt512p;
-			delete dgt1024p;
 
 			TreeParams();
 			OnProgress(std::string("SHA3Test: Passed KeccakParams parameter serialization test.."));
@@ -156,14 +136,14 @@ namespace Test
 
 	void SHA3Test::Ancillary()
 	{
-		std::array<ulong, 25> state = { 0 };
-		std::vector<byte> otp(0);
+		std::array<uint64_t, 25> state = { 0 };
+		std::vector<uint8_t> otp(0);
 
 		// SHA3-256
-		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Clear(state, 0, state.size() * sizeof(uint64_t));
 		otp.resize(Keccak::KECCAK256_RATE_SIZE);
-		Keccak::AbsorbR24(m_message[3], 0, m_message[3].size(), Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, state);
-		Keccak::SqueezeR24(state, otp, 0, 1, Keccak::KECCAK256_RATE_SIZE);
+		Keccak::Absorb(m_message[3], 0, m_message[3].size(), Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, state);
+		Keccak::Squeeze(state, otp, 0, 1, Keccak::KECCAK256_RATE_SIZE);
 
 		if (IntegerTools::Compare(m_expected[3], 0, otp, 0, Keccak::KECCAK256_DIGEST_SIZE) == false)
 		{
@@ -171,27 +151,15 @@ namespace Test
 		}
 
 		// SHA3-512
-		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Clear(state, 0, state.size() * sizeof(uint64_t));
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(Keccak::KECCAK512_RATE_SIZE);
-		Keccak::AbsorbR24(m_message[3], 0, m_message[3].size(), Keccak::KECCAK512_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, state);
-		Keccak::SqueezeR24(state, otp, 0, 1, Keccak::KECCAK512_RATE_SIZE);
+		Keccak::Absorb(m_message[3], 0, m_message[3].size(), Keccak::KECCAK512_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, state);
+		Keccak::Squeeze(state, otp, 0, 1, Keccak::KECCAK512_RATE_SIZE);
 
 		if (IntegerTools::Compare(m_expected[7], 0, otp, 0, Keccak::KECCAK512_DIGEST_SIZE) == false)
 		{
 			throw TestException(std::string("Exception"), std::string("SHA3-512"), std::string("Exception handling failure! -SA3"));
-		}
-
-		// SHA3-1024
-		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
-		MemoryTools::Clear(otp, 0, otp.size());
-		otp.resize(Keccak::KECCAK1024_RATE_SIZE * 4);
-		Keccak::AbsorbR48(m_message[3], 0, m_message[3].size(), Keccak::KECCAK1024_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, state);
-		Keccak::SqueezeR48(state, otp, 0, 4, Keccak::KECCAK1024_RATE_SIZE);
-
-		if (IntegerTools::Compare(m_expected[11], 0, otp, 0, Keccak::KECCAK1024_DIGEST_SIZE) == false)
-		{
-			throw TestException(std::string("Exception"), std::string("SHA3-1024"), std::string("Exception handling failure! -SA4"));
 		}
 	}
 
@@ -222,23 +190,6 @@ namespace Test
 			SHA3512 dgt(params);
 
 			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -KE2"));
-		}
-		catch (CryptoDigestException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
-		// test params constructor SHA31024
-		try
-		{
-			// invalid fan out -99
-			KeccakParams params(128, 128, 99);
-			SHA31024 dgt(params);
-
-			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -KE3"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -281,28 +232,11 @@ namespace Test
 		{
 			throw;
 		}
-
-		// test parallel max-degree SHA31024
-		try
-		{
-			SHA31024 dgt;
-			// set max degree to invalid -99
-			dgt.ParallelMaxDegree(99);
-
-			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -KE6"));
-		}
-		catch (CryptoDigestException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
 	}
 
-	void SHA3Test::Kat(IDigest* Digest, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void SHA3Test::Kat(IDigest* Digest, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> otp(Digest->DigestSize());
+		std::vector<uint8_t> otp(Digest->DigestSize());
 
 		Digest->Update(Message, 0, Message.size());
 		Digest->Finalize(otp, 0);
@@ -319,8 +253,8 @@ namespace Test
 		const size_t MAXSMP = 16384;
 		const size_t PRLLEN = Digest->ParallelProfile().ParallelBlockSize();
 		const size_t PRLDGR = Digest->ParallelProfile().ParallelMaxDegree();
-		std::vector<byte> msg;
-		std::vector<byte> code(Digest->DigestSize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> code(Digest->DigestSize());
 		Prng::SecureRandom rnd;
 		bool reduce;
 
@@ -360,14 +294,14 @@ namespace Test
 
 	void SHA3Test::PermutationR24()
 	{
-		std::array<ulong, 25> state1;
-		std::array<ulong, 25> state2;
+		std::array<uint64_t, 25> state1;
+		std::array<uint64_t, 25> state2;
 
-		MemoryTools::Clear(state1, 0, 25 * sizeof(ulong));
-		MemoryTools::Clear(state2, 0, 25 * sizeof(ulong));
+		MemoryTools::Clear(state1, 0, 25 * sizeof(uint64_t));
+		MemoryTools::Clear(state2, 0, 25 * sizeof(uint64_t));
 
 		Keccak::PermuteR24P1600U(state1);
-		Keccak::PermuteR24P1600C(state2);
+		Keccak::Permute(state2);
 
 		if (state1 != state2)
 		{
@@ -380,8 +314,8 @@ namespace Test
 
 		Keccak::PermuteR24P8x1600H(state512);
 
-		std::vector<ulong> state512ull(200);
-		std::memcpy(state512ull.data(), state512.data(), 200 * sizeof(ulong));
+		std::vector<uint64_t> state512ull(200);
+		std::memcpy(state512ull.data(), state512.data(), 200 * sizeof(uint64_t));
 
 		for (size_t i = 0; i < 25; ++i)
 		{
@@ -397,8 +331,8 @@ namespace Test
 
 		Keccak::PermuteR24P4x1600H(state256);
 
-		std::vector<ulong> state256ull(100);
-		std::memcpy(state256ull.data(), state256.data(), 100 * sizeof(ulong));
+		std::vector<uint64_t> state256ull(100);
+		std::memcpy(state256ull.data(), state256.data(), 100 * sizeof(uint64_t));
 
 		for (size_t i = 0; i < 25; ++i)
 		{
@@ -413,14 +347,14 @@ namespace Test
 
 	void SHA3Test::PermutationR48()
 	{
-		std::array<ulong, 25> state1;
-		std::array<ulong, 25> state2;
+		std::array<uint64_t, 25> state1;
+		std::array<uint64_t, 25> state2;
 
-		MemoryTools::Clear(state1, 0, 25 * sizeof(ulong));
-		MemoryTools::Clear(state2, 0, 25 * sizeof(ulong));
+		MemoryTools::Clear(state1, 0, 25 * sizeof(uint64_t));
+		MemoryTools::Clear(state2, 0, 25 * sizeof(uint64_t));
 
 		Keccak::PermuteR48P1600U(state1);
-		Keccak::PermuteR48P1600C(state2);
+		Keccak::Permute(state2, Keccak::PermutationRounds::RX48);
 
 		if (state1 != state2)
 		{
@@ -433,8 +367,8 @@ namespace Test
 
 		Keccak::PermuteR48P8x1600H(state512);
 
-		std::vector<ulong> state512ull(200);
-		MemoryTools::Copy(state512, 0, state512ull, 0, 200 * sizeof(ulong));
+		std::vector<uint64_t> state512ull(200);
+		MemoryTools::Copy(state512, 0, state512ull, 0, 200 * sizeof(uint64_t));
 
 		for (size_t i = 0; i < 25; ++i)
 		{
@@ -450,8 +384,8 @@ namespace Test
 
 		Keccak::PermuteR48P4x1600H(state256);
 
-		std::vector<ulong> state256ull(100);
-		MemoryTools::Copy(state256, 0, state256ull, 0, 100 * sizeof(ulong));
+		std::vector<uint64_t> state256ull(100);
+		MemoryTools::Copy(state256, 0, state256ull, 0, 100 * sizeof(uint64_t));
 
 		for (size_t i = 0; i < 25; ++i)
 		{
@@ -466,12 +400,12 @@ namespace Test
 
 	void SHA3Test::Stress(IDigest* Digest)
 	{
-		const uint MINPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize());
-		const uint MAXPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize() * 4);
+		const uint32_t MINPRL = static_cast<uint32_t>(Digest->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXPRL = static_cast<uint32_t>(Digest->ParallelProfile().ParallelBlockSize() * 4);
 
-		std::vector<byte> code1(Digest->DigestSize());
-		std::vector<byte> code2(Digest->DigestSize());
-		std::vector<byte> msg;
+		std::vector<uint8_t> code1(Digest->DigestSize());
+		std::vector<uint8_t> code2(Digest->DigestSize());
+		std::vector<uint8_t> msg;
 		SecureRandom rnd;
 		size_t i;
 
@@ -505,11 +439,11 @@ namespace Test
 
 	void SHA3Test::TreeParams()
 	{
-		std::vector<byte> code1(8, 7);
+		std::vector<uint8_t> code1(8, 7);
 
 		KeccakParams tree1(32, 32, 8);
 		tree1.DistributionCode() = code1;
-		std::vector<byte> tres = tree1.ToBytes();
+		std::vector<uint8_t> tres = tree1.ToBytes();
 		KeccakParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
@@ -517,7 +451,7 @@ namespace Test
 			throw TestException(std::string("TreeParams"), std::string("KeccakParams"), std::string("Tree parameters test failed! -KT1"));
 		}
 
-		std::vector<byte> code2(20, 7);
+		std::vector<uint8_t> code2(20, 7);
 		KeccakParams tree3(0, 64, 1, 128, 8, 1, code2);
 		tres = tree3.ToBytes();
 		KeccakParams tree4(tres);

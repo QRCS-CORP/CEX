@@ -15,8 +15,8 @@ namespace Test
 	{
 	public:
 
-		std::vector<byte> Key;
-		std::vector<byte> Nonce;
+		std::vector<uint8_t> Key;
+		std::vector<uint8_t> Nonce;
 		size_t ReseedCounter;
 
 		NistRngState()
@@ -71,7 +71,7 @@ namespace Test
 		return CLASSNAME;
 	}
 
-	void NistRng::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
+	void NistRng::Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length)
 	{
 		if (m_nistRngState->ReseedCounter == 0)
 		{
@@ -80,10 +80,10 @@ namespace Test
 
 		if (m_nistRngState->ReseedCounter > RNG_MAX_RESEED)
 		{
-			throw CryptoRandomException(std::string("NistRng"), std::string("Generate"), std::string("The prng has exceeded maximum reseed count!"), ErrorCodes::NotInitialized);
+			throw CryptoRandomException(std::string("NistRng"), std::string("Generate"), std::string("The prng has exceeded maximum reseed count!"), ErrorCodes::MaxExceeded);
 		}
 
-		std::vector<byte> blk(m_rngGenerator->BlockSize());
+		std::vector<uint8_t> blk(m_rngGenerator->BlockSize());
 		SymmetricKey kp(m_nistRngState->Key);
 
 		// key the cipher
@@ -103,40 +103,40 @@ namespace Test
 			Offset += RMDLEN;
 		}
 
-		std::vector<byte> zero(0);
+		std::vector<uint8_t> zero(0);
 		Update(zero, m_nistRngState->Key, m_nistRngState->Nonce);
 		++m_nistRngState->ReseedCounter;
 	}
 
-	void NistRng::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
+	void NistRng::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length)
 	{
-		std::vector<byte> tmpo(Length);
+		std::vector<uint8_t> tmpo(Length);
 		Generate(tmpo, 0, tmpo.size());
 		SecureMove(tmpo, Output, Offset);
 	}
 
-	void NistRng::Generate(std::vector<byte> &Output)
+	void NistRng::Generate(std::vector<uint8_t> &Output)
 	{
 		Generate(Output, 0, Output.size());
 	}
 
-	void NistRng::Generate(SecureVector<byte> &Output)
+	void NistRng::Generate(SecureVector<uint8_t> &Output)
 	{
-		std::vector<byte> tmpo(Output.size());
+		std::vector<uint8_t> tmpo(Output.size());
 		Generate(tmpo, 0, tmpo.size());
 		SecureMove(tmpo, Output, 0);
 	}
 
-	void NistRng::Initialize(const std::vector<byte> &Seed)
+	void NistRng::Initialize(const std::vector<uint8_t> &Seed)
 	{
 		m_nistRngState->Reset();
 		Update(Seed, m_nistRngState->Key, m_nistRngState->Nonce);
 		m_nistRngState->ReseedCounter = 1;
 	}
 
-	void NistRng::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Info)
+	void NistRng::Initialize(const std::vector<uint8_t> &Seed, const std::vector<uint8_t> &Info)
 	{
-		std::vector<byte> tmps(Seed.size());
+		std::vector<uint8_t> tmps(Seed.size());
 
 		MemoryTools::Copy(Seed, 0, tmps, 0, Seed.size());
 
@@ -151,40 +151,40 @@ namespace Test
 		m_nistRngState->ReseedCounter = 1;
 	}
 
-	ushort NistRng::NextUInt16()
+	uint16_t NistRng::NextUInt16()
 	{
-		ushort x;
-		std::vector<byte> smp(sizeof(ushort));
+		uint16_t x;
+		std::vector<uint8_t> smp(sizeof(uint16_t));
 
 		x = 0;
 		Generate(smp);
-		MemoryTools::CopyToValue(smp, 0, x, sizeof(ushort));
+		MemoryTools::CopyToValue(smp, 0, x, sizeof(uint16_t));
 		MemoryTools::Clear(smp, 0, smp.size());
 
 		return x;
 	}
 
-	uint NistRng::NextUInt32()
+	uint32_t NistRng::NextUInt32()
 	{
-		uint x;
-		std::vector<byte> smp(sizeof(uint));
+		uint32_t x;
+		std::vector<uint8_t> smp(sizeof(uint32_t));
 
 		x = 0;
 		Generate(smp);
-		MemoryTools::CopyToValue(smp, 0, x, sizeof(uint));
+		MemoryTools::CopyToValue(smp, 0, x, sizeof(uint32_t));
 		MemoryTools::Clear(smp, 0, smp.size());
 
 		return x;
 	}
 
-	ulong NistRng::NextUInt64()
+	uint64_t NistRng::NextUInt64()
 	{
-		ulong x;
-		std::vector<byte> smp(sizeof(ulong));
+		uint64_t x;
+		std::vector<uint8_t> smp(sizeof(uint64_t));
 
 		x = 0;
 		Generate(smp);
-		MemoryTools::CopyToValue(smp, 0, x, sizeof(ulong));
+		MemoryTools::CopyToValue(smp, 0, x, sizeof(uint64_t));
 		MemoryTools::Clear(smp, 0, smp.size());
 
 		return x;
@@ -192,16 +192,16 @@ namespace Test
 
 	void NistRng::Reset()
 	{
-		std::vector<byte> seed(RNG_SEED_SIZE);
+		std::vector<uint8_t> seed(RNG_SEED_SIZE);
 		Provider::CSP pvd;
 
 		pvd.Generate(seed);
 		Update(seed, m_nistRngState->Key, m_nistRngState->Nonce);
 	}
 
-	void NistRng::Update(const std::vector<byte> &Seed, std::vector<byte> &Key, std::vector<byte> &Nonce)
+	void NistRng::Update(const std::vector<uint8_t> &Seed, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce)
 	{
-		std::vector<byte> tmps(RNG_SEED_SIZE);
+		std::vector<uint8_t> tmps(RNG_SEED_SIZE);
 		size_t i;
 
 		// key the cipher

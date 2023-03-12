@@ -83,7 +83,7 @@ public:
 	/// <summary>
 	/// Read Only: The maximum number of bytes that can be generated with a generator instance
 	/// </summary>
-	virtual const ulong MaxOutputSize() = 0;
+	virtual const uint64_t MaxOutputSize() = 0;
 
 	/// <summary>
 	/// Read Only: The maximum number of bytes that can be generated in a single request
@@ -120,7 +120,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	virtual void Generate(std::vector<byte> &Output) = 0;
+	virtual void Generate(std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes
@@ -130,7 +130,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	virtual void Generate(SecureVector<byte> &Output) = 0;
+	virtual void Generate(SecureVector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
@@ -142,7 +142,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	virtual void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
+	virtual void Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) = 0;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes using offset and length parameters
@@ -154,7 +154,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	virtual void Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length) = 0;
+	virtual void Generate(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length) = 0;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey structure containing the key and optional salt (Nonce) and info string (Info)
@@ -172,7 +172,7 @@ public:
 	/// <param name="Key">The new seed value array</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
-	virtual void Update(const std::vector<byte> &Key) = 0;
+	virtual void Update(const std::vector<uint8_t> &Key) = 0;
 
 	/// <summary>
 	/// Update the generators keying material with a secure-vector key
@@ -181,7 +181,7 @@ public:
 	/// <param name="Key">The secure-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
-	virtual void Update(const SecureVector<byte> &Key) = 0;
+	virtual void Update(const SecureVector<uint8_t> &Key) = 0;
 
 };
 

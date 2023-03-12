@@ -48,7 +48,7 @@ using Enumeration::SocketShutdownFlags;
 typedef struct ipv4_info
 {
 	ipv4_address address;
-	ushort port;
+	uint16_t port;
 	uint8_t mask;
 } ipv4_info;
 
@@ -58,7 +58,7 @@ typedef struct ipv4_info
 typedef struct ipv6_info
 {
 	ipv6_address address;
-	ushort port;
+	uint16_t port;
 	uint8_t mask;
 } ipv6_info;
 
@@ -118,7 +118,7 @@ public:
 	/// <param name="Port">The service port number</param>
 	///
 	/// <returns>Returns true if the binding was successful</returns>
-	static bool Bind(Socket &Source, const ipv4_address &Address, ushort Port);
+	static bool Bind(Socket &Source, const ipv4_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// The Bind function associates an address with a socket
@@ -129,7 +129,7 @@ public:
 	/// <param name="Port">The service port number</param>
 	///
 	/// <returns>Returns true if the binding was successful</returns>
-	static bool Bind(Socket &Source, const ipv6_address &Address, ushort Port);
+	static bool Bind(Socket &Source, const ipv6_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// The CloseSocket function closes and disposes of the socket
@@ -149,7 +149,7 @@ public:
 	/// <param name="Port">The remote hosts service port number</param>
 	///
 	/// <returns>Returns true if the connection was successful</returns>
-	static bool Connect(Socket &Source, const ipv4_address &Address, ushort Port);
+	static bool Connect(Socket &Source, const ipv4_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// The Connect function establishes a connection to a remote host using IPv6 addressing
@@ -160,7 +160,7 @@ public:
 	/// <param name="Port">The remote hosts service port number</param>
 	///
 	/// <returns>Returns true if the connection was successful</returns>
-	static bool Connect(Socket &Source, const ipv6_address &Address, ushort Port);
+	static bool Connect(Socket &Source, const ipv6_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// The Create function creates a socket that is bound to a specific transport provider
@@ -177,7 +177,7 @@ public:
 	/// 
 	/// <param name="Source">The source socket instance</param>
 	/// <param name="BackLog">The maximum pending connections queue length</param>
-	static bool Listen(Socket &Source, int BackLog = SOCKET_MAX_CONN);
+	static bool Listen(Socket &Source, int32_t BackLog = SOCKET_MAX_CONN);
 
 	/// <summary>
 	/// Receive data from a synchronous connected socket or a bound connectionless socket
@@ -190,7 +190,7 @@ public:
 	/// <returns>The number of bytes received from the remote host</returns>
 	///
 	/// <exception cref="CryptoSocketException">Thrown if the socket returns an error</exception>
-	static uint Receive(Socket &Source, std::vector<byte> &Output, SocketReceiveFlags Flags);
+	static uint32_t Receive(Socket &Source, std::vector<uint8_t> &Output, SocketReceiveFlags Flags);
 
 	/// <summary>
 	/// Sends data on a connected socket
@@ -204,7 +204,7 @@ public:
 	/// <returns>The number of bytes sent to the remote host</returns>
 	///
 	/// <exception cref="CryptoSocketException">Thrown if the socket returns an error</exception>
-	static uint Send(Socket &Source, const std::vector<byte> &Input, size_t Length, SocketSendFlags Flags);
+	static uint32_t Send(Socket &Source, const std::vector<uint8_t> &Input, size_t Length, SocketSendFlags Flags);
 
 	/// <summary>
 	/// Tests the socket to see if it is ready to send data
@@ -234,7 +234,7 @@ public:
 	/// <param name="Arguments">The command arguments</param>
 	///
 	/// <remarks>Successful completion raises the SocketChanged event with the SocketEvents::Success flag</remarks>
-	static void IOCtl(Socket &Source, long Command, ulong* Arguments);
+	static void IOCtl(Socket &Source, int64_t Command, uint64_t* Arguments);
 
 	/// <summary>
 	/// Determines the status of a socket waiting for a synchronous connection
@@ -261,7 +261,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="ErrorCode">The error code</param>
-	static void SetLastError(int ErrorCode);
+	static void SetLastError(int32_t ErrorCode);
 
 	/// <summary>
 	/// Shut down the sockets library

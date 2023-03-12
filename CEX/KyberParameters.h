@@ -9,24 +9,24 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The Kyber parameter sets enumeration
 /// </summary>
-enum class KyberParameters : byte
+enum class KyberParameters : uint8_t
 {
 	/// <summary>
 	/// No parameter set is specified
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The S1 parameters; (Medium Security) A modulus of 3329 with 256 coefficients and K of 2
+	/// The S3 parameters; (Medium Security) A modulus of 3329 with 256 coefficients and K of 2
 	/// </summary>
-	MLWES1Q3329N256 = static_cast<byte>(AsymmetricParameters::MLWES1Q3329N256),
+	KYBERS32400 = static_cast<uint8_t>(AsymmetricParameters::KYBERS32400),
 	/// <summary>
-	/// The S2 parameters; (High Security) A modulus of 3329 with 256 coefficients and K of 3
+	/// The S5 parameters; (High Security) A modulus of 3329 with 256 coefficients and K of 3
 	/// </summary>
-	MLWES2Q3329N256 = static_cast<byte>(AsymmetricParameters::MLWES2Q3329N256),
+	KYBERS53168 = static_cast<uint8_t>(AsymmetricParameters::KYBERS53168),
 	/// <summary>
-	/// The S3 parameters; (Highest Security) A modulus of 3329 with 256 coefficients and K of 4
+	/// The S6 parameters; (Highest Security) A modulus of 3329 with 256 coefficients and K of 4
 	/// </summary>
-	MLWES3Q3329N256 = static_cast<byte>(AsymmetricParameters::MLWES3Q3329N256)
+	KYBERS63936 = static_cast<uint8_t>(AsymmetricParameters::KYBERS63936)
 };
 
 class KyberParameterConvert

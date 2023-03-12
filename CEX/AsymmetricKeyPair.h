@@ -16,7 +16,7 @@ private:
 
 	AsymmetricKey* m_privateKey;
 	AsymmetricKey* m_publicKey;
-	std::vector<byte> m_keyTag;
+	std::vector<uint8_t> m_keyTag;
 
 public:
 
@@ -52,7 +52,7 @@ public:
 	/// <param name="PrivateKey">The private asymmetric key</param>
 	/// <param name="PublicKey">The public asymmetric key</param>
 	/// <param name="Tag">The key-pairs identification tag</param>
-	AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey, std::vector<byte> &Tag);
+	AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey, std::vector<uint8_t> &Tag);
 
 	/// <summary>
 	/// Destructor: finalize this class.
@@ -77,7 +77,7 @@ public:
 	/// <summary>
 	/// Read/Write: An optional key-pair identification tag
 	/// </summary>
-	std::vector<byte> &Tag();
+	std::vector<uint8_t> &Tag();
 
 	/// <summary>
 	/// Clear all internal state, including the key-pair tag and public and private keys

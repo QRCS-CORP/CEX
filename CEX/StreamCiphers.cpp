@@ -49,10 +49,6 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 			{
 				name = StreamCiphers::RCSK512;
 			}
-			else if (Authenticator == StreamAuthenticators::KMAC1024)
-			{
-				name = StreamCiphers::RCSK1024;
-			}
 			else
 			{
 				name = StreamCiphers::RCS;
@@ -68,10 +64,6 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 			else if (Authenticator == StreamAuthenticators::KMAC512)
 			{
 				name = StreamCiphers::RWSK512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC1024)
-			{
-				name = StreamCiphers::RWSK1024;
 			}
 			else
 			{
@@ -105,9 +97,9 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 		}
 		case StreamCiphers::TSX1024:
 		{
-			if (Authenticator == StreamAuthenticators::KMAC1024)
+			if (Authenticator == StreamAuthenticators::KMAC512)
 			{
-				name = StreamCiphers::TSXR120K1024;
+				name = StreamCiphers::TSXR120K512;
 			}
 			else
 			{

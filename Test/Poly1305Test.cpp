@@ -110,7 +110,7 @@ namespace Test
 		// test initialization key input-size
 		try
 		{
-			std::vector<byte> key(ks.KeySize() - 1);
+			std::vector<uint8_t> key(ks.KeySize() - 1);
 			SymmetricKey k(key);
 
 			gen.Initialize(k);
@@ -128,8 +128,8 @@ namespace Test
 		// test initialization check -1
 		try
 		{
-			std::vector<byte> code(16);
-			std::vector<byte> msg(1);
+			std::vector<uint8_t> code(16);
+			std::vector<uint8_t> msg(1);
 
 			gen.Compute(msg, code);
 
@@ -146,8 +146,8 @@ namespace Test
 		// test initialization check -2
 		try
 		{
-			std::vector<byte> code(16);
-			std::vector<byte> msg(1);
+			std::vector<uint8_t> code(16);
+			std::vector<uint8_t> msg(1);
 
 			gen.Finalize(code, 0);
 
@@ -164,9 +164,9 @@ namespace Test
 		// output size check -1
 		try
 		{
-			std::vector<byte> code(gen.TagSize() - 1);
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> msg(1);
+			std::vector<uint8_t> code(gen.TagSize() - 1);
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> msg(1);
 			SymmetricKey kp(key);
 
 			gen.Initialize(kp);
@@ -185,9 +185,9 @@ namespace Test
 		// output size check -2
 		try
 		{
-			std::vector<byte> code(gen.TagSize() - 1);
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> msg(1);
+			std::vector<uint8_t> code(gen.TagSize() - 1);
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> msg(1);
 			SymmetricKey kp(key);
 
 			gen.Initialize(kp);
@@ -305,9 +305,9 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void Poly1305Test::Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void Poly1305Test::Kat(IMac* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> code(Generator->TagSize());
+		std::vector<uint8_t> code(Generator->TagSize());
 		SymmetricKey kp(Key);
 
 		Generator->Initialize(kp);
@@ -328,10 +328,10 @@ namespace Test
 	void Poly1305Test::Params(IMac* Generator)
 	{
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> msg;
-		std::vector<byte> otp1(Generator->TagSize());
-		std::vector<byte> otp2(Generator->TagSize());
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> otp1(Generator->TagSize());
+		std::vector<uint8_t> otp2(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -361,13 +361,13 @@ namespace Test
 
 	void Poly1305Test::Stress(IMac* Generator)
 	{
-		const uint MINMSG = 1;
-		const uint MAXMSG = 16384;
+		const uint32_t MINMSG = 1;
+		const uint32_t MAXMSG = 16384;
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
-		std::vector<byte> code1(Generator->TagSize());
-		std::vector<byte> code2(Generator->TagSize());
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> msg;
+		std::vector<uint8_t> code1(Generator->TagSize());
+		std::vector<uint8_t> code2(Generator->TagSize());
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> msg;
 		SecureRandom rnd;
 		size_t i;
 

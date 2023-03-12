@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Cryptographic strength security policy
 /// </summary>
-enum class SecurityPolicy : byte
+enum class SecurityPolicy : uint8_t
 {
 	/// <summary>
 	/// No policy is specified

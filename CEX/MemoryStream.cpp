@@ -35,7 +35,7 @@ MemoryStream::MemoryStream(size_t Length)
 	m_streamData.reserve(Length);
 }
 
-MemoryStream::MemoryStream(const std::vector<byte> &Data)
+MemoryStream::MemoryStream(const std::vector<uint8_t> &Data)
 	:
 	m_isDestroyed(false),
 	m_streamData(Data),
@@ -43,7 +43,7 @@ MemoryStream::MemoryStream(const std::vector<byte> &Data)
 {
 }
 
-MemoryStream::MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t Length)
+MemoryStream::MemoryStream(const std::vector<uint8_t> &Data, size_t Offset, size_t Length)
 	:
 	m_isDestroyed(false),
 	m_streamData(0),
@@ -87,17 +87,17 @@ const std::string MemoryStream::Name()
 	return CLASS_NAME;
 }
 
-const ulong MemoryStream::Length()
+const uint64_t MemoryStream::Length()
 {
-	return static_cast<ulong>(m_streamData.size()); 
+	return static_cast<uint64_t>(m_streamData.size()); 
 }
 
-const ulong MemoryStream::Position() 
+const uint64_t MemoryStream::Position() 
 { 
 	return m_streamPosition;
 }
 
-std::vector<byte> &MemoryStream::ToArray() 
+std::vector<uint8_t> &MemoryStream::ToArray() 
 { 
 	return m_streamData;
 }
@@ -125,7 +125,7 @@ void MemoryStream::Destroy()
 	}
 }
 
-size_t MemoryStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
+size_t MemoryStream::Read(std::vector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (Offset + Length > m_streamData.size() - m_streamPosition)
 	{
@@ -141,10 +141,10 @@ size_t MemoryStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 	return Length;
 }
 
-byte MemoryStream::ReadByte()
+uint8_t MemoryStream::ReadByte()
 {
 	CEXASSERT(m_streamData.size() - m_streamPosition >= 1, "Stream length exceeded");
-	byte data = 0;
+	uint8_t data = 0;
 	MemoryTools::CopyToValue(m_streamData, m_streamPosition, data, 1);
 	m_streamPosition += 1;
 
@@ -158,7 +158,7 @@ void MemoryStream::Reset()
 	m_streamPosition = 0;
 }
 
-void MemoryStream::Seek(ulong Offset, SeekOrigin Origin)
+void MemoryStream::Seek(uint64_t Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
 	{
@@ -174,12 +174,12 @@ void MemoryStream::Seek(ulong Offset, SeekOrigin Origin)
 	}
 }
 
-void MemoryStream::SetLength(ulong Length)
+void MemoryStream::SetLength(uint64_t Length)
 {
 	m_streamData.reserve(Length);
 }
 
-void MemoryStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
+void MemoryStream::Write(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	CEXASSERT(Offset + Length <= Input.size(), "Input stream length exceeded");
 
@@ -198,7 +198,7 @@ void MemoryStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 	m_streamPosition += Length;
 }
 
-void MemoryStream::WriteByte(byte Value)
+void MemoryStream::WriteByte(uint8_t Value)
 {
 	if (m_streamData.size() - m_streamPosition < 1)
 	{

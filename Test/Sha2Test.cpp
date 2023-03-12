@@ -142,7 +142,7 @@ namespace Test
 
 	void SHA2Test::Ancillary()
 	{
-		std::vector<byte> otp(0);
+		std::vector<uint8_t> otp(0);
 
 		// SHA2-256
 
@@ -318,9 +318,9 @@ namespace Test
 		}
 	}
 
-	void SHA2Test::Kat(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void SHA2Test::Kat(IDigest* Digest, std::vector<uint8_t> &Input, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> code(Digest->DigestSize(), 0);
+		std::vector<uint8_t> code(Digest->DigestSize(), 0);
 
 		Digest->Update(Input, 0, Input.size());
 		Digest->Finalize(code, 0);
@@ -346,8 +346,8 @@ namespace Test
 		const size_t MAXSMP = 16384;
 		const size_t PRLLEN = Digest->ParallelProfile().ParallelBlockSize();
 		const size_t PRLDGR = Digest->ParallelProfile().ParallelMaxDegree();
-		std::vector<byte> msg;
-		std::vector<byte> code(Digest->DigestSize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> code(Digest->DigestSize());
 		Prng::SecureRandom rnd;
 		bool reduce;
 
@@ -387,12 +387,12 @@ namespace Test
 
 	void SHA2Test::PermutationR64()
 	{
-		std::vector<byte> input(64, 128U);
-		std::array<uint, 8> state1;
-		std::array<uint, 8> state2;
+		std::vector<uint8_t> input(64, 128U);
+		std::array<uint32_t, 8> state1;
+		std::array<uint32_t, 8> state2;
 
-		MemoryTools::Clear(state1, 0, 8 * sizeof(uint));
-		MemoryTools::Clear(state2, 0, 8 * sizeof(uint));
+		MemoryTools::Clear(state1, 0, 8 * sizeof(uint32_t));
+		MemoryTools::Clear(state2, 0, 8 * sizeof(uint32_t));
 
 		SHA2::PermuteR64P512C(input, 0, state1);
 		SHA2::PermuteR64P512U(input, 0, state2);
@@ -404,13 +404,13 @@ namespace Test
 
 #if defined(__AVX512__)
 
-		std::vector<byte> input512(1024, 128U);
+		std::vector<uint8_t> input512(1024, 128U);
 		std::vector<UInt512> state512(8, UInt512(0));
 
 		SHA2::PermuteR64P16x512H(input512, 0, state512);
 
-		std::vector<uint> state512ul(64);
-		std::memcpy(state512ul.data(), state512.data(), 64 * sizeof(uint));
+		std::vector<uint32_t> state512ul(64);
+		std::memcpy(state512ul.data(), state512.data(), 64 * sizeof(uint32_t));
 
 		for (size_t i = 0; i < 64; ++i)
 		{
@@ -422,13 +422,13 @@ namespace Test
 
 #elif defined(__AVX2__)
 
-		std::vector<byte> input256(512, 128U);
+		std::vector<uint8_t> input256(512, 128U);
 		std::vector<UInt256> state256(8, UInt256(0));
 
 		SHA2::PermuteR64P8x512H(input256, 0, state256);
 
-		std::vector<uint> state256ul(32);
-		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
+		std::vector<uint32_t> state256ul(32);
+		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint32_t));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
@@ -443,12 +443,12 @@ namespace Test
 
 	void SHA2Test::PermutationR80()
 	{
-		std::vector<byte> input(128, 128U);
-		std::array<ulong, 8> state1;
-		std::array<ulong, 8> state2;
+		std::vector<uint8_t> input(128, 128U);
+		std::array<uint64_t, 8> state1;
+		std::array<uint64_t, 8> state2;
 
-		std::memset(state1.data(), 0, 8 * sizeof(ulong));
-		std::memset(state2.data(), 0, 8 * sizeof(ulong));
+		std::memset(state1.data(), 0, 8 * sizeof(uint64_t));
+		std::memset(state2.data(), 0, 8 * sizeof(uint64_t));
 
 		SHA2::PermuteR80P1024C(input, 0, state1);
 		SHA2::PermuteR80P1024U(input, 0, state2);
@@ -460,13 +460,13 @@ namespace Test
 
 #if defined(__AVX512__)
 
-		std::vector<byte> input512(1024, 128U);
+		std::vector<uint8_t> input512(1024, 128U);
 		std::vector<ULong512> state512(8, ULong512(0));
 
 		SHA2::PermuteR80P8x1024H(input512, 0, state512);
 
-		std::vector<ulong> state512ull(64);
-		MemoryTools::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));
+		std::vector<uint64_t> state512ull(64);
+		MemoryTools::Copy(state512, 0, state512ull, 0, 64 * sizeof(uint64_t));
 
 		for (size_t i = 0; i < 64; ++i)
 		{
@@ -478,13 +478,13 @@ namespace Test
 
 #elif defined(__AVX2__)
 
-		std::vector<byte> input256(512, 128U);
+		std::vector<uint8_t> input256(512, 128U);
 		std::vector<ULong256> state256(8, ULong256(0));
 
 		SHA2::PermuteR80P4x1024H(input256, 0, state256);
 
-		std::vector<ulong> state256ull(32);
-		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
+		std::vector<uint64_t> state256ull(32);
+		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(uint64_t));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
@@ -499,12 +499,12 @@ namespace Test
 
 	void SHA2Test::Stress(IDigest* Digest)
 	{
-		const uint MINPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize());
-		const uint MAXPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize() * 4);
+		const uint32_t MINPRL = static_cast<uint32_t>(Digest->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXPRL = static_cast<uint32_t>(Digest->ParallelProfile().ParallelBlockSize() * 4);
 
-		std::vector<byte> code1(Digest->DigestSize());
-		std::vector<byte> code2(Digest->DigestSize());
-		std::vector<byte> msg;
+		std::vector<uint8_t> code1(Digest->DigestSize());
+		std::vector<uint8_t> code2(Digest->DigestSize());
+		std::vector<uint8_t> msg;
 		SecureRandom rnd;
 		size_t i;
 
@@ -538,11 +538,11 @@ namespace Test
 
 	void SHA2Test::TreeParams()
 	{
-		std::vector<byte> code1(8, 7);
+		std::vector<uint8_t> code1(8, 7);
 
 		SHA2Params tree1(32, 32, 8);
 		tree1.DistributionCode() = code1;
-		std::vector<byte> tres = tree1.ToBytes();
+		std::vector<uint8_t> tres = tree1.ToBytes();
 		SHA2Params tree2(tres);
 
 		if (!tree1.Equals(tree2))
@@ -550,7 +550,7 @@ namespace Test
 			throw TestException(std::string("TreeParams"), std::string("SHA2Params"), std::string("Tree parameters test failed! -ST1"));
 		}
 
-		std::vector<byte> code2(20, 7);
+		std::vector<uint8_t> code2(20, 7);
 		SHA2Params tree3(0, 64, 1, 128, 8, 1, code2);
 		tres = tree3.ToBytes();
 		SHA2Params tree4(tres);

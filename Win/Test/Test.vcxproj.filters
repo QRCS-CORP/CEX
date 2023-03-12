@@ -109,12 +109,6 @@
     <Filter Include="Header Files\Test\PrngTest\DiehardResults\100MB">
       <UniqueIdentifier>{3b74ae82-ab25-4665-a517-7d790ec73df6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Test\KmsTest">
-      <UniqueIdentifier>{f38a2fe3-814c-4109-a20c-424c1d23982b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Test\KmsTest">
-      <UniqueIdentifier>{62f9e2d6-2c6e-4695-bdc9-f218ce18b583}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Vectors\AESAVS">
       <UniqueIdentifier>{7fc2e197-1b32-48a5-b194-851322f0b7f3}</UniqueIdentifier>
     </Filter>
@@ -407,29 +401,14 @@
     <ClInclude Include="..\..\Test\XMSSTest.h">
       <Filter>Header Files\Test\Asymmetric\Sign</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\RainbowTest.h">
-      <Filter>Header Files\Test\Asymmetric\Sign</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\KyberTest.h">
-      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\NewHopeTest.h">
       <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\SphincsPlusTest.h">
       <Filter>Header Files\Test\Asymmetric\Sign</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\NTRUPrimeTest.h">
-      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\HKDFTest.h">
       <Filter>Header Files\Test\KdfTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\HKDSTest.h">
-      <Filter>Header Files\Test\KmsTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\DUKPTTest.h">
-      <Filter>Header Files\Test\KmsTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\RWSTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
@@ -451,6 +430,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\KPATest.h">
       <Filter>Header Files\Test\MacTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\NistPqParser.h">
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -625,26 +607,11 @@
     <ClCompile Include="..\..\Test\XMSSTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Sign</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\RainbowTest.cpp">
-      <Filter>Source Files\Test\Asymmetric\Sign</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\KyberTest.cpp">
-      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\NewHopeTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\SphincsPlusTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Sign</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\NTRUPrimeTest.cpp">
-      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\HKDSTest.cpp">
-      <Filter>Source Files\Test\KmsTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\DUKPTTest.cpp">
-      <Filter>Source Files\Test\KmsTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\RWSTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
@@ -666,6 +633,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\KPATest.cpp">
       <Filter>Source Files\Test\MacTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\NistPqParser.cpp">
+      <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

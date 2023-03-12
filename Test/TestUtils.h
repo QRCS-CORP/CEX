@@ -61,13 +61,13 @@ namespace Test
 		}
 
 		/// <summary>
-		/// Outputs a formatted hex byte array to console
+		/// Outputs a formatted hex uint8_t array to console
 		/// </summary>
 		/// 
 		/// <param name="Data">The array to convert</param>
 		/// <param name="Size">The number of integers to convert</param>
 		/// <param name="Suffix">The integer type suffix</param>
-		static void PrintHex(byte* Data, size_t Size);
+		static void PrintHex(uint8_t* Data, size_t Size);
 
 		/// <summary>
 		/// Prints a hex-formatted 8-bit unsigned integer array
@@ -77,7 +77,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex8(const std::vector<byte> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 32)
+		static void PrintHex8(const std::vector<uint8_t> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 32)
 		{
 			const size_t ZERLEN = 2;
 			std::string tmp = "";
@@ -117,7 +117,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex16(const std::vector<ushort> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("U, "), size_t RowLength = 16)
+		static void PrintHex16(const std::vector<uint16_t> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("U, "), size_t RowLength = 16)
 		{
 			const size_t ZERLEN = 4;
 			std::string tmp = "";
@@ -157,7 +157,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex32(const std::vector<uint> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("UL, "), size_t RowLength = 8)
+		static void PrintHex32(const std::vector<uint32_t> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("UL, "), size_t RowLength = 8)
 		{
 			const size_t ZERLEN = 8;
 			std::string tmp = "";
@@ -197,7 +197,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex64(const std::vector<ulong> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("ULL, "), size_t RowLength = 4)
+		static void PrintHex64(const std::vector<uint64_t> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("ULL, "), size_t RowLength = 4)
 		{
 			const size_t ZERLEN = 16;
 			std::string tmp = "";
@@ -230,20 +230,20 @@ namespace Test
 		}
 
 		/// <summary>
-		/// Outputs a formatted hex byte array to a string
+		/// Outputs a formatted hex uint8_t array to a string
 		/// </summary>
 		/// 
 		/// <param name="Data">The array to convert</param>
 		/// <param name="Size">The number of integers to convert</param>
 		/// <param name="Suffix">The integer type suffix</param>
-		static std::string ToHex(const byte* Data, size_t Size)
+		static std::string ToHex(const uint8_t* Data, size_t Size)
 		{
 			char const HEXCHR[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 			std::string ret = "";
 
 			for (size_t i = 0; i < Size; ++i)
 			{
-				const byte val = Data[i];
+				const uint8_t val = Data[i];
 				ret += std::string("0x");
 				ret += HEXCHR[(val & 0xF0) >> 4];
 				ret += HEXCHR[(val & 0x0F) >> 0];
@@ -297,24 +297,26 @@ namespace Test
 
 		/// Internal ///
 
-		static double ChiSquare(std::vector<byte> &Input);
-		static void CopyVector(const std::vector<int> &SrcArray, size_t SrcIndex, std::vector<int> &DstArray, size_t DstIndex, size_t Length);
-		static bool IsEqual(std::vector<byte> &A, std::vector<byte> &B);
+		static double ChiSquare(std::vector<uint8_t> &Input);
+		static void CopyVector(const std::vector<int32_t> &SrcArray, size_t SrcIndex, std::vector<int32_t> &DstArray, size_t DstIndex, size_t Length);
+		static void FileClose(std::ifstream& Stream);
+		static std::ifstream FileOpen(std::string& FilePath);
+		static size_t FileRead(const std::string& FilePath, std::string& Contents);
+		static size_t FileReadLine(std::ifstream& Stream, std::string& Line);
+		static bool IsEqual(std::vector<uint8_t> &A, std::vector<uint8_t> &B);
 		static uint64_t GetTimeMs64();
 		static SymmetricKey* GetRandomKey(size_t KeySize, size_t IvSize);
-		static void GetRandom(std::vector<byte> &Data);
-		static double MeanValue(std::vector<byte> &Input);
-		static bool OrderedRuns(const std::vector<byte> &Input, size_t Threshold = 6);
+		static void GetRandom(std::vector<uint8_t> &Data);
+		static double MeanValue(std::vector<uint8_t> &Input);
+		static bool OrderedRuns(const std::vector<uint8_t> &Input, size_t Threshold = 6);
 		static std::string RandomReadableString(size_t Length);
-		static bool Read(const std::string &FilePath, std::string &Contents);
-		static std::ifstream OpenFile(std::string &FilePath);
-		static std::vector<byte> Reduce(std::vector<byte> Seed);
-		static void Reverse(std::vector<byte> &Data);
-		static bool SuccesiveZeros(const std::vector<byte> &Input, size_t Threshold = 4);
+		static std::vector<uint8_t> Reduce(std::vector<uint8_t> Seed);
+		static void Reverse(std::vector<uint8_t> &Data);
+		static bool SuccesiveZeros(const std::vector<uint8_t> &Input, size_t Threshold = 4);
 
 private:
 
-		static double PoChiSq(const double Ax, const int Df);
+		static double PoChiSq(const double Ax, const int32_t Df);
 		static double Poz(const double Z);
 	};
 }

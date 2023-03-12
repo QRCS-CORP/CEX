@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 // Updated October 20, 2016
 // Updated April 16, 2017
 // Updated November 30, 2018
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_SHX_H
 #define CEX_SHX_H
@@ -76,7 +76,7 @@ NAMESPACE_BLOCK
 /// The cipher can also use a user-definable cipher tweak through the Info parameter of the symmetric key container, this can be used to create a unique cipher-text output. \n
 /// This tweak array is set as either the information string for HKDF, or as the cSHAKE name string.</para>
 ///
-/// <para>When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits long. \n
+/// <para>When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits int64_t. \n
 /// SHX is capable of processing up to 64 rounds, that is twice the number of mixing rounds set in a standard implementation of Serpent; in extended mode a 256-bit key uses 40 rounds, a 512-bit key 48 rounds, and a 1024-bit key is set to 64 rounds.</para>
 /// 
 /// <list type="bullet">
@@ -108,16 +108,20 @@ class SHX final : public IBlockCipher
 private:
 
 	static const size_t BLOCK_SIZE = 16;
+	static const size_t IK128_SIZE = 16;
+	static const size_t IK192_SIZE = 24;
+	static const size_t IK256_SIZE = 32;
+	static const size_t IK512_SIZE = 64;
+	static const size_t INFO_SIZE = 32;
 	static const size_t MAX_ROUNDS = 64;
 	static const size_t MIN_ROUNDS = 32;
-	static const uint PHI = 0x9E3779B9UL;
+	static const uint32_t PHI = 0x9E3779B9UL;
 	// size of state buffer subtracted parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
 	class ShxState;
 	std::unique_ptr<ShxState> m_shxState;
 	std::unique_ptr<IKdf> m_kdfGenerator;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
 
 public:
 
@@ -210,7 +214,7 @@ public:
 	/// 
 	/// <param name="Input">Encrypted bytes</param>
 	/// <param name="Output">Decrypted bytes</param>
-	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
@@ -222,7 +226,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Encrypt a block of bytes.
@@ -232,7 +236,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Encrypt a block of bytes with offset parameters.
@@ -244,7 +248,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the cipher with a populated SymmetricKey or SymmetricSecureKey container
@@ -265,7 +269,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of bytes to transform or Decrypt</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void Transform(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.
@@ -277,7 +281,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Transform two blocks of bytes with offset parameters.
@@ -289,7 +293,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	void Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void Transform256(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Transform 4 blocks of bytes.
@@ -301,7 +305,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	void Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void Transform512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Transform 8 blocks of bytes.
@@ -313,7 +317,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	void Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void Transform1024(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Transform 16 blocks of bytes.
@@ -325,24 +329,24 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	virtual void Transform2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 private:
 
 	static std::vector<SymmetricKeySize> CalculateKeySizes(BlockCipherExtensions Extension);
-	static void SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> &State, std::unique_ptr<IKdf> &Generator);
-	static void StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> &State);
+	static void SecureExpand(const SecureVector<uint8_t> &Key, std::unique_ptr<ShxState> &State, std::unique_ptr<IKdf> &Generator);
+	static void StandardExpand(const SecureVector<uint8_t> &Key, std::unique_ptr<ShxState> &State);
 
-	void Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Decrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Decrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Decrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Encrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Encrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Encrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void Decrypt128(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Decrypt256(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Decrypt512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Decrypt1024(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Decrypt2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Encrypt128(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Encrypt256(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Encrypt512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Encrypt1024(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Encrypt2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
 
 };
 

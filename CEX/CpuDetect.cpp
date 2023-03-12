@@ -352,7 +352,7 @@ const bool CpuDetect::XOP()
 
 bool CpuDetect::AvxEnabled()
 {
-	std::array<uint, 4> cpuInfo;
+	std::array<uint32_t, 4> cpuInfo = { 0 };
 	Cpuid(1, cpuInfo);
 	bool status = false;
 
@@ -367,7 +367,7 @@ bool CpuDetect::AvxEnabled()
 
 bool CpuDetect::Avx2Enabled()
 {
-	std::array<uint, 4> cpuInfo;
+	std::array<uint32_t, 4> cpuInfo = { 0 };
 	Cpuid(1, cpuInfo);
 	bool status = false;
 
@@ -383,7 +383,7 @@ bool CpuDetect::Avx2Enabled()
 
 void CpuDetect::BusInfo()
 {
-	std::array<uint, 4> cpuInfo;
+	std::array<uint32_t, 4> cpuInfo = { 0 };
 	Cpuid(0, cpuInfo);
 
 	if (cpuInfo[0] >= 0x16)
@@ -396,22 +396,22 @@ void CpuDetect::BusInfo()
 	}
 }
 
-void CpuDetect::Cpuid(int Flag, std::array<uint, 4> &Output)
+void CpuDetect::Cpuid(int32_t Flag, std::array<uint32_t, 4> &Output)
 {
 #if defined(CEX_ARCH_X86_X64)
 #	if defined(CEX_COMPILER_MSC)
-	__cpuid(reinterpret_cast<int*>(Output.data()), Flag);
+	__cpuid(reinterpret_cast<int32_t*>(Output.data()), Flag);
 #	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
 	__get_cpuid(Flag, Output[0], Output[1], Output[2], Output[3]);
 #	endif
 #endif
 }
 
-void CpuDetect::CpuidSublevel(int Flag, int Level, std::array<uint, 4> &Output)
+void CpuDetect::CpuidSublevel(int32_t Flag, int32_t Level, std::array<uint32_t, 4> &Output)
 {
 #if defined(CEX_ARCH_X86_X64)
 #	if defined(CEX_COMPILER_MSC)
-	__cpuidex(reinterpret_cast<int*>(Output.data()), Flag, Level);
+	__cpuidex(reinterpret_cast<int32_t*>(Output.data()), Flag, Level);
 #	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
 	__cpuid_count(Flag, Level, Output[0], Output[1], Output[2], Output[3]);
 #	endif
@@ -420,15 +420,15 @@ void CpuDetect::CpuidSublevel(int Flag, int Level, std::array<uint, 4> &Output)
 
 bool CpuDetect::HasFeature(CpuidFlags Flag)
 {
-	uint f = static_cast<uint>(Flag);
+	uint32_t f = static_cast<uint32_t>(Flag);
 	return static_cast<bool>(ReadBits(m_x86CpuFlags[(f / 32)], (f % 32), 1));
 }
 
 void CpuDetect::Initialize()
 {
-	std::array<uint, 4> cpuInfo;
+	std::array<uint32_t, 4> cpuInfo = { 0 };
 	Cpuid(0, cpuInfo);
-	const uint SUBLVL = cpuInfo[0];
+	const uint32_t SUBLVL = cpuInfo[0];
 
 	if (SUBLVL != 0)
 	{
@@ -445,7 +445,7 @@ void CpuDetect::Initialize()
 		m_physCores = (m_hyperThread == true && m_virtCores > 1) ? (m_virtCores / 2) : m_virtCores;
 		m_logicalPerCore = (m_virtCores > m_physCores) ? (m_virtCores / m_physCores) : 1;
 		// f1 ecx, edx
-		std::memcpy(&m_x86CpuFlags[0], &cpuInfo[2], 2 * sizeof(ulong));
+		std::memcpy(&m_x86CpuFlags[0], &cpuInfo[2], 2 * sizeof(uint64_t));
 
 		if (m_cpuVendor == CpuVendors::INTEL)
 		{
@@ -457,7 +457,7 @@ void CpuDetect::Initialize()
 			std::memset(cpuInfo.data(), 0, 16);
 			CpuidSublevel(7, 0, cpuInfo);
 			// f7 ebx, ecx
-			std::memcpy(&m_x86CpuFlags[2], &cpuInfo[1], 2 * sizeof(ulong));
+			std::memcpy(&m_x86CpuFlags[2], &cpuInfo[1], 2 * sizeof(uint64_t));
 		}
 
 		if (SUBLVL >= 5)
@@ -473,7 +473,7 @@ void CpuDetect::Initialize()
 			std::memset(cpuInfo.data(), 0, 16);
 			Cpuid(0x80000001UL, cpuInfo);
 			// f8..1 ecx, edx
-			std::memcpy(&m_x86CpuFlags[4], &cpuInfo[2], 2 * sizeof(ulong));
+			std::memcpy(&m_x86CpuFlags[4], &cpuInfo[2], 2 * sizeof(uint64_t));
 			StoreTopology();
 		}
 	}
@@ -506,7 +506,7 @@ size_t CpuDetect::MaxLogicalPerCores()
 
 	if (m_hyperThread)
 	{
-		std::array<uint, 4> cpuInfo;
+		std::array<uint32_t, 4> cpuInfo = { 0 };
 		Cpuid(1, cpuInfo);
 
 		size_t logical = static_cast<size_t>(ReadBits(cpuInfo[0], 16, 8));
@@ -550,7 +550,7 @@ void CpuDetect::PrintCpuStats()
 	std::cout << "L2CacheTotal: " << L2CacheTotal() << std::endl;
 	std::cout << "L2CacheSize: " << L2CacheSize() << std::endl;
 	std::cout << "L2CacheTotal: " << L2CacheTotal() << std::endl;
-	std::cout << "L2Associative: " << static_cast<uint>(L2Associative()) << std::endl;
+	std::cout << "L2Associative: " << static_cast<uint32_t>(L2Associative()) << std::endl;
 	std::cout << "LogicalPerCore: " << LogicalPerCore() << std::endl;
 	std::cout << "MPX: " << BoolStr(MPX()) << std::endl;
 	std::cout << "PhysicalCores: " << PhysicalCores() << std::endl;
@@ -576,18 +576,18 @@ void CpuDetect::PrintCpuStats()
 	std::cout << "XOP: " << BoolStr(XOP()) << std::endl;
 }
 
-uint CpuDetect::ReadBits(uint Value, int Index, int Length)
+uint32_t CpuDetect::ReadBits(uint32_t Value, int32_t Index, int32_t Length)
 {
-	int mask = ((static_cast<int>(1) << Length) - 1) << Index;
+	int32_t mask = ((static_cast<int32_t>(1) << Length) - 1) << Index;
 	return (Value & mask) >> Index;
 }
 
 void CpuDetect::StoreSerialNumber()
 {
-	std::array<uint, 4> cpuInfo;
+	std::array<uint32_t, 4> cpuInfo = { 0 };
 	Cpuid(0x00000003, cpuInfo);
 
-	std::array<char, 8> prcId;
+	std::array<char, 8> prcId = { 0 };
 	std::memset(prcId.data(), 0, sizeof(prcId));
 	std::memcpy(&prcId[0], &cpuInfo[3], 4);
 	std::memcpy(&prcId[4], &cpuInfo[2], 4);
@@ -602,7 +602,7 @@ void CpuDetect::StoreTopology()
 	BusInfo();
 	StoreSerialNumber();
 
-	std::array<uint, 4> cpuInfo;
+	std::array<uint32_t, 4> cpuInfo = { 0 };
 	Cpuid(0x80000006UL, cpuInfo);
 
 	m_l1CacheSize = static_cast<size_t>(ReadBits(cpuInfo[2], 0, 8));
@@ -637,10 +637,10 @@ const CpuDetect::CpuVendors CpuDetect::VendorName(std::string &Name)
 	return vendor;
 }
 
-std::string CpuDetect::VendorString(std::array<uint, 4> &CpuInfo)
+std::string CpuDetect::VendorString(std::array<uint32_t, 4> &CpuInfo)
 {
 	// cpu vendor name
-	std::array<char, 0x20> vendId;
+	std::array<char, 0x20> vendId = { 0 };
 	std::memset(vendId.data(), 0, sizeof(vendId));
 	std::memcpy(&vendId[0], &CpuInfo[1], 4);
 	std::memcpy(&vendId[4], &CpuInfo[3], 4);

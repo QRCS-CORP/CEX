@@ -1,7 +1,7 @@
 
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by September 24, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_SECURERANDOM_H
 #define CEX_SECURERANDOM_H
@@ -52,7 +52,7 @@ using Provider::IProvider;
 /// <example>
 /// <c>
 /// SecureRandom rnd;
-/// int x = rnd.NextInt32();
+/// int32_t x = rnd.NextInt32();
 /// </c>
 /// </example>
 class SecureRandom
@@ -106,7 +106,7 @@ public:
 	/// <param name="Output">The uint16 destination array</param>
 	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements);
+	void Fill(std::vector<uint16_t> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
 	/// Fill a secure-vector of uint16 with pseudo-random using offset and length parameters
@@ -115,7 +115,7 @@ public:
 	/// <param name="Output">The uint16 destination array</param>
 	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(SecureVector<ushort> &Output, size_t Offset, size_t Elements);
+	void Fill(SecureVector<uint16_t> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
 	/// Fill a standard-vector of uint32 with pseudo-random using offset and length parameters
@@ -124,7 +124,7 @@ public:
 	/// <param name="Output">The uint32 destination array</param>
 	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<uint> &Output, size_t Offset, size_t Elements);
+	void Fill(std::vector<uint32_t> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
 	/// Fill a secure-vector of uint32 with pseudo-random using offset and length parameters
@@ -133,7 +133,7 @@ public:
 	/// <param name="Output">The uint32 destination array</param>
 	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(SecureVector<uint> &Output, size_t Offset, size_t Elements);
+	void Fill(SecureVector<uint32_t> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
 	/// Fill a standard-vector of uint64 with pseudo-random using offset and length parameters
@@ -142,7 +142,7 @@ public:
 	/// <param name="Output">The uint64 destination array</param>
 	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements);
+	void Fill(std::vector<uint64_t> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
 	/// Fill a secure-vector of uint64 with pseudo-random using offset and length parameters
@@ -151,7 +151,7 @@ public:
 	/// <param name="Output">The uint64 destination array</param>
 	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(SecureVector<ulong> &Output, size_t Offset, size_t Elements);
+	void Fill(SecureVector<uint64_t> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
 	/// Read Only: The random generators implementation name
@@ -164,42 +164,42 @@ public:
 	/// Return an array filled with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Length">Size of requested byte array</param>
+	/// <param name="Length">Size of requested uint8_t array</param>
 	/// 
-	/// <returns>Random byte array</returns>
-	std::vector<byte> Generate(size_t Length);
+	/// <returns>Random uint8_t array</returns>
+	std::vector<uint8_t> Generate(size_t Length);
 
 	/// <summary>
-	/// Fill a standard byte vector with pseudo-random bytes using offset and length parameters
+	/// Fill a standard uint8_t vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
 	/// <param name="Output">The destination vector to fill</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to write to the destination array</param>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length);
+	void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
-	/// Fill a secure byte vector with pseudo-random bytes using offset and length parameters
+	/// Fill a secure uint8_t vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
 	/// <param name="Output">The destination secure-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to write to the destination array</param>
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length);
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The destination vector to fill</param>
-	void Generate(std::vector<byte> &Output);
+	void Generate(std::vector<uint8_t> &Output);
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The destination secure-vector to fill</param>
-	void Generate(SecureVector<byte> &Output);
+	void Generate(SecureVector<uint8_t> &Output);
 
 	//~~~Char~~~//
 
@@ -211,11 +211,11 @@ public:
 	char NextChar();
 
 	/// <summary>
-	/// Get a random unsigned char
+	/// Get a random uint8_t
 	/// </summary>
 	/// 
-	/// <returns>Random unsigned char</returns>
-	unsigned char NextUChar();
+	/// <returns>Random uint8_t</returns>
+	uint8_t NextUChar();
 
 	//~~~Double~~~//
 
@@ -229,58 +229,58 @@ public:
 	//~~~Int16~~~//
 
 	/// <summary>
-	/// Get a random short integer
+	/// Get a random int16_t integer
 	/// </summary>
 	/// 
 	/// <returns>Random Int16</returns>
-	short NextInt16();
+	int16_t NextInt16();
 
 	/// <summary>
-	/// Get a random short integer up to a maximum value
+	/// Get a random int16_t integer up to a maximum value
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
 	/// <returns>Random Int16</returns>
-	short NextInt16(short Maximum);
+	int16_t NextInt16(int16_t Maximum);
 
 	/// <summary>
-	/// Get a random short integer ranged between minimum and maximum sizes
+	/// Get a random int16_t integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
 	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random Int16</returns>
-	short NextInt16(short Maximum, short Minimum);
+	int16_t NextInt16(int16_t Maximum, int16_t Minimum);
 
 
 	//~~~UInt16~~~//
 
 	/// <summary>
-	/// Get a random 16bit ushort integer
+	/// Get a random 16bit uint16_t integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
-	ushort NextUInt16();
+	uint16_t NextUInt16();
 
 	/// <summary>
-	/// Get a random 16bit ushort integer up to a maximum value
+	/// Get a random 16bit uint16_t integer up to a maximum value
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random UInt16</returns>
-	ushort NextUInt16(ushort Maximum);
+	uint16_t NextUInt16(uint16_t Maximum);
 
 	/// <summary>
-	/// Get a random 16bit ushort integer ranged between minimum and maximum sizes
+	/// Get a random 16bit uint16_t integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
 	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random UInt16</returns>
-	ushort NextUInt16(ushort Maximum, ushort Minimum);
+	uint16_t NextUInt16(uint16_t Maximum, uint16_t Minimum);
 
 	//~~~Int32~~~//
 
@@ -289,7 +289,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random Int32</returns>
-	int NextInt32();
+	int32_t NextInt32();
 
 	/// <summary>
 	/// Get a random 32bit integer up to a maximum value
@@ -298,7 +298,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random Int32</returns>
-	int NextInt32(int Maximum);
+	int32_t NextInt32(int32_t Maximum);
 
 	/// <summary>
 	/// Get a random 32bit integer ranged between minimum and maximum sizes
@@ -308,7 +308,7 @@ public:
 	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random Int32</returns>
-	int NextInt32(int Maximum, int Minimum);
+	int32_t NextInt32(int32_t Maximum, int32_t Minimum);
 
 	//~~~UInt32~~~//
 
@@ -317,7 +317,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random UInt32</returns>
-	uint NextUInt32();
+	uint32_t NextUInt32();
 
 	/// <summary>
 	/// Get a random 32bit unsigned integer up to a maximum value
@@ -326,7 +326,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random UInt32</returns>
-	uint NextUInt32(uint Maximum);
+	uint32_t NextUInt32(uint32_t Maximum);
 
 	/// <summary>
 	/// Get a random 32bit unsigned integer ranged between minimum and maximum sizes
@@ -336,35 +336,35 @@ public:
 	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random UInt32</returns>
-	uint NextUInt32(uint Maximum, uint Minimum);
+	uint32_t NextUInt32(uint32_t Maximum, uint32_t Minimum);
 
 	//~~~Int64~~~//
 
 	/// <summary>
-	/// Get a random 64bit long integer
+	/// Get a random 64bit int64_t integer
 	/// </summary>
 	/// 
 	/// <returns>Random Int64</returns>
-	long NextInt64();
+	int64_t NextInt64();
 
 	/// <summary>
-	/// Get a random 64bit long integer up to a maximum value
+	/// Get a random 64bit int64_t integer up to a maximum value
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random Int64</returns>
-	long NextInt64(long Maximum);
+	int64_t NextInt64(int64_t Maximum);
 
 	/// <summary>
-	/// Get a random 64bit long integer ranged between minimum and maximum sizes
+	/// Get a random 64bit int64_t integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
 	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random Int64</returns>
-	long NextInt64(long Maximum, long Minimum);
+	int64_t NextInt64(int64_t Maximum, int64_t Minimum);
 
 	//~~~UInt64~~~//
 
@@ -373,7 +373,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random UInt64</returns>
-	ulong NextUInt64();
+	uint64_t NextUInt64();
 
 	/// <summary>
 	/// Get a random 64bit unsigned integer up to a maximum value
@@ -382,7 +382,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random UInt64</returns>
-	ulong NextUInt64(ulong Maximum);
+	uint64_t NextUInt64(uint64_t Maximum);
 
 	/// <summary>
 	/// Get a random 64bit unsigned integer ranged between minimum and maximum sizes
@@ -392,7 +392,7 @@ public:
 	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random UInt64</returns>
-	ulong NextUInt64(ulong Maximum, ulong Minimum);
+	uint64_t NextUInt64(uint64_t Maximum, uint64_t Minimum);
 };
 
 NAMESPACE_PRNGEND

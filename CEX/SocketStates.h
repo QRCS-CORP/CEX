@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The socket instance current connection state
 /// </summary>
-enum class SocketStates : byte
+enum class SocketStates : uint8_t
 {
 	/// <summary>
 	/// The socket instance is not initialized

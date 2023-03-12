@@ -25,10 +25,10 @@ namespace Test
 		static const size_t MONTE_CYCLES = 10000;
 		static const size_t TEST_CYCLES = 100;
 
-        std::vector<std::vector<std::vector<byte>>> m_expected;
-        std::vector<std::vector<byte>> m_keys;
-        std::vector<std::vector<std::vector<byte>>> m_message;
-        std::vector<std::vector<byte>> m_nonce;
+        std::vector<std::vector<std::vector<uint8_t>>> m_expected;
+        std::vector<std::vector<uint8_t>> m_keys;
+        std::vector<std::vector<std::vector<uint8_t>>> m_message;
+        std::vector<std::vector<uint8_t>> m_nonce;
 		TestEventHandler m_progressEvent;
 
     public:
@@ -78,7 +78,7 @@ namespace Test
 		/// <param name="Message">The input test message</param>
 		/// <param name="Expected">The expected output vector</param>
 		/// <param name="Encryption">Set the transformation mode to encrypt ot decrypt</param>
-		void Kat(ICipherMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<std::vector<byte>> &Message, std::vector<std::vector<byte>> &Expected, bool Encryption);
+		void Kat(ICipherMode* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<std::vector<uint8_t>> &Message, std::vector<std::vector<uint8_t>> &Expected, bool Encryption);
 
 		/// <summary>
 		/// Test the CFB mode output with a an 8-bit register

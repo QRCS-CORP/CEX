@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Message Authentication Code generator enumeration names
 /// </summary>
-enum class StreamAuthenticators : byte
+enum class StreamAuthenticators : uint8_t
 {
 	/// <summary>
 	/// No MAC is specified
@@ -26,27 +26,23 @@ enum class StreamAuthenticators : byte
 	/// <summary>
 	/// A HMAC(SHA2256) message authentication code generator
 	/// </summary>
-	HMACSHA2256 = static_cast<byte>(Macs::HMACSHA2256), 
+	HMACSHA2256 = static_cast<uint8_t>(Macs::HMACSHA2256), 
 	/// <summary>
 	/// A HMAC(SHA2512) message authentication code generator
 	/// </summary>
-	HMACSHA2512 = static_cast<byte>(Macs::HMACSHA2512),
+	HMACSHA2512 = static_cast<uint8_t>(Macs::HMACSHA2512),
 	/// <summary>
 	/// The KMAC-256 message authentication code generator
 	/// </summary>
-	KMAC256 = static_cast<byte>(Macs::KMAC256),
+	KMAC256 = static_cast<uint8_t>(Macs::KMAC256),
 	/// <summary>
 	/// The KMAC-512 message authentication code generator
 	/// </summary>
-	KMAC512 = static_cast<byte>(Macs::KMAC512),
-	/// <summary>
-	/// The KMAC-1024 message authentication code generator (experimental)
-	/// </summary>
-	KMAC1024 = static_cast<byte>(Macs::KMAC1024),
+	KMAC512 = static_cast<uint8_t>(Macs::KMAC512),
 	/// <summary>
 	/// The Poly1305 message authentication code generator
 	/// </summary>
-	Poly1305 = static_cast<byte>(Macs::Poly1305)
+	Poly1305 = static_cast<uint8_t>(Macs::Poly1305)
 };
 
 class StreamAuthenticatorConvert

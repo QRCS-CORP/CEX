@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 #define CEX_MEMUTILS_H
 
 #include "CexDomain.h"
+//#include <cstring>
 #if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 #	include "Intrinsics.h"
 #endif
@@ -142,66 +143,6 @@ public:
 	CEX_OPTIMIZE_RESUME
 	/// endcond
 
-	/// cond PRIVATE
-	CEX_OPTIMIZE_IGNORE
-	/// endcond
-	/// <summary>
-	/// Clear bytes from an integer array.
-	/// <para>The Length is the number of *bytes* (8 bit integers) to Clear.
-	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64/128=AVX512), 
-	/// the operation is vectorized, otherwise this is a sequential clear operation.</para>
-	/// </summary>
-	/// 
-	/// <param name="Output">The destination integer array to clear</param>
-	/// <param name="Offset">The offset within the destination array</param>
-	/// <param name="Length">The number of bytes to clear</param>
-	template <typename Array>
-	inline static void Clear(Array &Output, size_t Offset, size_t Length)
-	{
-		size_t pctr;
-
-		if (Length != 0)
-		{
-			const size_t ELMLEN = sizeof(Array::value_type);
-			pctr = 0;
-
-#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
-#	if defined(CEX_HAS_AVX512)
-			const size_t SMDBLK = 64 / ELMLEN;
-#	elif defined(CEX_HAS_AVX2)
-			const size_t SMDBLK = 32 / ELMLEN;
-#	else
-			const size_t SMDBLK = 16 / ELMLEN;
-#	endif
-
-			if (Length / ELMLEN >= SMDBLK)
-			{
-				const size_t ALNLEN = (Length / (SMDBLK * ELMLEN)) * SMDBLK;
-
-				while (pctr != ALNLEN)
-				{
-#if defined(CEX_HAS_AVX512)
-					CLEAR512(Output, Offset + pctr);
-#elif defined(CEX_HAS_AVX2)
-					CLEAR256(Output, Offset + pctr);
-#elif defined(CEX_HAS_AVX)
-					CLEAR128(Output, Offset + pctr);
-#endif
-					pctr += SMDBLK;
-				}
-			}
-#endif
-
-			if (pctr * ELMLEN != Length)
-			{
-				std::memset(&Output[Offset + pctr], 0, Length - (pctr * ELMLEN));
-			}
-		}
-	}
-	/// cond PRIVATE
-	CEX_OPTIMIZE_RESUME
-	/// endcond
-
 	/// <summary>
 	/// Bitwise AND a specified number of 8-bit bytes to process.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to AND.
@@ -247,13 +188,13 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 					AND512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 					AND256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 					AND128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#endif
+#	endif
 					pctr += SMDBLK;
 				}
 			}
@@ -341,6 +282,125 @@ public:
 		AND256(Input, InOffset + (32 / INPLEN), Output, OutOffset + (32 / OTPLEN));
 #endif
 	}
+
+	/// cond PRIVATE
+	CEX_OPTIMIZE_IGNORE
+	/// endcond
+	/// <summary>
+	/// Clear bytes from an integer array.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to Clear.
+	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64/128=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential clear operation.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The destination integer array to clear</param>
+	/// <param name="Offset">The offset within the destination array</param>
+	/// <param name="Length">The number of bytes to clear</param>
+	template <typename Array>
+	inline static void Clear(Array& Output, size_t Offset, size_t Length)
+	{
+		size_t pctr;
+
+		if (Length != 0)
+		{
+			const size_t ELMLEN = sizeof(Array::value_type);
+			pctr = 0;
+
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
+			const size_t SMDBLK = 64 / ELMLEN;
+#	elif defined(CEX_HAS_AVX2)
+			const size_t SMDBLK = 32 / ELMLEN;
+#	else
+			const size_t SMDBLK = 16 / ELMLEN;
+#	endif
+
+			if (Length / ELMLEN >= SMDBLK)
+			{
+				const size_t ALNLEN = (Length / (SMDBLK * ELMLEN)) * SMDBLK;
+
+				while (pctr != ALNLEN)
+				{
+#	if defined(CEX_HAS_AVX512)
+					CLEAR512(Output, Offset + pctr);
+#	elif defined(CEX_HAS_AVX2)
+					CLEAR256(Output, Offset + pctr);
+#	elif defined(CEX_HAS_AVX)
+					CLEAR128(Output, Offset + pctr);
+#	endif
+					pctr += SMDBLK;
+				}
+			}
+#endif
+
+			if (pctr * ELMLEN != Length)
+			{
+				std::memset(&Output[Offset + pctr], 0, Length - (pctr * ELMLEN));
+			}
+		}
+	}
+	/// cond PRIVATE
+	CEX_OPTIMIZE_RESUME
+	/// endcond
+
+	/// cond PRIVATE
+	CEX_OPTIMIZE_IGNORE
+	/// endcond
+	/// <summary>
+	/// Clear bytes from an integer array.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to Clear.
+	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64/128=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential clear operation.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The destination integer array to clear</param>
+	/// <param name="Length">The number of bytes to clear</param>
+	static void ClearRaw(uint8_t* Output, size_t Length)
+	{
+		size_t pctr;
+
+		CEXASSERT(Length > 0, "Length can not be zero");
+
+		if (Length != 0)
+		{
+			pctr = 0;
+
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
+			const size_t SMDBLK = 64;
+#	elif defined(CEX_HAS_AVX2)
+			const size_t SMDBLK = 32;
+#	else
+			const size_t SMDBLK = 16;
+#	endif
+
+			if (Length >= SMDBLK)
+			{
+				const size_t ALNLEN = (Length / SMDBLK) * SMDBLK;
+
+				while (pctr != ALNLEN)
+				{
+#	if defined(CEX_HAS_AVX512)
+					_mm512_storeu_si512(reinterpret_cast<__m512i*>(Output + pctr), _mm512_setzero_si512());
+#	elif defined(CEX_HAS_AVX2)
+					_mm256_storeu_si256(reinterpret_cast<__m256i*>(Output + pctr), _mm256_setzero_si256());
+#	elif defined(CEX_HAS_AVX)
+					_mm_storeu_si128(reinterpret_cast<__m128i*>(Output + pctr), _mm_setzero_si128());
+#	endif
+					pctr += SMDBLK;
+				}
+			}
+#endif
+
+			if (pctr != Length)
+			{
+				std::memset(Output + pctr, 0, Length - pctr);
+			}
+		}
+	}
+	/// cond PRIVATE
+	CEX_OPTIMIZE_RESUME
+	/// endcond
 
 	/// <summary>
 	/// Clear 128 bits from an integer array.
@@ -458,13 +518,13 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 					COPY512FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 					COPY256FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 					COPY128FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
-#endif
+#	endif
 					pctr += SMDBLK;
 				}
 			}
@@ -515,13 +575,13 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 					COPY512TOOBJECT(Input, InOffset + pctr, Output + pctr);
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 					COPY256TOOBJECT(Input, InOffset + pctr, Output + pctr);
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 					COPY128TOOBJECT(Input, InOffset + pctr, Output + pctr);
-#endif
+#	endif
 					pctr += SMDBLK;
 				}
 			}
@@ -537,7 +597,7 @@ public:
 	/// <summary>
 	/// Copy bytes from an array to an integer.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
-	/// The length must not be larger than the integer (V) type byte size.</para>
+	/// The length must not be larger than the integer (V) type uint8_t size.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The integer source array to copy</param>
@@ -555,7 +615,7 @@ public:
 	/// <summary>
 	/// Copy bytes from an integer to an array.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
-	/// The length must not be larger than the integer arrays byte size.</para>
+	/// The length must not be larger than the integer arrays uint8_t size.</para>
 	/// </summary>
 	/// 
 	/// <param name="Value">The source integer value</param>
@@ -610,13 +670,13 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 					COPY512(Input, InOffset + pctr, Output, OutOffset + pctr);
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 					COPY256(Input, InOffset + pctr, Output, OutOffset + pctr);
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 					COPY128(Input, InOffset + pctr, Output, OutOffset + pctr);
-#endif
+#	endif
 					pctr += SMDBLK;
 				}
 			}
@@ -655,13 +715,13 @@ public:
 		{
 			pctr = 0;
 
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64;
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32;
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 			const size_t SMDBLK = 16;
-#endif
+#	endif
 
 #if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 			if (Length >= SMDBLK)
@@ -670,13 +730,13 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 					COPY512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 					COPY256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 					COPY128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#endif
+#	endif
 					pctr += SMDBLK;
 				}
 			}
@@ -685,6 +745,60 @@ public:
 			if (pctr != Length)
 			{
 				std::memcpy(&Output[OutOffset + (pctr / OTPLEN)], &Input[InOffset + (pctr / INPLEN)], Length - pctr);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Copy a raw uint8_t array.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
+	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512),
+	/// the operation is vectorized, otherwise this is a sequential copy operation.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The uint8_t source array to copy</param>
+	/// <param name="Output">The uint8_t destination array</param>
+	/// <param name="Length">The number of bytes to copy</param>
+	inline static void CopyRaw(const uint8_t* Input, uint8_t* Output, size_t Length)
+	{
+		size_t pctr;
+
+		CEXASSERT(Length > 0, "Length can not be zero");
+
+		if (Length != 0)
+		{
+			pctr = 0;
+
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
+			const size_t SMDBLK = 64;
+#	elif defined(CEX_HAS_AVX2)
+			const size_t SMDBLK = 32;
+#	else
+			const size_t SMDBLK = 16;
+#	endif
+
+			if (Length >= SMDBLK)
+			{
+				const size_t ALNLEN = (Length / SMDBLK) * SMDBLK;
+
+				while (pctr != ALNLEN)
+				{
+#	if defined(CEX_HAS_AVX512)
+					_mm512_storeu_si512(reinterpret_cast<__m512i*>(Output + pctr), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(Input + pctr)));
+#	elif defined(CEX_HAS_AVX2)
+					_mm256_storeu_si256(reinterpret_cast<__m256i*>(Output + pctr), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(Input + pctr)));
+#	elif defined(CEX_HAS_AVX)
+					_mm_storeu_si128(reinterpret_cast<__m128i*>(Output + pctr), _mm_loadu_si128(reinterpret_cast<const __m128i*>(Input + pctr)));
+#	endif
+					pctr += SMDBLK;
+				}
+			}
+#endif
+
+			if (pctr != Length)
+			{
+				std::memcpy(Output + pctr, Input + pctr, Length - pctr);
 			}
 		}
 	}
@@ -879,6 +993,74 @@ public:
 	}
 
 	/// <summary>
+	/// Allocate a block of memory
+	/// </summary>
+	/// 
+	/// <param name="Length">The length of the requested block</param>
+	///
+	/// <returns>Returns the aligned array of bytes, or NULL on failure</returns>
+	static void* Malloc(size_t Length)
+	{
+		void* ret;
+
+		ret = NULL;
+
+		if (Length != 0)
+		{
+#if defined(CEX_COMPILER_MSC)
+			ret = _aligned_malloc(Length, CEX_SIMD_ALIGNMENT);
+#else
+			ret = malloc(Length);
+#endif
+		}
+
+		return ret;
+	}
+
+	/// <summary>
+	/// Resize a block of memory
+	/// </summary>
+	/// 
+	/// <param name="Block">A pointer to a block of memory</param>
+	/// <param name="Length">The length of the requested block</param>
+	///
+	/// <returns>Returns the aligned array of bytes, or NULL on failure</returns>
+	static void* Realloc(void* Block, size_t Length)
+	{
+		void* ret;
+
+		ret = NULL;
+
+		if (Length != 0)
+		{
+#if defined(CEX_COMPILER_MSC)
+			ret = _aligned_realloc(Block, Length, CEX_SIMD_ALIGNMENT);
+#else
+			ret = realloc(Block, Length);
+#endif
+		}
+
+		return ret;
+	}
+
+	/// <summary>
+	/// Free a memory block created with alloc
+	/// </summary>
+	/// 
+	/// <param name="Block">A pointer to the memory block to release</param>
+	static void MallocFree(void* Block)
+	{
+		if (Block != NULL)
+		{
+#if defined(CEX_COMPILER_MSC)
+			_aligned_free(Block);
+#else
+			free(Block);
+#endif
+		}
+	}
+
+	/// <summary>
 	/// Move an integer array.
 	/// <para>This is a sequential move operation.
 	/// The Length is the number of *bytes* (8 bit integers) to Move.</para>
@@ -946,13 +1128,13 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 					OR512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 					OR256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 					OR128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#endif
+#	endif
 					pctr += SMDBLK;
 				}
 			}
@@ -1051,9 +1233,9 @@ public:
 	/// <param name="Output">The source integer array to modify</param>
 	/// <param name="Offset">The offset within the source array</param>
 	/// <param name="Length">The number of bytes to change</param>
-	/// <param name="Value">The 8 bit byte value to set</param>
+	/// <param name="Value">The 8 bit uint8_t value to set</param>
 	template <typename Array>
-	inline static void SetValue(Array &Output, size_t Offset, size_t Length, byte Value)
+	inline static void SetValue(Array &Output, size_t Offset, size_t Length, uint8_t Value)
 	{
 		const size_t ELMLEN = sizeof(Array::value_type);
 		size_t pctr;
@@ -1079,13 +1261,13 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 					SETVAL512(Output, Offset + pctr, Value);
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 					SETVAL256(Output, Offset + pctr, Value);
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 					SETVAL128(Output, Offset + pctr, Value);
-#endif
+#	endif
 					pctr += SMDBLK;
 				}
 			}
@@ -1105,9 +1287,9 @@ public:
 	/// 
 	/// <param name="Output">The source integer array to modify</param>
 	/// <param name="Offset">The offset within the source array</param>
-	/// <param name="Value">The 8 bit byte value to set</param>
+	/// <param name="Value">The 8 bit uint8_t value to set</param>
 	template <typename Array>
-	inline static void SETVAL128(Array &Output, size_t Offset, byte Value)
+	inline static void SETVAL128(Array &Output, size_t Offset, uint8_t Value)
 	{
 		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 16, "Length is larger than output size");
 
@@ -1125,9 +1307,9 @@ public:
 	/// 
 	/// <param name="Output">The source integer array to modify</param>
 	/// <param name="Offset">The offset within the source array</param>
-	/// <param name="Value">The 8 bit byte value to set</param>
+	/// <param name="Value">The 8 bit uint8_t value to set</param>
 	template <typename Array>
-	inline static void SETVAL256(Array &Output, size_t Offset, byte Value)
+	inline static void SETVAL256(Array &Output, size_t Offset, uint8_t Value)
 	{
 		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 32, "Length is larger than output size");
 
@@ -1146,9 +1328,9 @@ public:
 	/// 
 	/// <param name="Output">The source integer array to modify</param>
 	/// <param name="Offset">The offset within the source array</param>
-	/// <param name="Value">The 8 bit byte value to set</param>
+	/// <param name="Value">The 8 bit uint8_t value to set</param>
 	template <typename Array>
-	inline static void SETVAL512(Array &Output, size_t Offset, byte Value)
+	inline static void SETVAL512(Array &Output, size_t Offset, uint8_t Value)
 	{
 		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 64, "Length is larger than output size");
 
@@ -1202,13 +1384,13 @@ public:
 
 			while (pctr != ALNLEN)
 			{
-#if defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 				XOR512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(CEX_HAS_AVX2)
+#	elif defined(CEX_HAS_AVX2)
 				XOR256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(CEX_HAS_AVX)
+#	elif defined(CEX_HAS_AVX)
 				XOR128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#endif
+#	endif
 				pctr += SMDBLK;
 			}
 		}
@@ -1216,6 +1398,57 @@ public:
 		if (pctr * OTPLEN != Length)
 		{
 			XorPartial(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN), Length - pctr);
+		}
+	}
+
+	/// <summary>
+	/// Block XOR a specified number of 8-bit bytes to process.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to XOR.
+	/// If the length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential XOR operation.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="Length">The number of bytes to process</param>
+	inline static void XorRaw(const uint8_t* Input, uint8_t* Output, size_t Length)
+	{
+		size_t pctr;
+
+		CEXASSERT(Length > 0, "Length can not be zero");
+
+		pctr = 0;
+
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
+		const size_t SMDBLK = 64;
+#	elif defined(CEX_HAS_AVX2)
+		const size_t SMDBLK = 32;
+#	else
+		const size_t SMDBLK = 16;
+#	endif
+
+		if (Length >= SMDBLK)
+		{
+			const size_t ALNLEN = Length - (Length % SMDBLK);
+
+			while (pctr != ALNLEN)
+			{
+#	if defined(CEX_HAS_AVX512)
+				_mm512_storeu_si512(reinterpret_cast<__m512i*>(Output + pctr), _mm512_xor_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(Input + pctr)), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(Output + pctr))));
+#	elif defined(CEX_HAS_AVX2)
+				_mm256_storeu_si256(reinterpret_cast<__m256i*>(Output + pctr), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(Input + pctr)), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(Output + pctr))));
+#	elif defined(CEX_HAS_AVX)
+				_mm_storeu_si128(reinterpret_cast<__m128i*>(Output + pctr), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(Input + pctr)), _mm_loadu_si128(reinterpret_cast<__m128i*>(Output + pctr))));
+#	endif
+				pctr += SMDBLK;
+			}
+		}
+#endif
+		while (pctr < Length)
+		{
+			Output[pctr] ^= Input[pctr];
+			++pctr;
 		}
 	}
 
@@ -1334,8 +1567,8 @@ public:
 		const size_t OTPLEN = sizeof(ArrayB::value_type);
 		size_t i;
 
-		byte* pinp = (byte*)Input.data() + (InOffset * INPLEN);
-		byte* potp = (byte*)Output.data() + (OutOffset * OTPLEN);
+		uint8_t* pinp = (uint8_t*)Input.data() + (InOffset * INPLEN);
+		uint8_t* potp = (uint8_t*)Output.data() + (OutOffset * OTPLEN);
 
 		for (i = 0; i < Length; ++i)
 		{
@@ -1344,7 +1577,7 @@ public:
 	}
 
 	template <typename Array>
-	inline static void XorPad(Array &Output, byte N)
+	inline static void XorPad(Array &Output, uint8_t N)
 	{
 		size_t pctr;
 

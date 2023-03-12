@@ -28,20 +28,20 @@ const size_t StreamReader::Position()
 
 //~~~Public Functions~~~//
 
-byte StreamReader::ReadByte()
+uint8_t StreamReader::ReadByte()
 {
-	CEXASSERT(m_streamData.Position() + sizeof(byte) <= m_streamData.Length(), "Exceeds stream length");
+	CEXASSERT(m_streamData.Position() + sizeof(uint8_t) <= m_streamData.Length(), "Exceeds stream length");
 
-	std::vector<byte> data(1);
+	std::vector<uint8_t> data(1);
 	m_streamData.Read(data, 0, 1);
 	return data[0];
 }
 
-std::vector<byte> StreamReader::ReadBytes(size_t Length)
+std::vector<uint8_t> StreamReader::ReadBytes(size_t Length)
 {
 	CEXASSERT(m_streamData.Position() + Length <= m_streamData.Length(), "Exceeds stream length");
 
-	std::vector<byte> data(Length);
+	std::vector<uint8_t> data(Length);
 	m_streamData.Read(data, 0, Length);
 	return data;
 }

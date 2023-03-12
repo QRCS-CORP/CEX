@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -120,10 +120,10 @@ public:
 	/// <summary>
 	/// Read Only: The current value of the nonce counter array.
 	/// </summary>
-	virtual const std::vector<byte> Nonce() = 0;
+	virtual const std::vector<uint8_t> Nonce() = 0;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class, but must be a multiple of the ParallelMinimumSize().</para>
 	/// </summary>
 	virtual const size_t ParallelBlockSize() = 0;
@@ -139,14 +139,14 @@ public:
 	/// <summary>
 	/// Read Only: The current MAC tag value
 	/// </summary>
-	virtual const std::vector<byte> Tag() = 0;
+	virtual const std::vector<uint8_t> Tag() = 0;
 
 	/// <summary>
 	/// Copies the internal MAC tag to a secure-vector
 	/// </summary>
 	/// 
 	/// <param name="Output">The secure-vector receiving the MAC code</param>
-	virtual const void Tag(SecureVector<byte> &Output) = 0;
+	virtual const void Tag(SecureVector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Read Only: The legal MAC tag length in bytes
@@ -189,7 +189,7 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if state has been processed</exception>
-	virtual void SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
+	virtual void SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Encrypt/Decrypt a vector of bytes with offset and length parameters.
@@ -200,8 +200,8 @@ public:
 	/// <param name="InOffset">The starting offset within the input vector</param>
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">The starting offset within the output vector</param>
-	/// <param name="Length">The byte length of data to process</param>
-	virtual void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
+	/// <param name="Length">The uint8_t length of data to process</param>
+	virtual void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) = 0;
 };
 
 NAMESPACE_STREAMEND

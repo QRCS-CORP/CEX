@@ -16,8 +16,8 @@ class ProviderSelfTest
 {
 public:
 
-	static const size_t SELFTEST_LENGTH = sizeof(ulong);
-	SecureVector<byte> m_rndSample;
+	static const size_t SELFTEST_LENGTH = sizeof(uint64_t);
+	SecureVector<uint8_t> m_rndSample;
 
 	ProviderSelfTest();
 
@@ -28,7 +28,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Sample">The SecureVector random sample</param>
-	bool SelfTest(SecureVector<byte> &Sample);
+	bool SelfTest(SecureVector<uint8_t> &Sample);
 };
 
 NAMESPACE_PROVIDEREND

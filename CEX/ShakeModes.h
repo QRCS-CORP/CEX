@@ -10,28 +10,24 @@ NAMESPACE_ENUMERATION
 /// The type of SHAKE KDF variant.
 /// <para>Must coincide with Digests/Kdfs enumeration.</para>
 /// </summary>
-enum class ShakeModes : byte
+enum class ShakeModes : uint8_t
 {
 	/// <summary>
 	/// No SHAKE mode is selected
 	/// </summary>
-	None = static_cast<byte>(Digests::None),
+	None = static_cast<uint8_t>(Digests::None),
 	/// <summary>
 	/// The SHAKE128 XOF function
 	/// </summary>
-	SHAKE128 = static_cast<byte>(Digests::SHAKE128),
+	SHAKE128 = static_cast<uint8_t>(Digests::SHAKE128),
 	/// <summary>
 	/// The SHAKE256 XOF function
 	/// </summary>
-	SHAKE256 = static_cast<byte>(Digests::SHAKE256),
+	SHAKE256 = static_cast<uint8_t>(Digests::SHAKE256),
 	/// <summary>
 	/// The SHAKE512 XOF function
 	/// </summary>
-	SHAKE512 = static_cast<byte>(Digests::SHAKE512),
-	/// <summary>
-	/// The SHAKE1024 XOF function
-	/// </summary>
-	SHAKE1024 = static_cast<byte>(Digests::SHAKE1024)
+	SHAKE512 = static_cast<uint8_t>(Digests::SHAKE512)
 };
 
 class ShakeModeConvert

@@ -13,7 +13,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Symmetric AEAD cipher mode enumeration names
 /// </summary>
-enum class SocketExceptions : int
+enum class SocketExceptions : int32_t
 {
 	/// <summary>
 	/// No cipher mode is specified
@@ -134,7 +134,7 @@ enum class SocketExceptions : int
 	/// </summary>
 	SocketNoDestination = EDESTADDRREQ,
 	/// <summary>
-	/// Message too long
+	/// Message too int64_t
 	/// </summary>
 	SocketMessageTooLong = EMSGSIZE,
 	/// <summary>

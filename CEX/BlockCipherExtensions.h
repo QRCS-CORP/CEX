@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Select the symmetric block cipher round-key expansion engines
 /// </summary>
-enum class BlockCipherExtensions : byte
+enum class BlockCipherExtensions : uint8_t
 {
 	/// <summary>
 	/// Use the standard form of the block cipher
@@ -18,27 +18,23 @@ enum class BlockCipherExtensions : byte
 	/// <summary>
 	/// A Hash based Key Derivation Function: HKDF(SHA2-256)
 	/// </summary>
-	HKDF256 = static_cast<byte>(Kdfs::HKDF256),
+	HKDF256 = static_cast<uint8_t>(Kdfs::HKDF256),
 	/// <summary>
 	/// A Hash based Key Derivation Function: HKDF(SHA2-512)
 	/// </summary>
-	HKDF512 = static_cast<byte>(Kdfs::HKDF512),
+	HKDF512 = static_cast<uint8_t>(Kdfs::HKDF512),
 	/// <summary>
 	/// An implementation of the SHAKE-128 XOF function
 	/// </summary>
-	SHAKE128 = static_cast<byte>(Kdfs::SHAKE128),
+	SHAKE128 = static_cast<uint8_t>(Kdfs::SHAKE128),
 	/// <summary>
 	/// An implementation of the SHAKE-256 XOF function
 	/// </summary>
-	SHAKE256 = static_cast<byte>(Kdfs::SHAKE256),
+	SHAKE256 = static_cast<uint8_t>(Kdfs::SHAKE256),
 	/// <summary>
 	/// An implementation of the SHAKE-512 XOF function
 	/// </summary>
-	SHAKE512 = static_cast<byte>(Kdfs::SHAKE512),
-	/// <summary>
-	/// An implementation of the SHAKE-1024 XOF function -experimental
-	/// </summary>
-	SHAKE1024 = static_cast<byte>(Kdfs::SHAKE1024)
+	SHAKE512 = static_cast<uint8_t>(Kdfs::SHAKE512)
 };
 
 NAMESPACE_ENUMERATIONEND

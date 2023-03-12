@@ -22,7 +22,7 @@ SHA2Params::SHA2Params()
 {
 }
 
-SHA2Params::SHA2Params(ulong OutputSize, uint LeafSize, byte Fanout)
+SHA2Params::SHA2Params(uint64_t OutputSize, uint32_t LeafSize, uint8_t Fanout)
 	:
 	m_nodeOffset(0),
 	m_treeVersion(1),
@@ -45,7 +45,7 @@ SHA2Params::SHA2Params(ulong OutputSize, uint LeafSize, byte Fanout)
 	m_dstCode.resize(DistributionCodeMax());
 }
 
-SHA2Params::SHA2Params(const std::vector<byte> &TreeArray)
+SHA2Params::SHA2Params(const std::vector<uint8_t> &TreeArray)
 	:
 	m_nodeOffset(0),
 	m_treeVersion(0),
@@ -58,7 +58,7 @@ SHA2Params::SHA2Params(const std::vector<byte> &TreeArray)
 {
 	if (TreeArray.size() < GetHeaderSize())
 	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The TreeArray buffer is too short!"), ErrorCodes::IllegalOperation);
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The TreeArray buffer is too int16_t!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_nodeOffset = IntegerTools::LeBytesTo32(TreeArray, 0);
@@ -72,7 +72,7 @@ SHA2Params::SHA2Params(const std::vector<byte> &TreeArray)
 	std::memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 }
 
-SHA2Params::SHA2Params(uint NodeOffset, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &Info)
+SHA2Params::SHA2Params(uint32_t NodeOffset, uint64_t OutputSize, uint16_t Version, uint32_t LeafSize, uint8_t Fanout, uint8_t TreeDepth, std::vector<uint8_t> &Info)
 	:
 	m_nodeOffset(NodeOffset),
 	m_treeVersion(Version),
@@ -95,32 +95,32 @@ SHA2Params::~SHA2Params()
 
 //~~~Accessors~~~//
 
-byte &SHA2Params::FanOut()
+uint8_t &SHA2Params::FanOut()
 {
 	return m_treeFanout;
 }
 
-uint &SHA2Params::LeafSize()
+uint32_t &SHA2Params::LeafSize()
 {
 	return m_leafSize;
 }
 
-uint &SHA2Params::NodeOffset()
+uint32_t &SHA2Params::NodeOffset()
 {
 	return m_nodeOffset;
 }
 
-ulong &SHA2Params::OutputSize()
+uint64_t &SHA2Params::OutputSize()
 {
 	return m_outputSize;
 }
 
-uint &SHA2Params::Reserved()
+uint32_t &SHA2Params::Reserved()
 {
 	return m_reserved;
 }
 
-std::vector<byte> &SHA2Params::DistributionCode()
+std::vector<uint8_t> &SHA2Params::DistributionCode()
 {
 	return m_dstCode;
 }
@@ -141,7 +141,7 @@ const size_t SHA2Params::DistributionCodeMax()
 	return res;
 }
 
-ushort &SHA2Params::Version()
+uint16_t &SHA2Params::Version()
 {
 	return m_treeVersion;
 }
@@ -170,9 +170,9 @@ bool SHA2Params::Equals(SHA2Params &Input)
 	return res;
 }
 
-int SHA2Params::GetHashCode()
+int32_t SHA2Params::GetHashCode()
 {
-	int result = 31 * m_treeVersion;
+	int32_t result = 31 * m_treeVersion;
 	result += 31 * m_nodeOffset;
 	result += 31 * m_leafSize;
 	result += 31 * m_outputSize;
@@ -205,9 +205,9 @@ void SHA2Params::Reset()
 	m_reserved = 0;
 }
 
-std::vector<byte> SHA2Params::ToBytes()
+std::vector<uint8_t> SHA2Params::ToBytes()
 {
-	std::vector<byte> config(GetHeaderSize());
+	std::vector<uint8_t> config(GetHeaderSize());
 
 	IntegerTools::Le32ToBytes(m_nodeOffset, config, 0);
 	IntegerTools::Le16ToBytes(m_treeVersion, config, 4);

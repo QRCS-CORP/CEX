@@ -9,13 +9,13 @@ namespace Test
 	{
 	public:
 
-		static void Evaluate(const std::string &Name, std::vector<byte> &Sample);
+		static void Evaluate(const std::string &Name, std::vector<uint8_t> &Sample);
 
 		template<class T>
 		static std::string ChiSquare(T* Rng, size_t SampleSize = 1024000)
 		{
 			// converges slowly, needs 1mb or more
-			std::vector<byte> rnd(SampleSize);
+			std::vector<uint8_t> rnd(SampleSize);
 			std::string status;
 			double x;
 
@@ -40,10 +40,10 @@ namespace Test
 		}
 
 		template<class T>
-		static std::string ChiSquareG(T* Generator, std::vector<byte> &Seed, size_t SampleSize = 1024000)
+		static std::string ChiSquareG(T* Generator, std::vector<uint8_t> &Seed, size_t SampleSize = 1024000)
 		{
 			// converges slowly, needs 1mb or more
-			std::vector<byte> rnd(SampleSize);
+			std::vector<uint8_t> rnd(SampleSize);
 			std::string status;
 			double x;
 
@@ -72,7 +72,7 @@ namespace Test
 		static std::string MeanValue(T* Rng, size_t SampleSize = 102400)
 		{
 			// 100kb sample
-			std::vector<byte> rnd(SampleSize);
+			std::vector<uint8_t> rnd(SampleSize);
 			std::string status;
 			double x;
 
@@ -97,10 +97,10 @@ namespace Test
 		}
 
 		template<class T>
-		static std::string MeanValueG(T* Generator, std::vector<byte> &Seed, size_t SampleSize = 102400)
+		static std::string MeanValueG(T* Generator, std::vector<uint8_t> &Seed, size_t SampleSize = 102400)
 		{
 			// 100kb sample
-			std::vector<byte> rnd(SampleSize);
+			std::vector<uint8_t> rnd(SampleSize);
 			std::string status;
 			double x;
 

@@ -59,8 +59,8 @@ namespace Test
 	void SecureStreamTest::Evaluate()
 	{
 		Prng::SecureRandom gen;
-		uint cnt;
-		std::vector<byte> data;
+		uint32_t cnt;
+		std::vector<uint8_t> data;
 
 		for (size_t i = 0; i < 10; ++i)
 		{
@@ -84,43 +84,43 @@ namespace Test
 
 			// test read/write
 			size_t tmpSze = cnt - 1;
-			std::vector<byte> tmp1(tmpSze);
+			std::vector<uint8_t> tmp1(tmpSze);
 			sec1.Seek(0, SeekOrigin::Begin);
 			sec1.Read(tmp1, 0, tmpSze);
-			std::vector<byte> tmp2(tmpSze);
+			std::vector<uint8_t> tmp2(tmpSze);
 			memcpy(&tmp2[0], &data[0], tmpSze);
 			if (tmp1 != tmp2)
 			{
 				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE3"));
 			}
 
-			// read byte from start
+			// read uint8_t from start
 			sec2.Seek(1, SeekOrigin::Begin);
-			byte x = sec2.ReadByte();
+			uint8_t x = sec2.ReadByte();
 			if (x != data[1])
 			{
 				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE4"));
 			}
 
-			// read byte from end
+			// read uint8_t from end
 			sec2.Seek(1, SeekOrigin::End);
-			byte x1 = sec2.ReadByte();
+			uint8_t x1 = sec2.ReadByte();
 			if (x1 != data[cnt - 1])
 			{
 				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE5"));
 			}
 
-			// prepend byte
+			// prepend uint8_t
 			sec2.Seek(0, SeekOrigin::Begin);
 			sec2.WriteByte(x1);
 			sec2.Seek(0, SeekOrigin::Begin);
-			byte x2 = sec2.ReadByte();
+			uint8_t x2 = sec2.ReadByte();
 			if (x1 != x2)
 			{
 				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE6"));
 			}
 
-			// append byte
+			// append uint8_t
 			sec2.Seek(0, SeekOrigin::Begin);
 			sec2.WriteByte(33);
 			sec2.Seek(0, SeekOrigin::Begin);
@@ -135,7 +135,7 @@ namespace Test
 	void SecureStreamTest::Serialization()
 	{
 		Prng::SecureRandom gen;
-		std::vector<byte> data = gen.Generate(1023);
+		std::vector<uint8_t> data = gen.Generate(1023);
 		SecureStream sec(data);
 
 		MemoryStream mem;

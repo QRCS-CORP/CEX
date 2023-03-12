@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Cryptographic entropy provider enumeration names
 /// </summary>
-enum class Providers : byte
+enum class Providers : uint8_t
 {
 	/// <summary>
 	/// No provider is specified

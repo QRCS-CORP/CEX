@@ -80,14 +80,6 @@ namespace Test
 			Kat(gen512, m_key[14], m_expected[14]);
 			OnProgress(std::string("SHAKETest: Passed SHAKE512 KAT tests.."));
 
-			SHAKE* gen1024 = new SHAKE(ShakeModes::SHAKE1024);
-			Kat(gen1024, m_key[15], m_expected[15]);
-			Kat(gen1024, m_key[16], m_expected[16]);
-			Kat(gen1024, m_key[17], m_expected[17]);
-			Kat(gen1024, m_key[18], m_expected[18]);
-			Kat(gen1024, m_key[19], m_expected[19]);
-			OnProgress(std::string("SHAKETest: Passed SHAKE1024 KAT tests.."));
-
 			OnProgress(std::string("SHAKETest: Testing the custom cSHAKE implementations.."));
 			Kat(gen128, m_key[0], m_custom, m_expected[20]);
 			Kat(gen128, m_key[20], m_custom, m_expected[21]);
@@ -100,25 +92,19 @@ namespace Test
 			Kat(gen512, m_key[10], m_custom, m_expected[24]);
 			OnProgress(std::string("SHAKETest: Passed customized cSHAKE-512 KAT test.."));
 
-			Kat(gen1024, m_key[15], m_custom, m_expected[25]);
-			OnProgress(std::string("SHAKETest: Passed customized cSHAKE-1024 KAT test.."));
-
 			Params(gen128);
 			Params(gen256);
 			Params(gen512);
-			Params(gen1024);
 			OnProgress(std::string("SHAKETest: Passed initialization tests.."));
 
 			Stress(gen128);
 			Stress(gen256);
 			Stress(gen512);
-			Stress(gen1024);
 			OnProgress(std::string("SHAKETest: Passed stress tests.."));
 
 			delete gen128;
 			delete gen256;
 			delete gen512;
-			delete gen1024;
 
 			return SUCCESS;
 		}
@@ -147,10 +133,10 @@ namespace Test
 			(m_expected[0].size() / Keccak::KECCAK128_RATE_SIZE);
 
 		// test the absorb/squeeze api
-		std::vector<byte> otp(BLK128 * Keccak::KECCAK128_RATE_SIZE);
-		std::array<ulong, 25> state = { 0 };
-		Keccak::AbsorbR24(m_key[0], 0, m_key[0].size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-		Keccak::SqueezeR24(state, otp, 0, BLK128, Keccak::KECCAK128_RATE_SIZE);
+		std::vector<uint8_t> otp(BLK128 * Keccak::KECCAK128_RATE_SIZE);
+		std::array<uint64_t, 25> state = { 0 };
+		Keccak::Absorb(m_key[0], 0, m_key[0].size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
+		Keccak::Squeeze(state, otp, 0, BLK128, Keccak::KECCAK128_RATE_SIZE);
 
 		if (IntegerTools::Compare(m_expected[0], 0, otp, 0, m_expected[0].size()) == false)
 		{
@@ -160,7 +146,7 @@ namespace Test
 		// test the stand-alone XOF api
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[0].size());
-		Keccak::XOFR24P1600(m_key[0], 0, m_key[0].size(), otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
+		Keccak::XOFP1600(m_key[0], 0, m_key[0].size(), otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
 
 		if (otp != m_expected[0])
 		{
@@ -171,11 +157,11 @@ namespace Test
 		const size_t BLK256 = ((m_expected[5].size() % Keccak::KECCAK256_RATE_SIZE) != 0) ? (m_expected[5].size() / Keccak::KECCAK256_RATE_SIZE) + 1 :
 			(m_expected[5].size() / Keccak::KECCAK256_RATE_SIZE);
 
-		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Clear(state, 0, state.size() * sizeof(uint64_t));
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(BLK256 * Keccak::KECCAK256_RATE_SIZE);
-		Keccak::AbsorbR24(m_key[5], 0, m_key[5].size(), Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-		Keccak::SqueezeR24(state, otp, 0, BLK256, Keccak::KECCAK256_RATE_SIZE);
+		Keccak::Absorb(m_key[5], 0, m_key[5].size(), Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
+		Keccak::Squeeze(state, otp, 0, BLK256, Keccak::KECCAK256_RATE_SIZE);
 
 		if (IntegerTools::Compare(m_expected[5], 0, otp, 0, m_expected[5].size()) == false)
 		{
@@ -185,7 +171,7 @@ namespace Test
 		// test the SHAKE-256 XOF api
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[5].size());
-		Keccak::XOFR24P1600(m_key[5], 0, m_key[5].size(), otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
+		Keccak::XOFP1600(m_key[5], 0, m_key[5].size(), otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
 
 		if (otp != m_expected[5])
 		{
@@ -196,11 +182,11 @@ namespace Test
 		const size_t BLK512 = ((m_expected[10].size() % Keccak::KECCAK512_RATE_SIZE) != 0) ? (m_expected[10].size() / Keccak::KECCAK512_RATE_SIZE) + 1 :
 			(m_expected[10].size() / Keccak::KECCAK512_RATE_SIZE);
 
-		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Clear(state, 0, state.size() * sizeof(uint64_t));
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(BLK512 * Keccak::KECCAK512_RATE_SIZE);
-		Keccak::AbsorbR24(m_key[10], 0, m_key[10].size(), Keccak::KECCAK512_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-		Keccak::SqueezeR24(state, otp, 0, BLK512, Keccak::KECCAK512_RATE_SIZE);
+		Keccak::Absorb(m_key[10], 0, m_key[10].size(), Keccak::KECCAK512_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
+		Keccak::Squeeze(state, otp, 0, BLK512, Keccak::KECCAK512_RATE_SIZE);
 
 		if (IntegerTools::Compare(m_expected[10], 0, otp, 0, m_expected[10].size()) == false)
 		{
@@ -210,45 +196,20 @@ namespace Test
 		// test the SHAKE-512 XOF api
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[10].size());
-		Keccak::XOFR24P1600(m_key[10], 0, m_key[10].size(), otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
+		Keccak::XOFP1600(m_key[10], 0, m_key[10].size(), otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
 
 		if (otp != m_expected[10])
 		{
 			throw TestException(std::string("Exception"), std::string("SHAKE-512"), std::string("Exception handling failure! -SA6"));
 		}
 
-		// SHAKE-1024
-		const size_t BLK1024 = ((m_expected[15].size() % Keccak::KECCAK1024_RATE_SIZE) != 0) ? (m_expected[15].size() / Keccak::KECCAK1024_RATE_SIZE) + 1 :
-			(m_expected[15].size() / Keccak::KECCAK1024_RATE_SIZE);
-
-		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
-		MemoryTools::Clear(otp, 0, otp.size());
-		otp.resize(BLK1024 * Keccak::KECCAK1024_RATE_SIZE);
-		Keccak::AbsorbR48(m_key[15], 0, m_key[15].size(), Keccak::KECCAK1024_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-		Keccak::SqueezeR48(state, otp, 0, BLK1024, Keccak::KECCAK1024_RATE_SIZE);
-
-		if (IntegerTools::Compare(m_expected[15], 0, otp, 0, m_expected[15].size()) == false)
-		{
-			throw TestException(std::string("Exception"), std::string("SHAKE-1024"), std::string("Exception handling failure! -SA7"));
-		}
-
-		// test the SHAKE-1024 XOF api
-		MemoryTools::Clear(otp, 0, otp.size());
-		otp.resize(m_expected[15].size());
-		Keccak::XOFR48P1600(m_key[15], 0, m_key[15].size(), otp, 0, otp.size(), Keccak::KECCAK1024_RATE_SIZE);
-
-		if (otp != m_expected[15])
-		{
-			throw TestException(std::string("Exception"), std::string("SHAKE-1024"), std::string("Exception handling failure! -SA8"));
-		}
-
 		// cSHAKE compact-implementation tests //
 
-		const std::vector<byte> ZERO(0, 0x00);
+		const std::vector<uint8_t> ZERO(0, 0x00);
 
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[20].size());
-		Keccak::CXOFR24P1600(m_key[0], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
+		Keccak::CXOFP1600(m_key[0], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
 
 		if (otp != m_expected[20])
 		{
@@ -258,7 +219,7 @@ namespace Test
 		// cSHAKE-256
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[22].size());
-		Keccak::CXOFR24P1600(m_key[5], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
+		Keccak::CXOFP1600(m_key[5], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
 
 		if (otp != m_expected[22])
 		{
@@ -268,21 +229,11 @@ namespace Test
 		// cSHAKE-512
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[24].size());
-		Keccak::CXOFR24P1600(m_key[10], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
+		Keccak::CXOFP1600(m_key[10], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
 
 		if (otp != m_expected[24])
 		{
 			throw TestException(std::string("Exception"), std::string("cSHAKE-512"), std::string("Exception handling failure! -SA11"));
-		}
-
-		// cSHAKE-1024
-		MemoryTools::Clear(otp, 0, otp.size());
-		otp.resize(m_expected[25].size());
-		Keccak::CXOFPR481600(m_key[15], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK1024_RATE_SIZE);
-
-		if (otp != m_expected[25])
-		{
-			throw TestException(std::string("Exception"), std::string("cSHAKE-1024"), std::string("Exception handling failure! -SA12"));
 		}
 	}
 
@@ -309,7 +260,7 @@ namespace Test
 		{
 			SHAKE gen(ShakeModes::SHAKE128);
 			// invalid key size
-			std::vector<byte> key(1);
+			std::vector<uint8_t> key(1);
 			gen.Initialize(key);
 
 			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE2"));
@@ -326,7 +277,7 @@ namespace Test
 		try
 		{
 			SHAKE gen(ShakeModes::SHAKE128);
-			std::vector<byte> otp(32);
+			std::vector<uint8_t> otp(32);
 			// generator was not initialized
 			gen.Generate(otp);
 
@@ -344,9 +295,9 @@ namespace Test
 		try
 		{
 			SHAKE gen(ShakeModes::SHAKE128);
-			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> otp(32);
+			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[0];
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> otp(32);
 
 			gen.Initialize(key);
 			// array too small
@@ -363,9 +314,9 @@ namespace Test
 		}
 	}
 
-	void SHAKETest::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected)
+	void SHAKETest::Kat(IKdf* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> otp(Expected.size());
+		std::vector<uint8_t> otp(Expected.size());
 		SymmetricKey kp(Key);
 
 		Generator->Initialize(kp);
@@ -377,9 +328,9 @@ namespace Test
 		}
 	}
 
-	void SHAKETest::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Custom, std::vector<byte> &Expected)
+	void SHAKETest::Kat(IKdf* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Custom, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> otp(Expected.size());
+		std::vector<uint8_t> otp(Expected.size());
 		SymmetricKey kp(Key, Custom);
 
 		Generator->Initialize(kp);
@@ -716,10 +667,10 @@ namespace Test
 
 	void SHAKETest::Params(IKdf* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
-		std::vector<byte> otp1;
-		std::vector<byte> otp2;
-		std::vector<byte> key(ks.KeySize());
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
+		std::vector<uint8_t> otp1;
+		std::vector<uint8_t> otp2;
+		std::vector<uint8_t> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -750,9 +701,9 @@ namespace Test
 
 	void SHAKETest::Stress(IKdf* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> otp;
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 

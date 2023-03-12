@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -29,7 +29,7 @@ using Exception::CryptoDigestException;
 /// <summary>
 /// Specifies the Skein Ubi type
 /// </summary>
-enum class SkeinUbiType : ulong
+enum class SkeinUbiType : uint64_t
 {
 	/// <summary>
 	/// A key that turns Skein into a MAC or KDF function.
@@ -72,8 +72,8 @@ class SkeinUbiTweak
 {
 private:
 
-	static const ulong T1_FINAL = static_cast<ulong>(1) << 63;
-	static const ulong T1_FIRST = static_cast<ulong>(1) << 62;
+	static const uint64_t T1_FINAL = static_cast<uint64_t>(1) << 63;
+	static const uint64_t T1_FIRST = static_cast<uint64_t>(1) << 62;
 
 public:
 
@@ -85,7 +85,7 @@ public:
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
 	template<typename Array>
-	static ulong BitsProcessed(const Array &Tweak)
+	static uint64_t BitsProcessed(const Array &Tweak)
 	{
 		return Tweak[0];
 	}
@@ -110,7 +110,7 @@ public:
 	template<typename Array>
 	static void BlockType(Array &Tweak, SkeinUbiType Value)
 	{
-		Tweak[1] = static_cast<ulong>(Value) << 56;
+		Tweak[1] = static_cast<uint64_t>(Value) << 56;
 	}
 
 	/// <summary>
@@ -131,10 +131,10 @@ public:
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The final block state value</param>
 	template<typename Array>
-	static void IsFinalBlock(Array &Tweak, ulong Value)
+	static void IsFinalBlock(Array &Tweak, uint64_t Value)
 	{
-		long mask = Value ? 1 : 0;
-		Tweak[1] = (Tweak[1] & ~T1_FINAL) | (static_cast<ulong>(-mask & T1_FINAL));
+		int64_t mask = Value ? 1 : 0;
+		Tweak[1] = (Tweak[1] & ~T1_FINAL) | (static_cast<uint64_t>(-mask & T1_FINAL));
 	}
 
 	/// <summary>
@@ -157,8 +157,8 @@ public:
 	template<typename Array>
 	static void IsFirstBlock(Array &Tweak, bool Value)
 	{
-		long mask = Value ? 1 : 0;
-		Tweak[1] = (Tweak[1] & ~T1_FIRST) | (static_cast<ulong>(-mask & T1_FIRST));
+		int64_t mask = Value ? 1 : 0;
+		Tweak[1] = (Tweak[1] & ~T1_FIRST) | (static_cast<uint64_t>(-mask & T1_FIRST));
 	}
 
 	/// <summary>
@@ -169,9 +169,9 @@ public:
 	/// 
 	/// <returns>The tree level</returns>
 	template<typename Array>
-	static byte TreeLevel(const Array &Tweak)
+	static uint8_t TreeLevel(const Array &Tweak)
 	{
-		return static_cast<ulong>((Tweak[1] >> 48) & 0x3F);
+		return static_cast<uint64_t>((Tweak[1] >> 48) & 0x3F);
 	}
 
 	/// <summary>
@@ -181,15 +181,15 @@ public:
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The tree level value</param>
 	template<typename Array>
-	static void TreeLevel(Array &Tweak, byte Value)
+	static void TreeLevel(Array &Tweak, uint8_t Value)
 	{
 		if (Value > 63)
 		{
 			throw CryptoDigestException(std::string("SkeinUbiTweak"), std::string("TreeLevel"), std::string("Tree level must be between 0 and 63, inclusive."), Enumeration::ErrorCodes::InvalidParam);
 		}
 
-		Tweak[1] &= ~(static_cast<ulong>(0x3f) << 48);
-		Tweak[1] |= static_cast<ulong>(Value) << 48;
+		Tweak[1] &= ~(static_cast<uint64_t>(0x3f) << 48);
+		Tweak[1] |= static_cast<uint64_t>(Value) << 48;
 	}
 
 	/// <summary>
@@ -225,7 +225,7 @@ public:
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The number of bits processed</param>
 	template<typename Array>
-	static void SetBitsProcessed(Array &Tweak, ulong Value)
+	static void SetBitsProcessed(Array &Tweak, uint64_t Value)
 	{
 		Tweak[0] = Value;
 	}

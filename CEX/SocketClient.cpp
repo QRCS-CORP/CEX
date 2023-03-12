@@ -96,7 +96,7 @@ bool SocketClient::Connect(const std::string &Host, std::string &Service)
 	return ret;
 }
 
-bool SocketClient::Connect(const ipv4_address &Address, ushort Port)
+bool SocketClient::Connect(const ipv4_address &Address, uint16_t Port)
 {
 	bool ret;
 
@@ -121,7 +121,7 @@ bool SocketClient::Connect(const ipv4_address &Address, ushort Port)
 	return ret;
 }
 
-bool SocketClient::Connect(const ipv6_address &Address, ushort Port)
+bool SocketClient::Connect(const ipv6_address &Address, uint16_t Port)
 {
 	bool ret;
 
@@ -146,9 +146,9 @@ bool SocketClient::Connect(const ipv6_address &Address, ushort Port)
 	return ret;
 }
 
-void SocketClient::ConnectAsync(const std::string &Address, ushort Port)
+void SocketClient::ConnectAsync(const std::string &Address, uint16_t Port)
 {
-	IAsyncResult* ar = new IAsyncResult(m_baseSocket, Address, static_cast<uint>(Port));
+	IAsyncResult* ar = new IAsyncResult(m_baseSocket, Address, static_cast<uint32_t>(Port));
 	std::function<void(IAsyncResult*)> f = [this](IAsyncResult* x) { ConnectCallback(x); };
 	std::packaged_task<void(IAsyncResult*)> task(f);
 	std::future<void> result = task.get_future();
@@ -164,7 +164,7 @@ void SocketClient::ConnectCallback(IAsyncResult* Result)
 
 	if (Result != nullptr)
 	{
-		ret = Connect(Result->Address, static_cast<ushort>(Result->Option));
+		ret = Connect(Result->Address, static_cast<uint16_t>(Result->Option));
 
 
 		if (ret == true)
@@ -180,9 +180,9 @@ void SocketClient::ConnectCallback(IAsyncResult* Result)
 	}
 }
 
-uint SocketClient::Receive(std::vector<byte> &Output, SocketReceiveFlags Flags)
+uint32_t SocketClient::Receive(std::vector<uint8_t> &Output, SocketReceiveFlags Flags)
 {
-	uint ret;
+	uint32_t ret;
 
 	ret = 0;
 
@@ -203,10 +203,10 @@ uint SocketClient::Receive(std::vector<byte> &Output, SocketReceiveFlags Flags)
 	return ret;
 }
 
-uint SocketClient::Receive(size_t BufferLength, SocketReceiveFlags Flags)
+uint32_t SocketClient::Receive(size_t BufferLength, SocketReceiveFlags Flags)
 {
-	uint ret;
-	std::vector<byte> otp(BufferLength);
+	uint32_t ret;
+	std::vector<uint8_t> otp(BufferLength);
 	ret = 0;
 
 	try
@@ -233,7 +233,7 @@ uint SocketClient::Receive(size_t BufferLength, SocketReceiveFlags Flags)
 
 void SocketClient::ReceiveAsync(size_t BufferLength, SocketReceiveFlags Flags)
 {
-	IAsyncResult* ar = new IAsyncResult(m_baseSocket, static_cast<uint>(BufferLength), static_cast<uint>(Flags));
+	IAsyncResult* ar = new IAsyncResult(m_baseSocket, static_cast<uint32_t>(BufferLength), static_cast<uint32_t>(Flags));
 	std::function<void(IAsyncResult*)> f = [this](IAsyncResult* x) { ReceiveCallback(x); };
 	std::packaged_task<void(IAsyncResult*)> task(f);
 	std::future<void> result = task.get_future();
@@ -245,11 +245,11 @@ void SocketClient::ReceiveCallback(IAsyncResult* Result)
 {
 	std::mutex m;
 	std::unique_lock<std::mutex> lock(m);
-	uint ret(0);
+	uint32_t ret(0);
 
 	if (Result != nullptr)
 	{
-		std::vector<byte> otp(Result->Option);
+		std::vector<uint8_t> otp(Result->Option);
 
 		try
 		{
@@ -277,9 +277,9 @@ void SocketClient::ReceiveCallback(IAsyncResult* Result)
 	}
 }
 
-uint SocketClient::Send(const std::vector<byte> &Input, size_t Length, SocketSendFlags Flags)
+uint32_t SocketClient::Send(const std::vector<uint8_t> &Input, size_t Length, SocketSendFlags Flags)
 {
-	uint ret;
+	uint32_t ret;
 
 	ret = 0;
 
@@ -304,9 +304,9 @@ uint SocketClient::Send(const std::vector<byte> &Input, size_t Length, SocketSen
 	return ret;
 }
 
-void SocketClient::SendAsync(const std::vector<byte> &Input, size_t Length, SocketSendFlags Flags)
+void SocketClient::SendAsync(const std::vector<uint8_t> &Input, size_t Length, SocketSendFlags Flags)
 {
-	IAsyncResult* ar = new IAsyncResult(m_baseSocket, Input, static_cast<uint>(Length), static_cast<uint>(Flags));
+	IAsyncResult* ar = new IAsyncResult(m_baseSocket, Input, static_cast<uint32_t>(Length), static_cast<uint32_t>(Flags));
 	std::function<void(IAsyncResult*)> f = [this](IAsyncResult* x) { SendCallback(x); };
 	std::packaged_task<void(IAsyncResult*)> task(f);
 	std::future<void> result = task.get_future();
@@ -318,7 +318,7 @@ void SocketClient::SendCallback(IAsyncResult* Result)
 {
 	std::mutex m;
 	std::unique_lock<std::mutex> lock(m);
-	uint ret;
+	uint32_t ret;
 
 	if (Result != nullptr)
 	{

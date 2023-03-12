@@ -24,10 +24,10 @@ namespace Test
 		static const size_t MINM_ALLOC = 1024;
 		static const size_t TEST_CYCLES = 10;
 
-		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<uint8_t>> m_key;
+		std::vector<std::vector<uint8_t>> m_expected;
 		TestEventHandler m_progressEvent;
-		std::vector<std::vector<byte>> m_salt;
+		std::vector<std::vector<uint8_t>> m_salt;
 
 	public:
 
@@ -70,7 +70,7 @@ namespace Test
 		/// <param name="Key">The input key</param>
 		/// <param name="Expected">The expected output</param>
 		/// <param name="Iterations">The number of loop iterations</param>
-		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, uint Iterations);
+		void Kat(IKdf* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Salt, std::vector<uint8_t> &Expected, uint32_t Iterations);
 
 		/// <summary>
 		/// Test the different constructor initialization options

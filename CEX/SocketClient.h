@@ -28,25 +28,25 @@ public:
 	/// Raised when an asychronous socket is connected to a remote host.
 	/// <para>The event transmits an instance counter, and the address of the remote host<para>
 	/// </summary>
-	event<int, const std::string&> OnSocketConnected;
+	event<int32_t, const std::string&> OnSocketConnected;
 
 	/// <summary>
 	/// Raised when an asychronous socket is disconnected from a remote host.
 	/// <para>The event transmits an instance counter, and the address of the remote host<para>
 	/// </summary>
-	event<int, const std::string&> OnSocketDisconnected;
+	event<int32_t, const std::string&> OnSocketDisconnected;
 
 	/// <summary>
 	/// Raised when an asychronous socket receives data from a remote host.
-	/// <para>The event transmits an instance counter, and the data as a byte vector<para>
+	/// <para>The event transmits an instance counter, and the data as a uint8_t vector<para>
 	/// </summary>
-	event<int, const std::vector<byte>&> OnSocketReceived;
+	event<int32_t, const std::vector<uint8_t>&> OnSocketReceived;
 
 	/// <summary>
 	/// Raised when an asychronous socket has completed sending data to a remote host.
 	/// <para>The event transmits an instance counter, and the address of the remote host<para>
 	/// </summary>
-	event<int> OnSocketSent;
+	event<int32_t> OnSocketSent;
 
 	/// <summary>
 	/// Raised when a socket encounters an error.
@@ -117,7 +117,7 @@ public:
 	///
 	/// <param name="Address">The remote hosts IPv4 address</param>
 	/// <param name="Port">The remote hosts service port number</param>
-	bool Connect(const ipv4_address &Address, ushort Port);
+	bool Connect(const ipv4_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// The Connect function establishes a connection to a remote host using IPv6 addressing
@@ -125,7 +125,7 @@ public:
 	///
 	/// <param name="Address">The remote hosts IPv6 address</param>
 	/// <param name="Port">The remote hosts service port number</param>
-	bool Connect(const ipv6_address &Address, ushort Port);
+	bool Connect(const ipv6_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// Start Non-Blocking connect to a remote host
@@ -135,7 +135,7 @@ public:
 	/// <param name="Port">The application port number</param>
 	/// 
 	/// <exception cref="CryptoSocketException">Thrown if the Tcp connect operation has failed</exception>
-	void ConnectAsync(const std::string &Address, ushort Port);
+	void ConnectAsync(const std::string &Address, uint16_t Port);
 
 	/// <summary>
 	/// The async connect callback
@@ -153,7 +153,7 @@ public:
 	/// <returns>The number of bytes received from the remote host</returns>
 	///
 	/// <remarks>Requires the OnSocketReceived event handler.</remarks>
-	uint Receive(size_t BufferLength, SocketReceiveFlags Flags = SocketReceiveFlags::None);
+	uint32_t Receive(size_t BufferLength, SocketReceiveFlags Flags = SocketReceiveFlags::None);
 
 	/// <summary>
 	/// Receive data from a synchronous connected socket or a bound connectionless socket
@@ -165,13 +165,13 @@ public:
 	/// <returns>The number of bytes received from the remote host</returns>
 	///
 	/// <remarks>Successful receive operation raises the SocketChanged event with the SocketEvents::Received flag</remarks>
-	uint Receive(std::vector<byte> &Output, SocketReceiveFlags Flags = SocketReceiveFlags::None);
+	uint32_t Receive(std::vector<uint8_t> &Output, SocketReceiveFlags Flags = SocketReceiveFlags::None);
 
 	/// <summary>
 	/// Begin Non-Blocking receiver of incoming messages (called after a connection is made)
 	/// </summary>
 	/// 
-	/// <param name="BufferLength">The byte length of the input buffer</param>
+	/// <param name="BufferLength">The uint8_t length of the input buffer</param>
 	/// <param name="Flags">The bitwise combination of Socket Flags (default is None)</param>
 	/// 
 	/// <exception cref="CryptoSocketException">Thrown if the Tcp receive operation has failed</exception>
@@ -197,7 +197,7 @@ public:
 	/// <returns>The number of bytes sent to the remote host</returns>
 	///
 	/// <remarks>Successful send operation raises the SocketChanged event with the SocketEvents::Sent flag</remarks>
-	uint Send(const std::vector<byte> &Input, size_t Length, SocketSendFlags Flags = SocketSendFlags::SendOOB);
+	uint32_t Send(const std::vector<uint8_t> &Input, size_t Length, SocketSendFlags Flags = SocketSendFlags::SendOOB);
 
 	/// <summary>
 	/// Non-blocking transmission of data to the remote host
@@ -208,7 +208,7 @@ public:
 	/// <param name="Flags">Flags that influence the behavior of the send function</param>
 	/// 
 	/// <exception cref="CryptoSocketException">Thrown if the Tcp Send operation has failed, or the maximum allocation size is exceeded</exception>
-	void SendAsync(const std::vector<byte> &Input, size_t Length, SocketSendFlags Flags);
+	void SendAsync(const std::vector<uint8_t> &Input, size_t Length, SocketSendFlags Flags);
 
 	/// <summary>
 	/// The Send callback

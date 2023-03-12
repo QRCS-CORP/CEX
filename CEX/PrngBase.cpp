@@ -34,40 +34,40 @@ const std::string PrngBase::Name()
 
 //~~~Public Functions~~~//
 
-ushort PrngBase::NextUInt16()
+uint16_t PrngBase::NextUInt16()
 {
-	ushort x;
-	std::vector<byte> smp(sizeof(ushort));
+	uint16_t x;
+	std::vector<uint8_t> smp(sizeof(uint16_t));
 
 	x = 0;
 	Generate(smp);
-	MemoryTools::CopyToValue(smp, 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint16_t));
 	MemoryTools::Clear(smp, 0, smp.size());
 
 	return x;
 }
 
-uint PrngBase::NextUInt32()
+uint32_t PrngBase::NextUInt32()
 {
-	uint x;
-	std::vector<byte> smp(sizeof(uint));
+	uint32_t x;
+	std::vector<uint8_t> smp(sizeof(uint32_t));
 
 	x = 0;
 	Generate(smp);
-	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint32_t));
 	MemoryTools::Clear(smp, 0, smp.size());
 
 	return x;
 }
 
-ulong PrngBase::NextUInt64()
+uint64_t PrngBase::NextUInt64()
 {
-	ulong x;
-	std::vector<byte> smp(sizeof(ulong));
+	uint64_t x;
+	std::vector<uint8_t> smp(sizeof(uint64_t));
 
 	x = 0;
 	Generate(smp);
-	MemoryTools::CopyToValue(smp, 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint64_t));
 	MemoryTools::Clear(smp, 0, smp.size());
 
 	return x;

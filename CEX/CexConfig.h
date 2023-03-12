@@ -181,7 +181,7 @@
 
 #ifndef TYPE_OF_SOCKLEN_T
 #	if defined(_WIN64) || defined(_WIN32) || defined(__CYGWIN__)
-#		define TYPE_OF_SOCKLEN_T int
+#		define TYPE_OF_SOCKLEN_T int32_t
 #	else
 #		define TYPE_OF_SOCKLEN_T ::socklen_t
 #	endif
@@ -314,7 +314,7 @@
 #endif
 
 // detect endianess
-#define CEX_IS_LITTLE_ENDIAN (((union { unsigned x; unsigned char c; }){1}).c)
+#define CEX_IS_LITTLE_ENDIAN (((union { unsigned x; uint8_t c; }){1}).c)
 
 // define endianess of CPU
 #if (!defined(CEX_IS_LITTLE_ENDIAN))
@@ -327,28 +327,11 @@
 #	endif
 #endif
 
-// define universal data types
-typedef unsigned char byte;
-
-#if (defined(__GNUC__) && (!defined(__alpha))) || defined(__MWERKS__)
-	typedef unsigned int ushort;
-	typedef unsigned long uint;
-	typedef unsigned long long ulong;
-#elif defined(_MSC_VER) || defined(__BCPLUSPLUS__)
-	typedef unsigned __int16 ushort;
-	typedef unsigned __int32 uint;
-	typedef unsigned __int64 ulong;
-#else
-	typedef unsigned short ushort;
-	typedef unsigned int uint;
-	typedef unsigned long ulong;
-#endif
-
 // 128 bit unsigned integer support
 #if defined(__SIZEOF_INT128__) && defined(CEX_IS_X64) && !defined(__xlc__)
 #	define CEX_SYSTEM_NATIVE_UINT128
 #	if defined(__GNUG__)
-		typedef unsigned int uint128_t __attribute__((mode(TI)));
+		typedef uint32_t uint128_t __attribute__((mode(TI)));
 #	else
 		typedef unsigned __int128 uint128_t;
 #	endif
@@ -432,13 +415,6 @@ typedef unsigned char byte;
 
 // avx
 
-/// <summary>
-/// AVX minimum version support
-/// </summary>
-#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
-#	define CEX_AVX_SUPPORTED
-#endif
-
 // intrinsics support level
 #if defined(__SSE2__)
 #	define CEX_HAS_SSE2
@@ -506,10 +482,35 @@ typedef unsigned char byte;
 #	endif
 #endif
 
+/// <summary>
+/// AVX minimum version support
+/// </summary>
 #if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 #	define CEX_AVX_INTRINSICS
 #endif
 
+/// <summary>
+/// Align an array by SIMD instruction width
+/// </summary>
+#if defined(CEX_HAS_AVX512)
+#	define CEX_SIMD_ALIGN QSC_ALIGN(64)
+#	define CEX_SIMD_ALIGNMENT 64
+#elif defined(CEX_HAS_AVX2)
+#	define CEX_SIMD_ALIGN QSC_ALIGN(32)
+#	define CEX_SIMD_ALIGNMENT 32
+#elif defined(CEX_HAS_AVX)
+#	define CEX_SIMD_ALIGN QSC_ALIGN(16)
+#	define CEX_SIMD_ALIGNMENT 16
+#else
+#	define CEX_SIMD_ALIGN
+#	define CEX_SIMD_ALIGNMENT 8
+#endif
+
+/// <summary>
+/// Enables large-block AES-NI instructions (256/512).
+/// Not available on all processors, even ones with AVX2 support.
+/// Enabled manually on systems that have the extended instructions, but are not using AVX512.
+/// </summary>
 #if defined(CEX_HAS_AVX512)
 #	define CEX_EXTENDED_AESNI
 #endif
@@ -608,15 +609,6 @@ typedef unsigned char byte;
 /// Enable the legal-key-size exception set on all primitives
 /// </summary>
 //#define CEX_ENFORCE_LEGALKEY
-
-/// <summary>
-/// Enables large-block AES-NI instructions (256/512).
-/// Not available on all processors, even ones with AVX2 support.
-/// Enabled manually on systems that have the extended instructions, but are not using AVX512.
-/// </summary>
-#if !defined(CEX_EXTENDED_AESNI)
-//#	define CEX_EXTENDED_AESNI
-#endif
 
 /// <summary>
 /// Enable FIPS 140.2 entropy provider wellness test

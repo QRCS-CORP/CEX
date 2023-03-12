@@ -53,11 +53,6 @@ IAeadMode* AeadModeFromName::GetInstance(IBlockCipher* Cipher, AeadModes CipherM
 				mptr = new HBA(Cipher, StreamAuthenticators::KMAC512); 
 				break;
 			}
-			case AeadModes::HBAS1024:
-			{
-				mptr = new HBA(Cipher, StreamAuthenticators::KMAC1024); 
-				break;
-			}
 			default:
 			{
 				// invalid param
@@ -112,11 +107,6 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, AeadModes Ciph
 			case AeadModes::HBAS512:
 			{
 				mptr = new HBA(CipherType, StreamAuthenticators::KMAC512); 
-				break;
-			}
-			case AeadModes::HBAS1024:
-			{
-				mptr = new HBA(CipherType, StreamAuthenticators::KMAC1024); 
 				break;
 			}
 			default:

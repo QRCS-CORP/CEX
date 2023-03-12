@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The socket send api flags
 /// </summary>
-enum class SocketSendFlags : int
+enum class SocketSendFlags : int32_t
 {
 	/// <summary>
 	/// No flag is used

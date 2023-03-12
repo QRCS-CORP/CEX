@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -83,7 +83,7 @@ public:
 	/// Initialize with an integer array
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 256 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
 	explicit ULong256(const Array &Input, size_t Offset)
@@ -95,11 +95,11 @@ public:
 	/// Initialize with 4 * 64bit unsigned integers
 	/// </summary>
 	///
-	/// <param name="X0">ulong 0</param>
-	/// <param name="X1">ulong 1</param>
-	/// <param name="X2">ulong 2</param>
-	/// <param name="X3">ulong 3</param>
-	explicit ULong256(ulong X0, ulong X1, ulong X2, ulong X3)
+	/// <param name="X0">uint64_t 0</param>
+	/// <param name="X1">uint64_t 1</param>
+	/// <param name="X2">uint64_t 2</param>
+	/// <param name="X3">uint64_t 3</param>
+	explicit ULong256(uint64_t X0, uint64_t X1, uint64_t X2, uint64_t X3)
 	{
 		ymm = _mm256_set_epi64x(X0, X1, X2, X3);
 	}
@@ -108,8 +108,8 @@ public:
 	/// Initialize with 1 * 64bit unsigned integer; copied to every register
 	/// </summary>
 	///
-	/// <param name="X">The uint to add</param>
-	explicit ULong256(ulong X)
+	/// <param name="X">The uint32_t to add</param>
+	explicit ULong256(uint64_t X)
 	{
 		ymm = _mm256_set1_epi64x(X);
 	}
@@ -129,7 +129,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="X">Set all uint64 integers to this value</param>
-	inline void Load(ulong X)
+	inline void Load(uint64_t X)
 	{
 		ymm = _mm256_set1_epi64x(X);
 	}
@@ -138,7 +138,7 @@ public:
 	/// Load an array into a register
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 256 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
 	inline void Load(const Array &Input, size_t Offset)
@@ -154,7 +154,7 @@ public:
 	/// <param name="X1">uint64 1</param>
 	/// <param name="X2">uint64 2</param>
 	/// <param name="X3">uint64 3</param>
-	inline void Load(ulong X0, ulong X1, ulong X2, ulong X3)
+	inline void Load(uint64_t X0, uint64_t X1, uint64_t X2, uint64_t X3)
 	{
 		ymm = _mm256_set_epi64x(X0, X1, X2, X3);
 	}
@@ -164,24 +164,24 @@ public:
 	/// <para>Integers are loaded as 64bit integers regardless the natural size of T; but T must be less than or equal to 64bits in size</para>
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 256 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
 	inline void LoadULL(const Array &Input, size_t Offset)
 	{
-		CEXASSERT(sizeof(uint) <= sizeof(Array::value_type), "The input array integer size must be less or equal to uint32");
+		CEXASSERT(sizeof(uint32_t) <= sizeof(Array::value_type), "The input array integer size must be less or equal to uint32");
 
-		zmm = _mm256_set_epi64x(static_cast<uint>(Input[Offset]),
-			static_cast<uint>(Input[Offset + (sizeof(uint) / sizeof(Array::value_type))]),
-			static_cast<uint>(Input[Offset + (sizeof(uint) / sizeof(Array::value_type) * 2)]),
-			static_cast<uint>(Input[Offset + (sizeof(uint) / sizeof(Array::value_type) * 3)]));
+		zmm = _mm256_set_epi64x(static_cast<uint32_t>(Input[Offset]),
+			static_cast<uint32_t>(Input[Offset + (sizeof(uint32_t) / sizeof(Array::value_type))]),
+			static_cast<uint32_t>(Input[Offset + (sizeof(uint32_t) / sizeof(Array::value_type) * 2)]),
+			static_cast<uint32_t>(Input[Offset + (sizeof(uint32_t) / sizeof(Array::value_type) * 3)]));
 	}
 
 	/// <summary>
 	/// Store register in an integer array
 	/// </summary>
 	///
-	/// <param name="Output">The source integer array; must be at least 256 bits long</param>
+	/// <param name="Output">The source integer array; must be at least 256 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Output array</param>
 	template<typename Array>
 	inline void Store(Array &Output, size_t Offset) const
@@ -197,9 +197,9 @@ public:
 	/// <param name="X1">uint64 1</param>
 	/// <param name="X2">uint64 2</param>
 	/// <param name="X3">uint64 3</param>
-	inline void Store(ulong &X0, ulong &X1, ulong &X2, ulong &X3) const
+	inline void Store(uint64_t &X0, uint64_t &X1, uint64_t &X2, uint64_t &X3) const
 	{
-		std::array<ulong, 4> tmp;
+		std::array<uint64_t, 4> tmp;
 
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmp), ymm);
 
@@ -251,10 +251,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 64</param>
-	inline void RotL64(int Shift)
+	inline void RotL64(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
-		ymm = _mm256_or_si256(_mm256_slli_epi64(ymm, static_cast<int>(Shift)), _mm256_srli_epi64(ymm, static_cast<int>(64 - Shift)));
+		ymm = _mm256_or_si256(_mm256_slli_epi64(ymm, static_cast<int32_t>(Shift)), _mm256_srli_epi64(ymm, static_cast<int32_t>(64 - Shift)));
 	}
 
 	/// <summary>
@@ -265,10 +265,10 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 64</param>
 	/// 
 	/// <returns>The rotated ULong256</returns>
-	inline static ULong256 RotL64(const ULong256 &X, const int Shift)
+	inline static ULong256 RotL64(const ULong256 &X, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
-		return ULong256(_mm256_or_si256(_mm256_slli_epi64(X.ymm, static_cast<int>(Shift)), _mm256_srli_epi64(X.ymm, static_cast<int>(64 - Shift))));
+		return ULong256(_mm256_or_si256(_mm256_slli_epi64(X.ymm, static_cast<int32_t>(Shift)), _mm256_srli_epi64(X.ymm, static_cast<int32_t>(64 - Shift))));
 	}
 
 	/// <summary>
@@ -276,7 +276,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 64</param>
-	inline void RotR64(int Shift)
+	inline void RotR64(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
 		RotL64(64 - Shift);
@@ -290,17 +290,17 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 64</param>
 	/// 
 	/// <returns>The rotated ULong256</returns>
-	static ULong256 RotR64(const ULong256 &X, const int Shift)
+	static ULong256 RotR64(const ULong256 &X, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
 		return RotL64(X, 64 - Shift);
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 4 unsigned integers
+	/// Performs a uint8_t swap on 4 unsigned integers
 	/// </summary>
 	/// 
-	/// <returns>The byte swapped ULong256</returns>
+	/// <returns>The uint8_t swapped ULong256</returns>
 	inline ULong256 Swap() const
 	{
 		__m256i tmpX = ymm;
@@ -312,12 +312,12 @@ public:
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 4 unsigned integers
+	/// Performs a uint8_t swap on 4 unsigned integers
 	/// </summary>
 	/// 		
 	/// <param name="X">The ULong256 to process</param>
 	/// 
-	/// <returns>The byte swapped ULong256</returns>
+	/// <returns>The uint8_t swapped ULong256</returns>
 	inline static ULong256 Swap(ULong256 &X)
 	{
 		__m256i tmpX = X.ymm;
@@ -361,7 +361,7 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	inline ULong256 operator ++ (int)
+	inline ULong256 operator ++ (int32_t)
 	{
 		return ULong256(ymm) + ULong256::ONE();
 	}
@@ -426,8 +426,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline ULong256 operator / (const ULong256 &X) const
 	{
-		std::array<ulong, 4> tmpA;
-		std::array<ulong, 4> tmpB;
+		std::array<uint64_t, 4> tmpA;
+		std::array<uint64_t, 4> tmpB;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
 		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
@@ -442,8 +442,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const ULong256 &X)
 	{
-		std::array<ulong, 4> tmpA;
-		std::array<ulong, 4> tmpB;
+		std::array<uint64_t, 4> tmpA;
+		std::array<uint64_t, 4> tmpB;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
 		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
@@ -556,7 +556,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator <<= (int Shift)
+	inline void operator <<= (int32_t Shift)
 	{
 		ymm = _mm256_slli_epi64(ymm, Shift);
 	}
@@ -566,7 +566,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline ULong256 operator << (int Shift) const
+	inline ULong256 operator << (int32_t Shift) const
 	{
 		return ULong256(_mm256_slli_epi64(ymm, Shift));
 	}
@@ -576,7 +576,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator >>= (int Shift)
+	inline void operator >>= (int32_t Shift)
 	{
 		ymm = _mm256_srli_epi64(ymm, Shift);
 	}
@@ -586,7 +586,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline ULong256 operator >> (int Shift) const
+	inline ULong256 operator >> (int32_t Shift) const
 	{
 		return ULong256(_mm256_srli_epi64(ymm, Shift));
 	}

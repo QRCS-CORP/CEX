@@ -123,9 +123,9 @@ namespace Test
 		const std::string INPFILE = "C:\\Users\\John\\Documents\\Tests\\test1.txt"; // input
 		const std::string ENCFILE = "C:\\Users\\John\\Documents\\Tests\\test2.txt"; // empty
 		const std::string DECFILE = "C:\\Users\\John\\Documents\\Tests\\test3.txt"; // empty
-		std::vector<byte> key(32, 1);
-		std::vector<byte> iv(16, 2);
-		std::vector<byte> data(1025, 3);
+		std::vector<uint8_t> key(32, 1);
+		std::vector<uint8_t> iv(16, 2);
+		std::vector<uint8_t> data(1025, 3);
 
 		// initialize the cipher and key container
 		CipherStream cs(BlockCiphers::AES, CipherModes::CBC, PaddingModes::ESP);
@@ -166,11 +166,11 @@ namespace Test
 
 	void CipherStreamTest::Parallel(CipherStream* Cipher)
 	{
-		std::vector<byte> iv(16);
-		std::vector<byte> key(32);
-		std::vector<byte> dec(0);
-		std::vector<byte> enc(0);
-		std::vector<byte> pln(0);
+		std::vector<uint8_t> iv(16);
+		std::vector<uint8_t> key(32);
+		std::vector<uint8_t> dec(0);
+		std::vector<uint8_t> enc(0);
+		std::vector<uint8_t> pln(0);
 		SecureRandom rng;
 
 		rng.Generate(iv);
@@ -179,7 +179,7 @@ namespace Test
 
 		for (size_t i = 0; i < TEST_CYCLES; i++)
 		{
-			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4), static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize()));
+			const uint32_t SMPLEN = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize() * 4), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize()));
 			dec.clear();
 			enc.clear();
 			pln.clear();
@@ -200,7 +200,7 @@ namespace Test
 			Cipher->Initialize(true, kp);
 			Cipher->Write(&mpln, &menc);
 
-			// byte-array interface
+			// uint8_t-array interface
 			Cipher->Initialize(true, kp);
 			Cipher->Write(pln, 0, enc, 0);
 
@@ -222,7 +222,7 @@ namespace Test
 				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM2"));
 			}
 
-			// byte array interface
+			// uint8_t array interface
 			dec.resize(enc.size());
 			Cipher->Initialize(false, kp);
 			Cipher->Write(enc, 0, dec, 0);
@@ -236,11 +236,11 @@ namespace Test
 
 	void CipherStreamTest::Memory()
 	{
-		std::vector<byte> data(255);
-		std::vector<byte> data2(255);
+		std::vector<uint8_t> data(255);
+		std::vector<uint8_t> data2(255);
 		MemoryStream ms;
 		size_t i;
-		byte x;
+		uint8_t x;
 
 		ms.WriteByte(0xA);
 		ms.WriteByte(0xB);
@@ -248,7 +248,7 @@ namespace Test
 
 		for (i = 0; i < 255; i++)
 		{
-			data[i] = static_cast<byte>(i);
+			data[i] = static_cast<uint8_t>(i);
 		}
 		ms.Write(data, 0, 255);
 
@@ -281,11 +281,11 @@ namespace Test
 
 	void CipherStreamTest::Parameters()
 	{
-		std::vector<byte> iv(16);
-		std::vector<byte> key(32);
-		std::vector<byte> dec(1);
-		std::vector<byte> enc(1);
-		std::vector<byte> pln(1);
+		std::vector<uint8_t> iv(16);
+		std::vector<uint8_t> key(32);
+		std::vector<uint8_t> dec(1);
+		std::vector<uint8_t> enc(1);
+		std::vector<uint8_t> pln(1);
 		MemoryStream mdec;
 		MemoryStream mpln;
 		MemoryStream menc;
@@ -297,7 +297,7 @@ namespace Test
 		rng.Generate(pln);
 		SymmetricKey kp(key, iv);
 
-		// 1 byte test
+		// 1 uint8_t test
 		cs.Initialize(true, kp);
 		cs.Write(pln, 0, enc, 0);
 	
@@ -309,7 +309,7 @@ namespace Test
 			throw TestException(std::string("Parameters"), cs.Name(), std::string("Encrypted arrays are not equal! -CP1"));
 		}
 
-		// 1 byte with stream
+		// 1 uint8_t with stream
 		cs.Initialize(true, kp);
 		rng.Generate(pln);
 		mpln.Write(pln, 0, pln.size());
@@ -369,10 +369,10 @@ namespace Test
 			throw TestException(std::string("Parameters"), cs.Name(), std::string("Encrypted arrays are not equal! -CP4"));
 		}
 
-		// random block sizes with byte arrays
+		// random block sizes with uint8_t arrays
 		for (size_t i = 0; i < 10; i++)
 		{
-			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(cs.ParallelProfile().ParallelBlockSize() * 4), static_cast<uint>(cs.ParallelProfile().ParallelBlockSize()));
+			const uint32_t SMPLEN = rng.NextUInt32(static_cast<uint32_t>(cs.ParallelProfile().ParallelBlockSize() * 4), static_cast<uint32_t>(cs.ParallelProfile().ParallelBlockSize()));
 
 			dec.clear();
 			enc.clear();
@@ -398,7 +398,7 @@ namespace Test
 		// random block sizes with stream
 		for (size_t i = 0; i < 10; i++)
 		{
-			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(cs.ParallelProfile().ParallelBlockSize() * 4), static_cast<uint>(cs.ParallelProfile().ParallelBlockSize()));
+			const uint32_t SMPLEN = rng.NextUInt32(static_cast<uint32_t>(cs.ParallelProfile().ParallelBlockSize() * 4), static_cast<uint32_t>(cs.ParallelProfile().ParallelBlockSize()));
 			dec.clear();
 			enc.clear();
 			pln.clear();
@@ -430,11 +430,11 @@ namespace Test
 	void CipherStreamTest::Stress(CipherStream* Cipher)
 	{
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
-		std::vector<byte> cpt;
-		std::vector<byte> inp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.IVSize());
-		std::vector<byte> otp;
+		std::vector<uint8_t> cpt;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> nonce(ks.IVSize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 

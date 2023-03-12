@@ -15,11 +15,11 @@ class Skein256::Skein256State
 public:
 
 	// state
-	std::array<ulong, 4> S = { 0 };
+	std::array<uint64_t, 4> S = { 0 };
 	// config
-	std::array<ulong, 4> V = { 0 };
+	std::array<uint64_t, 4> V = { 0 };
 	// tweak
-	std::array<ulong, 2> T = { 0 };
+	std::array<uint64_t, 2> T = { 0 };
 
 	Skein256State()
 	{
@@ -37,9 +37,9 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(S, 0, S.size() * sizeof(ulong));
-		MemoryTools::Clear(T, 0, T.size() * sizeof(ulong));
-		MemoryTools::Clear(V, 0, V.size() * sizeof(ulong));
+		MemoryTools::Clear(S, 0, S.size() * sizeof(uint64_t));
+		MemoryTools::Clear(T, 0, T.size() * sizeof(uint64_t));
+		MemoryTools::Clear(V, 0, V.size() * sizeof(uint64_t));
 	}
 };
 
@@ -56,7 +56,7 @@ Skein256::Skein256(bool Parallel)
 	m_msgLength(0),
 	m_parallelProfile(Skein::SKEIN256_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
 	m_treeParams(Parallel ? 
-		SkeinParams(Skein::SKEIN256_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN256_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) :
+		SkeinParams(Skein::SKEIN256_DIGEST_SIZE, static_cast<uint8_t>(Skein::SKEIN256_RATE_SIZE), static_cast<uint8_t>(DEF_PRLDEGREE)) :
 		SkeinParams(Skein::SKEIN256_DIGEST_SIZE, 0x00, 0x00))
 {
 	Initialize(m_dgtState, m_treeParams);
@@ -132,7 +132,7 @@ ParallelOptions &Skein256::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void Skein256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void Skein256::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (Output.size() < Skein::SKEIN256_DIGEST_SIZE)
 	{
@@ -143,7 +143,7 @@ void Skein256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 	Finalize(Output, 0);
 }
 
-void Skein256::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void Skein256::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (Output.size() - OutOffset < Skein::SKEIN256_DIGEST_SIZE)
 	{
@@ -178,8 +178,8 @@ void Skein256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		// initialize a linear-mode hash config
 		Skein256State proot;
 		SkeinParams rparam{ Skein::SKEIN256_DIGEST_SIZE };
-		std::vector<ulong> tmp = rparam.GetConfig();
-		std::array<ulong, 4> cfg{ tmp[0], tmp[1], tmp[2], tmp[3] };
+		std::vector<uint64_t> tmp = rparam.GetConfig();
+		std::array<uint64_t, 4> cfg{ tmp[0], tmp[1], tmp[2], tmp[3] };
 		// load the initial state
 		LoadState(proot, cfg);
 
@@ -218,7 +218,7 @@ void Skein256::ParallelMaxDegree(size_t Degree)
 	m_dgtState.resize(Degree);
 	m_msgBuffer.clear();
 	m_msgBuffer.resize(Degree * Skein::SKEIN256_RATE_SIZE);
-	m_treeParams = { Skein::SKEIN256_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN256_RATE_SIZE), static_cast<byte>(Degree) };
+	m_treeParams = { Skein::SKEIN256_DIGEST_SIZE, static_cast<uint8_t>(Skein::SKEIN256_RATE_SIZE), static_cast<uint8_t>(Degree) };
 
 	Initialize(m_dgtState, m_treeParams);
 }
@@ -239,29 +239,29 @@ void Skein256::Reset()
 	m_msgLength = 0;
 }
 
-void Skein256::Update(byte Input)
+void Skein256::Update(uint8_t Input)
 {
-	std::vector<byte> one(1, Input);
+	std::vector<uint8_t> one(1, Input);
 	Update(one, 0, 1);
 }
 
-void Skein256::Update(uint Input)
+void Skein256::Update(uint32_t Input)
 {
-	std::vector<byte> tmp(sizeof(uint));
+	std::vector<uint8_t> tmp(sizeof(uint32_t));
 	IntegerTools::Le32ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void Skein256::Update(ulong Input)
+void Skein256::Update(uint64_t Input)
 {
-	std::vector<byte> tmp(sizeof(ulong));
+	std::vector<uint8_t> tmp(sizeof(uint64_t));
 	IntegerTools::Le64ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void Skein256::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too int16_t!");
 
 	if (Length != 0)
 	{
@@ -351,7 +351,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-void Skein256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Skein256State &State)
+void Skein256::HashFinal(std::vector<uint8_t> &Input, size_t InOffset, size_t Length, Skein256State &State)
 {
 	// process message block
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
@@ -374,14 +374,14 @@ void Skein256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Lengt
 	// finalize block
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Out);
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
-	std::vector<byte> tmp(Skein::SKEIN256_RATE_SIZE);
+	std::vector<uint8_t> tmp(Skein::SKEIN256_RATE_SIZE);
 	ProcessBlock(tmp, 0, State, 8);
 }
 
 void Skein256::Initialize(std::vector<Skein256State> &State, SkeinParams &Params)
 {
-	std::vector<ulong> tmp = Params.GetConfig();
-	std::array<ulong, 4> cfg{ tmp[0], tmp[1], tmp[2], tmp[3] };
+	std::vector<uint64_t> tmp = Params.GetConfig();
+	std::array<uint64_t, 4> cfg{ tmp[0], tmp[1], tmp[2], tmp[3] };
 	size_t i;
 
 	LoadState(State[0], cfg);
@@ -395,7 +395,7 @@ void Skein256::Initialize(std::vector<Skein256State> &State, SkeinParams &Params
 		// compress previous state
 		Permute(State[i - 1].V, State[i]);
 		// store the new state in V for reset
-		MemoryTools::Copy(State[i].S, 0, State[i].V, 0, State[i].V.size() * sizeof(ulong));
+		MemoryTools::Copy(State[i].S, 0, State[i].V, 0, State[i].V.size() * sizeof(uint64_t));
 		// mix config with state
 		MemoryTools::XOR256(cfg, 0, State[i].V, 0);
 	}
@@ -408,7 +408,7 @@ void Skein256::Initialize(std::vector<Skein256State> &State, SkeinParams &Params
 	}
 }
 
-void Skein256::LoadState(Skein256State &State, std::array<ulong, 4> &Config)
+void Skein256::LoadState(Skein256State &State, std::array<uint64_t, 4> &Config)
 {
 	// initialize the tweak value
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Config);
@@ -416,17 +416,17 @@ void Skein256::LoadState(Skein256State &State, std::array<ulong, 4> &Config)
 	State.Increase(32);
 	Permute(Config, State);
 	// store the initial state for reset
-	MemoryTools::Copy(State.S, 0, State.V, 0, State.V.size() * sizeof(ulong));
+	MemoryTools::Copy(State.S, 0, State.V, 0, State.V.size() * sizeof(uint64_t));
 	// add the config string
 	MemoryTools::XOR256(Config, 0, State.V, 0);
 }
 
-void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, Skein256State &State, size_t Length)
+void Skein256::ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Skein256State &State, size_t Length)
 {
 	// update length
 	State.Increase(Length);
 	// encrypt block
-	std::array<ulong, 4> msg;
+	std::array<uint64_t, 4> msg;
 	IntegerTools::LeBytesToULL256(Input, InOffset, msg, 0);
 	Permute(msg, State);
 	// feed-forward input with state
@@ -439,7 +439,7 @@ void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, Ske
 	}
 }
 
-void Skein256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Skein256State &State, ulong Length)
+void Skein256::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Skein256State &State, uint64_t Length)
 {
 	do
 	{
@@ -451,7 +451,7 @@ void Skein256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Skei
 	while (Length > 0);
 }
 
-void Skein256::Permute(std::array<ulong, 4> &Message, Skein256State &State)
+void Skein256::Permute(std::array<uint64_t, 4> &Message, Skein256State &State)
 {
 #if defined(CEX_DIGEST_COMPACT)
 	Skein::PemuteP256C(Message, State.T, State.S, 72);

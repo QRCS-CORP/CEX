@@ -12,7 +12,7 @@ using Digest::Keccak;
 using Tools::MemoryTools;
 using Digest::SHA2;
 
-void XMSSCore::AddressToBytes(std::vector<byte> &Input, const std::array<uint, 8> &Address)
+void XMSSCore::AddressToBytes(std::vector<uint8_t> &Input, const std::array<uint32_t, 8> &Address)
 {
 	size_t i;
 
@@ -22,7 +22,7 @@ void XMSSCore::AddressToBytes(std::vector<byte> &Input, const std::array<uint, 8
 	}
 }
 
-int32_t XMSSCore::CoreHash(const XmssParams &Params, std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, size_t InLength)
+int32_t XMSSCore::CoreHash(const XmssParams &Params, std::vector<uint8_t> &Output, size_t OutOffset, const std::vector<uint8_t> &Input, size_t InOffset, size_t InLength)
 {
 	int32_t res;
 
@@ -42,12 +42,12 @@ int32_t XMSSCore::CoreHash(const XmssParams &Params, std::vector<byte> &Output, 
 		}
 		case XMSS_SHAKE_128:
 		{
-			Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, Keccak::KECCAK256_DIGEST_SIZE, Keccak::KECCAK128_RATE_SIZE);
+			Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, Keccak::KECCAK256_DIGEST_SIZE, Keccak::KECCAK128_RATE_SIZE);
 			break;
 		}
 		case XMSS_SHAKE_256:
 		{
-			Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, Keccak::KECCAK512_DIGEST_SIZE, Keccak::KECCAK256_RATE_SIZE);
+			Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, Keccak::KECCAK512_DIGEST_SIZE, Keccak::KECCAK256_RATE_SIZE);
 			break;
 		}
 		default:
@@ -60,9 +60,9 @@ int32_t XMSSCore::CoreHash(const XmssParams &Params, std::vector<byte> &Output, 
 	return res;
 }
 
-int32_t XMSSCore::Prf(const XmssParams &Params, std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, const std::vector<byte> &Key, size_t KeyOffset)
+int32_t XMSSCore::Prf(const XmssParams &Params, std::vector<uint8_t> &Output, size_t OutOffset, const std::vector<uint8_t> &Input, const std::vector<uint8_t> &Key, size_t KeyOffset)
 {
-	std::vector<byte> buf((Params.N * 2) + XMSS_PRFCTR_SIZE);
+	std::vector<uint8_t> buf((Params.N * 2) + XMSS_PRFCTR_SIZE);
 	int32_t res;
 
 	UllToBytes(buf, 0, Params.N, XMSS_HASH_PADDING_PRF);
@@ -73,7 +73,7 @@ int32_t XMSSCore::Prf(const XmssParams &Params, std::vector<byte> &Output, size_
 	return res;
 }
 
-int32_t XMSSCore::HashMessage(const XmssParams &Params, std::vector<byte> &Output, const std::vector<byte> &R, size_t ROffset, const std::vector<byte> &Root, ulong Idx, std::vector<byte> &MsgPrefix, size_t MsgOffset, ulong Msglength)
+int32_t XMSSCore::HashMessage(const XmssParams &Params, std::vector<uint8_t> &Output, const std::vector<uint8_t> &R, size_t ROffset, const std::vector<uint8_t> &Root, uint64_t Idx, std::vector<uint8_t> &MsgPrefix, size_t MsgOffset, uint64_t Msglength)
 {
 	UllToBytes(MsgPrefix, MsgOffset, Params.N, XMSS_HASH_PADDING_HASH);
 	MemoryTools::Copy(R, ROffset, MsgPrefix, MsgOffset + Params.N, Params.N);
@@ -83,23 +83,23 @@ int32_t XMSSCore::HashMessage(const XmssParams &Params, std::vector<byte> &Outpu
 	return CoreHash(Params, Output, 0, MsgPrefix, MsgOffset, Msglength + (Params.N * 4));
 }
 
-int32_t XMSSCore::ThashH(const XmssParams &Params, std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, const std::vector<byte> &PubSeed, std::array<uint, 8> &Address)
+int32_t XMSSCore::ThashH(const XmssParams &Params, std::vector<uint8_t> &Output, size_t OutOffset, const std::vector<uint8_t> &Input, size_t InOffset, const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> &Address)
 {
-	std::vector<byte> bitmask(Params.N * 2);
-	std::vector<byte> buf(Params.N * 4);
-	std::vector<byte> tmpa(XMSS_PRFCTR_SIZE);
+	std::vector<uint8_t> bitmask(Params.N * 2);
+	std::vector<uint8_t> buf(Params.N * 4);
+	std::vector<uint8_t> tmpa(XMSS_PRFCTR_SIZE);
 	size_t i;
 	int32_t res;
 
 	// set the function padding
 	UllToBytes(buf, 0, Params.N, XMSS_HASH_PADDING_H);
 
-	// generate the n-byte key
+	// generate the n-uint8_t key
 	SetKeyAndMask(Address, 0);
 	AddressToBytes(tmpa, Address);
 	Prf(Params, buf, Params.N, tmpa, PubSeed, 0);
 
-	// generate the 2n-byte mask
+	// generate the 2n-uint8_t mask
 	SetKeyAndMask(Address, 1);
 	AddressToBytes(tmpa, Address);
 	Prf(Params, bitmask, 0, tmpa, PubSeed, 0);
@@ -118,23 +118,23 @@ int32_t XMSSCore::ThashH(const XmssParams &Params, std::vector<byte> &Output, si
 	return res;
 }
 
-int32_t XMSSCore::ThashF(const XmssParams &Params, std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, const std::vector<byte> &PubSeed, std::array<uint, 8> &Address)
+int32_t XMSSCore::ThashF(const XmssParams &Params, std::vector<uint8_t> &Output, size_t OutOffset, const std::vector<uint8_t> &Input, size_t InOffset, const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> &Address)
 {
-	std::vector<byte> bitmask(Params.N);
-	std::vector<byte> buf(Params.N * 3);
-	std::vector<byte> tmpa(XMSS_PRFCTR_SIZE);
+	std::vector<uint8_t> bitmask(Params.N);
+	std::vector<uint8_t> buf(Params.N * 3);
+	std::vector<uint8_t> tmpa(XMSS_PRFCTR_SIZE);
 	size_t i;
 	int32_t res;
 
 	// set the function padding
 	UllToBytes(buf, 0, Params.N, XMSS_HASH_PADDING_F);
 
-	// generate the n-byte key
+	// generate the n-uint8_t key
 	SetKeyAndMask(Address, 0);
 	AddressToBytes(tmpa, Address);
 	Prf(Params, buf, Params.N, tmpa, PubSeed, 0);
 
-	// generate the n-byte mask
+	// generate the n-uint8_t mask
 	SetKeyAndMask(Address, 1);
 	AddressToBytes(tmpa, Address);
 	Prf(Params, bitmask, 0, tmpa, PubSeed, 0);
@@ -151,67 +151,67 @@ int32_t XMSSCore::ThashF(const XmssParams &Params, std::vector<byte> &Output, si
 
 // hash_address.c //
 
-void XMSSCore::SetLayerAddress(std::array<uint, 8> &Address, uint Layer)
+void XMSSCore::SetLayerAddress(std::array<uint32_t, 8> &Address, uint32_t Layer)
 {
 	Address[0] = Layer;
 }
 
-void XMSSCore::SetTreeAddress(std::array<uint, 8> &Address, ulong Tree)
+void XMSSCore::SetTreeAddress(std::array<uint32_t, 8> &Address, uint64_t Tree)
 {
-	Address[1] = static_cast<uint>(Tree >> 32);
-	Address[2] = static_cast<uint>(Tree);
+	Address[1] = static_cast<uint32_t>(Tree >> 32);
+	Address[2] = static_cast<uint32_t>(Tree);
 }
 
-void XMSSCore::SetType(std::array<uint, 8> &Address, uint Type)
+void XMSSCore::SetType(std::array<uint32_t, 8> &Address, uint32_t Type)
 {
 	Address[3] = Type;
 }
 
-void XMSSCore::SetKeyAndMask(std::array<uint, 8> &Address, uint Mask)
+void XMSSCore::SetKeyAndMask(std::array<uint32_t, 8> &Address, uint32_t Mask)
 {
 	Address[7] = Mask;
 }
 
-void XMSSCore::CopySubtreeAdress(std::array<uint, 8> & Output, const std::array<uint, 8> & Input)
+void XMSSCore::CopySubtreeAdress(std::array<uint32_t, 8> & Output, const std::array<uint32_t, 8> & Input)
 {
 	Output[0] = Input[0];
 	Output[1] = Input[1];
 	Output[2] = Input[2];
 }
 
-void XMSSCore::SetOtsAddress(std::array<uint, 8> &Address, uint Ots)
+void XMSSCore::SetOtsAddress(std::array<uint32_t, 8> &Address, uint32_t Ots)
 {
 	Address[4] = Ots;
 }
 
-void XMSSCore::SetChainAddress(std::array<uint, 8> &Address, uint Chain)
+void XMSSCore::SetChainAddress(std::array<uint32_t, 8> &Address, uint32_t Chain)
 {
 	Address[5] = Chain;
 }
 
-void XMSSCore::SetHashAddress(std::array<uint, 8> &Address, uint Hash)
+void XMSSCore::SetHashAddress(std::array<uint32_t, 8> &Address, uint32_t Hash)
 {
 	Address[6] = Hash;
 }
 
-void XMSSCore::SetLtreeAddress(std::array<uint, 8> &Address, uint Ltree)
+void XMSSCore::SetLtreeAddress(std::array<uint32_t, 8> &Address, uint32_t Ltree)
 {
 	Address[4] = Ltree;
 }
 
-void XMSSCore::SetTreeHeight(std::array<uint, 8> &Address, uint Height)
+void XMSSCore::SetTreeHeight(std::array<uint32_t, 8> &Address, uint32_t Height)
 {
 	Address[5] = Height;
 }
 
-void XMSSCore::SetTreeIndex(std::array<uint, 8> &Address, uint Index)
+void XMSSCore::SetTreeIndex(std::array<uint32_t, 8> &Address, uint32_t Index)
 {
 	Address[6] = Index;
 }
 
 // params.c //
 
-int32_t XMSSCore::XmssParseOid(XmssParams &Params, const uint Oid)
+int32_t XMSSCore::XmssParseOid(XmssParams &Params, const uint32_t Oid)
 {
 	int32_t res;
 
@@ -327,7 +327,7 @@ int32_t XMSSCore::XmssParseOid(XmssParams &Params, const uint Oid)
 	return res;
 }
 
-int32_t XMSSCore::XmssMtParseOid(XmssParams &Params, const uint Oid)
+int32_t XMSSCore::XmssMtParseOid(XmssParams &Params, const uint32_t Oid)
 {
 	int32_t res;
 
@@ -615,7 +615,7 @@ int32_t XMSSCore::InitializeParams(XmssParams &Params)
 		}
 		else
 		{
-			// in XMSS^MT, round IndexSize up to nearest byte
+			// in XMSS^MT, round IndexSize up to nearest uint8_t
 			Params.IndexSize = (Params.FullHeight + 7) / 8;
 		}
 
@@ -633,7 +633,7 @@ int32_t XMSSCore::InitializeParams(XmssParams &Params)
 
 // utils.c //
 
-void XMSSCore::UllToBytes(std::vector<byte> &Output, size_t Offset, size_t Length, ulong Input)
+void XMSSCore::UllToBytes(std::vector<uint8_t> &Output, size_t Offset, size_t Length, uint64_t Input)
 {
 	size_t i;
 
@@ -649,16 +649,16 @@ void XMSSCore::UllToBytes(std::vector<byte> &Output, size_t Offset, size_t Lengt
 	while (i != 0);
 }
 
-ulong XMSSCore::BytesToUll(const std::vector<byte> &Input, size_t Length)
+uint64_t XMSSCore::BytesToUll(const std::vector<uint8_t> &Input, size_t Length)
 {
-	ulong res;
+	uint64_t res;
 	size_t i;
 
 	res = 0;
 
 	for (i = 0; i < Length; ++i)
 	{
-		res |= (static_cast<ulong>(Input[i])) << (8 * (Length - 1 - i));
+		res |= (static_cast<uint64_t>(Input[i])) << (8 * (Length - 1 - i));
 	}
 
 	return res;
@@ -666,9 +666,9 @@ ulong XMSSCore::BytesToUll(const std::vector<byte> &Input, size_t Length)
 
 // wots.c //
 
-void XMSSCore::ExpandSeed(const XmssParams &Params, std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input)
+void XMSSCore::ExpandSeed(const XmssParams &Params, std::vector<uint8_t> &Output, size_t OutOffset, const std::vector<uint8_t> &Input)
 {
-	std::vector<byte> ctr(XMSS_PRFCTR_SIZE);
+	std::vector<uint8_t> ctr(XMSS_PRFCTR_SIZE);
 	size_t i;
 
 	for (i = 0; i < Params.WotsLen; ++i)
@@ -678,10 +678,10 @@ void XMSSCore::ExpandSeed(const XmssParams &Params, std::vector<byte> &Output, s
 	}
 }
 
-void XMSSCore::GenChain(const XmssParams &Params, std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset,
-	uint Start, uint Steps, const std::vector<byte> &PubSeed, std::array<uint, 8> &Address)
+void XMSSCore::GenChain(const XmssParams &Params, std::vector<uint8_t> &Output, size_t OutOffset, const std::vector<uint8_t> &Input, size_t InOffset,
+	uint32_t Start, uint32_t Steps, const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> &Address)
 {
-	uint i;
+	uint32_t i;
 
 	// initialize out with the value at position 'start'
 	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Params.N);
@@ -694,12 +694,12 @@ void XMSSCore::GenChain(const XmssParams &Params, std::vector<byte> &Output, siz
 	}
 }
 
-void XMSSCore::BaseW(const XmssParams &Params, std::vector<int32_t> &Output, size_t OutOffset, size_t OutLength, const std::vector<byte> &Input)
+void XMSSCore::BaseW(const XmssParams &Params, std::vector<int32_t> &Output, size_t OutOffset, size_t OutLength, const std::vector<uint8_t> &Input)
 {
 	size_t i;
 	size_t inoft;
 	int32_t bits;
-	byte total;
+	uint8_t total;
 
 	bits = 0;
 	inoft = 0;
@@ -722,7 +722,7 @@ void XMSSCore::BaseW(const XmssParams &Params, std::vector<int32_t> &Output, siz
 void XMSSCore::WotsChecksum(const XmssParams &Params, std::vector<int32_t> &CsumBaseW, size_t CsumOffset, const std::vector<int32_t> &MsgBaseW)
 {
 	const size_t CSUMLEN = ((Params.WotsLen2 * Params.WotsLogW) + 7) / 8;
-	std::vector<byte> csumdata(CSUMLEN);
+	std::vector<uint8_t> csumdata(CSUMLEN);
 	size_t i;
 	int32_t csum;
 
@@ -737,17 +737,17 @@ void XMSSCore::WotsChecksum(const XmssParams &Params, std::vector<int32_t> &Csum
 	// convert checksum to base_w
 	// make sure expected empty zero bits are the least significant bits
 	csum = csum << (8 - ((Params.WotsLen2 * Params.WotsLogW) % 8));
-	UllToBytes(csumdata, 0, CSUMLEN, static_cast<ulong>(csum));
+	UllToBytes(csumdata, 0, CSUMLEN, static_cast<uint64_t>(csum));
 	BaseW(Params, CsumBaseW, CsumOffset, Params.WotsLen2, csumdata);
 }
 
-void XMSSCore::ChainLengths(const XmssParams &Params, std::vector<int32_t> &Lengths, const std::vector<byte> &Message)
+void XMSSCore::ChainLengths(const XmssParams &Params, std::vector<int32_t> &Lengths, const std::vector<uint8_t> &Message)
 {
 	BaseW(Params, Lengths, 0, Params.WotsLen1, Message);
 	WotsChecksum(Params, Lengths, Params.WotsLen1, Lengths);
 }
 
-void XMSSCore::WotsPkGen(const XmssParams &Params, std::vector<byte> &PublicKey, const std::vector<byte> &Seed, const std::vector<byte> &PubSeed, std::array<uint, 8> &Address)
+void XMSSCore::WotsPkGen(const XmssParams &Params, std::vector<uint8_t> &PublicKey, const std::vector<uint8_t> &Seed, const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> &Address)
 {
 	size_t i;
 
@@ -756,13 +756,13 @@ void XMSSCore::WotsPkGen(const XmssParams &Params, std::vector<byte> &PublicKey,
 
 	for (i = 0; i < Params.WotsLen; ++i)
 	{
-		SetChainAddress(Address, static_cast<uint>(i));
+		SetChainAddress(Address, static_cast<uint32_t>(i));
 		GenChain(Params, PublicKey, Params.N * i, PublicKey, Params.N * i, 0, Params.WotsW - 1, PubSeed, Address);
 	}
 }
 
-void XMSSCore::WotsSign(const XmssParams &Params, std::vector<byte> &Signature, size_t SigOffset, const std::vector<byte> &Message, const std::vector<byte> &Seed,
-	const std::vector<byte> &PubSeed, std::array<uint, 8> &Address)
+void XMSSCore::WotsSign(const XmssParams &Params, std::vector<uint8_t> &Signature, size_t SigOffset, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &Seed,
+	const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> &Address)
 {
 	std::vector<int32_t> lengths(Params.WotsLen * sizeof(int32_t));
 	size_t i;
@@ -774,13 +774,13 @@ void XMSSCore::WotsSign(const XmssParams &Params, std::vector<byte> &Signature, 
 
 	for (i = 0; i < Params.WotsLen; ++i)
 	{
-		SetChainAddress(Address, static_cast<uint>(i));
+		SetChainAddress(Address, static_cast<uint32_t>(i));
 		GenChain(Params, Signature, SigOffset + (Params.N * i), Signature, SigOffset + (Params.N * i), 0, lengths[i], PubSeed, Address);
 	}
 }
 
-void XMSSCore::WotsPkFromSig(const XmssParams &Params, std::vector<byte> &PublicKey, const std::vector<byte> &Signature, size_t SigOffset, const std::vector<byte> &Message,
-	const std::vector<byte> &PubSeed, std::array<uint, 8> &Address)
+void XMSSCore::WotsPkFromSig(const XmssParams &Params, std::vector<uint8_t> &PublicKey, const std::vector<uint8_t> &Signature, size_t SigOffset, const std::vector<uint8_t> &Message,
+	const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> &Address)
 {
 	std::vector<int32_t> lengths(Params.WotsLen * sizeof(int32_t));
 	size_t i;
@@ -789,14 +789,14 @@ void XMSSCore::WotsPkFromSig(const XmssParams &Params, std::vector<byte> &Public
 
 	for (i = 0; i < Params.WotsLen; ++i)
 	{
-		SetChainAddress(Address, static_cast<uint>(i));
+		SetChainAddress(Address, static_cast<uint32_t>(i));
 		GenChain(Params, PublicKey, Params.N * i, Signature, SigOffset + (Params.N * i), lengths[i], Params.WotsW - lengths[i] - 1, PubSeed, Address);
 	}
 }
 
 // xmss.c //
 
-int32_t XMSSCore::XmssKeyPair(std::vector<byte> &PublicKey, std::vector<byte> &SecretKey, const uint Oid, std::unique_ptr<Prng::IPrng> &Rng)
+int32_t XMSSCore::XmssKeyPair(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &SecretKey, const uint32_t Oid, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	XmssParams params;
 	size_t i;
@@ -823,11 +823,11 @@ int32_t XMSSCore::XmssKeyPair(std::vector<byte> &PublicKey, std::vector<byte> &S
 	return res;
 }
 
-int32_t XMSSCore::XmssSign(std::vector<byte> &SecretKey, std::vector<byte> &Signature, size_t &SigLength, const std::vector<byte> &Message, size_t MsgLength)
+int32_t XMSSCore::XmssSign(std::vector<uint8_t> &SecretKey, std::vector<uint8_t> &Signature, size_t &SigLength, const std::vector<uint8_t> &Message, size_t MsgLength)
 {
 	XmssParams params;
 	size_t i;
-	uint oid;
+	uint32_t oid;
 	int32_t res;
 
 	oid = 0;
@@ -849,11 +849,11 @@ int32_t XMSSCore::XmssSign(std::vector<byte> &SecretKey, std::vector<byte> &Sign
 	return res;
 }
 
-int32_t XMSSCore::XmssSignOpen(std::vector<byte> &Message, size_t &MsgLength, const std::vector<byte> &Signature, size_t SigLength, const std::vector<byte> &PublicKey)
+int32_t XMSSCore::XmssSignOpen(std::vector<uint8_t> &Message, size_t &MsgLength, const std::vector<uint8_t> &Signature, size_t SigLength, const std::vector<uint8_t> &PublicKey)
 {
 	XmssParams params;
 	size_t i;
-	uint oid;
+	uint32_t oid;
 	int32_t res;
 
 	oid = 0;
@@ -876,7 +876,7 @@ int32_t XMSSCore::XmssSignOpen(std::vector<byte> &Message, size_t &MsgLength, co
 	return res;
 }
 
-int32_t XMSSCore::XmssMtKeyPair(std::vector<byte> &PublicKey, std::vector<byte> &SecretKey, const uint Oid, std::unique_ptr<Prng::IPrng> &Rng)
+int32_t XMSSCore::XmssMtKeyPair(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &SecretKey, const uint32_t Oid, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	XmssParams params;
 	size_t i;
@@ -902,11 +902,11 @@ int32_t XMSSCore::XmssMtKeyPair(std::vector<byte> &PublicKey, std::vector<byte> 
 	return res;
 }
 
-int32_t XMSSCore::XmssMtSign(std::vector<byte> &SecretKey, std::vector<byte> &Signature, size_t &SigLength, const std::vector<byte> &Message, size_t MsgLength)
+int32_t XMSSCore::XmssMtSign(std::vector<uint8_t> &SecretKey, std::vector<uint8_t> &Signature, size_t &SigLength, const std::vector<uint8_t> &Message, size_t MsgLength)
 {
 	XmssParams params;
 	size_t i;
-	uint oid;
+	uint32_t oid;
 	int32_t res;
 
 	oid = 0;
@@ -928,11 +928,11 @@ int32_t XMSSCore::XmssMtSign(std::vector<byte> &SecretKey, std::vector<byte> &Si
 	return res;
 }
 
-int32_t XMSSCore::XmssMtSignOpen(std::vector<byte> &Message, size_t &MsgLength, const std::vector<byte> &Signature, size_t SigLength, const std::vector<byte> &PublicKey)
+int32_t XMSSCore::XmssMtSignOpen(std::vector<uint8_t> &Message, size_t &MsgLength, const std::vector<uint8_t> &Signature, size_t SigLength, const std::vector<uint8_t> &PublicKey)
 {
 	XmssParams params;
 	size_t i;
-	uint oid;
+	uint32_t oid;
 	int32_t res;
 
 	oid = 0;
@@ -956,15 +956,15 @@ int32_t XMSSCore::XmssMtSignOpen(std::vector<byte> &Message, size_t &MsgLength, 
 
 // xmms_commons.c //
 
-void XMSSCore::LTree(const XmssParams &Params, std::vector<byte> &Leaf, size_t LeafOffset, std::vector<byte> &WotsPk, const std::vector<byte> &PubSeed, std::array<uint, 8> &Address)
+void XMSSCore::LTree(const XmssParams &Params, std::vector<uint8_t> &Leaf, size_t LeafOffset, std::vector<uint8_t> &WotsPk, const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> &Address)
 {
 	size_t i;
-	uint height;
-	uint l;
-	uint parentnodes;
+	uint32_t height;
+	uint32_t l;
+	uint32_t parentnodes;
 
 	height = 0;
-	l = static_cast<uint>(Params.WotsLen);
+	l = static_cast<uint32_t>(Params.WotsLen);
 	SetTreeHeight(Address, height);
 
 	while (l > 1)
@@ -973,7 +973,7 @@ void XMSSCore::LTree(const XmssParams &Params, std::vector<byte> &Leaf, size_t L
 
 		for (i = 0; i < parentnodes; ++i)
 		{
-			SetTreeIndex(Address, static_cast<uint>(i));
+			SetTreeIndex(Address, static_cast<uint32_t>(i));
 
 			// hashes the nodes at (i*2)*params->n and (i*2)*params->n + 1
 			ThashH(Params, WotsPk, i * Params.N, WotsPk, Params.N * (i * 2), PubSeed, Address);
@@ -996,12 +996,12 @@ void XMSSCore::LTree(const XmssParams &Params, std::vector<byte> &Leaf, size_t L
 	MemoryTools::Copy(WotsPk, 0, Leaf, LeafOffset, Params.N);
 }
 
-void XMSSCore::ComputeRoot(const XmssParams &Params, std::vector<byte> &Root, const std::vector<byte> &Leaf, uint leafidx, const std::vector<byte> &Authpath, size_t AuthOffset,
-	const std::vector<byte> &PubSeed, std::array<uint, 8> &Address)
+void XMSSCore::ComputeRoot(const XmssParams &Params, std::vector<uint8_t> &Root, const std::vector<uint8_t> &Leaf, uint32_t leafidx, const std::vector<uint8_t> &Authpath, size_t AuthOffset,
+	const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> &Address)
 {
-	std::vector<byte> buffer(Params.N * 2);
+	std::vector<uint8_t> buffer(Params.N * 2);
 	size_t aoft;
-	uint i;
+	uint32_t i;
 
 	aoft = AuthOffset;
 
@@ -1048,20 +1048,20 @@ void XMSSCore::ComputeRoot(const XmssParams &Params, std::vector<byte> &Root, co
 	ThashH(Params, Root, 0, buffer, 0, PubSeed, Address);
 }
 
-void XMSSCore::GenLeafWots(const XmssParams &Params, std::vector<byte> &Leaf, size_t LeafOffset, const std::vector<byte> &SkSeed, size_t SkOffset,
-	const std::vector<byte> &PubSeed, std::array<uint, 8> & lTreeAddr, std::array<uint, 8> & OtsAddr)
+void XMSSCore::GenLeafWots(const XmssParams &Params, std::vector<uint8_t> &Leaf, size_t LeafOffset, const std::vector<uint8_t> &SkSeed, size_t SkOffset,
+	const std::vector<uint8_t> &PubSeed, std::array<uint32_t, 8> & lTreeAddr, std::array<uint32_t, 8> & OtsAddr)
 {
-	std::vector<byte> pk(Params.WotsSignatureSize);
-	std::vector<byte> seed(Params.N);
+	std::vector<uint8_t> pk(Params.WotsSignatureSize);
+	std::vector<uint8_t> seed(Params.N);
 
 	GetSeed(Params, seed, SkSeed, SkOffset, OtsAddr);
 	WotsPkGen(Params, pk, seed, PubSeed, OtsAddr);
 	LTree(Params, Leaf, LeafOffset, pk, PubSeed, lTreeAddr);
 }
 
-void XMSSCore::GetSeed(const XmssParams &Params, std::vector<byte> &Seed, const std::vector<byte> &SkSeed, size_t SkOffset, std::array<uint, 8> &Address)
+void XMSSCore::GetSeed(const XmssParams &Params, std::vector<uint8_t> &Seed, const std::vector<uint8_t> &SkSeed, size_t SkOffset, std::array<uint32_t, 8> &Address)
 {
-	std::vector<byte> tmp(XMSS_PRFCTR_SIZE);
+	std::vector<uint8_t> tmp(XMSS_PRFCTR_SIZE);
 
 	// make sure that chain addr, hash addr, and key bit are zeroed
 	SetChainAddress(Address, 0);
@@ -1073,7 +1073,7 @@ void XMSSCore::GetSeed(const XmssParams &Params, std::vector<byte> &Seed, const 
 	Prf(Params, Seed, 0, tmp, SkSeed, SkOffset);
 }
 
-int32_t XMSSCore::XmssCoreSignOpen(const XmssParams &Params, std::vector<byte> &Message, size_t &MsgLength, const std::vector<byte> &Signature, size_t SigLength, const std::vector<byte> &PublicKey)
+int32_t XMSSCore::XmssCoreSignOpen(const XmssParams &Params, std::vector<uint8_t> &Message, size_t &MsgLength, const std::vector<uint8_t> &Signature, size_t SigLength, const std::vector<uint8_t> &PublicKey)
 {
 	// XMSS signatures are fundamentally an instance of XMSSMT signatures
 	// For d=1, as is the case with XMSS, some of the calls in the XMSSMT
@@ -1082,21 +1082,21 @@ int32_t XMSSCore::XmssCoreSignOpen(const XmssParams &Params, std::vector<byte> &
 	return XmssMtCoreSignOpen(Params, Message, MsgLength, Signature, SigLength, PublicKey);
 }
 
-int32_t XMSSCore::XmssMtCoreSignOpen(const XmssParams &Params, std::vector<byte> &Message, size_t &MsgLength, const std::vector<byte> &Signature, size_t SigLength, const std::vector<byte> &PublicKey)
+int32_t XMSSCore::XmssMtCoreSignOpen(const XmssParams &Params, std::vector<uint8_t> &Message, size_t &MsgLength, const std::vector<uint8_t> &Signature, size_t SigLength, const std::vector<uint8_t> &PublicKey)
 {
-	std::vector<byte> pubroot(Params.N);
-	std::vector<byte> pubseed(Params.N);
-	std::vector<byte> leaf(Params.N);
-	std::vector<byte> root(Params.N);
-	std::vector<byte> wotspk(Params.WotsSignatureSize);
-	std::array<uint, 8> ltreeaddr = { 0 };
-	std::array<uint, 8> nodeaddr = { 0 };
-	std::array<uint, 8> otsaddr = { 0 };
+	std::vector<uint8_t> pubroot(Params.N);
+	std::vector<uint8_t> pubseed(Params.N);
+	std::vector<uint8_t> leaf(Params.N);
+	std::vector<uint8_t> root(Params.N);
+	std::vector<uint8_t> wotspk(Params.WotsSignatureSize);
+	std::array<uint32_t, 8> ltreeaddr = { 0 };
+	std::array<uint32_t, 8> nodeaddr = { 0 };
+	std::array<uint32_t, 8> otsaddr = { 0 };
 	size_t pkoft;
 	size_t smoft;
-	ulong idx;
-	uint i;
-	uint idxleaf;
+	uint64_t idx;
+	uint32_t i;
+	uint32_t idxleaf;
 	int32_t res;
 
 	pkoft = XMSS_OID_LEN;
@@ -1167,19 +1167,19 @@ int32_t XMSSCore::XmssMtCoreSignOpen(const XmssParams &Params, std::vector<byte>
 
 // xmss_core.c //
 
-void XMSSCore::TreeHash(const XmssParams &Params, std::vector<byte> &Root, size_t RootOffset, std::vector<byte> &AuthPath, size_t AuthOffset, const std::vector<byte> &SkSeed,
-	size_t SkOffset, const std::vector<byte> &PubSeed, uint LeafIdx, const std::array<uint, 8> & SubtreeAddress)
+void XMSSCore::TreeHash(const XmssParams &Params, std::vector<uint8_t> &Root, size_t RootOffset, std::vector<uint8_t> &AuthPath, size_t AuthOffset, const std::vector<uint8_t> &SkSeed,
+	size_t SkOffset, const std::vector<uint8_t> &PubSeed, uint32_t LeafIdx, const std::array<uint32_t, 8> & SubtreeAddress)
 {
-	std::vector<byte> stack(Params.N * (static_cast<size_t>(Params.TreeHeight) + 1));
-	std::vector<uint> heights((static_cast<size_t>(Params.TreeHeight) + 1) * sizeof(uint));
+	std::vector<uint8_t> stack(Params.N * (static_cast<size_t>(Params.TreeHeight) + 1));
+	std::vector<uint32_t> heights((static_cast<size_t>(Params.TreeHeight) + 1) * sizeof(uint32_t));
 	// we need all three types of addresses in parallel
-	std::array<uint, 8> otsaddr = { 0 };
-	std::array<uint, 8> ltreeaddr = { 0 };
-	std::array<uint, 8> nodeaddr = { 0 };
-	// the subtree has at most 2^20 leafs, so uint suffices
-	uint idx;
-	uint offset;
-	uint treeidx;
+	std::array<uint32_t, 8> otsaddr = { 0 };
+	std::array<uint32_t, 8> ltreeaddr = { 0 };
+	std::array<uint32_t, 8> nodeaddr = { 0 };
+	// the subtree has at most 2^20 leafs, so uint32_t suffices
+	uint32_t idx;
+	uint32_t offset;
+	uint32_t treeidx;
 
 	offset = 0;
 	// select the required subtree
@@ -1238,7 +1238,7 @@ size_t XMSSCore::CoreSkBytes(const XmssParams &Params)
 	return Params.IndexSize + (4 * Params.N);
 }
 
-int32_t XMSSCore::XmssCoreKeyPair(const XmssParams &Params, std::vector<byte> &PublicKey, std::vector<byte> &SecretKey, std::unique_ptr<Prng::IPrng> &Rng)
+int32_t XMSSCore::XmssCoreKeyPair(const XmssParams &Params, std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &SecretKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	// the key generation procedure of XMSS and XMSSMT is exactly the same.
 	// the only important detail is that the right subtree must be selected;
@@ -1246,7 +1246,7 @@ int32_t XMSSCore::XmssCoreKeyPair(const XmssParams &Params, std::vector<byte> &P
 	return XmssMtCoreKeyPair(Params, PublicKey, SecretKey, Rng);
 }
 
-int32_t XMSSCore::XmssCoreSign(const XmssParams &Params, std::vector<byte> &SecretKey, std::vector<byte> &Signature, size_t &SigLength, const std::vector<byte> &Message, size_t MsgLength)
+int32_t XMSSCore::XmssCoreSign(const XmssParams &Params, std::vector<uint8_t> &SecretKey, std::vector<uint8_t> &Signature, size_t &SigLength, const std::vector<uint8_t> &Message, size_t MsgLength)
 {
 	// XMSS signatures are fundamentally an instance of XMSSMT signatures.
 	// for d=1, as is the case with XMSS, some of the calls in the XMSSMT
@@ -1255,14 +1255,14 @@ int32_t XMSSCore::XmssCoreSign(const XmssParams &Params, std::vector<byte> &Secr
 	return XmssMtCoreSign(Params, SecretKey, Signature, SigLength, Message, MsgLength);
 }
 
-int32_t XMSSCore::XmssMtCoreKeyPair(const XmssParams &Params, std::vector<byte> &PublicKey, std::vector<byte> &SecretKey, std::unique_ptr<Prng::IPrng> &Rng)
+int32_t XMSSCore::XmssMtCoreKeyPair(const XmssParams &Params, std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &SecretKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	// we do not need the auth path in key generation, but it simplifies the
 	// code to have just one treehash routine that computes both root and path in one function
 
-	std::vector<byte> authpath(Params.TreeHeight * Params.N);
-	std::vector<byte> pkseed(Params.N);
-	std::array<uint, 8> toptreeaddr = { 0 };
+	std::vector<uint8_t> authpath(Params.TreeHeight * Params.N);
+	std::vector<uint8_t> pkseed(Params.N);
+	std::array<uint32_t, 8> toptreeaddr = { 0 };
 	size_t skoft;
 	int32_t res;
 
@@ -1287,21 +1287,21 @@ int32_t XMSSCore::XmssMtCoreKeyPair(const XmssParams &Params, std::vector<byte> 
 	return res;
 }
 
-int32_t XMSSCore::XmssMtCoreSign(const XmssParams &Params, std::vector<byte> &SecretKey, std::vector<byte> &Signature, size_t &SigLength, const std::vector<byte> &Message, size_t MsgLength)
+int32_t XMSSCore::XmssMtCoreSign(const XmssParams &Params, std::vector<uint8_t> &SecretKey, std::vector<uint8_t> &Signature, size_t &SigLength, const std::vector<uint8_t> &Message, size_t MsgLength)
 {
-	std::array<uint, 8> otsaddr = { 0 };
-	std::vector<byte> idx32(XMSS_PRFCTR_SIZE);
-	std::vector<byte> otsseed(Params.N);
-	std::vector<byte> pubroot(Params.N);
-	std::vector<byte> pubseed(Params.N);
-	std::vector<byte> root(Params.N);
-	std::vector<byte> skseed(Params.N);
-	std::vector<byte> skprf(Params.N);
-	ulong idx;
+	std::array<uint32_t, 8> otsaddr = { 0 };
+	std::vector<uint8_t> idx32(XMSS_PRFCTR_SIZE);
+	std::vector<uint8_t> otsseed(Params.N);
+	std::vector<uint8_t> pubroot(Params.N);
+	std::vector<uint8_t> pubseed(Params.N);
+	std::vector<uint8_t> root(Params.N);
+	std::vector<uint8_t> skseed(Params.N);
+	std::vector<uint8_t> skprf(Params.N);
+	uint64_t idx;
 	size_t skoft;
 	size_t smoft;
-	uint i;
-	uint idxleaf;
+	uint32_t i;
+	uint32_t idxleaf;
 	int32_t res;
 
 	res = 0;
@@ -1364,7 +1364,7 @@ int32_t XMSSCore::XmssMtCoreSign(const XmssParams &Params, std::vector<byte> &Se
 size_t XMSSCore::GetPublicKeySize(XmssParameters Parameters)
 {
 	XmssParams params;
-	uint oid;
+	uint32_t oid;
 
 	oid = XMSSUtils::ToOid(Parameters);
 
@@ -1385,7 +1385,7 @@ size_t XMSSCore::GetPrivateKeySize(XmssParameters Parameters)
 {
 	XmssParams params;
 	size_t klen;
-	uint oid;
+	uint32_t oid;
 
 	oid = XMSSUtils::ToOid(Parameters);
 
@@ -1408,7 +1408,7 @@ size_t XMSSCore::GetSignatureSize(XmssParameters Parameters)
 {
 	XmssParams params;
 	size_t slen;
-	uint oid;
+	uint32_t oid;
 
 	oid = XMSSUtils::ToOid(Parameters);
 
@@ -1427,9 +1427,9 @@ size_t XMSSCore::GetSignatureSize(XmssParameters Parameters)
 	return slen;
 }
 
-void XMSSCore::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, XmssParameters Parameters)
+void XMSSCore::Generate(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, XmssParameters Parameters)
 {
-	uint oid;
+	uint32_t oid;
 
 	oid = XMSSUtils::ToOid(Parameters);
 
@@ -1451,13 +1451,13 @@ void XMSSCore::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Private
 	}
 }
 
-size_t XMSSCore::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, XmssParameters Parameters)
+size_t XMSSCore::Sign(std::vector<uint8_t> &Signature, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &PrivateKey, XmssParameters Parameters)
 {
 	size_t smlen(0);
-	uint oid;
+	uint32_t oid;
 
 	oid = XMSSUtils::ToOid(Parameters);
-	std::vector<byte> sk2 = PrivateKey;
+	std::vector<uint8_t> sk2 = PrivateKey;
 
 	if (XMSSUtils::IsXMSS(Parameters))
 	{
@@ -1477,11 +1477,11 @@ size_t XMSSCore::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mes
 	return smlen;
 }
 
-bool XMSSCore::Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, XmssParameters Parameters)
+bool XMSSCore::Verify(std::vector<uint8_t> &Message, const std::vector<uint8_t> &Signature, const std::vector<uint8_t> &PublicKey, XmssParameters Parameters)
 {
-	std::vector<byte> tmpm(0);
+	std::vector<uint8_t> tmpm(0);
 	size_t mlen;
-	uint oid;
+	uint32_t oid;
 	int32_t res;
 
 	mlen = 0;

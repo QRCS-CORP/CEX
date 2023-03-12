@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -26,7 +26,7 @@
 // Written by John G. Underhill, September 19, 2014
 // Updated December 25, 2017
 // Updated March 19, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_KECCAK512_H
 #define CEX_KECCAK512_H
@@ -67,9 +67,9 @@ NAMESPACE_DIGEST
 /// <item><description>Output aligns with the Nist SHA3 standard.</description></item>
 /// <item><description>The output hash size is 64 bytes (512 bits).</description></item>
 /// <item><description>The input block size is 72 bytes (576 bits).</description></item>
-/// <item><description>The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data).</description>/></item>
-/// <item><description>The Update functions process message input, this can be a byte, 32--bit or 64-bit unsigned integer, or a vector of bytes.</description></item>
-/// <item><description>The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state.</description></item>
+/// <item><description>The ComputeHash(uint8_t[], uint8_t[]) function wraps the Update(uint8_t[], size_t, size_t) and Finalize(uint8_t[], size_t) functions; (suitable for small data).</description>/></item>
+/// <item><description>The Update functions process message input, this can be a uint8_t, 32--bit or 64-bit unsigned integer, or a vector of bytes.</description></item>
+/// <item><description>The Finalize(uint8_t[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state.</description></item>
 /// <item><description>Setting Parallel to true in the constructor instantiates the multi-threaded variant.</description></item>
 /// <item><description>Multi-threaded and sequential versions produce a different output hash for a message, this is expected.</description></item>
 /// </list>
@@ -97,7 +97,7 @@ private:
 
 	class SHA3512State;
 	std::vector<SHA3512State> m_dgtState;
-	std::vector<byte> m_msgBuffer;
+	std::vector<uint8_t> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
 	KeccakParams m_treeParams;
@@ -173,7 +173,7 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	const size_t ParallelBlockSize() override;
@@ -194,11 +194,11 @@ public:
 	/// <para>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Input">The input message uint8_t-vector</param>
 	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
 	///
-	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too int16_t</exception>
+	void Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Finalize message processing and return the hash code.
@@ -208,8 +208,8 @@ public:
 	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
 	/// <param name="OutOffset">The starting offset within the output vector</param>
 	///
-	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	void Finalize(std::vector<byte> &Output, size_t OutOffset) override;
+	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too int16_t</exception>
+	void Finalize(std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -228,43 +228,43 @@ public:
 	void Reset() override;
 
 	/// <summary>
-	/// Update the digest with a single byte
+	/// Update the digest with a single uint8_t
 	/// </summary>
 	///
-	/// <param name="Input">Input byte</param>
-	void Update(byte Input) override;
+	/// <param name="Input">Input uint8_t</param>
+	void Update(uint8_t Input) override;
 
 	/// <summary>
 	/// Update the message digest with a single unsigned 32-bit integer
 	/// </summary>
 	/// 
 	/// <param name="Input">The 32-bit integer to process</param>
-	void Update(uint Input) override;
+	void Update(uint32_t Input) override;
 
 	/// <summary>
 	/// Update the message digest with a single unsigned 64-bit integer
 	/// </summary>
 	/// 
 	/// <param name="Input">The 64-bit integer to process</param>
-	void Update(ulong Input) override;
+	void Update(uint64_t Input) override;
 
 	/// <summary>
 	/// Update the message digest with a vector using offset and length parameters.
 	/// <para>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Input">The input message uint8_t-vector</param>
 	/// <param name="InOffset">The starting offset within the input vector</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
+	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too int16_t</exception>
+	void Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length) override;
 
 private:
 
-	static void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA3512State &State);
-	static void Permute(std::array<ulong, 25> &State);
-	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA3512State &State, ulong Length);
+	static void HashFinal(std::vector<uint8_t> &Input, size_t InOffset, size_t Length, SHA3512State &State);
+	static void Permute(std::array<uint64_t, 25> &State);
+	void ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, SHA3512State &State, uint64_t Length);
 };
 
 NAMESPACE_DIGESTEND

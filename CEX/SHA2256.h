@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 // Updated March 20, 2017
 // Updated April 18, 2017
 // Updated March 19, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_SHA2256_H
 #define CEX_SHA2256_H
@@ -67,9 +67,9 @@ NAMESPACE_DIGEST
 /// <list type="bullet">
 /// <item><description>State block size is 64 bytes, (512 bits), in parallel mode the ParallelBlockSize() is used to trigger multi-threaded processing.</description></item>
 /// <item><description>Digest output size is 32 bytes, (256 bits).</description></item>
-/// <item><description>The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data).</description>/></item>
-/// <item><description>The Update functions process message input, this can be a byte, 32--bit or 64-bit unsigned integer, or a vector of bytes.</description></item>
-/// <item><description>The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state.</description></item>
+/// <item><description>The ComputeHash(uint8_t[], uint8_t[]) function wraps the Update(uint8_t[], size_t, size_t) and Finalize(uint8_t[], size_t) functions; (suitable for small data).</description>/></item>
+/// <item><description>The Update functions process message input, this can be a uint8_t, 32--bit or 64-bit unsigned integer, or a vector of bytes.</description></item>
+/// <item><description>The Finalize(uint8_t[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state.</description></item>
 /// <item><description>Setting Parallel to true in the constructor instantiates the multi-threaded variant.</description></item>
 /// <item><description>Multi-threaded and sequential versions produce a different output hash for a message, this is expected.</description></item>
 /// </list>
@@ -98,7 +98,7 @@ private:
 
 	class SHA2256State;
 	std::vector<SHA2256State> m_dgtState;
-	std::vector<byte> m_msgBuffer;
+	std::vector<uint8_t> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
 	SHA2Params m_treeParams;
@@ -174,7 +174,7 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	const size_t ParallelBlockSize() override;
@@ -195,11 +195,11 @@ public:
 	/// <para>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Input">The input message uint8_t-vector</param>
 	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
 	///
-	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too int16_t</exception>
+	void Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Finalize message processing and return the hash code.
@@ -209,8 +209,8 @@ public:
 	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
 	/// <param name="OutOffset">The starting offset within the output vector</param>
 	///
-	/// <exception cref="CryptoDigestException">Thrown if the output array is too short</exception>
-	void Finalize(std::vector<byte> &Output, size_t OutOffset) override;
+	/// <exception cref="CryptoDigestException">Thrown if the output array is too int16_t</exception>
+	void Finalize(std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -229,25 +229,25 @@ public:
 	void Reset() override;
 
 	/// <summary>
-	/// Update the hash with a single byte
+	/// Update the hash with a single uint8_t
 	/// </summary>
 	/// 
-	/// <param name="Input">Input message byte</param>
-	void Update(byte Input) override;
+	/// <param name="Input">Input message uint8_t</param>
+	void Update(uint8_t Input) override;
 
 	/// <summary>
 	/// Update the message digest with a single unsigned 32-bit integer
 	/// </summary>
 	/// 
 	/// <param name="Input">The 32-bit integer to process</param>
-	void Update(uint Input) override;
+	void Update(uint32_t Input) override;
 
 	/// <summary>
 	/// Update the message digest with a single unsigned 64-bit integer
 	/// </summary>
 	/// 
 	/// <param name="Input">The 64-bit integer to process</param>
-	void Update(ulong Input) override;
+	void Update(uint64_t Input) override;
 
 	/// <summary>
 	/// Update the message digest with a vector using offset and length parameters.
@@ -257,13 +257,13 @@ public:
 	/// <param name="Input">The input message array</param>
 	/// <param name="InOffset">The starting offset within the input vector</param>
 	/// <param name="Length">The number of message bytes to process</param>
-	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
+	void Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length) override;
 
 private:
 
-	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA2256State &State);
-	void Permute(const std::vector<byte> &Input, size_t InOffset, SHA2256State &State);
-	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA2256State &State, ulong Length);
+	void HashFinal(std::vector<uint8_t> &Input, size_t InOffset, size_t Length, SHA2256State &State);
+	void Permute(const std::vector<uint8_t> &Input, size_t InOffset, SHA2256State &State);
+	void ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, SHA2256State &State, uint64_t Length);
 };
 
 NAMESPACE_DIGESTEND

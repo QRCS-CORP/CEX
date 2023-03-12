@@ -55,13 +55,13 @@ namespace Test
 
 	void MemUtilsTest::Evaluate()
 	{
-		std::vector<byte> inp;
-		std::vector<byte> otp;
-		ulong cmpval;
-		ulong inpval;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> otp;
+		uint64_t cmpval;
+		uint64_t inpval;
 		size_t i;
-		uint inplen;
-		byte val;
+		uint32_t inplen;
+		uint8_t val;
 
 		Prng::SecureRandom rng;
 
@@ -126,7 +126,7 @@ namespace Test
 			}
 		}
 
-		// byte to ulong
+		// uint8_t to uint64_t
 
 		for (i = 0; i < 100; ++i)
 		{
@@ -225,7 +225,7 @@ namespace Test
 		for (i = 0; i < 100; ++i)
 		{
 			inplen = 16;
-			val = static_cast<byte>(rng.NextInt16(255, 1));
+			val = static_cast<uint8_t>(rng.NextInt16(255, 1));
 			inp.clear();
 			inp.resize(inplen, val);
 			otp.resize(inp.size());
@@ -241,7 +241,7 @@ namespace Test
 		for (i = 0; i < 100; ++i)
 		{
 			inplen = 32;
-			val = static_cast<byte>(rng.NextInt16(255, 1));
+			val = static_cast<uint8_t>(rng.NextInt16(255, 1));
 			inp.clear();
 			inp.resize(inplen, val);
 			otp.resize(inp.size());
@@ -257,7 +257,7 @@ namespace Test
 		for (i = 0; i < 100; ++i)
 		{
 			inplen = 64;
-			val = static_cast<byte>(rng.NextInt16(255, 1));
+			val = static_cast<uint8_t>(rng.NextInt16(255, 1));
 			inp.clear();
 			inp.resize(inplen, val);
 			otp.resize(inp.size());

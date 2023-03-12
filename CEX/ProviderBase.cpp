@@ -41,40 +41,40 @@ const std::string ProviderBase::Name()
 
 //~~~Public Functions~~~//
 
-ushort ProviderBase::NextUInt16()
+uint16_t ProviderBase::NextUInt16()
 {
-	ushort x;
-	SecureVector<byte> smp(sizeof(ushort));
+	uint16_t x;
+	SecureVector<uint8_t> smp(sizeof(uint16_t));
 
 	x = 0;
 	Generate(smp);
-	MemoryTools::CopyToValue(smp, 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint16_t));
 	SecureClear(smp);
 
 	return x;
 }
 
-uint ProviderBase::NextUInt32()
+uint32_t ProviderBase::NextUInt32()
 {
-	uint x;
-	SecureVector<byte> smp(sizeof(uint));
+	uint32_t x;
+	SecureVector<uint8_t> smp(sizeof(uint32_t));
 
 	x = 0;
 	Generate(smp);
-	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint32_t));
 	SecureClear(smp);
 
 	return x;
 }
 
-ulong ProviderBase::NextUInt64()
+uint64_t ProviderBase::NextUInt64()
 {
-	ulong x;
-	SecureVector<byte> smp(sizeof(ulong));
+	uint64_t x;
+	SecureVector<uint8_t> smp(sizeof(uint64_t));
 
 	x = 0;
 	Generate(smp);
-	MemoryTools::CopyToValue(smp, 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint64_t));
 	SecureClear(smp);
 
 	return x;

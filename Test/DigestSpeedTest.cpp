@@ -59,11 +59,6 @@ namespace Test
 			OnProgress(std::string("***The parallel Keccak 512 digest***"));
 			DigestBlockLoop(Digests::SHA3512, MB100, 10, true);
 
-			OnProgress(std::string("***The sequential Keccak 1024 digest***"));
-			DigestBlockLoop(Digests::SHA31024, MB100);
-			OnProgress(std::string("***The parallel Keccak 1024 digest***"));
-			DigestBlockLoop(Digests::SHA31024, MB100, 10, true);
-
 			OnProgress(std::string("***The sequential SHA2 256 digest***"));
 			DigestBlockLoop(Digests::SHA2256, MB100);
 			OnProgress(std::string("***The parallel SHA2 256 digest***"));
@@ -104,8 +99,8 @@ namespace Test
 	void DigestSpeedTest::DigestBlockLoop(Enumeration::Digests DigestType, size_t SampleSize, size_t Loops, bool Parallel)
 	{
 		Digest::IDigest* dgt;
-		std::vector<byte> hash(0);
-		std::vector<byte> buffer(0);
+		std::vector<uint8_t> hash(0);
+		std::vector<uint8_t> buffer(0);
 		std::string calc;
 		std::string glen;
 		std::string mbps;
@@ -151,7 +146,7 @@ namespace Test
 		delete dgt;
 
 		dur = TestUtils::GetTimeMs64() - start;
-		len = static_cast<ulong>(Loops) * SampleSize;
+		len = static_cast<uint64_t>(Loops) * SampleSize;
 		rate = GetBytesPerSecond(dur, len);
 		glen = TestUtils::ToString(len / GB1);
 		mbps = TestUtils::ToString((rate / MB1));

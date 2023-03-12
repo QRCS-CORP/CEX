@@ -47,9 +47,9 @@ SymmetricKey* SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 	{
 		if (KeySize.InfoSize() != 0)
 		{
-			SecureVector<byte> tmpk(KeySize.KeySize());
-			SecureVector<byte> tmpn(KeySize.IVSize());
-			SecureVector<byte> tmpi(KeySize.InfoSize());
+			SecureVector<uint8_t> tmpk(KeySize.KeySize());
+			SecureVector<uint8_t> tmpn(KeySize.IVSize());
+			SecureVector<uint8_t> tmpi(KeySize.InfoSize());
 
 			Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
 			Generate(m_providerType, m_securityPolicy, tmpn, 0, tmpn.size());
@@ -60,8 +60,8 @@ SymmetricKey* SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 		}
 		else
 		{
-			SecureVector<byte> tmpk(KeySize.KeySize());
-			SecureVector<byte> tmpn(KeySize.IVSize());
+			SecureVector<uint8_t> tmpk(KeySize.KeySize());
+			SecureVector<uint8_t> tmpn(KeySize.IVSize());
 
 			Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
 			Generate(m_providerType, m_securityPolicy, tmpn, 0, tmpn.size());
@@ -71,7 +71,7 @@ SymmetricKey* SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 	}
 	else
 	{
-		SecureVector<byte> tmpk(KeySize.KeySize());
+		SecureVector<uint8_t> tmpk(KeySize.KeySize());
 
 		Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
 
@@ -94,9 +94,9 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 	{
 		if (KeySize.InfoSize() != 0)
 		{
-			SecureVector<byte> tmpk(KeySize.KeySize());
-			SecureVector<byte> tmpn(KeySize.IVSize());
-			SecureVector<byte> tmpi(KeySize.InfoSize());
+			SecureVector<uint8_t> tmpk(KeySize.KeySize());
+			SecureVector<uint8_t> tmpn(KeySize.IVSize());
+			SecureVector<uint8_t> tmpi(KeySize.InfoSize());
 
 			Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
 			Generate(m_providerType, m_securityPolicy, tmpn, 0, tmpn.size());
@@ -106,8 +106,8 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 		}
 		else
 		{
-			SecureVector<byte> tmpk(KeySize.KeySize());
-			SecureVector<byte> tmpn(KeySize.IVSize());
+			SecureVector<uint8_t> tmpk(KeySize.KeySize());
+			SecureVector<uint8_t> tmpn(KeySize.IVSize());
 
 			Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
 			Generate(m_providerType, m_securityPolicy, tmpn, 0, tmpn.size());
@@ -117,7 +117,7 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 	}
 	else
 	{
-		SecureVector<byte> tmpk(KeySize.KeySize());
+		SecureVector<uint8_t> tmpk(KeySize.KeySize());
 
 		Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
 
@@ -127,7 +127,7 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 	return pkey;
 }
 
-void SymmetricKeyGenerator::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
+void SymmetricKeyGenerator::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (Length == 0)
 	{
@@ -141,14 +141,14 @@ void SymmetricKeyGenerator::Generate(SecureVector<byte> &Output, size_t Offset, 
 	Generate(m_providerType, m_securityPolicy, Output, Offset, Length);
 }
 
-SecureVector<byte> SymmetricKeyGenerator::Generate(size_t Length)
+SecureVector<uint8_t> SymmetricKeyGenerator::Generate(size_t Length)
 {
 	if (Length == 0)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The requested allocation can not be zero size!"), ErrorCodes::InvalidSize);
 	}
 
-	SecureVector<byte> tmpr(Length);
+	SecureVector<uint8_t> tmpr(Length);
 
 	Generate(m_providerType, m_securityPolicy, tmpr, 0, tmpr.size());
 
@@ -157,9 +157,9 @@ SecureVector<byte> SymmetricKeyGenerator::Generate(size_t Length)
 
 //~~~Private Functions~~~//
 
-void SymmetricKeyGenerator::Generate(Providers Provider, SecurityPolicy Policy, SecureVector<byte> &Output, size_t Offset, size_t Length)
+void SymmetricKeyGenerator::Generate(Providers Provider, SecurityPolicy Policy, SecureVector<uint8_t> &Output, size_t Offset, size_t Length)
 {
-	SecureVector<byte> tmpc(0);
+	SecureVector<uint8_t> tmpc(0);
 	Enumeration::ShakeModes mode;
 	size_t klen;
 
@@ -181,15 +181,15 @@ void SymmetricKeyGenerator::Generate(Providers Provider, SecurityPolicy Policy, 
 		}
 		default:
 		{
-			klen = 128;
-			mode = Enumeration::ShakeModes::SHAKE1024;
+			mode = Enumeration::ShakeModes::SHAKE256;
+			klen = 32;
 			break;
 		}
 	}
 
 	// instantiate the provider and create the seed
 	Provider::IProvider* pvd = Helper::ProviderFromName::GetInstance(Provider);
-	SecureVector<byte> tmpk(klen);
+	SecureVector<uint8_t> tmpk(klen);
 	pvd->Generate(tmpk);
 
 	// create the SHAKE instance aligned to the security policy

@@ -62,26 +62,19 @@ namespace Test
 			Kat(gen512, m_key[2], m_expected[2]);
 			OnProgress(std::string("SCBKDFTest: Passed SCBKDF512 KAT tests.."));
 
-			SCBKDF* gen1024 = new SCBKDF(ShakeModes::SHAKE1024);
-			Kat(gen1024, m_key[3], m_expected[3]);
-			OnProgress(std::string("SCBKDFTest: Passed SCBKDF1024 KAT tests.."));
-
 			Params(gen128);
 			Params(gen256);
 			Params(gen512);
-			Params(gen1024);
 			OnProgress(std::string("SCBKDFTest: Passed initialization tests.."));
 
 			Stress(gen128);
 			Stress(gen256);
 			Stress(gen512);
-			Stress(gen1024);
 			OnProgress(std::string("SCBKDFTest: Passed stress tests.."));
 
 			delete gen128;
 			delete gen256;
 			delete gen512;
-			delete gen1024;
 
 			return SUCCESS;
 		}
@@ -125,7 +118,7 @@ namespace Test
 		try
 		{
 			SCBKDF gen(ShakeModes::SHAKE128);
-			std::vector<byte> otp(32);
+			std::vector<uint8_t> otp(32);
 			// generator was not initialized
 			gen.Generate(otp);
 
@@ -140,9 +133,9 @@ namespace Test
 		}
 	}
 
-	void SCBKDFTest::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected)
+	void SCBKDFTest::Kat(IKdf* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> otp(Expected.size());
+		std::vector<uint8_t> otp(Expected.size());
 		SymmetricKey kp(Key);
 
 		Generator->Initialize(kp);
@@ -190,10 +183,10 @@ namespace Test
 
 	void SCBKDFTest::Params(IKdf* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
-		std::vector<byte> otp1;
-		std::vector<byte> otp2;
-		std::vector<byte> key(ks.KeySize());
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
+		std::vector<uint8_t> otp1;
+		std::vector<uint8_t> otp2;
+		std::vector<uint8_t> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -224,9 +217,9 @@ namespace Test
 
 	void SCBKDFTest::Stress(IKdf* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> otp;
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 

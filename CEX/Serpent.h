@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -31,7 +31,7 @@ NAMESPACE_SERPENTBASE
 using Tools::IntegerTools;
 
 template<typename T, typename ArrayA, typename ArrayB>
-static void DecryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, ArrayB &Key)
+static void DecryptW(const ArrayA &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, ArrayB &Key)
 {
 #if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 
@@ -173,13 +173,13 @@ static void DecryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Ou
 }
 
 template<typename T, typename ArrayA, typename ArrayB>
-static void EncryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, ArrayB &Key)
+static void EncryptW(const ArrayA &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, ArrayB &Key)
 {
 #if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 
 	const size_t RNDCNT = Key.size() - 5;
 	const size_t INPOFF = T::size();
-	int kctr = -1;
+	int32_t kctr = -1;
 
 	// input round
 	T R0(Input, InOffset);

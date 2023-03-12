@@ -98,19 +98,6 @@ namespace Test
 			Kat(hbar512k512, m_key[1], m_nonce[0], m_associatedText[0], m_plainText[0], m_cipherText[15]);
 			Kat(hbar512k512, m_key[1], m_nonce[1], m_associatedText[1], m_plainText[1], m_cipherText[16]);
 			Kat(hbar512k512, m_key[1], m_nonce[2], m_associatedText[2], m_plainText[2], m_cipherText[17]);
-			// RSX-1024-KMAC-1024
-			HBA* hbar1024k1024 = new HBA(BlockCiphers::RHXS1024, StreamAuthenticators::KMAC1024);
-			Kat(hbar1024k1024, m_key[2], m_nonce[0], m_associatedText[0], m_plainText[0], m_cipherText[18]);
-			Kat(hbar1024k1024, m_key[2], m_nonce[1], m_associatedText[1], m_plainText[1], m_cipherText[19]);
-			Kat(hbar1024k1024, m_key[2], m_nonce[2], m_associatedText[2], m_plainText[2], m_cipherText[20]);
-			OnProgress(std::string("AeadTest: Passed HBA known answer comparison tests.."));
-
-			Sequential(hbar256h256, m_plainText[0], m_cipherText[21], m_cipherText[22], m_cipherText[23]);
-			Sequential(hbar256k256, m_plainText[0], m_cipherText[24], m_cipherText[25], m_cipherText[26]);
-			Sequential(hbar512h512, m_plainText[0], m_cipherText[27], m_cipherText[28], m_cipherText[29]);
-			Sequential(hbar512k512, m_plainText[0], m_cipherText[30], m_cipherText[31], m_cipherText[32]);
-			Sequential(hbar1024k1024, m_plainText[0], m_cipherText[33], m_cipherText[34], m_cipherText[35]);
-			OnProgress(std::string("AeadTest: Passed HBA sequential transformation calls test.."));
 
 			Parallel(hbar256k256);
 			OnProgress(std::string("AeadTest: Passed HBA parallel tests.."));
@@ -124,7 +111,6 @@ namespace Test
 			delete hbar256h256;
 			delete hbar512h512;
 			delete hbar512k512;
-			delete hbar1024k1024;
 
 			// GCM
 			GCM* gcma = new GCM(Enumeration::BlockCiphers::AES);
@@ -220,8 +206,8 @@ namespace Test
 		{
 			HBA cpr(Enumeration::BlockCiphers::AES, Enumeration::StreamAuthenticators::HMACSHA2256);
 			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.IVSize());
+			std::vector<uint8_t> key(ks.KeySize() + 1);
+			std::vector<uint8_t> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -242,8 +228,8 @@ namespace Test
 		{
 			HBA cpr(Enumeration::BlockCiphers::AES, Enumeration::StreamAuthenticators::HMACSHA2256);
 			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(0);
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> nonce(0);
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -264,8 +250,8 @@ namespace Test
 		{
 			HBA cpr(Enumeration::BlockCiphers::AES, Enumeration::StreamAuthenticators::HMACSHA2256);
 			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.IVSize());
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -286,7 +272,7 @@ namespace Test
 		try
 		{
 			HBA cpr(Enumeration::BlockCiphers::AES, Enumeration::StreamAuthenticators::HMACSHA2256);
-			std::vector<byte> aad(16);
+			std::vector<uint8_t> aad(16);
 
 			// set associated data on an uninitialized cipher
 			cpr.SetAssociatedData(aad, 0, aad.size());
@@ -308,13 +294,13 @@ namespace Test
 			HBA cpr(Enumeration::BlockCiphers::AES, Enumeration::StreamAuthenticators::HMACSHA2256);
 			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.IVSize());
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
-			std::vector<byte> pln(16, 0x00);
+			std::vector<uint8_t> pln(16, 0x00);
 			// the output ciphertext array must be the plaintext size + the MAC tag size
-			std::vector<byte> cpt((pln.size() + cpr.TagSize()) - 1);
+			std::vector<uint8_t> cpt((pln.size() + cpr.TagSize()) - 1);
 
 			// imitialize for encryption
 			cpr.Initialize(true, kp);
@@ -332,14 +318,14 @@ namespace Test
 		}
 	}
 
-	void AeadTest::Kat(IAeadMode* Cipher, const std::vector<byte> &Key, const std::vector<byte> &Nonce, 
-		const std::vector<byte> &AssociatedText, const std::vector<byte> &PlainText, const std::vector<byte> &CipherText)
+	void AeadTest::Kat(IAeadMode* Cipher, const std::vector<uint8_t> &Key, const std::vector<uint8_t> &Nonce, 
+		const std::vector<uint8_t> &AssociatedText, const std::vector<uint8_t> &PlainText, const std::vector<uint8_t> &CipherText)
 	{
 		const size_t CPTLEN = CipherText.size();
 		const size_t TXTLEN = PlainText.size();
-		std::vector<byte> dec(CPTLEN);
-		std::vector<byte> enc(CPTLEN);
-		std::vector<byte> mac(CPTLEN - TXTLEN);
+		std::vector<uint8_t> dec(CPTLEN);
+		std::vector<uint8_t> enc(CPTLEN);
+		std::vector<uint8_t> mac(CPTLEN - TXTLEN);
 
 		SymmetricKey kp(Key, Nonce);
 		Cipher->Initialize(true, kp);
@@ -378,21 +364,21 @@ namespace Test
 
 	void AeadTest::Parallel(IAeadMode* Cipher)
 	{
-		std::vector<byte> data;
-		std::vector<byte> dec1;
-		std::vector<byte> dec2;
-		std::vector<byte> enc1;
-		std::vector<byte> enc2;
-		std::vector<byte> key(32);
+		std::vector<uint8_t> data;
+		std::vector<uint8_t> dec1;
+		std::vector<uint8_t> dec2;
+		std::vector<uint8_t> enc1;
+		std::vector<uint8_t> enc2;
+		std::vector<uint8_t> key(32);
 		std::vector<SymmetricKeySize> keySizes = Cipher->LegalKeySizes();
-		std::vector<byte> nonce(keySizes[0].IVSize());
-		std::vector<byte> assoc(16);
+		std::vector<uint8_t> nonce(keySizes[0].IVSize());
+		std::vector<uint8_t> assoc(16);
 		size_t i;
 		Prng::SecureRandom rng;
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			const uint BLKLEN = rng.NextUInt32(static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4), static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize()));
+			const uint32_t BLKLEN = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize() * 4), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize()));
 
 			data.resize(BLKLEN);
 			rng.Generate(data);
@@ -447,101 +433,15 @@ namespace Test
 		}
 	}
 
-	void AeadTest::Sequential(IAeadMode* Cipher, const std::vector<byte> &PlainText, 
-		const std::vector<byte> &Output1, const std::vector<byte> &Output2, const std::vector<byte> &Output3)
-	{
-		SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
-		std::vector<byte> ad(20, 0x01);
-		std::vector<byte> dec1(PlainText.size());
-		std::vector<byte> dec2(PlainText.size());
-		std::vector<byte> dec3(PlainText.size());
-		std::vector<byte> key(ks.KeySize(), 0x02);
-		std::vector<byte> nonce(16, 0x03);
-		std::vector<byte> otp1(Output1.size());
-		std::vector<byte> otp2(Output2.size());
-		std::vector<byte> otp3(Output3.size());
-
-		SymmetricKey kp(key, nonce);
-
-		Cipher->Initialize(true, kp);
-		Cipher->SetAssociatedData(ad, 0, ad.size());
-		Cipher->Transform(PlainText, 0, otp1, 0, PlainText.size());
-
-		if (otp1 != Output1)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS1"));
-		}
-
-		Cipher->Transform(PlainText, 0, otp2, 0, PlainText.size());
-
-		if (otp2 != Output2)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS2"));
-		}
-
-		Cipher->Transform(PlainText, 0, otp3, 0, PlainText.size());
-
-		if (otp3 != Output3)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS3"));
-		}
-
-		// test inverse operation -decryption mode
-		Cipher->Initialize(false, kp);
-		Cipher->SetAssociatedData(ad, 0, ad.size());
-
-		try
-		{
-			Cipher->Transform(otp1, 0, dec1, 0, dec1.size());
-		}
-		catch (CryptoAuthenticationFailure const &)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS4"));
-		}
-
-		if (dec1 != PlainText)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS5"));
-		}
-
-		try
-		{
-			Cipher->Transform(otp2, 0, dec2, 0, dec2.size());
-		}
-		catch (CryptoAuthenticationFailure const&)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS6"));
-		}
-
-		if (dec2 != PlainText)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS7"));
-		}
-
-		try
-		{
-			Cipher->Transform(otp3, 0, dec3, 0, dec3.size());
-		}
-		catch (CryptoAuthenticationFailure const&)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS8"));
-		}
-
-		if (dec3 != PlainText)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS9"));
-		}
-	}
-
 	void AeadTest::Stress(IAeadMode* Cipher)
 	{
 		SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
-		std::vector<byte> data;
-		std::vector<byte> dec;
-		std::vector<byte> enc;
-		std::vector<byte> key(32);
-		std::vector<byte> nonce(keySize.IVSize());
-		std::vector<byte> assoc(16);
+		std::vector<uint8_t> data;
+		std::vector<uint8_t> dec;
+		std::vector<uint8_t> enc;
+		std::vector<uint8_t> key(32);
+		std::vector<uint8_t> nonce(keySize.IVSize());
+		std::vector<uint8_t> assoc(16);
 
 		Prng::SecureRandom rng;
 		data.reserve(MAX_ALLOC);

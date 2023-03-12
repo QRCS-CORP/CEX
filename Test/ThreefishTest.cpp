@@ -220,11 +220,11 @@ namespace Test
 		const size_t TAGLEN = Cipher->TagSize();
 		const size_t MINSMP = 64;
 		const size_t MAXSMP = 6400;
-		std::vector<byte> cpt;
-		std::vector<byte> inp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.IVSize());
-		std::vector<byte> otp;
+		std::vector<uint8_t> cpt;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> nonce(ks.IVSize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 
@@ -267,17 +267,17 @@ namespace Test
 
 	void ThreefishTest::CompareP256()
 	{
-		std::array<ulong, 2> counter{ 128, 1 };
-		std::array<ulong, 4> key;
-		std::array<ulong, 2> tweak;
-		std::array<ulong, 4> state1;
-		std::array<ulong, 4> state2;
+		std::array<uint64_t, 2> counter{ 128, 1 };
+		std::array<uint64_t, 4> key;
+		std::array<uint64_t, 2> tweak;
+		std::array<uint64_t, 4> state1;
+		std::array<uint64_t, 4> state2;
 		SecureRandom rnd;
 
 		IntegerTools::Fill(key, 0, 4, rnd);
 		IntegerTools::Fill(tweak, 0, 2, rnd);
-		MemoryTools::Clear(state1, 0, 4 * sizeof(ulong));
-		MemoryTools::Clear(state2, 0, 4 * sizeof(ulong));
+		MemoryTools::Clear(state1, 0, 4 * sizeof(uint64_t));
+		MemoryTools::Clear(state2, 0, 4 * sizeof(uint64_t));
 
 		Threefish::PemuteP256C(key, counter, tweak, state1, 72);
 		Threefish::PemuteR72P256U(key, counter, tweak, state2);
@@ -289,10 +289,10 @@ namespace Test
 
 #if defined(__AVX512__)
 
-		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 32> state4;
+		std::array<uint64_t, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<uint64_t, 32> state4;
 
-		MemoryTools::Clear(state4, 0, 32 * sizeof(ulong));
+		MemoryTools::Clear(state4, 0, 32 * sizeof(uint64_t));
 
 		Threefish::PemuteP8x256H(key, counter16, tweak, state4, 72);
 
@@ -309,10 +309,10 @@ namespace Test
 
 #elif defined(__AVX2__)
 
-		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
-		std::array<ulong, 16> state3;
+		std::array<uint64_t, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
+		std::array<uint64_t, 16> state3;
 
-		MemoryTools::Clear(state3, 0, 16 * sizeof(ulong));
+		MemoryTools::Clear(state3, 0, 16 * sizeof(uint64_t));
 
 		Threefish::PemuteP4x256H(key, counter8, tweak, state3, 72);
 
@@ -332,17 +332,17 @@ namespace Test
 
 	void ThreefishTest::CompareP512()
 	{
-		std::array<ulong, 2> counter{ 128, 1 };
-		std::array<ulong, 8> key;
-		std::array<ulong, 2> tweak;
-		std::array<ulong, 8> state1;
-		std::array<ulong, 8> state2;
+		std::array<uint64_t, 2> counter{ 128, 1 };
+		std::array<uint64_t, 8> key;
+		std::array<uint64_t, 2> tweak;
+		std::array<uint64_t, 8> state1;
+		std::array<uint64_t, 8> state2;
 		SecureRandom rnd;
 
 		IntegerTools::Fill(key, 0, 8, rnd);
 		IntegerTools::Fill(tweak, 0, 2, rnd);
-		MemoryTools::Clear(state1, 0, 8 * sizeof(ulong));
-		MemoryTools::Clear(state2, 0, 8 * sizeof(ulong));
+		MemoryTools::Clear(state1, 0, 8 * sizeof(uint64_t));
+		MemoryTools::Clear(state2, 0, 8 * sizeof(uint64_t));
 
 		Threefish::PemuteP512C(key, counter, tweak, state1, 96);
 		Threefish::PemuteR96P512U(key, counter, tweak, state2);
@@ -354,10 +354,10 @@ namespace Test
 
 #if defined(__AVX512__)
 
-		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 64> state4;
+		std::array<uint64_t, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<uint64_t, 64> state4;
 
-		MemoryTools::Clear(state4, 0, 64 * sizeof(ulong));
+		MemoryTools::Clear(state4, 0, 64 * sizeof(uint64_t));
 
 		Threefish::PemuteP8x512H(key, counter16, tweak, state4, 96);
 
@@ -374,10 +374,10 @@ namespace Test
 
 #elif defined(__AVX2__)
 
-		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
-		std::array<ulong, 32> state3;
+		std::array<uint64_t, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
+		std::array<uint64_t, 32> state3;
 
-		MemoryTools::Clear(state3, 0, 32 * sizeof(ulong));
+		MemoryTools::Clear(state3, 0, 32 * sizeof(uint64_t));
 
 		Threefish::PemuteP4x512H(key, counter8, tweak, state3, 96);
 
@@ -398,17 +398,17 @@ namespace Test
 
 	void ThreefishTest::CompareP1024()
 	{
-		std::array<ulong, 2> counter{ 128, 1 };
-		std::array<ulong, 16> key;
-		std::array<ulong, 2> tweak;
-		std::array<ulong, 16> state1;
-		std::array<ulong, 16> state2;
+		std::array<uint64_t, 2> counter{ 128, 1 };
+		std::array<uint64_t, 16> key;
+		std::array<uint64_t, 2> tweak;
+		std::array<uint64_t, 16> state1;
+		std::array<uint64_t, 16> state2;
 		SecureRandom rnd;
 
 		IntegerTools::Fill(key, 0, 16, rnd);
 		IntegerTools::Fill(tweak, 0, 2, rnd);
-		MemoryTools::Clear(state1, 0, 16 * sizeof(ulong));
-		MemoryTools::Clear(state2, 0, 16 * sizeof(ulong));
+		MemoryTools::Clear(state1, 0, 16 * sizeof(uint64_t));
+		MemoryTools::Clear(state2, 0, 16 * sizeof(uint64_t));
 
 		Threefish::PemuteR120P1024U(key, counter, tweak, state2);
 		Threefish::PemuteP1024C(key, counter, tweak, state1, 120);
@@ -420,10 +420,10 @@ namespace Test
 
 #if defined(__AVX512__)
 
-		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 128> state4;
+		std::array<uint64_t, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<uint64_t, 128> state4;
 
-		MemoryTools::Clear(state4, 0, 128 * sizeof(ulong));
+		MemoryTools::Clear(state4, 0, 128 * sizeof(uint64_t));
 
 		Threefish::PemuteP8x1024H(key, counter16, tweak, state4, 120);
 
@@ -440,10 +440,10 @@ namespace Test
 
 #elif defined(__AVX2__)
 		
-		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
-		std::array<ulong, 64> state3;
+		std::array<uint64_t, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
+		std::array<uint64_t, 64> state3;
 
-		MemoryTools::Clear(state3, 0, 64 * sizeof(ulong));
+		MemoryTools::Clear(state3, 0, 64 * sizeof(uint64_t));
 
 		Threefish::PemuteP4x1024H(key, counter8, tweak, state3, 120);
 
@@ -469,8 +469,8 @@ namespace Test
 		// test initialization key input sizes
 		try
 		{
-			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.IVSize());
+			std::vector<uint8_t> key(ks.KeySize() + 1);
+			std::vector<uint8_t> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			Cipher->Initialize(true, kp);
@@ -487,8 +487,8 @@ namespace Test
 
 		try
 		{
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(1);
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> nonce(1);
 			SymmetricKey kp(key, nonce);
 
 			Cipher->Initialize(true, kp);
@@ -505,9 +505,9 @@ namespace Test
 
 		try
 		{
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.IVSize());
-			std::vector<byte> info(ks.InfoSize() + 1);
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> nonce(ks.IVSize());
+			std::vector<uint8_t> info(ks.InfoSize() + 1);
 			SymmetricKey kp(key, nonce, info);
 
 			Cipher->Initialize(true, kp);
@@ -525,8 +525,8 @@ namespace Test
 		// test invalid parallel options
 		try
 		{
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.IVSize());
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			Cipher->Initialize(true, kp);
@@ -543,14 +543,14 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, 
-		std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
+	void ThreefishTest::Finalization(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, 
+		std::vector<uint8_t> &Expected, std::vector<uint8_t> &MacCode1, std::vector<uint8_t> &MacCode2)
 	{
 		const size_t CPTLEN = Message.size() + Cipher->TagSize();
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
-		std::vector<byte> cpt(CPTLEN * 2);
-		std::vector<byte> otp(MSGLEN * 2);
+		std::vector<uint8_t> cpt(CPTLEN * 2);
+		std::vector<uint8_t> otp(MSGLEN * 2);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt msg 1
@@ -587,7 +587,7 @@ namespace Test
 			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("MAC output is not equal! -TF4"));
 		}
 
-		// use constant time IntegerTools::Compare to verify
+		// verify the output
 		if (IntegerTools::Compare(otp, 0, Message, 0, MSGLEN) == false || IntegerTools::Compare(otp, MSGLEN, Message, 0, MSGLEN) == false)
 		{
 			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("Decrypted output does not match the input! -TF5"));
@@ -598,13 +598,13 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void ThreefishTest::Kat(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected)
 	{
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Cipher->TagSize() : Message.size();
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> cpt(CPTLEN);
-		std::vector<byte> otp(MSGLEN);
+		std::vector<uint8_t> cpt(CPTLEN);
+		std::vector<uint8_t> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt
@@ -626,13 +626,13 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void ThreefishTest::MonteCarlo(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected)
 	{
 		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Cipher->TagSize() : Message.size();
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> msg = Message;
-		std::vector<byte> enc(CPTLEN);
-		std::vector<byte> dec(MSGLEN);
+		std::vector<uint8_t> msg = Message;
+		std::vector<uint8_t> enc(CPTLEN);
+		std::vector<uint8_t> dec(MSGLEN);
 		Cipher::SymmetricKey kp(Key, Nonce);
 
 		Cipher->Initialize(true, kp);
@@ -664,15 +664,15 @@ namespace Test
 
 	void ThreefishTest::Parallel(IStreamCipher* Cipher)
 	{
-		const uint MINSMP = static_cast<uint>(Cipher->ParallelBlockSize());
-		const uint MAXSMP = static_cast<uint>(Cipher->ParallelBlockSize()) * 4;
+		const uint32_t MINSMP = static_cast<uint32_t>(Cipher->ParallelBlockSize());
+		const uint32_t MAXSMP = static_cast<uint32_t>(Cipher->ParallelBlockSize()) * 4;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
-		std::vector<byte> cpt1;
-		std::vector<byte> cpt2;
-		std::vector<byte> inp;
-		std::vector<byte> otp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.IVSize());
+		std::vector<uint8_t> cpt1;
+		std::vector<uint8_t> cpt2;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> otp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> nonce(ks.IVSize());
 		Prng::SecureRandom rnd;
 
 		cpt1.reserve(MAXSMP);
@@ -723,16 +723,16 @@ namespace Test
 
 	void ThreefishTest::Stress(IStreamCipher* Cipher)
 	{
-		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
-		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
+		const uint32_t MINPRL = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXPRL = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
-		std::vector<byte> cpt;
-		std::vector<byte> inp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.IVSize());
-		std::vector<byte> otp;
+		std::vector<uint8_t> cpt;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> nonce(ks.IVSize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 
@@ -768,13 +768,13 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
+	void ThreefishTest::Verification(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected, std::vector<uint8_t> &Mac)
 	{
 		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Cipher->TagSize() : Message.size();
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
-		std::vector<byte> cpt(CPTLEN);
-		std::vector<byte> otp(MSGLEN);
+		std::vector<uint8_t> cpt(CPTLEN);
+		std::vector<uint8_t> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt
@@ -819,10 +819,10 @@ namespace Test
 			std::string("8E78A52890DB35E890287C9E5DE861A6FF2A8EC6DFC46DDD128BDE350B87F6A5DAD191F6D14D091F6E8467FF28D80B3D70ACA143D68CD95F72B02B48842EDC09"),	// tsx512k512
 			std::string("17AB9475ACBB133A100771DB30B56438CD06CE50D5CF8E28763DE3193308BC7498C5A77D73E0B101612770C68447742BF81554495371BE9EFC88E776ED0BACAE"),
 			// tsx1024 mac1024
-			std::string("6336C389BDE06C249BBC20653A717990146E18B721E22E847A5034588EEAFF56E8C74BC39C961F9548B44FDBDB780BA6DECF911C53DB4C6B5645F13E69725D44"
-				"3E0DE52D69E1AE6BB7D72C0384304464237B1DED8278E187BCE8ECF5F53EB043957B1ED835033CECBFA3703388F017156426DA7604F1C21FB22BD5AECA5DFA57"),
-			std::string("C3657A84953F2B8197943E5C944EB5C7F687E910FC3B4E8938A9FD9ED36F2EBA31B4C8124393FFF57A6348D02F8E2A6B9FE507D7C846C1D760B70E9B3F0C5070"
-				"75E2E6150EEB7560E0A4CC4A97AD1CF2EE493BA81D81B3AA7ED4F800F0E6001B97FD6405BAA472535BDD91410554321DC204A25FD70639D6FFE4FD90BEA2EFEA")
+			std::string("42F9C235C97B4FF540F884858A2464F4019982FA53AA028C91710007C1ABB37DBA3BD7B9FB6C51968DA2A0D549A8B8A69CE419743F7BA6F903CB39995AD93D10"
+				"4BBF7817A7A9F26BC4E1718F0F52E1F7B17D03329480342A08D60DB3665CC192103CE5FFEFA1DB8AB1B7D24B6A41B06B1A24509A82CD438F5285D01A9EABFE04"),
+			std::string("F53A7B161B9E76EF550AA341CF1DFA3425E3031702D82A0F43D19CFF409A0073DE231BF72D91816606619568B45CD0ADADCBBDACCCFEC6DDB8511BD658B0F1ED"
+				"E9BB9B72D7027630392A0F57361F3F5335903F65CE8B9FD73FFE163973F73A71F5A1BBFED51C0E16444B5BF33D42AA2847BC59C30DC0EA44758564272C716438")
 		};
 		HexConverter::Decode(code, 6, m_code);
 
@@ -836,10 +836,10 @@ namespace Test
 				"8E78A52890DB35E890287C9E5DE861A6FF2A8EC6DFC46DDD128BDE350B87F6A5DAD191F6D14D091F6E8467FF28D80B3D70ACA143D68CD95F72B02B48842EDC09"),
 			std::string("0F43C172A46F8EAC0E961938B2E56BC128B982CBA28DDE70C88C2DA3EF37BA3DBB457F420390EE146735169E573620C6B0415160284749DDFC72A3D13904557E"),
 			// tsx1024
-			std::string("BE983D2F4C93994E67E48ED9405A5102C2B42EB65A12FD9CCCA84D7E17C696AFCDF7468C821757C483842EB905AC61A2954BD430F0097F58DDBA3B2B08760B60"
-				"FCEB8C21F6DF3B97155CA0B439A1AB843205501D073AE6C135EBF926CDEE789DABC363AA92964FE24C8D95627F6F922F51E4ACF9B293A144FEE32758CEC47E6C"
-				"6336C389BDE06C249BBC20653A717990146E18B721E22E847A5034588EEAFF56E8C74BC39C961F9548B44FDBDB780BA6DECF911C53DB4C6B5645F13E69725D44"
-				"3E0DE52D69E1AE6BB7D72C0384304464237B1DED8278E187BCE8ECF5F53EB043957B1ED835033CECBFA3703388F017156426DA7604F1C21FB22BD5AECA5DFA57"),
+			std::string("0267F65A1CB54AC4FA003B6F427250B7535D1B393EFAEA724BC5F37902DA7C1DB75C2BFE80C35CF8570EA570A2A94C3A10A64F572ADC1E1B5417A7A85E6A955B"
+				"7A23578C9B5DF76923BE053DB17EFA2E80E90624763AC9B87F10871C7CD84A910B649E26CACD54DB8AB4FECD9B6FC708C47F99FDCBCC28DDE6EAC80CD6589D82"
+				"42F9C235C97B4FF540F884858A2464F4019982FA53AA028C91710007C1ABB37DBA3BD7B9FB6C51968DA2A0D549A8B8A69CE419743F7BA6F903CB39995AD93D10"
+				"4BBF7817A7A9F26BC4E1718F0F52E1F7B17D03329480342A08D60DB3665CC192103CE5FFEFA1DB8AB1B7D24B6A41B06B1A24509A82CD438F5285D01A9EABFE04"),
 			std::string("B3F7134A5977D657479377A1224CA0ACF29C79B4AF0C8A23B269850F6DAEEDB37F8EFCD7F0B65BA7B4F5264E255B459E96AC4D1DD13D7957B6581DB116C7F584"
 				"8BCD73FA5B588D28B0EE942F8E5F01C85E4E85B743B7CB0EC885B77533D733ABD811B6AB5D2AA25DFADA55138EEB5E3FF150BE937F1AB241DC374DB1F1BA6D09")
 		};

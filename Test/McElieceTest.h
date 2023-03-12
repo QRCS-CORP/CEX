@@ -22,11 +22,8 @@ namespace Test
 		static const size_t TEST_CYCLES = 2;
 #endif
 
-		std::vector<byte> m_cprseed;
-		std::vector<std::vector<byte>> m_cptexp;
-		std::vector<std::vector<byte>> m_rngexp;
-		std::vector<byte> m_rngkey;
-		std::vector<std::vector<byte>> m_sskexp;
+		std::vector<std::vector<uint8_t>> m_rngexp;
+		std::vector<uint8_t> m_rngkey;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -99,6 +96,10 @@ namespace Test
 	private:
 
 		void Initialize();
+		void KatN4608T96();
+		void KatN6960T119();
+		void KatN6688T128();
+		void KatN8192T128();
 		void OnProgress(const std::string &Data);
 	};
 }

@@ -23,15 +23,6 @@ std::string AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives Enumeral)
 		case AsymmetricPrimitives::McEliece:
 			name = std::string("McEliece");
 			break;
-		case AsymmetricPrimitives::NewHope:
-			name = std::string("NewHope");
-			break;
-		case AsymmetricPrimitives::NTRUPrime:
-			name = std::string("NTRUPrime");
-			break;
-		case AsymmetricPrimitives::Rainbow:
-			name = std::string("Rainbow");
-			break;
 		case AsymmetricPrimitives::SphincsPlus:
 			name = std::string("SphincsPlus");
 			break;
@@ -73,18 +64,6 @@ AsymmetricPrimitives AsymmetricPrimitiveConvert::FromName(std::string &Name)
 	{
 		tname = AsymmetricPrimitives::McEliece;
 	}	
-	else if (Name == std::string("NewHope"))
-	{
-		tname = AsymmetricPrimitives::NewHope;
-	}
-	else if (Name == std::string("NTRUPrime"))
-	{
-		tname = AsymmetricPrimitives::NTRUPrime;
-	}
-	else if (Name == std::string("Rainbow"))
-	{
-		tname = AsymmetricPrimitives::Rainbow;
-	}
 	else if (Name == std::string("SphincsPlus"))
 	{
 		tname = AsymmetricPrimitives::SphincsPlus;

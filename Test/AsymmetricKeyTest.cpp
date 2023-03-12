@@ -75,8 +75,8 @@ namespace Test
 
 		try
 		{
-			std::vector<byte> poly(0);
-			AsymmetricKey kp(poly, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761);
+			std::vector<uint8_t> poly(0);
+			AsymmetricKey kp(poly, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricKey"), std::string("Exception handling failure! -AE1"));
 		}
@@ -91,8 +91,8 @@ namespace Test
 		// test AsymmetricKey initialization with invalid primitive type
 		try
 		{
-			std::vector<byte> poly(100);
-			AsymmetricKey kp(poly, AsymmetricPrimitives::None, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761);
+			std::vector<uint8_t> poly(100);
+			AsymmetricKey kp(poly, AsymmetricPrimitives::None, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricKey"), std::string("Exception handling failure! -AE3"));
 		}
@@ -107,8 +107,8 @@ namespace Test
 		// test AsymmetricKey initialization with invalid key class
 		try
 		{
-			std::vector<byte> poly(100);
-			AsymmetricKey kp(poly, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::None, AsymmetricParameters::NTRUS2SQ4591N761);
+			std::vector<uint8_t> poly(100);
+			AsymmetricKey kp(poly, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::None, AsymmetricParameters::KYBERS32400);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricKey"), std::string("Exception handling failure! -AE5"));
 		}
@@ -123,8 +123,8 @@ namespace Test
 		// test AsymmetricKey initialization with invalid parameter set
 		try
 		{
-			std::vector<byte> poly(100);
-			AsymmetricKey kp(poly, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::None);
+			std::vector<uint8_t> poly(100);
+			AsymmetricKey kp(poly, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::None);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricKey"), std::string("Exception handling failure! -AE7"));
 		}
@@ -141,10 +141,10 @@ namespace Test
 		// test AsymmetricSecureKey initialization with zero sized poly-key
 		try
 		{
-			SecureVector<byte> poly(0);
-			SecureVector<byte> salt(0);
+			SecureVector<uint8_t> poly(0);
+			SecureVector<uint8_t> salt(0);
 
-			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
+			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400, SecurityPolicy::SPL256);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricSecureKey"), std::string("Exception handling failure! -AE2"));
 		}
@@ -159,10 +159,10 @@ namespace Test
 		// test AsymmetricSecureKey initialization with invalid primitive type
 		try
 		{
-			SecureVector<byte> poly(100);
-			SecureVector<byte> salt(0);
+			SecureVector<uint8_t> poly(100);
+			SecureVector<uint8_t> salt(0);
 
-			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::None, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
+			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::None, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400, SecurityPolicy::SPL256);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricSecureKey"), std::string("Exception handling failure! -AE4"));
 		}
@@ -177,10 +177,10 @@ namespace Test
 		// test AsymmetricSecureKey initialization invalid key class
 		try
 		{
-			SecureVector<byte> poly(100);
-			SecureVector<byte> salt(0);
+			SecureVector<uint8_t> poly(100);
+			SecureVector<uint8_t> salt(0);
 
-			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::None, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
+			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::None, AsymmetricParameters::KYBERS32400, SecurityPolicy::SPL256);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricSecureKey"), std::string("Exception handling failure! -AE6"));
 		}
@@ -195,10 +195,10 @@ namespace Test
 		// test AsymmetricSecureKey initialization with invalid primitive type
 		try
 		{
-			SecureVector<byte> poly(100);
-			SecureVector<byte> salt(0);
+			SecureVector<uint8_t> poly(100);
+			SecureVector<uint8_t> salt(0);
 
-			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::None, SecurityPolicy::SPL256);
+			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::None, SecurityPolicy::SPL256);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricSecureKey"), std::string("Exception handling failure! -AE8"));
 		}
@@ -213,10 +213,10 @@ namespace Test
 		// test AsymmetricSecureKey initialization with invalid security policy
 		try
 		{
-			SecureVector<byte> poly(100);
-			SecureVector<byte> salt(0);
+			SecureVector<uint8_t> poly(100);
+			SecureVector<uint8_t> salt(0);
 
-			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::None);
+			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400, SecurityPolicy::None);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricSecureKey"), std::string("Exception handling failure! -AE9"));
 		}
@@ -231,11 +231,11 @@ namespace Test
 		// test AsymmetricSecureKey securepoly extraction with undersize output vector
 		try
 		{
-			SecureVector<byte> poly(100);
-			SecureVector<byte> salt(0);
-			SecureVector<byte> tmpr(99);
+			SecureVector<uint8_t> poly(100);
+			SecureVector<uint8_t> salt(0);
+			SecureVector<uint8_t> tmpr(99);
 
-			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
+			AsymmetricSecureKey kp(poly, salt, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400, SecurityPolicy::SPL256);
 			kp.SecurePolynomial(tmpr);
 
 			throw TestException(std::string("Exception"), std::string("AsymmetricSecureKey"), std::string("Exception handling failure! -AE9"));
@@ -251,19 +251,19 @@ namespace Test
 
 	void AsymmetricKeyTest::Initialization()
 	{
-		std::vector<byte> poly(100);
-		SecureVector<byte> spoly(100);
-		SecureVector<byte> tmpk(0);
-		SecureVector<byte> tmpp(100);
-		SecureVector<byte> tmps(0);
+		std::vector<uint8_t> poly(100);
+		SecureVector<uint8_t> spoly(100);
+		SecureVector<uint8_t> tmpk(0);
+		SecureVector<uint8_t> tmpp(100);
+		SecureVector<uint8_t> tmps(0);
 		SecureRandom gen;
 
 		gen.Generate(poly);
 		gen.Generate(spoly);
 
-		AsymmetricKey kp1(poly, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761);
+		AsymmetricKey kp1(poly, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400);
 
-		if (kp1.Polynomial() != poly || kp1.KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp1.PrimitiveType() != AsymmetricPrimitives::NTRUPrime)
+		if (kp1.Polynomial() != poly || kp1.KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp1.PrimitiveType() != AsymmetricPrimitives::Kyber)
 		{
 			throw TestException(std::string("Serialization"), std::string("AsymmetricKey"), std::string("The serialized asymmetric key is invalid! -AS1"));
 		}
@@ -273,9 +273,9 @@ namespace Test
 			throw TestException(std::string("Serialization"), std::string("AsymmetricKey"), std::string("The serialized asymmetric key is invalid! -AS2"));
 		}
 
-		AsymmetricSecureKey kp2(spoly, tmps, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
+		AsymmetricSecureKey kp2(spoly, tmps, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400, SecurityPolicy::SPL256);
 
-		if (kp2.Polynomial() != SecureUnlock(spoly) || kp2.KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp2.PrimitiveType() != AsymmetricPrimitives::NTRUPrime)
+		if (kp2.Polynomial() != SecureUnlock(spoly) || kp2.KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp2.PrimitiveType() != AsymmetricPrimitives::Kyber)
 		{
 			throw TestException(std::string("Serialization"), std::string("AsymmetricSecureKey"), std::string("The serialized asymmetric key is invalid! -AS3"));
 		}
@@ -290,32 +290,32 @@ namespace Test
 
 	void AsymmetricKeyTest::Serialization()
 	{
-		std::vector<byte> poly(100);
-		SecureVector<byte> spoly(100);
-		SecureVector<byte> tmpk(0);
-		SecureVector<byte> tmps(0);
+		std::vector<uint8_t> poly(100);
+		SecureVector<uint8_t> spoly(100);
+		SecureVector<uint8_t> tmpk(0);
+		SecureVector<uint8_t> tmps(0);
 		SecureRandom gen;
 
 		gen.Generate(poly);
 		gen.Generate(spoly);
 
-		AsymmetricKey kp1(poly, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761);
+		AsymmetricKey kp1(poly, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400);
 		// serialize to a secure vector
 		tmpk = AsymmetricKey::Serialize(kp1);
 		// create a new key from the serialized key
 		AsymmetricKey* kp2 = AsymmetricKey::DeSerialize(tmpk);
 
 		// compare
-		if (kp2->Polynomial() != poly || kp2->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp2->PrimitiveType() != AsymmetricPrimitives::NTRUPrime)
+		if (kp2->Polynomial() != poly || kp2->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp2->PrimitiveType() != AsymmetricPrimitives::Kyber)
 		{
 			throw TestException(std::string("Serialization"), std::string("AsymmetricKey"), std::string("The deserialized asymmetric key is invalid! -AS1"));
 		}
 
-		AsymmetricSecureKey kp3(spoly, tmps, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
+		AsymmetricSecureKey kp3(spoly, tmps, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400, SecurityPolicy::SPL256);
 		tmpk = AsymmetricSecureKey::Serialize(kp3);
 		AsymmetricKey* kp4 = AsymmetricKey::DeSerialize(tmpk);
 
-		if (kp4->Polynomial() != SecureUnlock(spoly) || kp4->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp4->PrimitiveType() != AsymmetricPrimitives::NTRUPrime)
+		if (kp4->Polynomial() != SecureUnlock(spoly) || kp4->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp4->PrimitiveType() != AsymmetricPrimitives::Kyber)
 		{
 			throw TestException(std::string("Serialization"), std::string("AsymmetricSecureKey"), std::string("The deserialized asymmetric key is invalid! -AS2"));
 		}
@@ -323,10 +323,10 @@ namespace Test
 
 	void AsymmetricKeyTest::Stress()
 	{
-		std::vector<byte> poly;
-		SecureVector<byte> spoly;
-		SecureVector<byte> tmpr(0);
-		SecureVector<byte> tmps(0);
+		std::vector<uint8_t> poly;
+		SecureVector<uint8_t> spoly;
+		SecureVector<uint8_t> tmpr(0);
+		SecureVector<uint8_t> tmps(0);
 		size_t i;
 		SecureRandom gen;
 
@@ -334,7 +334,7 @@ namespace Test
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
 			poly = gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
-			AsymmetricKey kp(poly, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761);
+			AsymmetricKey kp(poly, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400);
 
 			if (kp.Polynomial() != poly)
 			{
@@ -348,7 +348,7 @@ namespace Test
 			spoly = SecureLock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
 			tmps = SecureLock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
 
-			AsymmetricSecureKey kp(spoly, tmps, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
+			AsymmetricSecureKey kp(spoly, tmps, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::KYBERS32400, SecurityPolicy::SPL256);
 			tmpr.resize(spoly.size());
 			kp.SecurePolynomial(tmpr);
 

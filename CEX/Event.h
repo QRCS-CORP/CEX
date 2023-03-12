@@ -18,15 +18,15 @@ NAMESPACE_ROUTING
 /// {
 /// public:
 /// 	SampleEvent();
-/// 	void Completed(int result);
-/// 	LISTENER(SampleEvent, Completed, int);
+/// 	void Completed(int32_t result);
+/// 	LISTENER(SampleEvent, Completed, int32_t);
 /// };
 /// 
 /// SampleEvent::SampleEvent()
 /// 	: LCompleted(this)
 /// { }
 /// 
-/// void SampleEvent::Completed(int result)
+/// void SampleEvent::Completed(int32_t result)
 /// {
 /// 	std::cout << result << std::endl;
 /// }
@@ -39,11 +39,11 @@ NAMESPACE_ROUTING
 /// 
 /// 	SampleEvent evt;
 /// 	cs.ProgressPercent += &evt.Completed;
-/// 	std::vector&lt;byte&gt; key(32);
-/// 	std::vector&lt;byte&gt; iv(16);
+/// 	std::vector&lt;uint8_t&gt; key(32);
+/// 	std::vector&lt;uint8_t&gt; iv(16);
 /// 	cs.Initialize(true, Cipher::SymmetricKey(key, iv));
-/// 	std::vector&lt;byte&gt; data(32000);
-/// 	std::vector&lt;byte&gt; vret(32000);
+/// 	std::vector&lt;uint8_t&gt; data(32000);
+/// 	std::vector&lt;uint8_t&gt; vret(32000);
 /// 	cs.Write(data, 0, vret, 0);
 /// }
 /// </code>

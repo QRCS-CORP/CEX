@@ -20,9 +20,6 @@ std::string DigestConvert::ToName(Digests Enumeral)
 		case CEX::Enumeration::Digests::SHA3512:
 			name = std::string("SHA3512");
 			break;
-		case CEX::Enumeration::Digests::SHA31024:
-			name = std::string("SHA31024");
-			break;
 		case CEX::Enumeration::Digests::SHA2256:
 			name = std::string("SHA2256");
 			break;
@@ -37,9 +34,6 @@ std::string DigestConvert::ToName(Digests Enumeral)
 			break;
 		case CEX::Enumeration::Digests::SHAKE512:
 			name = std::string("SHAKE512");
-			break;
-		case CEX::Enumeration::Digests::SHAKE1024:
-			name = std::string("SHAKE1024");
 			break;
 		case CEX::Enumeration::Digests::Skein256:
 			name = std::string("Skein256");
@@ -78,10 +72,6 @@ Digests DigestConvert::FromName(std::string &Name)
 	{
 		tname = Digests::SHA3512;
 	}
-	else if (Name == std::string("SHA31024"))
-	{
-		tname = Digests::SHA31024;
-	}
 	else if (Name == std::string("SHA2256"))
 	{
 		tname = Digests::SHA2256;
@@ -101,10 +91,6 @@ Digests DigestConvert::FromName(std::string &Name)
 	else if (Name == std::string("SHAKE512"))
 	{
 		tname = Digests::SHAKE512;
-	}
-	else if (Name == std::string("SHAKE1024"))
-	{
-		tname = Digests::SHAKE1024;
 	}
 	else if (Name == std::string("Skein256"))
 	{

@@ -15,8 +15,8 @@ class Donna128
 {
 private:
 
-	ulong high;
-	ulong low;
+	uint64_t high;
+	uint64_t low;
 
 public:
 
@@ -36,7 +36,7 @@ public:
 	///
 	/// <param name="Low">The low portion of the integer</param>
 	/// <param name="High">The high portion of the integer</param>
-	Donna128(ulong Low = 0, ulong High = 0)
+	Donna128(uint64_t Low = 0, uint64_t High = 0)
 		:
 		high(High),
 		low(Low)
@@ -46,7 +46,7 @@ public:
 	/// <summary>
 	/// The Low portion of the integer
 	/// </summary>
-	ulong Low() const 
+	uint64_t Low() const 
 	{ 
 		return low;
 	}
@@ -54,7 +54,7 @@ public:
 	/// <summary>
 	/// The High portion of the integer
 	/// </summary>
-	ulong High() const 
+	uint64_t High() const 
 	{ 
 		return high;
 	}
@@ -82,7 +82,7 @@ public:
 
 		if (Shift > 0)
 		{
-			const ulong CARRY = z.high << (64 - Shift);
+			const uint64_t CARRY = z.high << (64 - Shift);
 			z.high = (z.high >> Shift);
 			z.low = (z.low >> Shift) | CARRY;
 		}
@@ -103,7 +103,7 @@ public:
 
 		if (Shift > 0)
 		{
-			const ulong CARRY = z.low >> (64 - Shift);
+			const uint64_t CARRY = z.low >> (64 - Shift);
 			z.low = (z.low << Shift);
 			z.high = (z.high << Shift) | CARRY;
 		}
@@ -118,7 +118,7 @@ public:
 	/// <param name="Mask">The AND mask</param>
 	///
 	/// <returns>The AND'd value</returns>
-	inline ulong operator & (ulong Mask)
+	inline uint64_t operator & (uint64_t Mask)
 	{
 		return low & Mask;
 	}
@@ -130,7 +130,7 @@ public:
 	/// <param name="Mask">The AND mask</param>
 	///
 	/// <returns>The AND'd value</returns>
-	inline ulong operator &= (ulong Mask)
+	inline uint64_t operator &= (uint64_t Mask)
 	{
 		high = 0;
 		low &= Mask;
@@ -162,7 +162,7 @@ public:
 	/// <param name="Y">The value to add</param>
 	///
 	/// <returns>The sum value</returns>
-	inline Donna128 operator + (ulong Y)
+	inline Donna128 operator + (uint64_t Y)
 	{
 		Donna128 z;
 
@@ -184,7 +184,7 @@ public:
 		low += X.low;
 		high += X.high;
 
-		const ulong CARRY = (low < X.low);
+		const uint64_t CARRY = (low < X.low);
 		high += CARRY;
 
 		return *this;
@@ -197,10 +197,10 @@ public:
 	/// <param name="X">The value to add</param>
 	///
 	/// <returns>The sum value</returns>
-	inline Donna128& operator += (ulong X)
+	inline Donna128& operator += (uint64_t X)
 	{
 		low += X;
-		const ulong CARRY = (low < X);
+		const uint64_t CARRY = (low < X);
 		high += CARRY;
 
 		return *this;
@@ -213,10 +213,10 @@ public:
 	/// <param name="Y">The value to multiply</param>
 	///
 	/// <returns>The sum value</returns>
-	inline Donna128 operator * (ulong Y)
+	inline Donna128 operator * (uint64_t Y)
 	{
-		ulong low;
-		ulong high;
+		uint64_t low;
+		uint64_t high;
 
 		low = 0;
 		high = 0;
@@ -246,7 +246,7 @@ public:
 	/// <param name="Shift">The shift register</param>
 	///
 	/// <returns>The sum value</returns>
-	inline static ulong CarryShift(Donna128 &X, size_t Shift)
+	inline static uint64_t CarryShift(Donna128 &X, size_t Shift)
 	{
 		Donna128 z(X.high, X.low);
 
@@ -261,7 +261,7 @@ public:
 	/// <param name="Shift">The shift register</param>
 	///
 	/// <returns>The sum value</returns>
-	inline static ulong CarryShift(const ulong &X, size_t Shift)
+	inline static uint64_t CarryShift(const uint64_t &X, size_t Shift)
 	{
 		return X >> Shift;
 	}
@@ -276,7 +276,7 @@ public:
 	/// <param name="S2">The second shift register</param>
 	///
 	/// <returns>The sum value</returns>
-	inline static ulong CombineLow(Donna128 &X, size_t S1, Donna128 &Y, size_t S2)
+	inline static uint64_t CombineLow(Donna128 &X, size_t S1, Donna128 &Y, size_t S2)
 	{
 		Donna128 z;
 
@@ -295,9 +295,9 @@ public:
 	/// <param name="Shift">The shift register</param>
 	///
 	/// <returns>The sum value</returns>
-	inline static ulong CarryShift(uint128_t X, size_t Shift)
+	inline static uint64_t CarryShift(uint128_t X, size_t Shift)
 	{
-		return static_cast<ulong>(X >> Shift);
+		return static_cast<uint64_t>(X >> Shift);
 	}
 
 	/// <summary>
@@ -310,9 +310,9 @@ public:
 	/// <param name="S2">The second shift register</param>
 	///
 	/// <returns>The sum value</returns>
-	inline static ulong CombineLow(uint128_t X, size_t S1, uint128_t Y, size_t S2)
+	inline static uint64_t CombineLow(uint128_t X, size_t S1, uint128_t Y, size_t S2)
 	{
-		return static_cast<ulong>((X >> S1) | (Y << S2));
+		return static_cast<uint64_t>((X >> S1) | (Y << S2));
 	}
 
 #endif
@@ -325,7 +325,7 @@ public:
 	/// <param name="Y">The factor</param>
 	/// <param name="Low">The low return value</param>
 	/// <param name="High">The high return value</param>
-	inline static void Mul64x64To128(ulong X, ulong Y, ulong* Low, ulong* High)
+	inline static void Mul64x64To128(uint64_t X, uint64_t Y, uint64_t* Low, uint64_t* High)
 	{
 #if defined(CEX_FAST_64X64_MUL)
 		CEX_FAST_64X64_MUL(X, Y, Low, High);
@@ -335,24 +335,24 @@ public:
 		// some adds and shifts. Last resort for CPUs like UltraSPARC (with
 		// 64-bit registers/ALU, but no 64x64->128 multiply) or 32-bit CPUs.
 		const size_t HWORD_BITS = 32;
-		const uint HWORD_MASK = 0xFFFFFFFFUL;
+		const uint32_t HWORD_MASK = 0xFFFFFFFFUL;
 
-		const uint ah = (X >> HWORD_BITS);
-		const uint al = (X  & HWORD_MASK);
-		const uint bh = (Y >> HWORD_BITS);
-		const uint bl = (Y  & HWORD_MASK);
+		const uint32_t ah = (X >> HWORD_BITS);
+		const uint32_t al = (X  & HWORD_MASK);
+		const uint32_t bh = (Y >> HWORD_BITS);
+		const uint32_t bl = (Y  & HWORD_MASK);
 
-		ulong x0 = static_cast<ulong>(ah) * bh;
-		ulong x1 = static_cast<ulong>(al) * bh;
-		ulong x2 = static_cast<ulong>(ah) * bl;
-		ulong x3 = static_cast<ulong>(al) * bl;
+		uint64_t x0 = static_cast<uint64_t>(ah) * bh;
+		uint64_t x1 = static_cast<uint64_t>(al) * bh;
+		uint64_t x2 = static_cast<uint64_t>(ah) * bl;
+		uint64_t x3 = static_cast<uint64_t>(al) * bl;
 
 		// this cannot overflow as (2^32-1)^2 + 2^32-1 < 2^64-1
 		x2 += x3 >> HWORD_BITS;
 		// this one can overflow
 		x2 += x1;
 		// propagate the carry if any
-		x0 += static_cast<ulong>(static_cast<bool>(x2 < x1)) << HWORD_BITS;
+		x0 += static_cast<uint64_t>(static_cast<bool>(x2 < x1)) << HWORD_BITS;
 
 		*High = x0 + (x2 >> HWORD_BITS);
 		*Low = ((x2 & HWORD_MASK) << HWORD_BITS) + (x3 & HWORD_MASK);

@@ -16,9 +16,9 @@ class Blake512::Blake2bState
 {
 public:
 
-	std::array<ulong, 2> F = { 0 };
-	std::array<ulong, 8> H = { 0 };
-	std::array<ulong, 2> T = { 0 };
+	std::array<uint64_t, 2> F = { 0 };
+	std::array<uint64_t, 8> H = { 0 };
+	std::array<uint64_t, 2> T = { 0 };
 
 	Blake2bState()
 	{
@@ -31,9 +31,9 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(F, 0, F.size() * sizeof(ulong));
-		MemoryTools::Clear(H, 0, H.size() * sizeof(ulong));
-		MemoryTools::Clear(T, 0, T.size() * sizeof(ulong));
+		MemoryTools::Clear(F, 0, F.size() * sizeof(uint64_t));
+		MemoryTools::Clear(H, 0, H.size() * sizeof(uint64_t));
+		MemoryTools::Clear(T, 0, T.size() * sizeof(uint64_t));
 	}
 };
 
@@ -50,8 +50,8 @@ Blake512::Blake512(bool Parallel)
 	m_msgLength(0),
 	m_parallelProfile(Blake::BLAKE512_RATE_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
 	m_treeParams(Parallel ? 
-		BlakeParams(static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE), 0x02, static_cast<byte>(DEF_PRLDEGREE), 0x00, static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE)) : 
-		BlakeParams(static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE), 0x01, 0x01, 0x00, 0x00))
+		BlakeParams(static_cast<uint8_t>(Blake::BLAKE512_DIGEST_SIZE), 0x02, static_cast<uint8_t>(DEF_PRLDEGREE), 0x00, static_cast<uint8_t>(Blake::BLAKE512_DIGEST_SIZE)) : 
+		BlakeParams(static_cast<uint8_t>(Blake::BLAKE512_DIGEST_SIZE), 0x01, 0x01, 0x00, 0x00))
 {
 	//m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
 
@@ -91,7 +91,7 @@ Blake512::Blake512(BlakeParams &Params)
 	else
 	{
 		// fixed at defaults for sequential; depth 1, fanout 1, leaf length unlimited
-		m_treeParams = BlakeParams(static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE));
+		m_treeParams = BlakeParams(static_cast<uint8_t>(Blake::BLAKE512_DIGEST_SIZE));
 	}
 
 	Reset();
@@ -154,7 +154,7 @@ ParallelOptions &Blake512::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void Blake512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void Blake512::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (Output.size() < Blake::BLAKE512_DIGEST_SIZE)
 	{
@@ -165,7 +165,7 @@ void Blake512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 	Finalize(Output, 0);
 }
 
-void Blake512::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void Blake512::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (Output.size() - OutOffset < Blake::BLAKE512_DIGEST_SIZE)
 	{
@@ -175,11 +175,11 @@ void Blake512::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	size_t bcnt;
 	size_t blen;
 	size_t i;
-	ulong pblk;
+	uint64_t pblk;
 
 	if (m_treeParams.FanOut() > 1)
 	{
-		std::vector<byte> codes(m_treeParams.FanOut() * Blake::BLAKE512_DIGEST_SIZE);
+		std::vector<uint8_t> codes(m_treeParams.FanOut() * Blake::BLAKE512_DIGEST_SIZE);
 
 		// clear the unused buffer
 		MemoryTools::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
@@ -247,7 +247,7 @@ void Blake512::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		rootp.NodeDepth() = 1;
 		rootp.NodeOffset() = 0;
 		rootp.MaxDepth() = 2;
-		std::vector<ulong> config(CONFIG_SIZE);
+		std::vector<uint64_t> config(CONFIG_SIZE);
 		LoadState(m_dgtState[0], rootp, config);
 
 		// load blocks
@@ -298,7 +298,7 @@ void Blake512::Initialize(Cipher::ISymmetricKey &MacKey)
 		throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Mac Key has invalid length!"), ErrorCodes::InvalidKey);
 	}
 
-	std::vector<ulong> config(CONFIG_SIZE);
+	std::vector<uint64_t> config(CONFIG_SIZE);
 
 	if (MacKey.IV().size() != 0)
 	{
@@ -322,9 +322,9 @@ void Blake512::Initialize(Cipher::ISymmetricKey &MacKey)
 		config[7] = IntegerTools::LeBytesTo64(MacKey.Info(), 8);
 	}
 
-	std::vector<byte> mkey(Blake::BLAKE512_RATE_SIZE, 0);
+	std::vector<uint8_t> mkey(Blake::BLAKE512_RATE_SIZE, 0);
 	MemoryTools::Copy(MacKey.Key(), 0, mkey, 0, IntegerTools::Min(MacKey.Key().size(), mkey.size()));
-	m_treeParams.KeyLength() = static_cast<byte>(MacKey.Key().size());
+	m_treeParams.KeyLength() = static_cast<uint8_t>(MacKey.Key().size());
 
 	if (m_treeParams.FanOut() > 1)
 	{
@@ -332,7 +332,7 @@ void Blake512::Initialize(Cipher::ISymmetricKey &MacKey)
 		for (i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			MemoryTools::Copy(mkey, 0, m_msgBuffer, i * Blake::BLAKE512_RATE_SIZE, mkey.size());
-			m_treeParams.NodeOffset() = static_cast<byte>(i);
+			m_treeParams.NodeOffset() = static_cast<uint8_t>(i);
 			LoadState(m_dgtState[i], m_treeParams, config);
 		}
 		m_msgLength = m_parallelProfile.ParallelMinimumSize();
@@ -361,14 +361,14 @@ void Blake512::ParallelMaxDegree(size_t Degree)
 
 	if (Degree > 1 && m_parallelProfile.ProcessorCount() > 1)
 	{
-		m_treeParams.FanOut() = static_cast<byte>(Degree);
+		m_treeParams.FanOut() = static_cast<uint8_t>(Degree);
 		m_treeParams.MaxDepth() = 2;
-		m_treeParams.InnerLength() = static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE);
+		m_treeParams.InnerLength() = static_cast<uint8_t>(Blake::BLAKE512_DIGEST_SIZE);
 		m_parallelProfile.IsParallel() = true;
 	}
 	else
 	{
-		m_treeParams = BlakeParams(static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE));
+		m_treeParams = BlakeParams(static_cast<uint8_t>(Blake::BLAKE512_DIGEST_SIZE));
 		m_parallelProfile.IsParallel() = false;
 	}
 
@@ -377,14 +377,14 @@ void Blake512::ParallelMaxDegree(size_t Degree)
 
 void Blake512::Reset()
 {
-	std::vector<ulong> config(CONFIG_SIZE);
+	std::vector<uint64_t> config(CONFIG_SIZE);
 	size_t i;
 
 	if (m_treeParams.FanOut() > 1)
 	{
 		for (i = 0; i < m_treeParams.FanOut(); ++i)
 		{
-			m_treeParams.NodeOffset() = static_cast<byte>(i);
+			m_treeParams.NodeOffset() = static_cast<uint8_t>(i);
 			LoadState(m_dgtState[i], m_treeParams, config);
 		}
 		m_treeParams.NodeOffset() = 0;
@@ -399,29 +399,29 @@ void Blake512::Reset()
 	m_msgLength = 0;
 }
 
-void Blake512::Update(byte Input)
+void Blake512::Update(uint8_t Input)
 {
-	std::vector<byte> inp(1, Input);
+	std::vector<uint8_t> inp(1, Input);
 	Update(inp, 0, 1);
 }
 
-void Blake512::Update(uint Input)
+void Blake512::Update(uint32_t Input)
 {
-	std::vector<byte> tmp(sizeof(uint));
+	std::vector<uint8_t> tmp(sizeof(uint32_t));
 	IntegerTools::Le32ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void Blake512::Update(ulong Input)
+void Blake512::Update(uint64_t Input)
 {
-	std::vector<byte> tmp(sizeof(ulong));
+	std::vector<uint8_t> tmp(sizeof(uint64_t));
 	IntegerTools::Le64ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void Blake512::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too int16_t!");
 
 	size_t plen;
 	size_t tlen;
@@ -544,19 +544,19 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-void Blake512::LoadState(Blake2bState &State, BlakeParams &Params, std::vector<ulong> &Config)
+void Blake512::LoadState(Blake2bState &State, BlakeParams &Params, std::vector<uint64_t> &Config)
 {
-	MemoryTools::Clear(State.T, 0, State.T.size() * sizeof(ulong));
-	MemoryTools::Clear(State.F, 0, State.F.size() * sizeof(ulong));
-	MemoryTools::Copy(Blake::IV512, 0, State.H, 0, State.H.size() * sizeof(ulong));
+	MemoryTools::Clear(State.T, 0, State.T.size() * sizeof(uint64_t));
+	MemoryTools::Clear(State.F, 0, State.F.size() * sizeof(uint64_t));
+	MemoryTools::Copy(Blake::IV512, 0, State.H, 0, State.H.size() * sizeof(uint64_t));
 
-	Params.GetConfig<ulong>(Config);
+	Params.GetConfig<uint64_t>(Config);
 	MemoryTools::XOR512(Config, 0, State.H, 0);
 }
 
-void Blake512::Permute(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State)
+void Blake512::Permute(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State)
 {
-	std::array<ulong, 8> iv {
+	std::array<uint64_t, 8> iv {
 		Blake::IV512[0],
 		Blake::IV512[1],
 		Blake::IV512[2],
@@ -577,7 +577,7 @@ void Blake512::Permute(const std::vector<byte> &Input, size_t InOffset, Blake2bS
 #endif
 }
 
-void Blake512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, ulong Length, Blake2bState &State)
+void Blake512::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, uint64_t Length, Blake2bState &State)
 {
 	do
 	{

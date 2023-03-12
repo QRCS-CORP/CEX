@@ -103,22 +103,22 @@ namespace Test
 			Blake256* dgt256s = new Blake256(false);
 			Stress(dgt256s);
 			delete dgt256s;
-			OnProgress(std::string("Blake2Test: Passed Passed Blake2-S sequential stress tests.."));
+			OnProgress(std::string("Blake2Test: Passed Blake2-S sequential stress tests.."));
 
 			Blake512* dgt512s = new Blake512(false);
 			Stress(dgt512s);
 			delete dgt512s;
-			OnProgress(std::string("Blake2Test: Passed Passed Blake2-B sequential stress tests.."));
+			OnProgress(std::string("Blake2Test: Passed Blake2-B sequential stress tests.."));
 
 			if (detect.VirtualCores() >= 2)
 			{
 				Blake256* dgt256p = new Blake256(true);
 				Stress(dgt256p);
-				OnProgress(std::string("Blake2Test: Passed Passed Blake2-SP parallel stress tests.."));
+				OnProgress(std::string("Blake2Test: Passed Blake2-SP parallel stress tests.."));
 
 				Blake512* dgt512p = new Blake512(true);
 				Stress(dgt512p);
-				OnProgress(std::string("Blake2Test: Passed Passed Blake2-BP parallel stress tests.."));
+				OnProgress(std::string("Blake2Test: Passed Blake2-BP parallel stress tests.."));
 
 				Parallel(dgt256p);
 				delete dgt256p;
@@ -223,7 +223,7 @@ namespace Test
 		{
 			Blake256 dgt;
 			// set mac key to an invalid size -99
-			std::vector<byte> k(99);
+			std::vector<uint8_t> k(99);
 			Cipher::SymmetricKey kp(k);
 			dgt.Initialize(kp);
 
@@ -242,7 +242,7 @@ namespace Test
 		{
 			Blake512 dgt;
 			// set mac key to an invalid size -99
-			std::vector<byte> k(99);
+			std::vector<uint8_t> k(99);
 			Cipher::SymmetricKey kp(k);
 			dgt.Initialize(kp);
 
@@ -259,29 +259,29 @@ namespace Test
 
 	void Blake2Test::PermutationR10P512()
 	{
-		std::vector<byte> input(64, 128U);
-		std::array<uint, 8> iv{ 0, 1, 2, 3, 4, 5, 6, 7 };
-		std::array<uint, 8> state1;
-		std::array<uint, 8> state2;
-		std::array<uint, 8> state3;
+		std::vector<uint8_t> input(64, 128U);
+		std::array<uint32_t, 8> iv{ 0, 1, 2, 3, 4, 5, 6, 7 };
+		std::array<uint32_t, 8> state1;
+		std::array<uint32_t, 8> state2;
+		std::array<uint32_t, 8> state3;
 
-		MemoryTools::Clear(state1, 0, 8 * sizeof(uint));
-		MemoryTools::Clear(state2, 0, 8 * sizeof(uint));
-		MemoryTools::Clear(state3, 0, 8 * sizeof(uint));
+		MemoryTools::Clear(state1, 0, 8 * sizeof(uint32_t));
+		MemoryTools::Clear(state2, 0, 8 * sizeof(uint32_t));
+		MemoryTools::Clear(state3, 0, 8 * sizeof(uint32_t));
 
 		Blake::PermuteR10P512C(input, 0, state1, iv);
 		Blake::PermuteR10P512U(input, 0, state2, iv);
 
 #if defined(__AVX512__)
 
-		std::vector<byte> input512(1024, 128U);
+		std::vector<uint8_t> input512(1024, 128U);
 		std::vector<UInt512> iv512{ UInt512(0), UInt512(1), UInt512(2), UInt512(3), UInt512(4), UInt512(5), UInt512(6), UInt512(7) };
 		std::vector<UInt512> state512(8, UInt512(0));
 
 		Blake::PermuteR10P16x512H(input512, 0, state512, iv512);
 
-		std::vector<uint> state512ul(64);
-		std::memcpy(state512ul.data(), state512.data(), 64 * sizeof(uint));
+		std::vector<uint32_t> state512ul(64);
+		std::memcpy(state512ul.data(), state512.data(), 64 * sizeof(uint32_t));
 
 		for (size_t i = 0; i < 64; ++i)
 		{
@@ -305,14 +305,14 @@ namespace Test
 			throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P512"), std::string("Permutation output is not equal! -BCS2"));
 		}
 
-		std::vector<byte> input256(512, 128UL);
+		std::vector<uint8_t> input256(512, 128UL);
 		std::vector<UInt256> iv256{ UInt256(0), UInt256(1), UInt256(2), UInt256(3), UInt256(4), UInt256(5), UInt256(6), UInt256(7) };
 		std::vector<UInt256> state256(8, UInt256(0));
 
 		Blake::PermuteR10P8x512H(input256, 0, state256, iv256);
 
-		std::vector<uint> state256ul(32);
-		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
+		std::vector<uint32_t> state256ul(32);
+		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint32_t));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
@@ -327,29 +327,29 @@ namespace Test
 
 	void Blake2Test::PermutationR12P1024()
 	{
-		std::vector<byte> input(128, 128U);
-		std::array<ulong, 8> iv{ 0, 1, 2, 3, 4, 5, 6, 7 };
-		std::array<ulong, 8> state1;
-		std::array<ulong, 8> state2;
-		std::array<ulong, 8> state3;
+		std::vector<uint8_t> input(128, 128U);
+		std::array<uint64_t, 8> iv{ 0, 1, 2, 3, 4, 5, 6, 7 };
+		std::array<uint64_t, 8> state1;
+		std::array<uint64_t, 8> state2;
+		std::array<uint64_t, 8> state3;
 
-		std::memset(state1.data(), 0, 8 * sizeof(ulong));
-		std::memset(state2.data(), 0, 8 * sizeof(ulong));
-		std::memset(state3.data(), 0, 8 * sizeof(ulong));
+		std::memset(state1.data(), 0, 8 * sizeof(uint64_t));
+		std::memset(state2.data(), 0, 8 * sizeof(uint64_t));
+		std::memset(state3.data(), 0, 8 * sizeof(uint64_t));
 
 		Blake::PermuteR12P1024C(input, 0, state1, iv);
 		Blake::PermuteR12P1024U(input, 0, state2, iv);
 
 #if defined(__AVX512__)
 
-		std::vector<byte> input512(1024, 128U);
+		std::vector<uint8_t> input512(1024, 128U);
 		std::vector<ULong512> iv512{ ULong512(0), ULong512(1), ULong512(2), ULong512(3), ULong512(4), ULong512(5), ULong512(6), ULong512(7) };
 		std::vector<ULong512> state512(8, ULong512(0));
 
 		Blake::PermuteR12P8x1024H(input512, 0, state512, iv512);
 
-		std::vector<ulong> state512ull(64);
-		MemoryTools::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));
+		std::vector<uint64_t> state512ull(64);
+		MemoryTools::Copy(state512, 0, state512ull, 0, 64 * sizeof(uint64_t));
 
 		for (size_t i = 0; i < 64; ++i)
 		{
@@ -373,14 +373,14 @@ namespace Test
 			throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P1024"), std::string("Permutation output is not equal! -BCL2"));
 		}
 
-		std::vector<byte> input256(512, 128U);
+		std::vector<uint8_t> input256(512, 128U);
 		std::vector<ULong256> iv256{ ULong256(0), ULong256(1), ULong256(2), ULong256(3), ULong256(4), ULong256(5), ULong256(6), ULong256(7) };
 		std::vector<ULong256> state256(8, ULong256(0));
 
 		Blake::PermuteR12P4x1024H(input256, 0, state256, iv256);
 
-		std::vector<ulong> state256ull(32);
-		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
+		std::vector<uint64_t> state256ull(32);
+		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(uint64_t));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
@@ -409,10 +409,10 @@ namespace Test
 			{
 				if (line.find(DMK_INP) != std::string::npos)
 				{
-					std::vector<byte> input(0);
-					std::vector<byte> expect(64);
-					std::vector<byte> key;
-					std::vector<byte> hash(64);
+					std::vector<uint8_t> input(0);
+					std::vector<uint8_t> expect(64);
+					std::vector<uint8_t> key;
+					std::vector<uint8_t> hash(64);
 
 					size_t sze = DMK_INP.length();
 					if (line.length() - sze > 0)
@@ -465,11 +465,11 @@ namespace Test
 			{
 				if (line.find(DMK_INP) != std::string::npos)
 				{
-					std::vector<byte> input(0);
-					std::vector<byte> expect(64);
-					std::vector<byte> key;
-					std::vector<byte> hash(64);
-					std::vector<byte> hash2(64);
+					std::vector<uint8_t> input(0);
+					std::vector<uint8_t> expect(64);
+					std::vector<uint8_t> key;
+					std::vector<uint8_t> hash(64);
+					std::vector<uint8_t> hash2(64);
 
 					size_t sze = DMK_INP.length();
 					if (line.length() - sze > 0)
@@ -526,10 +526,10 @@ namespace Test
 			{
 				if (line.find(DMK_INP) != std::string::npos)
 				{
-					std::vector<byte> input(0);
-					std::vector<byte> expect(32);
-					std::vector<byte> key;
-					std::vector<byte> hash(32);
+					std::vector<uint8_t> input(0);
+					std::vector<uint8_t> expect(32);
+					std::vector<uint8_t> key;
+					std::vector<uint8_t> hash(32);
 
 					size_t sze = DMK_INP.length();
 					if (line.length() - sze > 0)
@@ -582,10 +582,10 @@ namespace Test
 			{
 				if (line.find(DMK_INP) != std::string::npos)
 				{
-					std::vector<byte> input(0);
-					std::vector<byte> expect(32);
-					std::vector<byte> key;
-					std::vector<byte> hash(32);
+					std::vector<uint8_t> input(0);
+					std::vector<uint8_t> expect(32);
+					std::vector<uint8_t> key;
+					std::vector<uint8_t> hash(32);
 
 					size_t sze = DMK_INP.length();
 					if (line.length() - sze > 0)
@@ -630,8 +630,8 @@ namespace Test
 		const size_t MAXSMP = 16384;
 		const size_t PRLLEN = Digest->ParallelProfile().ParallelBlockSize();
 		const size_t PRLDGR = Digest->ParallelProfile().ParallelMaxDegree();
-		std::vector<byte> msg;
-		std::vector<byte> code(Digest->DigestSize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> code(Digest->DigestSize());
 		Prng::SecureRandom rnd;
 		bool reduce;
 
@@ -670,12 +670,12 @@ namespace Test
 
 	void Blake2Test::Stress(IDigest* Digest)
 	{
-		const uint MINPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize());
-		const uint MAXPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize() * 4);
+		const uint32_t MINPRL = static_cast<uint32_t>(Digest->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXPRL = static_cast<uint32_t>(Digest->ParallelProfile().ParallelBlockSize() * 4);
 
-		std::vector<byte> code1(Digest->DigestSize());
-		std::vector<byte> code2(Digest->DigestSize());
-		std::vector<byte> msg;
+		std::vector<uint8_t> code1(Digest->DigestSize());
+		std::vector<uint8_t> code2(Digest->DigestSize());
+		std::vector<uint8_t> msg;
 		SecureRandom rnd;
 		size_t i;
 
@@ -709,10 +709,10 @@ namespace Test
 
 	void Blake2Test::TreeParams()
 	{
-		std::vector<byte> code1(40, 7);
+		std::vector<uint8_t> code1(40, 7);
 
 		BlakeParams tree1(64, 64, 2, 1, 64000, 64, 1, 32, code1);
-		std::vector<byte> tres = tree1.ToBytes();
+		std::vector<uint8_t> tres = tree1.ToBytes();
 		BlakeParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
@@ -720,7 +720,7 @@ namespace Test
 			throw TestException(std::string("TreeParams"), std::string("BlakeParams"), std::string("TreeParams: Tree parameters test failed! -BT1"));
 		}
 
-		std::vector<byte> code2(12, 3);
+		std::vector<uint8_t> code2(12, 3);
 		BlakeParams tree3(32, 32, 2, 1, 32000, 32, 1, 32, code1);
 		tres = tree3.ToBytes();
 		BlakeParams tree4(tres);

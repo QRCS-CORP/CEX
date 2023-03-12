@@ -32,31 +32,31 @@ namespace Test
 
 		~NistRng();
 
-		void Initialize(const std::vector<byte> &Seed);
+		void Initialize(const std::vector<uint8_t> &Seed);
 
-		void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Info);
+		void Initialize(const std::vector<uint8_t> &Seed, const std::vector<uint8_t> &Info);
 
 		virtual const Prngs Enumeral() override;
 
 		virtual const std::string Name() override;
 
-		virtual void Generate(std::vector<byte>& Output, size_t Offset, size_t Length) override;
+		virtual void Generate(std::vector<uint8_t>& Output, size_t Offset, size_t Length) override;
 
-		virtual void Generate(SecureVector<byte>& Output, size_t Offset, size_t Length) override;
+		virtual void Generate(SecureVector<uint8_t>& Output, size_t Offset, size_t Length) override;
 
-		virtual void Generate(std::vector<byte>& Output) override;
+		virtual void Generate(std::vector<uint8_t>& Output) override;
 
-		virtual void Generate(SecureVector<byte>& Output) override;
+		virtual void Generate(SecureVector<uint8_t>& Output) override;
 
-		virtual ushort NextUInt16() override;
+		virtual uint16_t NextUInt16() override;
 
-		virtual uint NextUInt32() override;
+		virtual uint32_t NextUInt32() override;
 
-		virtual ulong NextUInt64() override;
+		virtual uint64_t NextUInt64() override;
 
 		virtual void Reset() override;
 
-		void Update(const std::vector<byte> &Seed, std::vector<byte> &Key, std::vector<byte> &IV);
+		void Update(const std::vector<uint8_t> &Seed, std::vector<uint8_t> &Key, std::vector<uint8_t> &IV);
 	};
 }
 

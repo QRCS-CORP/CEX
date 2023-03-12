@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -74,10 +74,10 @@ class SystemTools
 private:
 
 	// library version info
-	static const int CEX_VERSION_MAJOR = 1;
-	static const int CEX_VERSION_MINOR = 0;
-	static const int CEX_VERSION_PATCH = 0;
-	static const int CEX_VERSION_RELEASE = 4;
+	static const int32_t CEX_VERSION_MAJOR = 1;
+	static const int32_t CEX_VERSION_MINOR = 0;
+	static const int32_t CEX_VERSION_PATCH = 0;
+	static const int32_t CEX_VERSION_RELEASE = 4;
 
 	static bool HAS_RDRAND;
 	static bool TMR_RDTSC;
@@ -97,8 +97,8 @@ public:
 	/// 
 	/// <param name="Drive">The drive to poll</param>
 	///
-	/// <returns>A vector of 64bit uint sizes</returns>
-	static std::vector<ulong> DriveSpace(const std::string &Drive);
+	/// <returns>A vector of 64bit uint32_t sizes</returns>
+	static std::vector<uint64_t> DriveSpace(const std::string &Drive);
 
 	/// <summary>
 	/// Return the intel RDRAND instructions
@@ -112,7 +112,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The 64bit frequency size</returns>
-	static ulong GetRdtscFrequency();
+	static uint64_t GetRdtscFrequency();
 
 	/// <summary>
 	/// Return availability of RDTSCP timer
@@ -125,29 +125,29 @@ public:
 	/// Return the total physical memory size in bytes
 	/// </summary>
 	/// 
-	/// <returns>The 64bit uint size</returns>
-	static ulong MemoryPhysicalTotal();
+	/// <returns>The 64bit uint32_t size</returns>
+	static uint64_t MemoryPhysicalTotal();
 
 	/// <summary>
 	/// Return the used physical memory size in bytes
 	/// </summary>
 	/// 
-	/// <returns>The 64bit uint size</returns>
-	static ulong MemoryPhysicalUsed();
+	/// <returns>The 64bit uint32_t size</returns>
+	static uint64_t MemoryPhysicalUsed();
 
 	/// <summary>
 	/// Return the used virtual memory size in bytes
 	/// </summary>
 	/// 
-	/// <returns>The 64bit uint size</returns>
-	static ulong MemoryVirtualTotal();
+	/// <returns>The 64bit uint32_t size</returns>
+	static uint64_t MemoryVirtualTotal();
 
 	/// <summary>
 	/// Return the used virtual memory size in bytes
 	/// </summary>
 	/// 
-	/// <returns>The 64bit uint size</returns>
-	static ulong MemoryVirtualUsed();
+	/// <returns>The 64bit uint32_t size</returns>
+	static uint64_t MemoryVirtualUsed();
 
 	/// <summary>
 	/// Return the operating system name string
@@ -161,7 +161,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The 32bit process id</returns>
-	static uint ProcessId();
+	static uint32_t ProcessId();
 
 	/// <summary>
 	/// Return the logged-in user name
@@ -174,22 +174,22 @@ public:
 	/// Return the current time in nanoseconds
 	/// </summary>
 	/// 
-	/// <returns>The 64bit uint size</returns>
-	static ulong TimeCurrentNS();
+	/// <returns>The 64bit uint32_t size</returns>
+	static uint64_t TimeCurrentNS();
 
 	/// <summary>
 	/// Return the system tick count
 	/// </summary>
 	/// 
-	/// <returns>The 64bit uint size</returns>
-	static ulong TimeStamp(bool HasRdtsc = false);
+	/// <returns>The 64bit uint32_t size</returns>
+	static uint64_t TimeStamp(bool HasRdtsc = false);
 
 	/// <summary>
 	/// Return the time in milliseconds since the system was booted
 	/// </summary>
 	/// 
-	/// <returns>The 64bit uint size</returns>
-	static ulong TimeSinceBoot();
+	/// <returns>The 64bit uint32_t size</returns>
+	static uint64_t TimeSinceBoot();
 
 	/// <summary>
 	/// Return the CEX library version string
@@ -211,8 +211,8 @@ public:
 	/// Return the current thread id
 	/// </summary>
 	/// 
-	/// <returns>The 32bit uint id</returns>
-	static uint CurrentThreadId();
+	/// <returns>The 32bit uint32_t id</returns>
+	static uint32_t CurrentThreadId();
 
 	/// <summary>
 	/// Return the current caret position
@@ -332,7 +332,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A PTOKEN_USER structure</returns>
-	static std::vector<byte> UserToken();
+	static std::vector<uint8_t> UserToken();
 
 #elif defined(CEX_OS_POSIX)
 
@@ -341,7 +341,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The available free space</returns>
-	static ulong AvailableFreeSpace();
+	static uint64_t AvailableFreeSpace();
 
 	/// <summary>
 	/// Get a list of directories in the path
@@ -385,7 +385,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A vector of process information</returns>
-	static std::vector<uint> ProcessEntries();
+	static std::vector<uint32_t> ProcessEntries();
 
 	/// <summary>
 	/// Return an rusage struct with system usage information

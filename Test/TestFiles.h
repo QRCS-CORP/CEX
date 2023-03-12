@@ -53,6 +53,26 @@ namespace Test
 			const std::string SERPENTPTEXT192 = "../../Test/Vectors/Nessie/serpentplain192.txt";
 			const std::string SERPENTPTEXT256 = "../../Test/Vectors/Nessie/serpentplain256.txt";
 		}
+
+		namespace NISTPQ3
+		{
+			const std::string DILITHIUM2544 = "../../Test/Vectors/NPQCR3/dilithium-2544.rsp";
+			const std::string DILITHIUM4016 = "../../Test/Vectors/NPQCR3/dilithium-4016.rsp";
+			const std::string DILITHIUM4880 = "../../Test/Vectors/NPQCR3/dilithium-4880.rsp";
+			const std::string KYBER2400 = "../../Test/Vectors/NPQCR3/kyber-2400.rsp";
+			const std::string KYBER3168 = "../../Test/Vectors/NPQCR3/kyber-3168.rsp";
+			const std::string KYBER3936 = "../../Test/Vectors/NPQCR3/kyber-3936.rsp";
+			const std::string MCELIECE460896 = "../../Test/Vectors/NPQCR3/mceliece-460896.rsp";
+			const std::string MCELIECE6688128 = "../../Test/Vectors/NPQCR3/mceliece-6688128.rsp";
+			const std::string MCELIECE6960119 = "../../Test/Vectors/NPQCR3/mceliece-6960119.rsp";
+			const std::string MCELIECE8192128 = "../../Test/Vectors/NPQCR3/mceliece-8192128.rsp";
+			const std::string SPHINCSPLUS128F = "../../Test/Vectors/NPQCR3/sphincs-shake256-128f-robust.rsp";
+			const std::string SPHINCSPLUS128S = "../../Test/Vectors/NPQCR3/sphincs-shake256-128s-robust.rsp";
+			const std::string SPHINCSPLUS192F = "../../Test/Vectors/NPQCR3/sphincs-shake256-192f-robust.rsp";
+			const std::string SPHINCSPLUS192S = "../../Test/Vectors/NPQCR3/sphincs-shake256-192s-robust.rsp";
+			const std::string SPHINCSPLUS256F = "../../Test/Vectors/NPQCR3/sphincs-shake256-256f-robust.rsp";
+			const std::string SPHINCSPLUS256S = "../../Test/Vectors/NPQCR3/sphincs-shake256-256s-robust.rsp";
+		}
 	}
 }
 

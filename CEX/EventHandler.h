@@ -20,7 +20,7 @@ template <typename... Args> class event_handler
 public:
 
 	typedef std::function<void(Args...)> handler_func_type;
-	typedef unsigned int handler_id_type;
+	typedef uint32_t handler_id_type;
 
 	explicit event_handler(const handler_func_type& handlerFunc)
 		: m_handlerFunc(handlerFunc)

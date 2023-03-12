@@ -264,10 +264,10 @@ namespace Test
 		}
 	}
 
-	void SkeinTest::Kat(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void SkeinTest::Kat(IDigest* Digest, std::vector<uint8_t> &Input, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> hash1(Digest->DigestSize(), 0);
-		std::vector<byte> hash2(Digest->DigestSize(), 0);
+		std::vector<uint8_t> hash1(Digest->DigestSize(), 0);
+		std::vector<uint8_t> hash2(Digest->DigestSize(), 0);
 
 		Digest->Update(Input, 0, Input.size());
 		Digest->Finalize(hash1, 0);
@@ -291,8 +291,8 @@ namespace Test
 		const size_t MAXSMP = 16384;
 		const size_t PRLLEN = Digest->ParallelProfile().ParallelBlockSize();
 		const size_t PRLDGR = Digest->ParallelProfile().ParallelMaxDegree();
-		std::vector<byte> msg;
-		std::vector<byte> code(Digest->DigestSize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> code(Digest->DigestSize());
 		Prng::SecureRandom rnd;
 		bool reduce;
 
@@ -331,13 +331,13 @@ namespace Test
 
 	void SkeinTest::PermutationR72()
 	{
-		std::array<ulong, 4> input{ 0, 1, 2, 3 };
-		std::array<ulong, 2> tweak{ 0, 1 };
-		std::array<ulong, 4> state1;
-		std::array<ulong, 4> state2;
+		std::array<uint64_t, 4> input{ 0, 1, 2, 3 };
+		std::array<uint64_t, 2> tweak{ 0, 1 };
+		std::array<uint64_t, 4> state1;
+		std::array<uint64_t, 4> state2;
 
-		MemoryTools::Clear(state1, 0, 4 * sizeof(ulong));
-		MemoryTools::Clear(state2, 0, 4 * sizeof(ulong));
+		MemoryTools::Clear(state1, 0, 4 * sizeof(uint64_t));
+		MemoryTools::Clear(state2, 0, 4 * sizeof(uint64_t));
 
 		Skein::PemuteP256C(input, tweak, state1, 72);
 		Skein::PemuteR72P256U(input, tweak, state2);
@@ -350,16 +350,16 @@ namespace Test
 
 	void SkeinTest::PermutationR80()
 	{
-		std::array<ulong, 16> input;
-		std::array<ulong, 2> tweak;
-		std::array<ulong, 16> state1;
-		std::array<ulong, 16> state2;
+		std::array<uint64_t, 16> input;
+		std::array<uint64_t, 2> tweak;
+		std::array<uint64_t, 16> state1;
+		std::array<uint64_t, 16> state2;
 		Prng::SecureRandom rnd;
 
-		IntegerTools::Fill<std::array<ulong, 16>>(input, 0, 16, rnd);
-		IntegerTools::Fill<std::array<ulong, 2>>(tweak, 0, 2, rnd);
-		MemoryTools::Clear(state1, 0, 16 * sizeof(ulong));
-		MemoryTools::Clear(state2, 0, 16 * sizeof(ulong));
+		IntegerTools::Fill<std::array<uint64_t, 16>>(input, 0, 16, rnd);
+		IntegerTools::Fill<std::array<uint64_t, 2>>(tweak, 0, 2, rnd);
+		MemoryTools::Clear(state1, 0, 16 * sizeof(uint64_t));
+		MemoryTools::Clear(state2, 0, 16 * sizeof(uint64_t));
 
 		Skein::PemuteP1024C(input, tweak, state1, 80);
 		Skein::PemuteR80P1024U(input, tweak, state2);
@@ -372,12 +372,12 @@ namespace Test
 
 	void SkeinTest::Stress(IDigest* Digest)
 	{
-		const uint MINPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize());
-		const uint MAXPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize() * 4);
+		const uint32_t MINPRL = static_cast<uint32_t>(Digest->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXPRL = static_cast<uint32_t>(Digest->ParallelProfile().ParallelBlockSize() * 4);
 
-		std::vector<byte> code1(Digest->DigestSize());
-		std::vector<byte> code2(Digest->DigestSize());
-		std::vector<byte> msg;
+		std::vector<uint8_t> code1(Digest->DigestSize());
+		std::vector<uint8_t> code2(Digest->DigestSize());
+		std::vector<uint8_t> msg;
 		SecureRandom rnd;
 		size_t i;
 
@@ -411,10 +411,10 @@ namespace Test
 
 	void SkeinTest::TreeParams()
 	{
-		std::vector<byte> code1(8, 7);
+		std::vector<uint8_t> code1(8, 7);
 		SkeinParams tree1(32, 32, 8);
 		tree1.DistributionCode() = code1;
-		std::vector<byte> tres = tree1.ToBytes();
+		std::vector<uint8_t> tres = tree1.ToBytes();
 		SkeinParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
@@ -422,8 +422,8 @@ namespace Test
 			throw TestException(std::string("TreeParams"), std::string("SkeinParams"), std::string("Tree parameters test failed! -ST1"));
 		}
 
-		std::vector<byte> code2(20, 7);
-		SkeinParams tree3(std::vector<byte> { 1, 2, 3, 4 }, 64, 1, 64, 8, 0, code2);
+		std::vector<uint8_t> code2(20, 7);
+		SkeinParams tree3(std::vector<uint8_t> { 1, 2, 3, 4 }, 64, 1, 64, 8, 0, code2);
 		tres = tree3.ToBytes();
 		SkeinParams tree4(tres);
 

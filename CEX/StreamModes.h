@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Streaming file and memory container types
 /// </summary>
-enum class StreamModes : byte
+enum class StreamModes : uint8_t
 {
 	/// <summary>
 	/// No stream mode is specified

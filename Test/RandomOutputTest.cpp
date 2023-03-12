@@ -125,7 +125,7 @@ namespace Test
 	void RandomOutputTest::ACPGenerateFile(std::string FilePath, size_t FileSize)
 	{
 		ACP pvd;
-		std::vector<byte> tmpr(1024);
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen = FileSize;
 		IO::FileStream fs(FilePath, IO::FileStream::FileAccess::Write);
 
@@ -145,7 +145,7 @@ namespace Test
 	void RandomOutputTest::CJPGenerateFile(std::string FilePath, size_t FileSize)
 	{
 		CJP pvd;
-		std::vector<byte> tmpr(1024);
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen = FileSize;
 		IO::FileStream fs(FilePath, IO::FileStream::FileAccess::Write);
 
@@ -165,7 +165,7 @@ namespace Test
 	void RandomOutputTest::CSPGenerateFile(std::string FilePath, size_t FileSize)
 	{
 		CSP pvd;
-		std::vector<byte> tmpr(1024);
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen = FileSize;
 		IO::FileStream fs(FilePath, IO::FileStream::FileAccess::Write);
 
@@ -185,7 +185,7 @@ namespace Test
 	void RandomOutputTest::ECPGenerateFile(std::string FilePath, size_t FileSize)
 	{
 		ECP pvd;
-		std::vector<byte> tmpr(1024);
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen = FileSize;
 		IO::FileStream fs(FilePath, IO::FileStream::FileAccess::Write);
 
@@ -205,7 +205,7 @@ namespace Test
 	void RandomOutputTest::RDPGenerateFile(std::string FilePath, size_t FileSize)
 	{
 		RDP pvd;
-		std::vector<byte> tmpr(1024);
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen = FileSize;
 		IO::FileStream fs(FilePath, IO::FileStream::FileAccess::Write);
 
@@ -228,12 +228,12 @@ namespace Test
 	{
 		BCG gen(Providers::CSP);
 		CSP pvd;
-		SymmetricKeySize ks = gen.LegalKeySizes()[1];
-		std::vector<byte> tmpk(ks.KeySize());
-		std::vector<byte> tmpn(ks.IVSize());
-		std::vector<byte> tmpi(ks.InfoSize());
+		SymmetricKeySize ks = gen.LegalKeySizes()[0];
+		std::vector<uint8_t> tmpk(ks.KeySize());
+		std::vector<uint8_t> tmpn(ks.IVSize());
+		std::vector<uint8_t> tmpi(ks.InfoSize());
 		const size_t PRCLEN = 1024;
-		std::vector<byte> tmpr(PRCLEN);
+		std::vector<uint8_t> tmpr(PRCLEN);
 		size_t plen;
 
 		pvd.Generate(tmpk);
@@ -263,12 +263,12 @@ namespace Test
 	{
 		CSG gen(ShakeModes::SHAKE256, Providers::CSP, Parallel);
 		CSP pvd;
-		SymmetricKeySize ks = gen.LegalKeySizes()[1];
-		std::vector<byte> tmpk(ks.KeySize());
-		std::vector<byte> tmpn(ks.IVSize());
-		std::vector<byte> tmpi(ks.InfoSize());
+		SymmetricKeySize ks = gen.LegalKeySizes()[0];
+		std::vector<uint8_t> tmpk(ks.KeySize());
+		std::vector<uint8_t> tmpn(ks.IVSize());
+		std::vector<uint8_t> tmpi(ks.InfoSize());
 		const size_t PRCLEN = Parallel ? 4096 : 1024;
-		std::vector<byte> tmpr(PRCLEN);
+		std::vector<uint8_t> tmpr(PRCLEN);
 		size_t plen;
 
 		pvd.Generate(tmpk);
@@ -297,11 +297,11 @@ namespace Test
 	{
 		HCG gen(SHA2Digests::SHA2256, Providers::CSP);
 		CSP pvd;
-		SymmetricKeySize ks = gen.LegalKeySizes()[1];
-		std::vector<byte> tmpk(ks.KeySize());
-		std::vector<byte> tmpn(ks.IVSize());
-		std::vector<byte> tmpi(ks.InfoSize());
-		std::vector<byte> tmpr(1024);
+		SymmetricKeySize ks = gen.LegalKeySizes()[0];
+		std::vector<uint8_t> tmpk(ks.KeySize());
+		std::vector<uint8_t> tmpn(ks.IVSize());
+		std::vector<uint8_t> tmpi(ks.InfoSize());
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen;
 
 		pvd.Generate(tmpk);
@@ -331,7 +331,7 @@ namespace Test
 	void RandomOutputTest::BCRGenerateFile(std::string FilePath, size_t FileSize)
 	{
 		BCR gen(Providers::CSP);
-		std::vector<byte> tmpr(1024);
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen;
 
 		plen = FileSize;
@@ -353,7 +353,7 @@ namespace Test
 	void RandomOutputTest::CSRGenerateFile(std::string FilePath, size_t FileSize)
 	{
 		CSR gen(ShakeModes::SHAKE256, Providers::CSP);
-		std::vector<byte> tmpr(1024);
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen;
 
 		plen = FileSize;
@@ -375,7 +375,7 @@ namespace Test
 	void RandomOutputTest::HCRGenerateFile(std::string FilePath, size_t FileSize)
 	{
 		HCR gen(SHA2Digests::SHA2256, Providers::CSP);
-		std::vector<byte> tmpr(1024);
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen;
 
 		plen = FileSize;
@@ -398,11 +398,11 @@ namespace Test
 	{
 		Kdf::SHAKE gen(ShakeModes::SHAKE256);
 		CSP pvd;
-		SymmetricKeySize ks = gen.LegalKeySizes()[1];
-		std::vector<byte> tmpk(ks.KeySize());
-		std::vector<byte> tmpn(ks.IVSize());
-		std::vector<byte> tmpi(ks.InfoSize());
-		std::vector<byte> tmpr(1024);
+		SymmetricKeySize ks = gen.LegalKeySizes()[0];
+		std::vector<uint8_t> tmpk(ks.KeySize());
+		std::vector<uint8_t> tmpn(ks.IVSize());
+		std::vector<uint8_t> tmpi(ks.InfoSize());
+		std::vector<uint8_t> tmpr(1024);
 		size_t plen;
 
 		pvd.Generate(tmpk);

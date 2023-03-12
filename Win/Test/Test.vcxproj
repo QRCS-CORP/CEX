@@ -28,26 +28,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -242,17 +242,15 @@
     <ClInclude Include="..\..\Test\CSRTest.h" />
     <ClInclude Include="..\..\Test\CSXTest.h" />
     <ClInclude Include="..\..\Test\DilithiumTest.h" />
-    <ClInclude Include="..\..\Test\DUKPTTest.h" />
     <ClInclude Include="..\..\Test\ECDHTest.h" />
     <ClInclude Include="..\..\Test\ECDSATest.h" />
     <ClInclude Include="..\..\Test\ECPTest.h" />
     <ClInclude Include="..\..\Test\HCRTest.h" />
     <ClInclude Include="..\..\Test\HKDFTest.h" />
-    <ClInclude Include="..\..\Test\HKDSTest.h" />
     <ClInclude Include="..\..\Test\KPATest.h" />
+    <ClInclude Include="..\..\Test\NistPqParser.h" />
     <ClInclude Include="..\..\Test\NistRng.h" />
     <ClInclude Include="..\..\Test\RWSTest.h" />
-    <ClInclude Include="..\..\Test\RainbowTest.h" />
     <ClInclude Include="..\..\Test\RandomUtils.h" />
     <ClInclude Include="..\..\Test\RCSTest.h" />
     <ClInclude Include="..\..\Test\RDPTest.h" />
@@ -274,12 +272,10 @@
     <ClInclude Include="..\..\Test\McElieceTest.h" />
     <ClInclude Include="..\..\Test\MemUtilsTest.h" />
     <ClInclude Include="..\..\Test\KyberTest.h" />
-    <ClInclude Include="..\..\Test\NTRUPrimeTest.h" />
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
     <ClInclude Include="..\..\Test\Poly1305Test.h" />
     <ClInclude Include="..\..\Test\RandomOutputTest.h" />
-    <ClInclude Include="..\..\Test\NewHopeTest.h" />
     <ClInclude Include="..\..\Test\SCBKDFTest.h" />
     <ClInclude Include="..\..\Test\SecureStreamTest.h" />
     <ClInclude Include="..\..\Test\SHAKETest.h" />
@@ -320,16 +316,14 @@
     <ClCompile Include="..\..\Test\CSRTest.cpp" />
     <ClCompile Include="..\..\Test\CSXTest.cpp" />
     <ClCompile Include="..\..\Test\DilithiumTest.cpp" />
-    <ClCompile Include="..\..\Test\DUKPTTest.cpp" />
     <ClCompile Include="..\..\Test\ECDHTest.cpp" />
     <ClCompile Include="..\..\Test\ECDSATest.cpp" />
     <ClCompile Include="..\..\Test\ECPTest.cpp" />
     <ClCompile Include="..\..\Test\HCRTest.cpp" />
-    <ClCompile Include="..\..\Test\HKDSTest.cpp" />
     <ClCompile Include="..\..\Test\KPATest.cpp" />
+    <ClCompile Include="..\..\Test\NistPqParser.cpp" />
     <ClCompile Include="..\..\Test\NistRng.cpp" />
     <ClCompile Include="..\..\Test\RWSTest.cpp" />
-    <ClCompile Include="..\..\Test\RainbowTest.cpp" />
     <ClCompile Include="..\..\Test\RandomUtils.cpp" />
     <ClCompile Include="..\..\Test\RCSTest.cpp" />
     <ClCompile Include="..\..\Test\RDPTest.cpp" />
@@ -358,13 +352,11 @@
     <ClCompile Include="..\..\Test\McElieceTest.cpp" />
     <ClCompile Include="..\..\Test\MemUtilsTest.cpp" />
     <ClCompile Include="..\..\Test\KyberTest.cpp" />
-    <ClCompile Include="..\..\Test\NTRUPrimeTest.cpp" />
     <ClCompile Include="..\..\Test\PaddingTest.cpp" />
     <ClCompile Include="..\..\Test\ParallelModeTest.cpp" />
     <ClCompile Include="..\..\Test\PBKDF2Test.cpp" />
     <ClCompile Include="..\..\Test\Poly1305Test.cpp" />
     <ClCompile Include="..\..\Test\RandomOutputTest.cpp" />
-    <ClCompile Include="..\..\Test\NewHopeTest.cpp" />
     <ClCompile Include="..\..\Test\SecureStreamTest.cpp" />
     <ClCompile Include="..\..\Test\SerpentTest.cpp" />
     <ClCompile Include="..\..\Test\Sha2Test.cpp" />

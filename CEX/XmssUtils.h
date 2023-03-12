@@ -28,7 +28,7 @@ public:
 	/// <param name="Enumeral">The XmssParameters enumeration member</param>
 	///
 	/// <returns>The matching XmssParameters OID value</returns>
-	static uint ToOid(XmssParameters Enumeral);
+	static uint32_t ToOid(XmssParameters Enumeral);
 };
 
 NAMESPACE_XMSSEND

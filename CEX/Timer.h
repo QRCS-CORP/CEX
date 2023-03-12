@@ -23,7 +23,7 @@ class TimerBase
 {
 public:
 
-	enum class Unit : uint
+	enum class Unit : uint32_t
 	{ 
 		SECONDS = 0, 
 		MILLISECONDS = 1, 
@@ -48,7 +48,7 @@ public:
 
 	void StartTimer();
 	double ElapsedTimeAsDouble();
-	ulong ElapsedTime();
+	uint64_t ElapsedTime();
 
 private:
 

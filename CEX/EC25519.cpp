@@ -7,10 +7,10 @@ NAMESPACE_ECDH
 using Tools::IntegerTools;
 using Tools::MemoryTools;
 
-int32_t EC25519::EcdsaBaseIsZero(const std::vector<byte> &N, const size_t Nlen)
+int32_t EC25519::EcdsaBaseIsZero(const std::vector<uint8_t> &N, const size_t Nlen)
 {
 	size_t i;
-	byte d;
+	uint8_t d;
 
 	d = 0;
 
@@ -22,40 +22,40 @@ int32_t EC25519::EcdsaBaseIsZero(const std::vector<byte> &N, const size_t Nlen)
 	return 1 & ((d - 1) >> 8);
 }
 
-ulong EC25519::EcdsaBaseLoad3(const std::vector<byte> &Input, size_t Offset)
+uint64_t EC25519::EcdsaBaseLoad3(const std::vector<uint8_t> &Input, size_t Offset)
 {
-	ulong res;
+	uint64_t res;
 
-	res = static_cast<ulong>(Input[Offset]);
-	res |= (static_cast<ulong>(Input[Offset+ 1])) << 8;
-	res |= (static_cast<ulong>(Input[Offset + 2])) << 16;
+	res = static_cast<uint64_t>(Input[Offset]);
+	res |= (static_cast<uint64_t>(Input[Offset+ 1])) << 8;
+	res |= (static_cast<uint64_t>(Input[Offset + 2])) << 16;
 
 	return res;
 }
 
-ulong EC25519::EcdsaBaseLoad4(const std::vector<byte> &Input, size_t Offset)
+uint64_t EC25519::EcdsaBaseLoad4(const std::vector<uint8_t> &Input, size_t Offset)
 {
-	ulong res;
+	uint64_t res;
 
-	res = static_cast<ulong>(Input[Offset]);
-	res |= (static_cast<ulong>(Input[Offset + 1])) << 8;
-	res |= (static_cast<ulong>(Input[Offset + 2])) << 16;
-	res |= (static_cast<ulong>(Input[Offset + 3])) << 24;
+	res = static_cast<uint64_t>(Input[Offset]);
+	res |= (static_cast<uint64_t>(Input[Offset + 1])) << 8;
+	res |= (static_cast<uint64_t>(Input[Offset + 2])) << 16;
+	res |= (static_cast<uint64_t>(Input[Offset + 3])) << 24;
 
 	return res;
 }
 
-byte EC25519::EcdsaBaseNegative(int8_t B)
+uint8_t EC25519::EcdsaBaseNegative(int8_t B)
 {
-	ulong x;
+	uint64_t x;
 
 	x = B;
 	x >>= 63;
 
-	return static_cast<byte>(x);
+	return static_cast<uint8_t>(x);
 }
 
-void EC25519::EcdsaBaseSlideVarTime(std::vector<int8_t> &R, const std::vector<byte> &A, size_t AOffset)
+void EC25519::EcdsaBaseSlideVarTime(std::vector<int8_t> &R, const std::vector<uint8_t> &A, size_t AOffset)
 {
 	size_t i;
 	size_t k;
@@ -174,23 +174,23 @@ const EC25519::fe25519 EC25519::Ed25519SqdMOne =
 
 void EC25519::Fe25519Zero(fe25519 &H)
 {
-	MemoryTools::Clear(H, 0, H.size() * sizeof(ulong));
+	MemoryTools::Clear(H, 0, H.size() * sizeof(uint64_t));
 }
 
 void EC25519::Fe25519One(fe25519 &H)
 {
-	MemoryTools::Clear(H, 0, H.size() * sizeof(ulong));
+	MemoryTools::Clear(H, 0, H.size() * sizeof(uint64_t));
 	H[0] = 1;
 }
 
 void EC25519::Fe25519Add(fe25519 &H, const fe25519 &F, const fe25519 &G)
 {
 	// h = f + g; Can overlap h with f or g
-	ulong h0;
-	ulong h1;
-	ulong h2;
-	ulong h3;
-	ulong h4;
+	uint64_t h0;
+	uint64_t h1;
+	uint64_t h2;
+	uint64_t h3;
+	uint64_t h4;
 
 	h0 = F[0] + G[0];
 	h1 = F[1] + G[1];
@@ -207,12 +207,12 @@ void EC25519::Fe25519Add(fe25519 &H, const fe25519 &F, const fe25519 &G)
 void EC25519::Fe25519Sub(fe25519 &H, const fe25519 &F, const fe25519 &G)
 {
 	// h = f - g
-	const ulong MASK = 0x7FFFFFFFFFFFFULL;
-	ulong h0;
-	ulong h1;
-	ulong h2;
-	ulong h3;
-	ulong h4;
+	const uint64_t MASK = 0x7FFFFFFFFFFFFULL;
+	uint64_t h0;
+	uint64_t h1;
+	uint64_t h2;
+	uint64_t h3;
+	uint64_t h4;
 
 	h0 = G[0];
 	h1 = G[1];
@@ -254,22 +254,22 @@ void EC25519::Fe25519Neg(fe25519 &H, const fe25519 &F)
 }
 
 
-void EC25519::Fe25519cMov(fe25519 &F, const fe25519 &G, uint B)
+void EC25519::Fe25519cMov(fe25519 &F, const fe25519 &G, uint32_t B)
 {
 	// Replace (f,g) with (g,g) if b == 1;
 	// replace (f,g) with (f,g) if b == 0.
 	// Preconditions: b in {0,1}.
-	const ulong MASK = ~B + 1;
-	ulong f0;
-	ulong f1;
-	ulong f2;
-	ulong f3;
-	ulong f4;
-	ulong x0;
-	ulong x1;
-	ulong x2;
-	ulong x3;
-	ulong x4;
+	const uint64_t MASK = ~B + 1;
+	uint64_t f0;
+	uint64_t f1;
+	uint64_t f2;
+	uint64_t f3;
+	uint64_t f4;
+	uint64_t x0;
+	uint64_t x1;
+	uint64_t x2;
+	uint64_t x3;
+	uint64_t x4;
 
 	f0 = F[0];
 	f1 = F[1];
@@ -296,27 +296,27 @@ void EC25519::Fe25519cMov(fe25519 &F, const fe25519 &G, uint B)
 	F[4] = f4 ^ x4;
 }
 
-void EC25519::Fe25519cSwap(fe25519 &F, fe25519 &G, uint B)
+void EC25519::Fe25519cSwap(fe25519 &F, fe25519 &G, uint32_t B)
 {
 	// Replace (f,g) with (g,f) if b == 1;
 	// replace (f,g) with (f,g) if b == 0.
 	// Preconditions: b in {0,1}.
-	const ulong MASK = ~B + 1;
-	ulong f0;
-	ulong f1;
-	ulong f2;
-	ulong f3;
-	ulong f4;
-	ulong g0;
-	ulong g1;
-	ulong g2;
-	ulong g3;
-	ulong g4;
-	ulong x0;
-	ulong x1;
-	ulong x2;
-	ulong x3;
-	ulong x4;
+	const uint64_t MASK = ~B + 1;
+	uint64_t f0;
+	uint64_t f1;
+	uint64_t f2;
+	uint64_t f3;
+	uint64_t f4;
+	uint64_t g0;
+	uint64_t g1;
+	uint64_t g2;
+	uint64_t g3;
+	uint64_t g4;
+	uint64_t x0;
+	uint64_t x1;
+	uint64_t x2;
+	uint64_t x3;
+	uint64_t x4;
 
 	f0 = F[0];
 	f1 = F[1];
@@ -364,7 +364,7 @@ int32_t EC25519::Fe25519IsNegative(const fe25519 &F)
 {
 	// return 1 if f is in {1,3,5,...,q-2}
 	// return 0 if f is in {0,2,4,...,q-1}
-	std::vector<byte> s(32);
+	std::vector<uint8_t> s(32);
 
 	Fe25519ToBytes(s, F);
 
@@ -373,7 +373,7 @@ int32_t EC25519::Fe25519IsNegative(const fe25519 &F)
 
 int32_t EC25519::Fe25519IsZero(const fe25519 &F)
 {
-	std::vector<byte> s(32);
+	std::vector<uint8_t> s(32);
 
 	Fe25519ToBytes(s, F);
 
@@ -383,7 +383,7 @@ int32_t EC25519::Fe25519IsZero(const fe25519 &F)
 void EC25519::Fe25519Mul(fe25519 &H, const fe25519 &F, const fe25519 &G)
 {
 	// h = f * g; Can overlap h with f or g
-	const ulong MASK = 0x7FFFFFFFFFFFFULL;
+	const uint64_t MASK = 0x7FFFFFFFFFFFFULL;
 	uint128_t r0;
 	uint128_t r1;
 	uint128_t r2;
@@ -407,8 +407,8 @@ void EC25519::Fe25519Mul(fe25519 &H, const fe25519 &F, const fe25519 &G)
 	uint128_t r02;
 	uint128_t r03;
 	uint128_t r04;
-	ulong  carry;
-	ulong  r00;
+	uint64_t  carry;
+	uint64_t  r00;
 
 	f0 = static_cast<uint128_t>(F[0]);
 	f1 = static_cast<uint128_t>(F[1]);
@@ -433,20 +433,20 @@ void EC25519::Fe25519Mul(fe25519 &H, const fe25519 &F, const fe25519 &G)
 	r3 = f0 * g3 + f1 * g2 + f2 * g1 + f3 * g0 + f419 * g4;
 	r4 = f0 * g4 + f1 * g3 + f2 * g2 + f3 * g1 + f4 * g0;
 
-	r00 = static_cast<ulong>(r0) & MASK;
-	carry = static_cast<ulong>(r0 >> 51);
+	r00 = static_cast<uint64_t>(r0) & MASK;
+	carry = static_cast<uint64_t>(r0 >> 51);
 	r1 += carry;
-	r01 = static_cast<ulong>(r1) & MASK;
-	carry = static_cast<ulong>(r1 >> 51);
+	r01 = static_cast<uint64_t>(r1) & MASK;
+	carry = static_cast<uint64_t>(r1 >> 51);
 	r2 += carry;
-	r02 = static_cast<ulong>(r2) & MASK;
-	carry = static_cast<ulong>(r2 >> 51);
+	r02 = static_cast<uint64_t>(r2) & MASK;
+	carry = static_cast<uint64_t>(r2 >> 51);
 	r3 += carry;
-	r03 = static_cast<ulong>(r3) & MASK;
-	carry = static_cast<ulong>(r3 >> 51);
+	r03 = static_cast<uint64_t>(r3) & MASK;
+	carry = static_cast<uint64_t>(r3 >> 51);
 	r4 += carry;
-	r04 = static_cast<ulong>(r4) & MASK;
-	carry = static_cast<ulong>(r4 >> 51);
+	r04 = static_cast<uint64_t>(r4) & MASK;
+	carry = static_cast<uint64_t>(r4 >> 51);
 	r00 += 19ULL * carry;
 	carry = r00 >> 51;
 	r00 &= MASK;
@@ -465,7 +465,7 @@ void EC25519::Fe25519Mul(fe25519 &H, const fe25519 &F, const fe25519 &G)
 void EC25519::Fe25519Sq(fe25519 &H, const fe25519 &F)
 {
 	// h = f * f; Can overlap h with f
-	const ulong MASK = 0x7FFFFFFFFFFFFULL;
+	const uint64_t MASK = 0x7FFFFFFFFFFFFULL;
 	uint128_t r0;
 	uint128_t r1;
 	uint128_t r2;
@@ -487,8 +487,8 @@ void EC25519::Fe25519Sq(fe25519 &H, const fe25519 &F)
 	uint128_t r02;
 	uint128_t r03;
 	uint128_t r04;
-	ulong  carry;
-	ulong r00;
+	uint64_t  carry;
+	uint64_t r00;
 
 	f0 = static_cast<uint128_t>(F[0]);
 	f1 = static_cast<uint128_t>(F[1]);
@@ -510,20 +510,20 @@ void EC25519::Fe25519Sq(fe25519 &H, const fe25519 &F)
 	r3 = f0x2 * f3 + f1x2 * f2 + f419 * f4;
 	r4 = f0x2 * f4 + f1x2 * f3 + f2 * f2;
 
-	r00 = static_cast<ulong>(r0) & MASK;
-	carry = static_cast<ulong>(r0 >> 51);
+	r00 = static_cast<uint64_t>(r0) & MASK;
+	carry = static_cast<uint64_t>(r0 >> 51);
 	r1 += carry;
-	r01 = static_cast<ulong>(r1) & MASK;
-	carry = static_cast<ulong>(r1 >> 51);
+	r01 = static_cast<uint64_t>(r1) & MASK;
+	carry = static_cast<uint64_t>(r1 >> 51);
 	r2 += carry;
-	r02 = static_cast<ulong>(r2) & MASK;
-	carry = static_cast<ulong>(r2 >> 51);
+	r02 = static_cast<uint64_t>(r2) & MASK;
+	carry = static_cast<uint64_t>(r2 >> 51);
 	r3 += carry;
-	r03 = static_cast<ulong>(r3) & MASK;
-	carry = static_cast<ulong>(r3 >> 51);
+	r03 = static_cast<uint64_t>(r3) & MASK;
+	carry = static_cast<uint64_t>(r3 >> 51);
 	r4 += carry;
-	r04 = static_cast<ulong>(r4) & MASK;
-	carry = static_cast<ulong>(r4 >> 51);
+	r04 = static_cast<uint64_t>(r4) & MASK;
+	carry = static_cast<uint64_t>(r4 >> 51);
 	r00 += 19ULL * carry;
 	carry = r00 >> 51;
 	r00 &= MASK;
@@ -542,7 +542,7 @@ void EC25519::Fe25519Sq(fe25519 &H, const fe25519 &F)
 void EC25519::Fe25519Sq2(fe25519 &H, const fe25519 &F)
 {
 	// h = 2 * f * f; Can overlap h with f
-	const ulong MASK = 0x7FFFFFFFFFFFFULL;
+	const uint64_t MASK = 0x7FFFFFFFFFFFFULL;
 	uint128_t r0;
 	uint128_t r1;
 	uint128_t r2;
@@ -564,8 +564,8 @@ void EC25519::Fe25519Sq2(fe25519 &H, const fe25519 &F)
 	uint128_t r02;
 	uint128_t r03;
 	uint128_t r04;
-	ulong carry;
-	ulong r00;
+	uint64_t carry;
+	uint64_t r00;
 
 	f0 = static_cast<uint128_t>(F[0]);
 	f1 = static_cast<uint128_t>(F[1]);
@@ -593,20 +593,20 @@ void EC25519::Fe25519Sq2(fe25519 &H, const fe25519 &F)
 	r3 <<= 1;
 	r4 <<= 1;
 
-	r00 = static_cast<ulong>(r0) & MASK;
-	carry = static_cast<ulong>(r0 >> 51);
+	r00 = static_cast<uint64_t>(r0) & MASK;
+	carry = static_cast<uint64_t>(r0 >> 51);
 	r1 += carry;
-	r01 = static_cast<ulong>(r1) & MASK;
-	carry = static_cast<ulong>(r1 >> 51);
+	r01 = static_cast<uint64_t>(r1) & MASK;
+	carry = static_cast<uint64_t>(r1 >> 51);
 	r2 += carry;
-	r02 = static_cast<ulong>(r2) & MASK;
-	carry = static_cast<ulong>(r2 >> 51);
+	r02 = static_cast<uint64_t>(r2) & MASK;
+	carry = static_cast<uint64_t>(r2 >> 51);
 	r3 += carry;
-	r03 = static_cast<ulong>(r3) & MASK;
-	carry = static_cast<ulong>(r3 >> 51);
+	r03 = static_cast<uint64_t>(r3) & MASK;
+	carry = static_cast<uint64_t>(r3 >> 51);
 	r4 += carry;
-	r04 = static_cast<ulong>(r4) & MASK;
-	carry = static_cast<ulong>(r4 >> 51);
+	r04 = static_cast<uint64_t>(r4) & MASK;
+	carry = static_cast<uint64_t>(r4 >> 51);
 	r00 += 19ULL * carry;
 	carry = r00 >> 51;
 	r00 &= MASK;
@@ -622,29 +622,29 @@ void EC25519::Fe25519Sq2(fe25519 &H, const fe25519 &F)
 	H[4] = r04;
 }
 
-void EC25519::Fe25519Mul32(fe25519 &H, const fe25519 &F, uint N)
+void EC25519::Fe25519Mul32(fe25519 &H, const fe25519 &F, uint32_t N)
 {
-	const ulong MASK = 0x7FFFFFFFFFFFFULL;
+	const uint64_t MASK = 0x7FFFFFFFFFFFFULL;
 	uint128_t a;
 	uint128_t sn;
-	ulong h0;
-	ulong h1;
-	ulong h2;
-	ulong h3;
-	ulong h4;
+	uint64_t h0;
+	uint64_t h1;
+	uint64_t h2;
+	uint64_t h3;
+	uint64_t h4;
 
 	sn = static_cast<uint128_t>(N);
 	a = F[0] * sn;
-	h0 = static_cast<ulong>(a) & MASK;
-	a = (F[1] * sn) + static_cast<ulong>(a >> 51);
-	h1 = static_cast<ulong>(a) & MASK;
-	a = (F[2] * sn) + static_cast<ulong>(a >> 51);
-	h2 = static_cast<ulong>(a) & MASK;
-	a = (F[3] * sn) + static_cast<ulong>(a >> 51);
-	h3 = static_cast<ulong>(a) & MASK;
-	a = (F[4] * sn) + static_cast<ulong>(a >> 51);
-	h4 = static_cast<ulong>(a) & MASK;
-	h0 += static_cast<ulong>(a >> 51) * 19ULL;
+	h0 = static_cast<uint64_t>(a) & MASK;
+	a = (F[1] * sn) + static_cast<uint64_t>(a >> 51);
+	h1 = static_cast<uint64_t>(a) & MASK;
+	a = (F[2] * sn) + static_cast<uint64_t>(a >> 51);
+	h2 = static_cast<uint64_t>(a) & MASK;
+	a = (F[3] * sn) + static_cast<uint64_t>(a >> 51);
+	h3 = static_cast<uint64_t>(a) & MASK;
+	a = (F[4] * sn) + static_cast<uint64_t>(a >> 51);
+	h4 = static_cast<uint64_t>(a) & MASK;
+	h0 += static_cast<uint64_t>(a >> 51) * 19ULL;
 
 	H[0] = h0;
 	H[1] = h1;
@@ -653,14 +653,14 @@ void EC25519::Fe25519Mul32(fe25519 &H, const fe25519 &F, uint N)
 	H[4] = h4;
 }
 
-void EC25519::Fe25519FromBytes(fe25519 &H, const std::vector<byte> &S)
+void EC25519::Fe25519FromBytes(fe25519 &H, const std::vector<uint8_t> &S)
 {
-	const ulong MASK = 0x7FFFFFFFFFFFFULL;
-	ulong h0;
-	ulong h1;
-	ulong h2;
-	ulong h3;
-	ulong h4;
+	const uint64_t MASK = 0x7FFFFFFFFFFFFULL;
+	uint64_t h0;
+	uint64_t h1;
+	uint64_t h2;
+	uint64_t h3;
+	uint64_t h4;
 
 	h0 = (IntegerTools::LeBytesTo64(S, 0)) & MASK;
 	h1 = (IntegerTools::LeBytesTo64(S, 6) >> 3) & MASK;
@@ -677,7 +677,7 @@ void EC25519::Fe25519FromBytes(fe25519 &H, const std::vector<byte> &S)
 
 void EC25519::Fe25519Reduce(fe25519 &H, const fe25519 &F)
 {
-	const ulong MASK = 0x7FFFFFFFFFFFFULL;
+	const uint64_t MASK = 0x7FFFFFFFFFFFFULL;
 	std::array<uint128_t, 5> t = { 0 };
 
 	t[0] = F[0];
@@ -747,13 +747,13 @@ void EC25519::Fe25519Reduce(fe25519 &H, const fe25519 &F)
 	H[4] = t[4];
 }
 
-void EC25519::Fe25519ToBytes(std::vector<byte> &S, const fe25519 &H)
+void EC25519::Fe25519ToBytes(std::vector<uint8_t> &S, const fe25519 &H)
 {
 	fe25519 t = { 0 };
-	ulong t0;
-	ulong t1;
-	ulong t2;
-	ulong t3;
+	uint64_t t0;
+	uint64_t t1;
+	uint64_t t2;
+	uint64_t t3;
 
 	Fe25519Reduce(t, H);
 	t0 = t[0] | (t[1] << 51);
@@ -811,9 +811,9 @@ void EC25519::Fe25519Add(fe25519 &H, const fe25519 &F, const fe25519 &G)
 	H[9] = F[9] + G[9];
 }
 
-void EC25519::Fe25519cSwap(fe25519 &F, fe25519 &G, uint B)
+void EC25519::Fe25519cSwap(fe25519 &F, fe25519 &G, uint32_t B)
 {
-	const uint MASK = ~B + 1;
+	const uint32_t MASK = ~B + 1;
 	int32_t f0;
 	int32_t f1;
 	int32_t f2;
@@ -947,9 +947,9 @@ void EC25519::Fe25519Neg(fe25519 &H, const fe25519 &F)
 	H[9] = -F[9];
 }
 
-void EC25519::Fe25519cMov(fe25519 &F, const fe25519 &G, uint B)
+void EC25519::Fe25519cMov(fe25519 &F, const fe25519 &G, uint32_t B)
 {
-	const uint MASK = ~B + 1;
+	const uint32_t MASK = ~B + 1;
 	int32_t f0;
 	int32_t f1;
 	int32_t f2;
@@ -1002,7 +1002,7 @@ void EC25519::Fe25519Copy(fe25519 &H, const fe25519 &F)
 
 int32_t EC25519::Fe25519IsNegative(const fe25519 &F)
 {
-	std::vector<byte> s(32);
+	std::vector<uint8_t> s(32);
 
 	Fe25519ToBytes(s, F);
 
@@ -1011,7 +1011,7 @@ int32_t EC25519::Fe25519IsNegative(const fe25519 &F)
 
 int32_t EC25519::Fe25519IsZero(const fe25519 &F)
 {
-	std::vector<byte> s(32);
+	std::vector<uint8_t> s(32);
 
 	Fe25519ToBytes(s, F);
 
@@ -1192,7 +1192,7 @@ void EC25519::Fe25519Mul(fe25519 &H, const fe25519 &F, const fe25519 &G)
 	H[9] = static_cast<int32_t>(h9);
 }
 
-void EC25519::Fe25519Mul32(fe25519 &H, const fe25519 &F, uint N)
+void EC25519::Fe25519Mul32(fe25519 &H, const fe25519 &F, uint32_t N)
 {
 	int64_t carry;
 	int64_t h0;
@@ -1585,7 +1585,7 @@ void EC25519::Fe25519Sq2(fe25519 &H, const fe25519 &F)
 	H[9] = static_cast<int32_t>(h9);
 }
 
-void EC25519::Fe25519FromBytes(fe25519 &H, const std::vector<byte> &S)
+void EC25519::Fe25519FromBytes(fe25519 &H, const std::vector<uint8_t> &S)
 {
 	int64_t carry;
 	int64_t h0;
@@ -1753,44 +1753,44 @@ void EC25519::Fe25519Reduce(fe25519 &H, const fe25519 &F)
 	H[9] = h9;
 }
 
-void EC25519::Fe25519ToBytes(std::vector<byte> &S, const fe25519 &H)
+void EC25519::Fe25519ToBytes(std::vector<uint8_t> &S, const fe25519 &H)
 {
 	fe25519 t = { 0 };
 
 	Fe25519Reduce(t, H);
 
-	S[0] = static_cast<byte>(t[0]);
-	S[1] = static_cast<byte>(t[0] >> 8);
-	S[2] = static_cast<byte>(t[0] >> 16);
-	S[3] = static_cast<byte>((t[0] >> 24) | (t[1] * (1UL << 2)));
-	S[4] = static_cast<byte>(t[1] >> 6);
-	S[5] = static_cast<byte>(t[1] >> 14);
-	S[6] = static_cast<byte>((t[1] >> 22) | (t[2] * (1UL << 3)));
-	S[7] = static_cast<byte>(t[2] >> 5);
-	S[8] = static_cast<byte>(t[2] >> 13);
-	S[9] = static_cast<byte>((t[2] >> 21) | (t[3] * (1UL << 5)));
-	S[10] = static_cast<byte>(t[3] >> 3);
-	S[11] = static_cast<byte>(t[3] >> 11);
-	S[12] = static_cast<byte>((t[3] >> 19) | (t[4] * (1UL << 6)));
-	S[13] = static_cast<byte>(t[4] >> 2);
-	S[14] = static_cast<byte>(t[4] >> 10);
-	S[15] = static_cast<byte>(t[4] >> 18);
-	S[16] = static_cast<byte>(t[5]);
-	S[17] = static_cast<byte>(t[5] >> 8);
-	S[18] = static_cast<byte>(t[5] >> 16);
-	S[19] = static_cast<byte>((t[5] >> 24) | (t[6] * (1UL << 1)));
-	S[20] = static_cast<byte>(t[6] >> 7);
-	S[21] = static_cast<byte>(t[6] >> 15);
-	S[22] = static_cast<byte>((t[6] >> 23) | (t[7] * (1UL << 3)));
-	S[23] = static_cast<byte>(t[7] >> 5);
-	S[24] = static_cast<byte>(t[7] >> 13);
-	S[25] = static_cast<byte>((t[7] >> 21) | (t[8] * (1UL << 4)));
-	S[26] = static_cast<byte>(t[8] >> 4);
-	S[27] = static_cast<byte>(t[8] >> 12);
-	S[28] = static_cast<byte>((t[8] >> 20) | (t[9] * (1UL << 6)));
-	S[29] = static_cast<byte>(t[9] >> 2);
-	S[30] = static_cast<byte>(t[9] >> 10);
-	S[31] = static_cast<byte>(t[9] >> 18);
+	S[0] = static_cast<uint8_t>(t[0]);
+	S[1] = static_cast<uint8_t>(t[0] >> 8);
+	S[2] = static_cast<uint8_t>(t[0] >> 16);
+	S[3] = static_cast<uint8_t>((t[0] >> 24) | (t[1] * (1UL << 2)));
+	S[4] = static_cast<uint8_t>(t[1] >> 6);
+	S[5] = static_cast<uint8_t>(t[1] >> 14);
+	S[6] = static_cast<uint8_t>((t[1] >> 22) | (t[2] * (1UL << 3)));
+	S[7] = static_cast<uint8_t>(t[2] >> 5);
+	S[8] = static_cast<uint8_t>(t[2] >> 13);
+	S[9] = static_cast<uint8_t>((t[2] >> 21) | (t[3] * (1UL << 5)));
+	S[10] = static_cast<uint8_t>(t[3] >> 3);
+	S[11] = static_cast<uint8_t>(t[3] >> 11);
+	S[12] = static_cast<uint8_t>((t[3] >> 19) | (t[4] * (1UL << 6)));
+	S[13] = static_cast<uint8_t>(t[4] >> 2);
+	S[14] = static_cast<uint8_t>(t[4] >> 10);
+	S[15] = static_cast<uint8_t>(t[4] >> 18);
+	S[16] = static_cast<uint8_t>(t[5]);
+	S[17] = static_cast<uint8_t>(t[5] >> 8);
+	S[18] = static_cast<uint8_t>(t[5] >> 16);
+	S[19] = static_cast<uint8_t>((t[5] >> 24) | (t[6] * (1UL << 1)));
+	S[20] = static_cast<uint8_t>(t[6] >> 7);
+	S[21] = static_cast<uint8_t>(t[6] >> 15);
+	S[22] = static_cast<uint8_t>((t[6] >> 23) | (t[7] * (1UL << 3)));
+	S[23] = static_cast<uint8_t>(t[7] >> 5);
+	S[24] = static_cast<uint8_t>(t[7] >> 13);
+	S[25] = static_cast<uint8_t>((t[7] >> 21) | (t[8] * (1UL << 4)));
+	S[26] = static_cast<uint8_t>(t[8] >> 4);
+	S[27] = static_cast<uint8_t>(t[8] >> 12);
+	S[28] = static_cast<uint8_t>((t[8] >> 20) | (t[9] * (1UL << 6)));
+	S[29] = static_cast<uint8_t>(t[9] >> 2);
+	S[30] = static_cast<uint8_t>(t[9] >> 10);
+	S[31] = static_cast<uint8_t>(t[9] >> 18);
 }
 
 #endif
@@ -1977,24 +1977,24 @@ void EC25519::Ge25519PrecompZero(ge25519precomp &H)
 	Fe25519Zero(H.xy2d);
 }
 
-void EC25519::Ge25519cMov(ge25519precomp &T, const ge25519precomp &U, byte B)
+void EC25519::Ge25519cMov(ge25519precomp &T, const ge25519precomp &U, uint8_t B)
 {
 	Fe25519cMov(T.yplusx, U.yplusx, B);
 	Fe25519cMov(T.yminusx, U.yminusx, B);
 	Fe25519cMov(T.xy2d, U.xy2d, B);
 }
 
-byte EC25519::Ge25519Equal(int8_t B, int8_t C)
+uint8_t EC25519::Ge25519Equal(int8_t B, int8_t C)
 {
-	byte ub;
-	byte uc;
-	byte x;
-	uint y;
+	uint8_t ub;
+	uint8_t uc;
+	uint8_t x;
+	uint32_t y;
 
 	ub = B;
 	uc = C;
 	x = ub ^ uc;
-	y = static_cast<uint>(x);
+	y = static_cast<uint32_t>(x);
 	y -= 1;
 	y >>= 31;
 
@@ -2004,8 +2004,8 @@ byte EC25519::Ge25519Equal(int8_t B, int8_t C)
 void EC25519::Ge25519cMov8(ge25519precomp &T, const std::vector<ge25519precomp> &PreComp, const int8_t B)
 {
 	ge25519precomp minust = { 0 };
-	const byte BNEG = EcdsaBaseNegative(B);
-	const byte BABS = B - (((~BNEG + 1) & B) * (1 << 1));
+	const uint8_t BNEG = EcdsaBaseNegative(B);
+	const uint8_t BABS = B - (((~BNEG + 1) & B) * (1 << 1));
 
 	Ge25519PrecompZero(T);
 
@@ -4777,7 +4777,7 @@ void EC25519::Ge25519P1P1ToP2(ge25519p2 &R, const ge25519p1p1 &P)
 	Fe25519Mul(R.z, P.z, P.t);
 }
 
-void EC25519::Ge25519ScalarBase(ge25519p3 &H, const std::vector<byte> &A)
+void EC25519::Ge25519ScalarBase(ge25519p3 &H, const std::vector<uint8_t> &A)
 {
 	std::array<int8_t, 64> e = { 0 };
 	ge25519p1p1 r = { 0 };
@@ -4788,7 +4788,7 @@ void EC25519::Ge25519ScalarBase(ge25519p3 &H, const std::vector<byte> &A)
 
 	for (i = 0; i < 32; ++i)
 	{
-		e[2 * i + 0] = A[i] & 15;
+		e[2 * i] = A[i] & 15;
 		e[2 * i + 1] = (A[i] >> 4) & 15;
 	}
 
@@ -4801,7 +4801,7 @@ void EC25519::Ge25519ScalarBase(ge25519p3 &H, const std::vector<byte> &A)
 		e[i] += carry;
 		carry = e[i] + 8;
 		carry >>= 4;
-		e[i] -= carry * ((byte)1 << 4);
+		e[i] -= carry * ((uint8_t)1 << 4);
 	}
 
 	e[63] += carry;
@@ -4833,7 +4833,7 @@ void EC25519::Ge25519ScalarBase(ge25519p3 &H, const std::vector<byte> &A)
 	}
 }
 
-void EC25519::Ge25519P3ToBytes(std::vector<byte> &S, const ge25519p3 &H)
+void EC25519::Ge25519P3ToBytes(std::vector<uint8_t> &S, const ge25519p3 &H)
 {
 	fe25519 recip = { 0 };
 	fe25519 x = { 0 };
@@ -4846,11 +4846,11 @@ void EC25519::Ge25519P3ToBytes(std::vector<byte> &S, const ge25519p3 &H)
 	S[31] ^= Fe25519IsNegative(x) << 7;
 }
 
-int32_t EC25519::Ge25519IsCanonical(const std::vector<byte> &S)
+int32_t EC25519::Ge25519IsCanonical(const std::vector<uint8_t> &S)
 {
 	size_t i;
-	byte c;
-	byte d;
+	uint8_t c;
+	uint8_t d;
 
 	c = (S[31] & 0x7F) ^ 0x7F;
 
@@ -4859,15 +4859,15 @@ int32_t EC25519::Ge25519IsCanonical(const std::vector<byte> &S)
 		c |= S[i] ^ 0xFF;
 	}
 
-	c = (static_cast<uint>(c) - 1U) >> 8;
-	d = (0xED - 1U - static_cast<uint>(S[0])) >> 8;
+	c = (static_cast<uint32_t>(c) - 1U) >> 8;
+	d = (0xED - 1U - static_cast<uint32_t>(S[0])) >> 8;
 
 	return 1L - (c & d & 1);
 }
 
-int32_t EC25519::Ge25519HasSmallOrder(const std::vector<byte> &S)
+int32_t EC25519::Ge25519HasSmallOrder(const std::vector<uint8_t> &S)
 {
-	static const std::vector<std::vector<byte>> blocklist =
+	static const std::vector<std::vector<uint8_t>> blocklist =
 	{
 		// 0 (order 4) 
 		{
@@ -4913,10 +4913,10 @@ int32_t EC25519::Ge25519HasSmallOrder(const std::vector<byte> &S)
 		}
 	};
 
-	std::array<byte, 7> c = { 0 };
+	std::array<uint8_t, 7> c = { 0 };
 	size_t i;
 	size_t j;
-	uint k;
+	uint32_t k;
 
 	for (j = 0; j < 31; ++j)
 	{
@@ -4941,7 +4941,7 @@ int32_t EC25519::Ge25519HasSmallOrder(const std::vector<byte> &S)
 	return static_cast<int32_t>((k >> 8) & 1);
 }
 
-int32_t EC25519::Ge25519FromBytesNegateVarTime(ge25519p3 &H, const std::vector<byte> &S)
+int32_t EC25519::Ge25519FromBytesNegateVarTime(ge25519p3 &H, const std::vector<uint8_t> &S)
 {
 	fe25519 u = { 0 };
 	fe25519 v = { 0 };
@@ -5047,7 +5047,7 @@ void EC25519::Ge25519SubPrecomp(ge25519p1p1 &R, const ge25519p3 &P, const ge2551
 	Fe25519Add(R.t, t0, R.t);
 }
 
-void EC25519::Ge25519DoubleScalarMultVarTime(ge25519p2 &R, const std::vector<byte> &A, const ge25519p3 &AL, const std::vector<byte> &B, size_t BOffset)
+void EC25519::Ge25519DoubleScalarMultVarTime(ge25519p2 &R, const std::vector<uint8_t> &A, const ge25519p3 &AL, const std::vector<uint8_t> &B, size_t BOffset)
 {
 	static const std::vector<ge25519precomp> Bi =
 	{
@@ -5237,7 +5237,7 @@ void EC25519::Ge25519SubCached(ge25519p1p1 &R, const ge25519p3 &P, const ge25519
 	Fe25519Add(R.t, t0, R.t);
 }
 
-void EC25519::Ge25519ToBytes(std::vector<byte> &S, const ge25519p2 &H)
+void EC25519::Ge25519ToBytes(std::vector<uint8_t> &S, const ge25519p2 &H)
 {
 	fe25519 recip = { 0 };
 	fe25519 x = { 0 };
@@ -5261,7 +5261,7 @@ void EC25519::EdwardsToMontgomery(fe25519 &MontgomeryX, const fe25519 &EdwardsY,
 	Fe25519Mul(MontgomeryX, tempX, tempZ);
 }
 
-int32_t EC25519::ScalarmultCurve25519Ref10Base(std::vector<byte> &Q, const std::vector<byte> &N)
+int32_t EC25519::ScalarmultCurve25519Ref10Base(std::vector<uint8_t> &Q, const std::vector<uint8_t> &N)
 {
 	ge25519p3 A = { 0 };
 	fe25519 pk = { 0 };
@@ -5280,7 +5280,7 @@ int32_t EC25519::ScalarmultCurve25519Ref10Base(std::vector<byte> &Q, const std::
 	return 0;
 }
 
-int32_t EC25519::ScalarMultCurve25519Ref10(std::vector<byte> &Q, const std::vector<byte> &N, const std::vector<byte> &P)
+int32_t EC25519::ScalarMultCurve25519Ref10(std::vector<uint8_t> &Q, const std::vector<uint8_t> &N, const std::vector<uint8_t> &P)
 {
 	fe25519 a = { 0 };
 	fe25519 b = { 0 };
@@ -5295,8 +5295,8 @@ int32_t EC25519::ScalarMultCurve25519Ref10(std::vector<byte> &Q, const std::vect
 	fe25519 z2 = { 0 };
 	fe25519 z3 = { 0 };
 	size_t i;
-	uint swap;
-	uint bit;
+	uint32_t swap;
+	uint32_t bit;
 	int32_t pos;
 
 	if (Ed25519SmallOrder(P))
@@ -5355,10 +5355,10 @@ int32_t EC25519::ScalarMultCurve25519Ref10(std::vector<byte> &Q, const std::vect
 	return 0;
 }
 
-int32_t EC25519::ScalarMultCurve25519(std::vector<byte> &Q, const std::vector<byte> &N, const std::vector<byte> &P)
+int32_t EC25519::ScalarMultCurve25519(std::vector<uint8_t> &Q, const std::vector<uint8_t> &N, const std::vector<uint8_t> &P)
 {
 	size_t i;
-	byte d;
+	uint8_t d;
 
 	d = 0;
 
@@ -5375,12 +5375,12 @@ int32_t EC25519::ScalarMultCurve25519(std::vector<byte> &Q, const std::vector<by
 	return -(1 & ((d - 1) >> 8));
 }
 
-int32_t EC25519::Ed25519SmallOrder(const std::vector<byte> &S)
+int32_t EC25519::Ed25519SmallOrder(const std::vector<uint8_t> &S)
 {
 	// Reject small order points early to mitigate the implications of
 	// unexpected optimizations that would affect the ref10 code.
 	// See https://eprint.iacr.org/2017/806.pdf for reference.
-	static const std::vector<std::vector<byte>> blocklist =
+	static const std::vector<std::vector<uint8_t>> blocklist =
 	{
 		// 0 (order 4) 
 		{
@@ -5426,10 +5426,10 @@ int32_t EC25519::Ed25519SmallOrder(const std::vector<byte> &S)
 		}
 	};
 
-	std::array<byte, 7> c = { 0 };
+	std::array<uint8_t, 7> c = { 0 };
 	size_t i;
 	size_t j;
-	uint k;
+	uint32_t k;
 
 	for (j = 0; j < 31; ++j)
 	{
@@ -5454,16 +5454,16 @@ int32_t EC25519::Ed25519SmallOrder(const std::vector<byte> &S)
 	return static_cast<int32_t>((k >> 8) & 1);
 }
 
-void EC25519::Sc25519Clamp(std::vector<byte> &K)
+void EC25519::Sc25519Clamp(std::vector<uint8_t> &K)
 {
 	K[0] &= 248;
 	K[31] &= 127;
 	K[31] |= 64;
 }
 
-int32_t EC25519::Sc25519IsCanonical(const std::vector<byte> &S, size_t Offset)
+int32_t EC25519::Sc25519IsCanonical(const std::vector<uint8_t> &S, size_t Offset)
 {
-	static const std::array<byte, 32> L =
+	static const std::array<uint8_t, 32> L =
 	{
 		0xED, 0xD3, 0xF5, 0x5C, 0x1A, 0x63, 0x12, 0x58, 0xD6, 0x9C, 0xF7,
 		0xA2, 0xDE, 0xF9, 0xDE, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5471,8 +5471,8 @@ int32_t EC25519::Sc25519IsCanonical(const std::vector<byte> &S, size_t Offset)
 	};
 
 	size_t i;
-	byte c;
-	byte n;
+	uint8_t c;
+	uint8_t n;
 
 	c = 0;
 	n = 1;
@@ -5489,7 +5489,7 @@ int32_t EC25519::Sc25519IsCanonical(const std::vector<byte> &S, size_t Offset)
 	return (c != 0);
 }
 
-void EC25519::Sc25519MulAdd(std::vector<byte> &S, size_t SOffset, const std::vector<byte> &A, const std::vector<byte> &B, const std::vector<byte> &C)
+void EC25519::Sc25519MulAdd(std::vector<uint8_t> &S, size_t SOffset, const std::vector<uint8_t> &A, const std::vector<uint8_t> &B, const std::vector<uint8_t> &C)
 {
 	int64_t a0;
 	int64_t a1;
@@ -5932,41 +5932,41 @@ void EC25519::Sc25519MulAdd(std::vector<byte> &S, size_t SOffset, const std::vec
 	s11 += carry;
 	s10 -= carry * (1ULL << 21);
 
-	S[SOffset] = static_cast<byte>(s0);
-	S[SOffset + 1] = static_cast<byte>(s0 >> 8);
-	S[SOffset + 2] = static_cast<byte>((s0 >> 16) | (s1 * (1ULL << 5)));
-	S[SOffset + 3] = static_cast<byte>(s1 >> 3);
-	S[SOffset + 4] = static_cast<byte>(s1 >> 11);
-	S[SOffset + 5] = static_cast<byte>((s1 >> 19) | (s2 * (1ULL << 2)));
-	S[SOffset + 6] = static_cast<byte>(s2 >> 6);
-	S[SOffset + 7] = static_cast<byte>((s2 >> 14) | (s3 * (1ULL << 7)));
-	S[SOffset + 8] = static_cast<byte>(s3 >> 1);
-	S[SOffset + 9] = static_cast<byte>(s3 >> 9);
-	S[SOffset + 10] = static_cast<byte>((s3 >> 17) | (s4 * (1ULL << 4)));
-	S[SOffset + 11] = static_cast<byte>(s4 >> 4);
-	S[SOffset + 12] = static_cast<byte>(s4 >> 12);
-	S[SOffset + 13] = static_cast<byte>((s4 >> 20) | (s5 * (1ULL << 1)));
-	S[SOffset + 14] = static_cast<byte>(s5 >> 7);
-	S[SOffset + 15] = static_cast<byte>((s5 >> 15) | (s6 * (1ULL << 6)));
-	S[SOffset + 16] = static_cast<byte>(s6 >> 2);
-	S[SOffset + 17] = static_cast<byte>(s6 >> 10);
-	S[SOffset + 18] = static_cast<byte>((s6 >> 18) | (s7 * (1ULL << 3)));
-	S[SOffset + 19] = static_cast<byte>(s7 >> 5);
-	S[SOffset + 20] = static_cast<byte>(s7 >> 13);
-	S[SOffset + 21] = static_cast<byte>(s8);
-	S[SOffset + 22] = static_cast<byte>(s8 >> 8);
-	S[SOffset + 23] = static_cast<byte>((s8 >> 16) | (s9 * (1ULL << 5)));
-	S[SOffset + 24] = static_cast<byte>(s9 >> 3);
-	S[SOffset + 25] = static_cast<byte>(s9 >> 11);
-	S[SOffset + 26] = static_cast<byte>((s9 >> 19) | (s10 * (1ULL << 2)));
-	S[SOffset + 27] = static_cast<byte>(s10 >> 6);
-	S[SOffset + 28] = static_cast<byte>((s10 >> 14) | (s11 * (1ULL << 7)));
-	S[SOffset + 29] = static_cast<byte>(s11 >> 1);
-	S[SOffset + 30] = static_cast<byte>(s11 >> 9);
-	S[SOffset + 31] = static_cast<byte>(s11 >> 17);
+	S[SOffset] = static_cast<uint8_t>(s0);
+	S[SOffset + 1] = static_cast<uint8_t>(s0 >> 8);
+	S[SOffset + 2] = static_cast<uint8_t>((s0 >> 16) | (s1 * (1ULL << 5)));
+	S[SOffset + 3] = static_cast<uint8_t>(s1 >> 3);
+	S[SOffset + 4] = static_cast<uint8_t>(s1 >> 11);
+	S[SOffset + 5] = static_cast<uint8_t>((s1 >> 19) | (s2 * (1ULL << 2)));
+	S[SOffset + 6] = static_cast<uint8_t>(s2 >> 6);
+	S[SOffset + 7] = static_cast<uint8_t>((s2 >> 14) | (s3 * (1ULL << 7)));
+	S[SOffset + 8] = static_cast<uint8_t>(s3 >> 1);
+	S[SOffset + 9] = static_cast<uint8_t>(s3 >> 9);
+	S[SOffset + 10] = static_cast<uint8_t>((s3 >> 17) | (s4 * (1ULL << 4)));
+	S[SOffset + 11] = static_cast<uint8_t>(s4 >> 4);
+	S[SOffset + 12] = static_cast<uint8_t>(s4 >> 12);
+	S[SOffset + 13] = static_cast<uint8_t>((s4 >> 20) | (s5 * (1ULL << 1)));
+	S[SOffset + 14] = static_cast<uint8_t>(s5 >> 7);
+	S[SOffset + 15] = static_cast<uint8_t>((s5 >> 15) | (s6 * (1ULL << 6)));
+	S[SOffset + 16] = static_cast<uint8_t>(s6 >> 2);
+	S[SOffset + 17] = static_cast<uint8_t>(s6 >> 10);
+	S[SOffset + 18] = static_cast<uint8_t>((s6 >> 18) | (s7 * (1ULL << 3)));
+	S[SOffset + 19] = static_cast<uint8_t>(s7 >> 5);
+	S[SOffset + 20] = static_cast<uint8_t>(s7 >> 13);
+	S[SOffset + 21] = static_cast<uint8_t>(s8);
+	S[SOffset + 22] = static_cast<uint8_t>(s8 >> 8);
+	S[SOffset + 23] = static_cast<uint8_t>((s8 >> 16) | (s9 * (1ULL << 5)));
+	S[SOffset + 24] = static_cast<uint8_t>(s9 >> 3);
+	S[SOffset + 25] = static_cast<uint8_t>(s9 >> 11);
+	S[SOffset + 26] = static_cast<uint8_t>((s9 >> 19) | (s10 * (1ULL << 2)));
+	S[SOffset + 27] = static_cast<uint8_t>(s10 >> 6);
+	S[SOffset + 28] = static_cast<uint8_t>((s10 >> 14) | (s11 * (1ULL << 7)));
+	S[SOffset + 29] = static_cast<uint8_t>(s11 >> 1);
+	S[SOffset + 30] = static_cast<uint8_t>(s11 >> 9);
+	S[SOffset + 31] = static_cast<uint8_t>(s11 >> 17);
 }
 
-void EC25519::Sc25519Reduce(std::vector<byte> &S)
+void EC25519::Sc25519Reduce(std::vector<uint8_t> &S)
 {
 	int64_t carry;
 	int64_t s0;
@@ -6263,41 +6263,41 @@ void EC25519::Sc25519Reduce(std::vector<byte> &S)
 	s11 += carry;
 	s10 -= carry * (1ULL << 21);
 
-	S[0] = static_cast<byte>(s0);
-	S[1] = static_cast<byte>(s0 >> 8);
-	S[2] = static_cast<byte>((s0 >> 16) | (s1 * (1ULL << 5)));
-	S[3] = static_cast<byte>(s1 >> 3);
-	S[4] = static_cast<byte>(s1 >> 11);
-	S[5] = static_cast<byte>((s1 >> 19) | (s2 * (1ULL << 2)));
-	S[6] = static_cast<byte>(s2 >> 6);
-	S[7] = static_cast<byte>((s2 >> 14) | (s3 * (1ULL << 7)));
-	S[8] = static_cast<byte>(s3 >> 1);
-	S[9] = static_cast<byte>(s3 >> 9);
-	S[10] = static_cast<byte>((s3 >> 17) | (s4 * (1ULL << 4)));
-	S[11] = static_cast<byte>(s4 >> 4);
-	S[12] = static_cast<byte>(s4 >> 12);
-	S[13] = static_cast<byte>((s4 >> 20) | (s5 * (1ULL << 1)));
-	S[14] = static_cast<byte>(s5 >> 7);
-	S[15] = static_cast<byte>((s5 >> 15) | (s6 * (1ULL << 6)));
-	S[16] = static_cast<byte>(s6 >> 2);
-	S[17] = static_cast<byte>(s6 >> 10);
-	S[18] = static_cast<byte>((s6 >> 18) | (s7 * (1ULL << 3)));
-	S[19] = static_cast<byte>(s7 >> 5);
-	S[20] = static_cast<byte>(s7 >> 13);
-	S[21] = static_cast<byte>(s8);
-	S[22] = static_cast<byte>(s8 >> 8);
-	S[23] = static_cast<byte>((s8 >> 16) | (s9 * (1ULL << 5)));
-	S[24] = static_cast<byte>(s9 >> 3);
-	S[25] = static_cast<byte>(s9 >> 11);
-	S[26] = static_cast<byte>((s9 >> 19) | (s10 * (1ULL << 2)));
-	S[27] = static_cast<byte>(s10 >> 6);
-	S[28] = static_cast<byte>((s10 >> 14) | (s11 * (1ULL << 7)));
-	S[29] = static_cast<byte>(s11 >> 1);
-	S[30] = static_cast<byte>(s11 >> 9);
-	S[31] = static_cast<byte>(s11 >> 17);
+	S[0] = static_cast<uint8_t>(s0);
+	S[1] = static_cast<uint8_t>(s0 >> 8);
+	S[2] = static_cast<uint8_t>((s0 >> 16) | (s1 * (1ULL << 5)));
+	S[3] = static_cast<uint8_t>(s1 >> 3);
+	S[4] = static_cast<uint8_t>(s1 >> 11);
+	S[5] = static_cast<uint8_t>((s1 >> 19) | (s2 * (1ULL << 2)));
+	S[6] = static_cast<uint8_t>(s2 >> 6);
+	S[7] = static_cast<uint8_t>((s2 >> 14) | (s3 * (1ULL << 7)));
+	S[8] = static_cast<uint8_t>(s3 >> 1);
+	S[9] = static_cast<uint8_t>(s3 >> 9);
+	S[10] = static_cast<uint8_t>((s3 >> 17) | (s4 * (1ULL << 4)));
+	S[11] = static_cast<uint8_t>(s4 >> 4);
+	S[12] = static_cast<uint8_t>(s4 >> 12);
+	S[13] = static_cast<uint8_t>((s4 >> 20) | (s5 * (1ULL << 1)));
+	S[14] = static_cast<uint8_t>(s5 >> 7);
+	S[15] = static_cast<uint8_t>((s5 >> 15) | (s6 * (1ULL << 6)));
+	S[16] = static_cast<uint8_t>(s6 >> 2);
+	S[17] = static_cast<uint8_t>(s6 >> 10);
+	S[18] = static_cast<uint8_t>((s6 >> 18) | (s7 * (1ULL << 3)));
+	S[19] = static_cast<uint8_t>(s7 >> 5);
+	S[20] = static_cast<uint8_t>(s7 >> 13);
+	S[21] = static_cast<uint8_t>(s8);
+	S[22] = static_cast<uint8_t>(s8 >> 8);
+	S[23] = static_cast<uint8_t>((s8 >> 16) | (s9 * (1ULL << 5)));
+	S[24] = static_cast<uint8_t>(s9 >> 3);
+	S[25] = static_cast<uint8_t>(s9 >> 11);
+	S[26] = static_cast<uint8_t>((s9 >> 19) | (s10 * (1ULL << 2)));
+	S[27] = static_cast<uint8_t>(s10 >> 6);
+	S[28] = static_cast<uint8_t>((s10 >> 14) | (s11 * (1ULL << 7)));
+	S[29] = static_cast<uint8_t>(s11 >> 1);
+	S[30] = static_cast<uint8_t>(s11 >> 9);
+	S[31] = static_cast<uint8_t>(s11 >> 17);
 }
 
-int32_t EC25519::Sc25519Verify(const std::vector<byte> &X, const std::vector<byte> &Y, const size_t N)
+int32_t EC25519::Sc25519Verify(const std::vector<uint8_t> &X, const std::vector<uint8_t> &Y, const size_t N)
 {
 	size_t i;
 	uint16_t d;

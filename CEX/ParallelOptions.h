@@ -207,7 +207,7 @@ public:
 	const size_t ParallelBlockSize();
 
 	/// <summary>
-	/// Read Only: Maximum input block byte length when using multi-threaded processing
+	/// Read Only: Maximum input block uint8_t length when using multi-threaded processing
 	/// </summary>
 	const size_t ParallelMaximumSize();
 

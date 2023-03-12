@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 // Updated February 24, 2019
 // Updated July 31, 2020
 // Updated August 19, 2020
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_CSX512_H
 #define CEX_CSX512_H
@@ -127,7 +127,7 @@ private:
 
 	static const size_t BLOCK_SIZE = 128;
 	static const std::string CLASS_NAME;
-	static const size_t KEY_SIZE = 64;
+	static const size_t IK512_SIZE = 64;
 	static const size_t INFO_SIZE = 48;
 	static const size_t NONCE_SIZE = 2;
 #if defined(CEX_CSX512_STRONG)
@@ -135,7 +135,7 @@ private:
 #else
 	static const size_t ROUND_COUNT = 40;
 #endif
-	static const std::vector<byte> SIGMA_INFO;
+	static const std::vector<uint8_t> SIGMA_INFO;
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_THRESHOLD = 243;
 	static const size_t STATE_SIZE = 14;
@@ -143,7 +143,6 @@ private:
 
 	class CSX512State;
 	std::unique_ptr<CSX512State> m_csx512State;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ParallelOptions m_parallelProfile;
 
@@ -184,7 +183,7 @@ public:
 	/// <param name="State">The serialized state, created by the Serialize() function</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid state array is used</exception>
-	explicit CSX512(SecureVector<byte> &State);
+	explicit CSX512(SecureVector<uint8_t> &State);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -233,10 +232,10 @@ public:
 	/// <summary>
 	/// Read Only: The current value of the nonce counter array.
 	/// </summary>
-	const std::vector<byte> Nonce() override;
+	const std::vector<uint8_t> Nonce() override;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class, but must be a multiple of the ParallelMinimumSize().</para>
 	/// </summary>
 	const size_t ParallelBlockSize() override;
@@ -252,14 +251,14 @@ public:
 	/// <summary>
 	/// Read Only: The current standard-vector MAC tag value
 	/// </summary>
-	const std::vector<byte> Tag() override;
+	const std::vector<uint8_t> Tag() override;
 
 	/// <summary>
 	/// Copies the internal MAC tag to a secure-vector
 	/// </summary>
 	/// 
 	/// <param name="Output">The secure-vector receiving the MAC code</param>
-	const void Tag(SecureVector<byte> &Output) override;
+	const void Tag(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Read Only: The legal MAC tag length in bytes
@@ -300,7 +299,7 @@ public:
 	/// </summary>
 	///
 	/// <returns>The serialized cipher state</returns>
-	SecureVector<byte> Serialize();
+	SecureVector<uint8_t> Serialize();
 
 	/// <summary>
 	/// Add additional data to the message authentication code generator.  
@@ -312,12 +311,12 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if the cipher is not initialized</exception>
-	void SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
+	void SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Encrypt/Decrypt a vector of bytes with offset and length parameters.
 	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used.
-	///	In authenticated encryption mode, the MAC code is automatically appended to the output stream at the end of the cipher-text, the output array must be long enough to accommodate this TagSize() code.
+	///	In authenticated encryption mode, the MAC code is automatically appended to the output stream at the end of the cipher-text, the output array must be int64_t enough to accommodate this TagSize() code.
 	/// In decryption mode, this code is checked before the stream is decrypted, if the authentication fails a CryptoAuthenticationFailure exception is thrown.</para>
 	/// </summary>
 	/// 
@@ -328,14 +327,14 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoAuthenticationFailure">Thrown during decryption if the the ciphertext fails authentication</exception>
-	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 private:
 
 	static void Finalize(std::unique_ptr<CSX512State> &State, std::unique_ptr<IMac> &Authenticator);
-	static void Generate(std::unique_ptr<CSX512State> &State, std::vector<byte> &Output, size_t OutOffset, std::array<ulong, 2> &Counter, size_t Length);
-	void Load(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Code);
-	void Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	static void Generate(std::unique_ptr<CSX512State> &State, std::vector<uint8_t> &Output, size_t OutOffset, std::array<uint64_t, 2> &Counter, size_t Length);
+	void Load(const SecureVector<uint8_t> &Key, const SecureVector<uint8_t> &Nonce, const SecureVector<uint8_t> &Code);
+	void Process(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
 	void Reset();
 };
 

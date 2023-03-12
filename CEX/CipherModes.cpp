@@ -41,9 +41,6 @@ std::string CipherModeConvert::ToName(CipherModes Enumeral)
 	case CipherModes::HBAS512:
 		name = std::string("HBAS512");
 		break;
-	case CipherModes::HBAS1024:
-		name = std::string("HHBAS1024BA");
-		break;
 	case CipherModes::ICM:
 		name = std::string("ICM");
 		break;
@@ -105,10 +102,6 @@ CipherModes CipherModeConvert::FromName(std::string &Name)
 	else if (Name == std::string("HBAS512"))
 	{
 		tname = CipherModes::HBAS512;
-	}
-	else if (Name == std::string("HBAS1024"))
-	{
-		tname = CipherModes::HBAS1024;
 	}
 	else if (Name == std::string("ICM"))
 	{

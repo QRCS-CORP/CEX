@@ -41,11 +41,6 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType)
 				rptr = new CSR(ShakeModes::SHAKE512, ProviderType);
 				break;
 			}
-			case Prngs::CSRC1024:
-			{
-				rptr = new CSR(ShakeModes::SHAKE1024, ProviderType);
-				break;
-			}
 			case Prngs::HCR:
 			{
 				rptr = new HCR(SHA2Digests::SHA2256, ProviderType);

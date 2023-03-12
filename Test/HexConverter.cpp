@@ -8,19 +8,19 @@
 
 namespace Test
 {
-	const byte HexConverter::ENCODING_TABLE[16] = 
+	const uint8_t HexConverter::ENCODING_TABLE[16] = 
 	{
 		0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66
 	};
 
-	void HexConverter::Decode(const std::string &Input, std::vector<byte> &Output)
+	void HexConverter::Decode(const std::string &Input, std::vector<uint8_t> &Output)
 	{
 		size_t end;
 		size_t i(0);
 		size_t j(0);
 		size_t len(0);
-		byte b1;
-		byte b2;
+		uint8_t b1;
+		uint8_t b2;
 
 		end = Input.size();
 		Output.resize(end / 2, 0);
@@ -36,7 +36,7 @@ namespace Test
 		}
 
 
-		std::vector<byte> decTable = GetDecodingTable();
+		std::vector<uint8_t> decTable = GetDecodingTable();
 
 		while (i < end)
 		{
@@ -55,15 +55,15 @@ namespace Test
 
 			b2 = decTable[Input[i]];
 			++i;
-			Output[j] = static_cast<byte>((b1 << 4) | b2);
+			Output[j] = static_cast<uint8_t>((b1 << 4) | b2);
 			++j;
 			++len;
 		}
 	}
 
-	void HexConverter::Decode(const std::vector<std::string> &Input, std::vector<std::vector<byte>> &Output)
+	void HexConverter::Decode(const std::vector<std::string> &Input, std::vector<std::vector<uint8_t>> &Output)
 	{
-		std::vector<byte> temp;
+		std::vector<uint8_t> temp;
 		size_t i;
 
 		Output.clear();
@@ -76,9 +76,9 @@ namespace Test
 		}
 	}
 
-	void HexConverter::Decode(const char* Input[], size_t Length, std::vector<std::vector<byte>> &Output)
+	void HexConverter::Decode(const char* Input[], size_t Length, std::vector<std::vector<uint8_t>> &Output)
 	{
-		std::vector<byte> dec;
+		std::vector<uint8_t> dec;
 		std::string enc;
 		size_t i;
 
@@ -92,9 +92,9 @@ namespace Test
 		}
 	}
 
-	void HexConverter::Decode(const std::vector<std::string> &Input, size_t Length, std::vector<std::vector<byte>> &Output)
+	void HexConverter::Decode(const std::vector<std::string> &Input, size_t Length, std::vector<std::vector<uint8_t>> &Output)
 	{
-		std::vector<byte> dec;
+		std::vector<uint8_t> dec;
 		std::string enc;
 		size_t i;
 
@@ -108,12 +108,12 @@ namespace Test
 		}
 	}
 
-	void HexConverter::Encode(const std::vector<byte> &Input, size_t Offset, size_t Length, std::vector<byte> &Output)
+	void HexConverter::Encode(const std::vector<uint8_t> &Input, size_t Offset, size_t Length, std::vector<uint8_t> &Output)
 	{
-		const std::vector<byte> ENCTBL = GetEncodingTable();
+		const std::vector<uint8_t> ENCTBL = GetEncodingTable();
 		size_t ctr(0);
 		size_t i;
-		int vct;
+		int32_t vct;
 
 		Output.resize(Length * 2, 0);
 
@@ -127,7 +127,7 @@ namespace Test
 		}
 	}
 
-	void HexConverter::Encode(const std::vector<byte> &Input, std::string &Output)
+	void HexConverter::Encode(const std::vector<uint8_t> &Input, std::string &Output)
 	{
 		Output = ToString(Input);
 	}
@@ -150,7 +150,7 @@ namespace Test
 			if (i != 0 && i % Length == 0)
 			{
 				std::memcpy((void*)tmp.c_str(), Input.c_str() + pos, Length);
-				std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int, int>(toupper));
+				std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int32_t, int32_t>(toupper));
 				std::cout << tmp <<  std::endl;
 				pos += Length;
 			}
@@ -162,14 +162,14 @@ namespace Test
 		{
 			tmp.resize(RMDLEN);
 			std::memcpy((void*)tmp.c_str(), Input.c_str() + pos, RMDLEN);
-			std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int, int>(toupper));
+			std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int32_t, int32_t>(toupper));
 			std::cout << tmp << std::endl;
 		}
 
 		std::cout << std::endl;
 	}
 
-	void HexConverter::Print(const std::vector<byte> &Input, size_t Length)
+	void HexConverter::Print(const std::vector<uint8_t> &Input, size_t Length)
 	{
 		std::string inp;
 		std::string tmp;
@@ -184,7 +184,7 @@ namespace Test
 			if (i != 0 && i % Length == 0)
 			{
 				std::memcpy((void*)tmp.c_str(), inp.c_str() + pos, Length);
-				std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int, int>(toupper));
+				std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int32_t, int32_t>(toupper));
 				std::cout << tmp << std::endl;
 				pos += Length;
 			}
@@ -196,16 +196,16 @@ namespace Test
 		{
 			tmp.resize(RMDLEN);
 			std::memcpy((void*)tmp.c_str(), inp.c_str() + pos, RMDLEN);
-			std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int, int>(toupper));
+			std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int32_t, int32_t>(toupper));
 			std::cout << tmp << std::endl;
 		}
 
 		std::cout << std::endl;
 	}
 
-	std::string HexConverter::ToString(const std::vector<byte> &Input)
+	std::string HexConverter::ToString(const std::vector<uint8_t> &Input)
 	{
-		std::vector<byte> enc;
+		std::vector<uint8_t> enc;
 		std::string otp("");
 
 		Encode(Input, 0, Input.size(), enc);
@@ -214,17 +214,17 @@ namespace Test
 		return otp;
 	}
 
-	void HexConverter::ToString(const std::vector<byte> &Input, std::string &Output)
+	void HexConverter::ToString(const std::vector<uint8_t> &Input, std::string &Output)
 	{
-		std::vector<byte> enc;
+		std::vector<uint8_t> enc;
 
 		Encode(Input, 0, Input.size(), enc);
 		Output.assign(reinterpret_cast<char*>(&enc[0]), enc.size());
 	}
 
-	std::vector<byte> HexConverter::GetEncodingTable()
+	std::vector<uint8_t> HexConverter::GetEncodingTable()
 	{
-		std::vector<byte> encTable;
+		std::vector<uint8_t> encTable;
 		size_t i;
 
 		encTable.reserve(sizeof(ENCODING_TABLE));
@@ -237,15 +237,15 @@ namespace Test
 		return encTable;
 	}
 
-	std::vector<byte> HexConverter::GetDecodingTable()
+	std::vector<uint8_t> HexConverter::GetDecodingTable()
 	{
-		std::vector<byte> ENCTBL = GetEncodingTable();
-		std::vector<byte> decTable(128, 0);
+		std::vector<uint8_t> ENCTBL = GetEncodingTable();
+		std::vector<uint8_t> decTable(128, 0);
 		size_t i;
 
 		for (i = 0; i < ENCTBL.size(); i++)
 		{
-			decTable[ENCTBL[i]] = static_cast<byte>(i);
+			decTable[ENCTBL[i]] = static_cast<uint8_t>(i);
 		}
 
 		decTable['A'] = decTable['a'];

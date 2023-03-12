@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The socket event flags
 /// </summary>
-enum class SocketEvents : int
+enum class SocketEvents : int32_t
 {
 	/// <summary>
 	/// The socket process has completed successfully

@@ -1,26 +1,28 @@
 #include "DilithiumTest.h"
+#include "NistPqParser.h"
 #include "NistRng.h"
 #include "../CEX/AsymmetricKey.h"
 #include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/Dilithium.h"
 #include "../CEX/IntegerTools.h"
-#include "../CEX/Kyber.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SecureVector.h"
 
 namespace Test
 {
-	using Asymmetric::AsymmetricKey;
-	using Asymmetric::AsymmetricKeyPair;
-	using Enumeration::AsymmetricKeyTypes;
-	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricParameters;
-	using Exception::CryptoAsymmetricException;
-	using Asymmetric::Sign::DLTM::Dilithium;
-	using Enumeration::DilithiumParameters;
-	using Tools::IntegerTools;
+	using CEX::Asymmetric::AsymmetricKey;
+	using CEX::Asymmetric::AsymmetricKeyPair;
+	using CEX::Asymmetric::Sign::DLTM::Dilithium;
+	using CEX::Enumeration::AsymmetricKeyTypes;
+	using CEX::Enumeration::AsymmetricPrimitives;
+	using CEX::Enumeration::AsymmetricParameters;
+	using CEX::Enumeration::DilithiumParameters;
+	using CEX::Exception::CryptoAsymmetricException;
+	using CEX::Prng::SecureRandom;
+	using CEX::Tools::IntegerTools;
+	using Test::NistPqParser;
 	using Test::NistRng;
-	using Prng::SecureRandom;
+	using namespace Test::TestFiles::NISTPQ3;
 
 	const std::string DilithiumTest::CLASSNAME = "DilithiumTest";
 	const std::string DilithiumTest::DESCRIPTION = "DilithiumTest key generation, signature generation, and verification tests..";
@@ -28,22 +30,12 @@ namespace Test
 
 	DilithiumTest::DilithiumTest()
 		:
-		m_msgexp(0),
-		m_pubexp(0),
-		m_priexp(0),
-		m_rngseed(0),
-		m_sigexp(0),
 		m_progressEvent()
 	{
 	}
 
 	DilithiumTest::~DilithiumTest()
 	{
-		IntegerTools::Clear(m_msgexp);
-		IntegerTools::Clear(m_pubexp);
-		IntegerTools::Clear(m_priexp);
-		IntegerTools::Clear(m_rngseed);
-		IntegerTools::Clear(m_sigexp);
 	}
 
 	const std::string DilithiumTest::Description()
@@ -62,8 +54,6 @@ namespace Test
 		{
 			Initialize();
 
-			Integrity();
-			OnProgress(std::string("DilithiumTest: Passed NIST PQ Round 2 signature, message verification, public and private key known answer tests.."));
 			Kat();
 			OnProgress(std::string("DilithiumTest: Passed signature cipher-text and message verification known answer tests.."));
 			Authentication();
@@ -99,11 +89,11 @@ namespace Test
 
 	void DilithiumTest::Authentication()
 	{
-		Dilithium sgn1(DilithiumParameters::DLTMS2N256Q8380417);
-		Dilithium sgn2(DilithiumParameters::DLTMS2N256Q8380417);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		Dilithium sgn1(DilithiumParameters::DLTMS3P4016);
+		Dilithium sgn2(DilithiumParameters::DLTMS3P4016);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 		SecureRandom rnd;
 		bool ret;
 
@@ -145,7 +135,7 @@ namespace Test
 		// invalid prng type
 		try
 		{
-			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417, Enumeration::Prngs::None);
+			Dilithium sgn(DilithiumParameters::DLTMS3P4016, Enumeration::Prngs::None);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE2"));
 		}
@@ -160,7 +150,7 @@ namespace Test
 		// null prng
 		try
 		{
-			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417, nullptr);
+			Dilithium sgn(DilithiumParameters::DLTMS3P4016, nullptr);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE3"));
 		}
@@ -175,9 +165,9 @@ namespace Test
 		// test sign without initialization
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
-			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
+			Dilithium sgn(DilithiumParameters::DLTMS3P4016);
 			sgn.Sign(msg, sig);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE4"));
@@ -193,9 +183,9 @@ namespace Test
 		// test verify without initialization
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
-			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
+			Dilithium sgn(DilithiumParameters::DLTMS3P4016);
 			sgn.Verify(sig, msg);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE5"));
@@ -208,31 +198,12 @@ namespace Test
 			throw;
 		}
 
-		// test initialization with invalid key
-		try
-		{
-			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
-			Asymmetric::Encrypt::MLWE::Kyber cprb;
-			// create an invalid key set
-			AsymmetricKeyPair* kp = cprb.Generate();
-			sgn.Initialize(kp->PrivateKey());
-
-			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE6"));
-		}
-		catch (CryptoAsymmetricException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
 		// test initialization with wrong key
 		try
 		{
-			std::vector<byte> msg(32);
-			std::vector<byte> sig(0);
-			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
+			std::vector<uint8_t> msg(32);
+			std::vector<uint8_t> sig(0);
+			Dilithium sgn(DilithiumParameters::DLTMS3P4016);
 			AsymmetricKeyPair* kp = sgn.Generate();
 			sgn.Initialize(kp->PublicKey());
 			sgn.Sign(msg, sig);
@@ -248,293 +219,231 @@ namespace Test
 		}
 	}
 
-	void DilithiumTest::Integrity()
+	void DilithiumTest::Kat()
 	{
-		std::vector<byte> msg(0);
-		std::vector<byte> sig(0);
+		Kat2544();
+		Kat4016();
+		Kat4880();
+	}
+
+	void DilithiumTest::Kat2544()
+	{
+		std::vector<uint8_t> kmsg(0);
+		std::vector<uint8_t> kpk(0);
+		std::vector<uint8_t> ksig(0);
+		std::vector<uint8_t> ksk(0);
+		std::vector<uint8_t> msg(0);
+		std::vector<uint8_t> seed(0);
+		std::vector<uint8_t> sig(0);
 		NistRng gen;
+		size_t msglen;
+		size_t pklen;
+		size_t seedlen;
+		size_t siglen;
+		size_t sklen;
 
-		// DLTMS1N256Q8380417
+		msglen = 0;
+		pklen = 0;
+		seedlen = 0;
+		siglen = 0;
+		sklen = 0;
+		
+		NistPqParser::ParseNistSignatureKat(DILITHIUM2544, seed, &seedlen, kmsg, &msglen, kpk, &pklen, ksk, &sklen, ksig, &siglen, 0);
 
-		gen.Initialize(m_rngseed[0]);
+		gen.Initialize(seed);
 
-		Dilithium sgn1(DilithiumParameters::DLTMS1N256Q8380417, &gen);
+		Dilithium sgn(DilithiumParameters::DLTMS1P2544, &gen);
 
 		// generate the key pair
-		AsymmetricKeyPair* kp1 = sgn1.Generate();
+		AsymmetricKeyPair* kp = sgn.Generate();
 
-		// verify private and public keys
-		if (kp1->PublicKey()->Polynomial() != m_pubexp[0])
+		if (kpk != kp->PublicKey()->Polynomial())
 		{
-			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Public key does not match expected! -DI1"));
+			throw TestException(std::string("Kat2544"), sgn.Name(), std::string("Failed expected public key test! -DK1"));
 		}
 
-		if (kp1->PrivateKey()->Polynomial() != m_priexp[0])
+		if (ksk != kp->PrivateKey()->Polynomial())
 		{
-			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Private key does not match expected! -DI2"));
+			throw TestException(std::string("Kat2544"), sgn.Name(), std::string("Failed expected private key test! -DK2"));
 		}
 
 		// initialize and sign
-		sgn1.Initialize(kp1->PrivateKey());
-		sgn1.Sign(m_msgexp[0], sig);
+		sgn.Initialize(kp->PrivateKey());
+		sgn.Sign(kmsg, sig);
 
-		// verify the signature
-		if (sig != m_sigexp[0])
+		// test for correct signature cipher-text
+		if (sig != ksig)
 		{
-			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Cipher-text arrays do not match! -DI4"));
+			throw TestException(std::string("Kat2544"), sgn.Name(), std::string("Cipher-text arrays do not match! -DK3"));
 		}
 
 		// initialize and verify
-		sgn1.Initialize(kp1->PublicKey());
+		sgn.Initialize(kp->PublicKey());
 
-		// verify and test for expected output
-		if (!sgn1.Verify(sig, msg))
+		// verify and test for expected message
+		if (!sgn.Verify(sig, msg))
 		{
-			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Failed authentication test! -DI3"));
+			throw TestException(std::string("Kat2544"), sgn.Name(), std::string("Failed authentication test! -DK4"));
 		}
 
-		if (msg != m_msgexp[0])
+		if (msg != kmsg)
 		{
-			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Messages do not match! -DI5"));
+			throw TestException(std::string("Kat2544"), sgn.Name(), std::string("Messages do not match! -DK5"));
 		}
 
-		msg.clear();
-		sig.clear();
-		delete kp1;
+		delete kp;
+	}
+	
+	void DilithiumTest::Kat4016()
+	{
+		std::vector<uint8_t> kmsg(0);
+		std::vector<uint8_t> kpk(0);
+		std::vector<uint8_t> ksig(0);
+		std::vector<uint8_t> ksk(0);
+		std::vector<uint8_t> msg(0);
+		std::vector<uint8_t> seed(0);
+		std::vector<uint8_t> sig(0);
+		NistRng gen;
+		size_t msglen;
+		size_t pklen;
+		size_t seedlen;
+		size_t siglen;
+		size_t sklen;
 
-		// DLTMS1N256Q8380417
+		msglen = 0;
+		pklen = 0;
+		seedlen = 0;
+		siglen = 0;
+		sklen = 0;
 
-		gen.Initialize(m_rngseed[0]);
+		NistPqParser::ParseNistSignatureKat(DILITHIUM4016, seed, &seedlen, kmsg, &msglen, kpk, &pklen, ksk, &sklen, ksig, &siglen, 0);
 
-		Dilithium sgn2(DilithiumParameters::DLTMS2N256Q8380417, &gen);
+		gen.Initialize(seed);
+
+		Dilithium sgn(DilithiumParameters::DLTMS3P4016, &gen);
 
 		// generate the key pair
-		AsymmetricKeyPair* kp2 = sgn2.Generate();
+		AsymmetricKeyPair* kp = sgn.Generate();
 
-		if (kp2->PublicKey()->Polynomial() != m_pubexp[1])
+		if (kpk != kp->PublicKey()->Polynomial())
 		{
-			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Public key does not match expected! -DI6"));
+			throw TestException(std::string("Kat4016"), sgn.Name(), std::string("Failed expected public key test! -DK6"));
 		}
 
-		if (kp2->PrivateKey()->Polynomial() != m_priexp[1])
+		if (ksk != kp->PrivateKey()->Polynomial())
 		{
-			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Private key does not match expected! -DI7"));
+			throw TestException(std::string("Kat4016"), sgn.Name(), std::string("Failed expected private key test! -DK7"));
 		}
 
-		// initialize and encapsulate
-		sgn2.Initialize(kp2->PrivateKey());
-		sgn2.Sign(m_msgexp[0], sig);
+		// initialize and sign
+		sgn.Initialize(kp->PrivateKey());
+		sgn.Sign(kmsg, sig);
 
-		if (sig != m_sigexp[4])
+		// test for correct signature cipher-text
+		if (sig != ksig)
 		{
-			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Cipher-text arrays do not match! -DI8"));
+			throw TestException(std::string("Kat4016"), sgn.Name(), std::string("Cipher-text arrays do not match! -DK8"));
 		}
 
-		// initialize and decapsulate
-		sgn2.Initialize(kp2->PublicKey());
+		// initialize and verify
+		sgn.Initialize(kp->PublicKey());
 
-		if (!sgn2.Verify(sig, msg))
+		// verify and test for expected message
+		if (!sgn.Verify(sig, msg))
 		{
-			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Failed authentication test! -DI9"));
+			throw TestException(std::string("Kat4016"), sgn.Name(), std::string("Failed authentication test! -DK9"));
 		}
 
-		if (msg != m_msgexp[0])
+		if (msg != kmsg)
 		{
-			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Messages do not match! -DI10"));
+			throw TestException(std::string("Integrity"), sgn.Name(), std::string("Messages do not match! -DK10"));
 		}
 
-		msg.clear();
-		sig.clear();
-		delete kp2;
-
-		// DLTMS3N256Q8380417
-
-		gen.Initialize(m_rngseed[0]);
-
-		Dilithium sgn3(DilithiumParameters::DLTMS3N256Q8380417, &gen);
-
-		// generate the key pair
-		AsymmetricKeyPair* kp3 = sgn3.Generate();
-
-		if (kp3->PublicKey()->Polynomial() != m_pubexp[2])
-		{
-			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Public key does not match expected! -DI11"));
-		}
-
-		if (kp3->PrivateKey()->Polynomial() != m_priexp[2])
-		{
-			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Private key does not match expected! -DI12"));
-		}
-
-		// initialize and encapsulate
-		sgn3.Initialize(kp3->PrivateKey());
-		sgn3.Sign(m_msgexp[0], sig);
-
-		if (sig != m_sigexp[8])
-		{
-			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Cipher-text arrays do not match! -DI13"));
-		}
-
-		// initialize and decapsulate
-		sgn3.Initialize(kp3->PublicKey());
-
-		if (!sgn3.Verify(sig, msg))
-		{
-			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Failed authentication test! -DI14"));
-		}
-
-		if (msg != m_msgexp[0])
-		{
-			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Messages do not match! -DI15"));
-		}
-
-		msg.clear();
-		sig.clear();
-		delete kp3;
+		delete kp;
 	}
 
-	void DilithiumTest::Kat()
+	void DilithiumTest::Kat4880()
 	{
-		std::vector<byte> cpt(0);
-		std::vector<byte> msg(0);
-		std::vector<byte> sig(0);
+		std::vector<uint8_t> kmsg(0);
+		std::vector<uint8_t> kpk(0);
+		std::vector<uint8_t> ksig(0);
+		std::vector<uint8_t> ksk(0);
+		std::vector<uint8_t> msg(0);
+		std::vector<uint8_t> seed(0);
+		std::vector<uint8_t> sig(0);
 		NistRng gen;
-		size_t i;
+		size_t msglen;
+		size_t pklen;
+		size_t seedlen;
+		size_t siglen;
+		size_t sklen;
 
-		// DLTMS1N256Q8380417
+		msglen = 0;
+		pklen = 0;
+		seedlen = 0;
+		siglen = 0;
+		sklen = 0;
 
-		for (i = 0; i < m_rngseed.size(); ++i)
+		NistPqParser::ParseNistSignatureKat(DILITHIUM4880, seed, &seedlen, kmsg, &msglen, kpk, &pklen, ksk, &sklen, ksig, &siglen, 0);
+
+		gen.Initialize(seed);
+
+		Dilithium sgn(DilithiumParameters::DLTMS5P4880, &gen);
+
+		// generate the key pair
+		AsymmetricKeyPair* kp = sgn.Generate();
+
+		if (kpk != kp->PublicKey()->Polynomial())
 		{
-			gen.Initialize(m_rngseed[i]);
-
-			Dilithium sgn(DilithiumParameters::DLTMS1N256Q8380417, &gen);
-
-			// generate the key pair
-			AsymmetricKeyPair* kp = sgn.Generate();
-
-			// initialize and sign
-			sgn.Initialize(kp->PrivateKey());
-			sgn.Sign(m_msgexp[i], sig);
-
-			// test for correct signature cipher-text
-			if (sig != m_sigexp[i])
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Cipher-text arrays do not match! -DK1"));
-			}
-
-			// initialize and verify
-			sgn.Initialize(kp->PublicKey());
-
-			// verify and test for expected message
-			if (!sgn.Verify(sig, msg))
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Failed authentication test! -DK2"));
-			}
-
-			if (msg != m_msgexp[i])
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Messages do not match! -DK3"));
-			}
-
-			cpt.clear();
-			msg.clear();
-			sig.clear();
-			delete kp;
+			throw TestException(std::string("Kat4880"), sgn.Name(), std::string("Failed expected public key test! -DK11"));
 		}
 
-		// DLTMS1N256Q8380417
-
-		for (i = 0; i < m_rngseed.size(); ++i)
+		if (ksk != kp->PrivateKey()->Polynomial())
 		{
-			gen.Initialize(m_rngseed[i]);
-
-			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417, &gen);
-
-			// generate the key pair
-			AsymmetricKeyPair* kp = sgn.Generate();
-
-			// initialize and sign
-			sgn.Initialize(kp->PrivateKey());
-			sgn.Sign(m_msgexp[i], sig);
-
-			if (sig != m_sigexp[4 + i])
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Cipher-text arrays do not match! -DK4"));
-			}
-
-			// initialize and verify
-			sgn.Initialize(kp->PublicKey());
-
-			if (!sgn.Verify(sig, msg))
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Failed authentication test! -DK5"));
-			}
-
-			if (msg != m_msgexp[i])
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Messages do not match! -DK6"));
-			}
-
-			cpt.clear();
-			msg.clear();
-			sig.clear();
-			delete kp;
+			throw TestException(std::string("Kat4880"), sgn.Name(), std::string("Failed expected private key test! -DK12"));
 		}
 
-		// DLTMS1N256Q8380417
+		// initialize and sign
+		sgn.Initialize(kp->PrivateKey());
+		sgn.Sign(kmsg, sig);
 
-		for (i = 0; i < m_rngseed.size(); ++i)
+		// test for correct signature cipher-text
+		if (sig != ksig)
 		{
-			gen.Initialize(m_rngseed[i]);
-
-			Dilithium sgn(DilithiumParameters::DLTMS3N256Q8380417, &gen);
-
-			// generate the key pair
-			AsymmetricKeyPair* kp = sgn.Generate();
-
-			// initialize and sign
-			sgn.Initialize(kp->PrivateKey());
-			sgn.Sign(m_msgexp[i], sig);
-
-			if (sig != m_sigexp[8 + i])
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Cipher-text arrays do not match! -DK7"));
-			}
-
-			// initialize and verify
-			sgn.Initialize(kp->PublicKey());
-
-			if (!sgn.Verify(sig, msg))
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Failed authentication test! -DK8"));
-			}
-
-			if (msg != m_msgexp[i])
-			{
-				throw TestException(std::string("Integrity"), sgn.Name(), std::string("Messages do not match! -DK9"));
-			}
-
-			cpt.clear();
-			msg.clear();
-			sig.clear();
-			delete kp;
+			throw TestException(std::string("Kat4880"), sgn.Name(), std::string("Cipher-text arrays do not match! -DK13"));
 		}
+
+		// initialize and verify
+		sgn.Initialize(kp->PublicKey());
+
+		// verify and test for expected message
+		if (!sgn.Verify(sig, msg))
+		{
+			throw TestException(std::string("Kat4880"), sgn.Name(), std::string("Failed authentication test! -DK14"));
+		}
+
+		if (msg != kmsg)
+		{
+			throw TestException(std::string("Kat4880"), sgn.Name(), std::string("Messages do not match! -DK15"));
+		}
+
+		delete kp;
 	}
 
 	void DilithiumTest::PrivateKey()
 	{
 		SecureRandom gen;
-		Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		Dilithium sgn(DilithiumParameters::DLTMS3P4016);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 
 		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// serialize and alter private key
-		std::vector<byte> sk1 = kp->PrivateKey()->Polynomial();
+		std::vector<uint8_t> sk1 = kp->PrivateKey()->Polynomial();
 		gen.Generate(sk1, 0, 16);
-		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLTMS2N256Q8380417));
+		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLTMS3P4016));
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -551,17 +460,17 @@ namespace Test
 	void DilithiumTest::PublicKey()
 	{
 		SecureRandom gen;
-		Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		Dilithium sgn(DilithiumParameters::DLTMS3P4016);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 
 		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = kp->PublicKey()->Polynomial();
+		std::vector<uint8_t> pk1 = kp->PublicKey()->Polynomial();
 		gen.Generate(pk1, 0, 16);
-		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLTMS2N256Q8380417));
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLTMS3P4016));
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -577,8 +486,8 @@ namespace Test
 
 	void DilithiumTest::Serialization()
 	{
-		Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
-		SecureVector<byte> skey(0);
+		Dilithium sgn(DilithiumParameters::DLTMS3P4016);
+		SecureVector<uint8_t> skey(0);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -615,10 +524,10 @@ namespace Test
 	void DilithiumTest::Signature()
 	{
 		SecureRandom gen;
-		Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
-		std::vector<byte> msg1(32);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		Dilithium sgn(DilithiumParameters::DLTMS3P4016);
+		std::vector<uint8_t> msg1(32);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 
 		AsymmetricKeyPair* kp = sgn.Generate();
 
@@ -640,12 +549,12 @@ namespace Test
 	void DilithiumTest::Stress()
 	{
 		SecureRandom gen;
-		Dilithium sgn1(DilithiumParameters::DLTMS1N256Q8380417);
-		Dilithium sgn2(DilithiumParameters::DLTMS2N256Q8380417);
-		Dilithium sgn3(DilithiumParameters::DLTMS3N256Q8380417);
-		std::vector<byte> msg1(0);
-		std::vector<byte> msg2(0);
-		std::vector<byte> sig(0);
+		Dilithium sgn1(DilithiumParameters::DLTMS1P2544);
+		Dilithium sgn2(DilithiumParameters::DLTMS3P4016);
+		Dilithium sgn3(DilithiumParameters::DLTMS5P4880);
+		std::vector<uint8_t> msg1(0);
+		std::vector<uint8_t> msg2(0);
+		std::vector<uint8_t> sig(0);
 		size_t msglen;
 		bool status;
 
@@ -739,803 +648,6 @@ namespace Test
 
 	void DilithiumTest::Initialize()
 	{
-		/*lint -save -e417 */
-
-		const std::vector<std::string> msgexp =
-		{
-			std::string("D81C4D8D734FCBFBEADE3D3F8A039FAA2A2C9957E835AD55B22E75BF57BB556AC8"),
-			std::string("225D5CE2CEAC61930A07503FB59F7C2F936A3E075481DA3CA299A80F8C5DF9223A073E7B90E02EBF98CA2227EBA38C1AB2568209E46DBA961869C6F83983B17DCD49"),
-			std::string("2B8C4B0F29363EAEE469A7E33524538AA066AE98980EAA19D1F10593203DA2143B9E9E1973F7FF0E6C6AAA3C0B900E50D003412EFE96DEECE3046D8C46BC7709228789775ABDF56AED6416C90033780CB7A4984815DA1B14660DCF34AA34BF82CEBBCF"),
-			std::string("2F7AF5B52A046471EFCD720C9384919BE05A61CDE8E8B01251C5AB885E820FD36ED9FF6FDF45783EC81A86728CBB74B426ADFF96123C08FAC2BC6C58A9C0DD71761292262C65F20DF47751F0831770A6BB7B3760BB7F5EFFFB6E11AC35F353A6F24400B80B287834E92C9CF0D3C949D6DCA31B0B94E0E3312E8BD02174B170C2CA9355FE")
-		};
-		HexConverter::Decode(msgexp, 4, m_msgexp);
-
-		const std::vector<std::string> pubexp =
-		{
-			std::string("7C9935A0B07694AA0C6D10E4DB6B1ADD2FD81A25CCB148032DCD739936737F2D10AC3B097F04F4C6C79F83DA5A6D4A313B532C9E18D47F36AA32DCFC6DFBCC9C"
-				"111288C9E4F73435E3E2A9C90D6864B47C8FADAAF24435F9F71F8F622177B0F817BC6FE1BD8109F1C501A99D877C8DA66A4DA0A22E447AEFF979BAD70D1406B3"
-				"8BAF1A2ACE6621F74EE3ECE12D80D128A689458F961805F742D262D1A8C578DE7FDB8FF6FAB267A9FD91F3171861A4B4BBD2726F48C32F3BB3B979AE8872218E"
-				"3B5DDDC6D8AE7420B311AD8CE8EF7BD6B6B1FBFE2463F182DDD0BCC51C78D0818B5370F6FC7F3CD3D4032C947FB7926E89091873EEB31DB257E5F00CBA5D4A3F"
-				"F9D25058A62373F1849EAE24DBCAAFB6319BF4EBB1869D7B5A2081B604FDF287CABC752F532378E19000E6DDBC2DC2BFD9ED6844EDED226B685976859352A2FB"
-				"AE1EB938172E9A09557CDB0D6C96EE4C36E17B91E8417D7A137A4C8503C288960399A1B420214762F0DE06A47F88CD6B9B5C55B9404D85CC42208C50372805F4"
-				"1CA34F557574D0BB622C77BE81BBA4109F809834279ED633B82B33A79D564021BDDC608440ABCB89B95E12357EAD46E36B877F92C3D2CAD66DBE9691278CBC6A"
-				"55D315EA538BA913244626A4DCA5270200E504C2142D0AF09C3DD82FC299922A0107F515FC69956B656B188FAF30874E8EE7484A2FC8F0864A1ABADE50824710"
-				"A684EB62BE389E5088918BC345A031ADEAC9B6E30DD131B50B4FB0064FF6C7814DAE0FEF28045F95D9C1A5B62C6543642CD40B4EF2F81C03359D84FFE3B5D969"
-				"C1F46A8670031DFBB48E1CC12D24C0045BD4F8A7063228053CF8FD9F35983D5A6857B7D8CCFB6B3161303CE01DAC6CF04F9F33C0D53BD673C98E6F2B9C9FF93D"
-				"D2EEF8EBF1F1544A2FE2D4EF15562E036BE742034179A135C0678A102EFEC568AC7C6EECD347A2AD906B741C8D08F4EC1AF90BA4DB21C8C1C5AC95A695D7F634"
-				"42464803D7407FFA7FBBCC65D40766845D750116A35E301018522BC7190F70E7353D7D861BC365DE327249285AF8ABFAF90AA25A6EA736D4619D597DFA290A8D"
-				"FD98D54625C5F43850F39092565906F2EC843E0BFFD5C848014C20CF511A89F8FECDF43E23358789DE0E482F3983C3869EF66CD50952D270D1BAEE20C06DB1E4"
-				"A119D132BC67EB701FD5C78A91564557E27AED37FDE71EE78820C855596D85BDB02333A9ECAC26477F46D6CE89A91E0F7BC5764B24F2F193B1A39EE3254C4B48"
-				"C2A2A10461D539CCBA520121381213CBE2AA39B675884C83AED195CECCB8909BF6E99723A10CCDFF5F4A320A514905E226FF5FE12F85F70AD4200405BDCCA84C"
-				"8D825ABA69ECE74FA48BCE5478E52F74946472C489155237ACE7EB4B2B4F643DDA0F91C6956FEE4408F87737555C5D8F8FAE4E73052398F429C6D9A3CE2D7404"
-				"25350D86FADF938AAA46F732B711C10C050B0E7A0794BA883E781D66E515C2B1D55E316CA42062C335B117249C356FFBC57A2EE3E2F2CE91A3D550D37216EECA"
-				"F7D0A37FCBE67952770AFB20A5348CF06299DB4A4DA6B06ADA93E13D712910628C6A82E43949691660FF3B31D6E777C96FD209DB0C625BE5FD50B4D95069BDB6"
-				"B046D4C59C1D107ABC2AC78293271C122A16E0034D8BDE59D64DC53B4C8C968A"),
-			std::string("7C9935A0B07694AA0C6D10E4DB6B1ADD2FD81A25CCB148032DCD739936737F2D2F4F8FABA268F4304160EEAE093D9C539F7A9E872C5B92C85581253EBF8DF0CE"
-				"453A1012702FF50FD3C6D20E41A44F1A1F5C0393C7DECA45321ECB9EBDCA30329898D579C33756AAF76CE77D3543FD45945BF334766AF01926781F4034AB54AC"
-				"6F7E0B902D17C9C209016788386D13A5163E4D3A7278971F71011DA9E4147F59BFBA7185A1D91B6B90E357D44FD2F330E459971967C3567A9CE229B6F03B43F1"
-				"A78AD086BB47C084406899DC25B14D2CD2BAD6FFF71E4DD284FC52EECEA00496AE1B8A3B6071F4F9052A01ABD009C3D642E74221026165635EE70B81DC153C69"
-				"3CE63E69A051EBC4F8B57EA55F48A97254532EDA16F2AB90B1F8BB22FBF0364AA6AB7D8AC1FF84E48EB58B26C6743FAA0884E4733D4052F10A97E65CFFC209DA"
-				"B18E55935C0D216C2D1F1B1DF8786FFBA842C5F2E2AFB60199777B8896A0DA28BB277CA0AC09C2585B11B6548AB897228DE43AD50563207AD55D7AB94730DD9C"
-				"7805E409CBF67B9A591F8FDD8B4214071E5FA7BEA20594F3D8AF4E1E7605C228CC2D2AED226B92D50AADFB8439BFF3C9B477CD833935B9C4AC4738DF186492B5"
-				"8E03589E3BC418F203D1ACAE047B877330F5F7FAAD662319265684C5E53D18B941E2354334BB39098166D5E484F1783FA0E104147B47686F3869F13157F84321"
-				"264A6E3A843041E11D9BF90166223109E1490928D8407A91CAA3111FB5A9C49B16943C0E48780D9406188D9808318BCA9736A02F781F995BD5F0520C9F3733E1"
-				"0DA420814ACE11F7F54B739674A920CB81C9D3A2C136576D4D5FF6B904D6E2801DD9BE45D9B1CC52E3D060BF58B04C78B52036DCBF41A3F6D9CD8B50443106ED"
-				"A8D18A14059618649B0F899642A8BDEB2669E90F4077D2FF84703600649F1BC0B6FAF5A687EF96432FB759B01F76DD6075946BE66DC6831A265AF2BDB0C0D919"
-				"2DC66EB6A47D54A396AD67D2A6A065FA9F2600F304DC5E1428BE154D6D6009BB09DE42953B128E1117F1684D44B8ED6537C1F55F81ED39E355500FF91DC5C51F"
-				"FCB0CBD3D054AA39ADD29F79C39F246D2BFDC4FC2D0B82B4A2FFAEBB58793508D03568DB1DCADC4D4D21F9D5AD87499F603C352C60762E01F5D16E960B70333D"
-				"65884A9444F5A64D475D0900AF4912D4674E40A617E75C21171AE63CF81D46C8E15185899DED8462F460F654DAB1601F2B38FDDAE0431044379F57CC7370AC59"
-				"10D66BF7C8C9A482BDBBFE457C6658BBEDE885F2EDEF21F2B30164C5C326616758A8D2C6F7981CB406578DDEEF5D137C69BBAE88A8304C412A2A42A1D07A9813"
-				"42E34118AF1BD6E3671B1EFCED77F164552A388ABB9A53A378B9ED72CFDD35A4BB8CE60BFE757AEC5EB38A1148CF8852778E1D17EC09FB99F1CAA898DF8E44D6"
-				"C666EE8AB91622E7CA3483A93EAD60FB86AFED66D5989FC8BE4E95ECCD83E0F4A9BE20CD2CF7318C2D717CA677160CDAFACF686B1E5303D9E8F2E424A6993331"
-				"E29487879933670ECF533CBEEEC370E29A9CF8525A754550DEBD91AB754E6FE0C21044A4C20CEB7515E61908E2F67FB12C89A091B56594B5E17FC0B74FE46523"
-				"E12B0E3A5849D0EEB05AD0CEE8DFB62EBD2CF333A6E146D2CECCA2C791CF21F2D6E2842B4E599BFBC50EE479C929DAF97ED4CFA55A127ABAB621C7236B5A2621"
-				"E98B7B5E70ACB6AAC2D67DBA314000BA3010889DF20A799FCEA1BAFDE2D992C4D222AA94F5A3EDF65439ED6544E42EC9E5E4D4F086243B50D00E6A17E778DAEF"
-				"618DA339C48585953CBECF47F33B2C64DF968B6CC7AB75547E291F69EAD45D36B1AD8F13FA49F3D823FF5E9358D6C009A1CCD98E3CBFC9596CB979ACF28347BF"
-				"165D0A18A2A9AC979EDA93CDEF6469BAA54F072DFA023D0A08594D7BEB10B0D6E7213AC08E470D0F52C63BB2B2D5E23AC5B4CC8BAD8589378DA67D7DE1B394FA"
-				"F5A624112A0A7317B63BA331C645BCD78FAB3C374496CC0148E454392F0A82C8C94800824A1A7CC577A407D3830C495541D07B2586B581F3F1F3708187D34610"),
-			std::string("7C9935A0B07694AA0C6D10E4DB6B1ADD2FD81A25CCB148032DCD739936737F2D6859F64C663916795E9D42A628F7A11FB6CAD6BE5A229206F38EC3E87E7487C6"
-				"512745FED6D0B64F605507C043E25D103D19673493730473CDC0EF780A83F23A5C6C3875BC10B6A053B13AAD6FD7FF1ECF8F725F460181460C5C75E05052FEA0"
-				"DBC4992EE04322BB21AF25D784CBD434DF2A87AA486AE7057FA04287DA5FC0D0088C1682E09E47ABF30836C38242C8A4BA58FA4B7A172D3B0032516563FE46B7"
-				"2E49DFACD0033E444F5CEF0FF497D4D9D9E5B9886F4B47299D635241A6DCF069F1ED1C815A51A6F7C755D3FB2CF0D619F848C35C5A61419A53CBA51930974383"
-				"828DAD667C4B8901F7DF68F49F7FA2069F2AA5C7FDC85D37D0663565711DD1C5E65356DDFBE34A675C6F55A185CBEC69747D3F248CC81D1FB7D4BC6E3F785AD0"
-				"2170017D2A985C5CC9E105CB5DFB8786D4578013E793B0AF057565B5FAA4F41C3EA710C019F87D7E39BBBC093201F76ECB19B4E4BE14908639E446C3D1B13504"
-				"8B72D3863093921CE60C51C70813F6E8F0B06938B4AFA796D16FB65F0C1BE6F215A4E3F0846FC39BD6D2C33BCADFFF2A9ECD9640DC3CBFEE6F251FC53A5350BF"
-				"1BBC12C94B263CD589B56AEE8AED891D342B76BD6215D93211EFED7C4A86BAEC77BBE118CAC74DB9BA4241F119FB7F1115DD0AEA465A83BFB07D7F595B66A7EB"
-				"257B395E804581C258854BF7643F2BBC4AC2D2112070C3E67BAB0D406759EAE6EB90BE54EF9227D4B166AD28834222685765711877A7827B2BDBD7F5F8F21992"
-				"4ADD54CC3024924182C542C81011021D851B397286F5211C82DEF9B520F56464805AD65DBD8C6039BE9486C072C0430805131BE1C1EA43CC08E6BE9CEB94ABEB"
-				"48C8DD39A9DE0BF0A332CC25EF1B36A36B06F80D559B46E24D0302E82B81F1ADD48849EED87C3E3BEE7AF5CBCC96017E32E8BE0C3EBC6F19874358CE70C851AD"
-				"A6BA8685392C69B9062CF74DB3C53CBBE8E7782BE79E09100DE3211DF2A57208314B632ED8799E4226F7BD087902ABFD1F3BE729F8608513326F3F4142D5A9CF"
-				"3C196180A23CBBBD37DE01C6064A75CBAC5DC7731576366F3C706EC29E0E15BEC348A607E2CFD42A392AF0E8C49D4B89CE0579D186F0C22D84C5066F1A3DF60E"
-				"ED663DFAF6A35A7440D4C76853D744FE186D989F271F15C70AD7A86091B77867DD2C4FE5E2AD843D7C99A60B70768F3844F5CC3555F8191B56C8B5C62D54D3DE"
-				"7BED980134F151D7E2CE982F192C010842BD4AB440EEE9836E872C8AEF5E2B86578B368CDE15968614EADECCEDE72179D4CC1272EA35BB7CB092508C722D6DB8"
-				"E8CC9E52C0E707E44AA0237153AE20DE9D7ED57980C1B819F7B3A859402B1CDDFD0C49184B9A1204A1D3DB63FF9D6AB79B18CFED0BDB76CCAA24A3F7B6E77CA7"
-				"3D63F15B2E986765D86855BCEF5D453DEADA48C30F48BD33E8E135112798FEC744EAD8338A7787FE59E3B90889ED8963509F68020F436192E95441127E03F764"
-				"32845476FF284EE6F1628C0FEC65EBBD9B48F2025F1434E5A2235F8FCE873D8CCAEF94C3BAEB200A0800A60B9B1FFE7278FD5A3AE30C893436C9AF57D7E0D625"
-				"80D45F2DA7770E4994A1031E7BA1F33CAA2E20EC8396605FBD4C7B32A1D460B87BBDC1934698E7F571DA5608DC1DA58054BAA0B983E03484CFBC32D01CCA13BC"
-				"F0CA0CEFB74803B9FDBECA4C7042B728D2B7B3F43C47B0A42AD0C6D5262BC398E716448BB68FAE542A0D5F46820BD78A61C3E833FD7BEE3E398F7C91B89F89E5"
-				"EB12298ECC7BCA64F99F0A5F48F53F1677EE13A1E1F37C1A8DD2855816459B3F14A10CAE3D7F19E0412AEEA53B4305F0D022885060DA5F2B46652DE2F5AFA8BF"
-				"7E6CE5A6E40466C792D31750AD2840651A442B673537A76EF45FA1D38FF77E470521773992D56994126EC9EC780473A0FD5A7EC9F3CF781256F4F1A969301522"
-				"193FD8CB8CCD5F94124F2C39CAE45574761BD76F64153934BD220B48FBD0FCB5D739833B203D554357C8B1919A46FD84FA39643F5E059EB74D13F8B9D0E77328"
-				"5FE9DB5D9856C14D76E285CFB7F1E00CB216CFDAA91F6844DC0813F3ECB53631B1CD94194A6926B01B35A316169A672BCB96F3D3504CAAF4C08132C177FD4738"
-				"512823849147197C873DF3C6DD2ACBCCD2557DD964344AA115C9472F38BD98964A4226EF913B64B5405DEFCA1F008CBACEDE3F6326BF43663EDDB7E5FCCA8EAD"
-				"A886BC9DF42EDE4CC1429CD7FF4C9EEDB2A210BC28AE73D6233F6F6570739A0C53726C32E2E95FCA8C34E36093726A87013A3512D88EA92A6B957BF10A6AEE6E"
-				"976ABCC95C14A8EFE60A2C1AF0ABBE6BF789D4F69738092AE3E62AF1773ED6A42F1AAABCFB98731CE2701F42E4BA9E128B67261C598D3189D06024F01E25354D"
-				"60327FB6570BF7E163FA04324B32E7EBF8B78AC2ECFA3D36B13A59A3A727029B")
-		};
-		HexConverter::Decode(pubexp, 3, m_pubexp);
-
-		const std::vector<std::string> priexp =
-		{
-			std::string("7C9935A0B07694AA0C6D10E4DB6B1ADD2FD81A25CCB148032DCD739936737F2D3E784CCB7EBCDCFD45542B7F6AF778742E0F4479175084AA488B3B74340678AA"
-				"33BFA9A36F4F24C0D5AD06FAA77234FDD214131824E159B01927DD8D1EE7314EB714454EDDAEEC19AF29DB8DE006287E49523B3B99C556601290482A20490331"
-				"B5460049AAB306BBCB53886A1BC0AA60030189CB1C519C64CC844B6C88B6034A4C29C9A5C79440C7239735A486A292411B87A7A80061AC8C928C868024997231"
-				"7915B545CB5C30A7758B3A29B9484B52B797A2B566997658056171C593466916826C0A6C3B566725688738B0730877614B1722A043B19B90A09AB8309A87C187"
-				"53715B7ABA4103304C005018B831B57459C3229108191A148C91884B6588C362B275505C8B0105938376197A4730BC08026362877A407C59A10B0204171AC467"
-				"BA57A0C43831672630B40665530866353AB5A63452B4053B058134A66C309291C9C8C5646A6B99A905520678404011B3C578018C7059B7C56A164623950CA2C0"
-				"2C17BC56B88A79C376C00B8449886813605712AA73C24185C42B898B16528B174B42885B1653192362310380209C28A9616A8B3A9766024B352703B3142A32C7"
-				"64B232909A304386A200648169786C34412C86001C6A7A0A735CC7C739548AC5869885B17468688107BC751B23A7969362CAB550A57635B1564B79C3201484A9"
-				"A2404738BB9800A7BA098920773CBA4761668571B368B032217CBB0B5CB430B2C31440B3A3A87608A391178A8B5AC6454BC957A079587C03341BB0941C202534"
-				"2276406979CC05206A452C449547C59887A33212412A9A879B2BAA8210C87699285578C4489CB05488AC03462738C2C88262245278C17741A9429489786BA122"
-				"526C3648203A236296B549B83BC77320A9301202C739C7A7B5914214483373AA3B89A6B326AAA634821C4B74474B958A9943AA4046BBBB668475AC62504B1007"
-				"8B1B92868431CA718C3347A79A3A01BAB4B995CA5A9B81528AA977C3402071A89B1A2494BA653B7284C16A796374CA56444B23AB2A511CC71533075A306523C3"
-				"6C79943147B914069178A441A4393A289846812351605206C5C864255410314089216CC67C9660232A96C043CA32077C06BCBB0225972831B85AB023A471C027"
-				"30627728B138170015C40946690B39740B12B5C1A092242912A45A74C0999106784552545A4806487442C5603B12801B790C715681BB819BB2A2BA63910051AA"
-				"651AC4BC79551B86AA5359BA2A626C40117C70081131AAB65A7BB8B96213748B4232B8716231BAB33709B2162BC45A03491AB14274BB906193C18AB8CA285258"
-				"161A94216040089C1BC509632217301C0285326904038C098B6CA52CB246A17BC779632020AC26AA8A73670704899AC9042E5F7F9DB14F6C6E1B067F44C56FF7"
-				"E5FF18A379EDA38174491E685D3C8F9DF559FE83425DD8DF415C8161D3ADF5C58B42060A12ADACA2B304DD903500CCF95C73EA45B66ED0D429C92F7279DE7DC9"
-				"1405E38E968F9A778DBD14C93C887D9A5A72C3F7978A36DD3F8719A1C5CC09233AEE9A11FEBEF0B4F3F9D2426C393806866B9BEC16C99BB538502E43130EBD86"
-				"B10DB90115EDD9619C1A80C918B05D22FE39201AAC52BEF4F84577061B3E42B69322688D3E18B8F9502C0C1D0B6260598F0B3B051EB2B1BD895DD8D0EDE94885"
-				"058C5ABF2AE94BFEFC19AFC19CDDA37B97A443D67CCA28307CA83756B005C5469E179F085288CF48D9DFC8EFB64991D193EAAB18B6499268C31AF8080C56962E"
-				"41FB01A3D67F68E13C818337827E479F3424CF795F4B32D106938EB31F915F26925740EBE3D473C9521EE1552A38921EB239CF44F4D9079BE3871A3636A4EA5C"
-				"52DB71AAD22973C0F92E0A0243B6E37580EDAB721635D4B195FCC9DBDED7422729355BBF6EB0D934AC24828FC381739FA78355AF93BCF70D4DC9586E52BC60F9"
-				"0B1706BC515CF74E96CE341087C10315DD593FCF54CAF078D5D234210AFC677A59EE5ACDD77439EE7EF766E71D5B3ED7875BF8BA2040730F3A06447EB0DB240C"
-				"9CE3E9EA87DA38A077DA976B89887D13BB8CB9CD0CF2EA2C4D6617721F06734F83EB8989DCE767D54C66E71DAC0EF51D697824C2E9A1A3713EB6B55C89827209"
-				"04F52785D08156C35B40ED825E3EA8FBB97863D587020370516485922E5BF6B5603FEEAE5AFF1D4130D68AC6EB8681813D35D93AD22DF2E3C06CCDD9A9CD7757"
-				"12375C91A22CD2AB1CE3738161CA1D09906EF16919598F7263E048967E24A905972EB9B413377943FD9CB0AAF83CEEE968D9E38C6E853576A5FB943E4812215F"
-				"919F0F30B7DBBBC31716AFA28E626087BBDC6C0064309749F0C7BC3E1DACBBAFE46BA59D1C82A53FAA854A137680F25115423830B62A6CE15A0522B222AD97DF"
-				"E09A1D69EF874D37785FDAA0D9C593471C6838BEBBD7026C1F2419CB47BEA2EE63E4D026B07AF725ED0601A2591293B93ABEAA82E61C12E459B7621739312942"
-				"A0E70530E496FA8B7E9832FBB5DF162454D8192B2E014FF6D7D88B8623CB7E19437B151C510CA74655A8CC41BE38980FDB73F03D6D96EE021C3CD83DB106BF49"
-				"30E4395BBE7E0B5F9BD6CE0EBEBDB9E01238B6399D1ED33191C6F450E58F4799DDF458CC45A1D092CECD43096042AF833396CAF40BA5D55BBC2A16FC7FDC887E"
-				"DE6ADE447FFA7E7A26B36679781A94B7D2B6ECFEA2157794025C5F24B5564393E069459D19B2FDCC7A90E389BC0B6ED54F6B2CCD679ED1FB1BE3D2DF207EBA1F"
-				"CED33F3287B470ACAF13845675B7E2403D5DFEFD8E15DBFC3B49E93562F2BABC5B63C25042E5DA4D3311BFDB625B6B00220C021506D327798101B02D8FA7B0D1"
-				"7729C565334345AA171E4F50F0FDAD4F26AE4C470BE3AE599BD7DAD799F54E4FDBD45B06BC9BF3DAD8FBA277F3F5515D770ACCF7A06F375417725E9F39231F47"
-				"BB7457DBAECD24AAB925A10E93EF2150521BFA9C5A5088C6401FB67B1963BE6E7CE4D0B1A15BD03F18EB09697B8EEE2E3466F9E688ECCF83DACDDC7061FD7CF6"
-				"0FA80751B3EEB119A824118F7E0DDC255F938CCAE20F0C2D62FAAE3370A6215B28E3FCA5D3D1759FB172424DA4AF720C03C288B5EEA18C780A7887F4A1066779"
-				"AD3261BBFFBF35B203A977BEEA99E35858FF08D4E82D6DF549CFD1AD0CE8BB5FABEECA71E4417D2D07F3A41C33771A3339034D90952D71BBD37040549E6D2BA0"
-				"B330A9293A5E13298A112C959B32CEE4FB0D5602A3D8B8CA8196AE14279205AF74A50B795AE1C1BB8802FB6EE519E3F99F1B04014FD7A8D5ECF33350B905E3A7"
-				"128E47D19ADDF52BC8D21085E56F5190A16EF5504C05E0497FC39EABA1800A412C0EAF4E92DE7A29A226E94CE83B4E7662B22E5F02EEB921772C18B4B9D8A45D"
-				"8D3B8F29BEE0C008276E3C56FA3C934F5ECEE4426AD312A620E9A5EEE317E9E028273E7D431D2C006219E6122BAB6F48095EAAA753A5C5DAB20B8D3BFDCC1446"
-				"5ACC92B4FA090F3B0047590F50F14AF2328140400227AD9B936F659ED0A9A39888ABBB9FCEF734C5E8BBC2DDCC00571097FA15566BBA19801CBFCCB98B7E2466"
-				"50C00162FD16AE5FF7A859FECEE0B61250FC6E3C578E01C63816FABAF7D7C4733E855DA56BCE176FAA7A880E52C1B9C07FE805F4EE2F4AD4583D78D0CEFBB74A"
-				"09120198068D1CB233CC58C9C02BC5E767E9F8AE74B4138F3E9F8606D3BE0D09F704DDF74BA3B2B45B36DF29046912D4E411C34DE4704E901A1DDC444C26BD23"
-				"0E73F8B3D7BA9463EE57B991E4AB70F3A6B6146D320F4C0C7568C0CA5B56408214795044D6A631B1CBA73D564CE77458EB7DF415B4EFC8132B24C2D6C33A27BF"
-				"F720074704314144EB0F96D3E9AD70733FCF752F9D5E575860AE77DA5469547EF56EC37FE02B6870C5EAB8E1D0E3635A"),
-			std::string("7C9935A0B07694AA0C6D10E4DB6B1ADD2FD81A25CCB148032DCD739936737F2D3E784CCB7EBCDCFD45542B7F6AF778742E0F4479175084AA488B3B74340678AA"
-				"8EBAFDDFE871ABA84291DB726D9F129174454F5FC0DB3A12E77361CD504017A9F4F32E8624129F2D1B61B66820AE1C27495233996505260189A4029234105346"
-				"0049AA633085A816A00A36109018514946488668034A9492A5470974239735A486A2924171788A0A10A628898680249972317915555430A775A8939248247597"
-				"A265966987551016579346691682A6606375568276880373087761786140461418A460554063898296A890A4A00263197421023A140909AA89309A8771381557"
-				"7A1A3400430050181853745923128990A14181918854863862520755185030396897A177048320302676A8077459A1204070A141677A054A3831672630645036"
-				"856056A353A634525430058134A60623199958646A96995A20658007041431527A378403860702416484041049535A128517807059576A16462395200A726185"
-				"8A7963074098848836017625A13A27418524896821851724845816531923623103802089921AA6863A97660254733230142A32472632909A304386A200648169"
-				"784613248600A1A6A730577739548A6588591874686881077531726A39794692960905A017284AA02775346710108163625A50A57635614579034241982A0A74"
-				"84830970AA09892077A3476166857183063221074530321440338A6A87301A79A1885A564479059A87750334019401524223620794965700A256244495478579"
-				"382A2311A4A27998A22A0881769928557884944085A8034627388220235222505079312370955A26105844718077697882622452787117942A44998867A12252"
-				"668304A23322665949383707920A23217039775A914214483373AA93683A26AAA6348241744754A99839A40A64644658A7625004718021694818A371387374AA"
-				"A913A09495AA9581528AA977030412879A1A24945A367284A1963746A7564500025821750686611780341298166469354434A22A51711533075A306523637994"
-				"314749611089471A449AA383826914381205266550485642051103941862769660232A9630A43207672050728912835A30421A07273062772881730150410946"
-				"699043071215A092242912A45A7490196980572445A58564804427546023011869A33635A1757340798863926A27307879106715189822AA63910051AA651A94"
-				"571586AA5359AA2266401107871011A36A5A87293641874232182716A373932016425A03491A2144071936198AA8285258161A94216040081995302672011302"
-				"85326904039880562A62147A97370602A226AA8A73670704899A09A07355637321A1A2641773299A167965A561464516090A4862A97A206A1AA639060864A889"
-				"7033166730885590836A992372692309235449063023A88A214A4660AA9224160886A42385949681021952A25961684425250136947A46865030376856A20401"
-				"1A035066441362A32A44371721096A17A08786A9188886A590690078026802095A5517A29493656900171A406AA952910945761541A935148058789759119602"
-				"433624794969872069A943109A3690182A4547310644330316867522359312A241A8220A4636AA352527A060A78962910653380816768798330204400824972A"
-				"0929676A36997297268206963395691AA963743A04A47A5288A716339526439991477962419633A8017A0A38191700314AB99CCDBF53E9020EDE4D0FBE45CDA2"
-				"EED4850A4BE727E0136010DA01D6890D7D1189E08B9D98327A76C496BBA2A8805B9DA55DA7607539BBD16579070BD513D2FA830682A9D0DBFE50FC225294DC08"
-				"922A24807B3E7A22BB52E8FBBD9E556081B2C473EFEB452FC07375A08BD4D285E5469D9C93487B9ECD7057DA016F27A1FCFCAC13B196285EE10506A2D4660118"
-				"5B284900671C29992C3D4AE23E603B723BBDDDA4746C4322AC43CE1F58280D66B42227FEE12E5851955F3D8DC61814013B10B1D859C5E1BBAC80326777DCCB9F"
-				"994AC7278F9CDDA2F27438C2ACC0590AEC332096FE0FEF88EBD5CB71750E2737FBFEEDCCF56A5079D34A5488BDF3D141FA9E87EC3917650E4A85E76DC261EE1E"
-				"4FFEC9F014940A0BA62D3A9BF8EE0513290F072F0CD855345C0F790417AD701000218755DC00DB37CAE6FE198757AD6B049631F29B7C46C5E63B80F49E48CDC3"
-				"EC827FEF8E74D96DB18B0FDC78CE756F155CD07992CEF2E833C6CC3F6EEFC50DFBA0914554A40C5E85849FF5E4D79B9DE12353AE504A3592995E4EDF1F3E6D76"
-				"8D15BF1EA9CB4A44B69FF451BB4E796257EEBB176F919BD82922CD7DB1EE784B304C52BBBE1854EAD923E5C51A34CE2322AB7185C9920F955B9CF88417B9792F"
-				"B2FED46440A973A1711B4C5C39ADA26456943559EF7EBA0957EE1FB8E4EBE2A269009AF5662D53C00CFC851E9AE760D861F7E87C53A8B27E679CCC583951E3DE"
-				"F37C81A4D3BC43A6EC7BF9A15E7371ED7DC974C743F17F02B4561F32E590277D54C5A0907900693C78CFD450B2D0AFE8CE55B8300FA98B88C7E207D131B97BEA"
-				"31A1C444A9881A14943E256059194DF3D03F8D07EF3271911C7E8A04FE30542EF7AD3B6A4D0AE7FA5B84ECE3A30572257C3513072221D0FD8B999CBA0B1719FE"
-				"9A28766615F5069627FC198D6A819856D8E13EA76A18D4584E2B3983ED97583EB694E65B2867C5DD1CBA79D90D6CC86B9C2B6E1793EE73856597733A3639DDD3"
-				"27A375C7691D339476E45BB575F505A99F22F0E6AAF6702EBC99C28A659EF667306824D6C969CCB6248990ACBCF22A6E0E18C55BE47A1B2F407B56F2BC5F34BD"
-				"0C47A0499EC80AEBF89F8BE0A41F506E5194D04B92B02FA69635362AE1983DCFADA43D90C0DDACAAFCF31687B81CDD712BF4CDE1BB36BD4390FB0980A2047CDF"
-				"BC945ACD7E61165A37E1F10641AD062A90DC1BDD4B83094220728A749464046579500C6B655693B2616BADA36938D6B11CFD07D0970579C064741C398BC8D817"
-				"03ED1B3674609A788276205369595807B1B4AAA539008310BF8B3FD75B3BB105A28C2D38764F4C84875BC2D53B5BE30A80171BF3F1EE62B07BD1541B75501556"
-				"F5A40A5FAE0939E47A9F08E8B2A5EA151E17F469EE9D1DF162390DC70684D541F98C128DD080BF68291AE107E5005A1FFC69E399291AAF0F3599F481C9FF2B89"
-				"90351D5B9076BE7C5C49F8872515EC9BB4ACF0C5F723E15E3C9CE63FD7A38F4F81CF5B795C841B7E76302C4502D6B9FB9EB32000B3CD8911FC0D73627AD61946"
-				"F3D32444D299DA1CD79DFCC69541A05C90D425C9F50E91A1F8D67C86B69B36BA73113DB1560FA7133B5A91FBA63A71AC4F413999E49EE400340AD7735E09E1FA"
-				"6B91F4F62BDD773ADEB491767F8C3DBB5C47898687603FCA40F717DC91F5C6CCD81F98740EB8087E7083A08254138F44A477E9A5670E6082E8843DAC8050DEC1"
-				"457C3B7E75337637FB3D3A1FE6200EB77B3D0FE351256A709EA77F545CF081180CC58BF030BF536077B650083E811D1866B3E2E3D5EC451123CB73D700F98ED5"
-				"981E30B506F8542DA8F22CA70887912DFC06EE1397BE1F64E0475513E0E486D85C1E77C045A3286AEA26423A6B178B2ED968E44534A9239DA10385144A24337C"
-				"76AA66F54D1354B37097A7A0C5EC3C96D69EC08EC8F62A039DFC6E9A3A8B77DC086530FC8D9CD895795664A4AAF3994C391282A41274ACBC4B6DEE85695115D2"
-				"0F7275E09A8E57508DE27278C47CB25558E26CA7CEA390492ABCCF4980FA7B43DD230306E9E58420B5CB9AB6BBEFC0762D221C86BAADA78E3FC5A4EBD418C94A"
-				"BC001049DAAD7F132E23796197ABA484118D0A5FD04B7843E507263E4A0C968513FB87E02DA811BDD7529586BAD891717DD307682ACC44C8FD3156CD52240F6C"
-				"AA8CD6ED7B2D4AB6A0A66399EAECF0D76C6650BDF5053A7FC8D43CABC4A1ECB5BFCD4857D47CA0BFE7570A27A19B608D4C955A23019B47D0DBA1B6D21F481F02"
-				"6AB4999538F1665EB6F6E6D62135B36BF75014AB0A28BBAEBCD0C9C0B929DDBD86C224991062DD9BCAF8D84A4A8CEE1192922652DE1CCAD11339CB49C81E4494"
-				"8B92BE173B60A08EA9F8C4AA1FA0A208DC915B1FD2F9DA63CCB990397F41B72F964F1ED31C4A50CAAD02D66E8C4A9BE403CDA4AC0E1274EB7F3589C49327EC0A"
-				"F71DAD54D1B56DBB1641BD52737E786619715FE4BB14159D8668DC06261806F2C9271E2C0F68950853844FF3CBC9139FBAFACFF12F5041F61D9BA7C0A0242B56"
-				"66D1AB8095778A4FE6442B2430ABE84D6C0A3735AD3A2EAFAE710467DA963D551452740F96A0816CE5630637911EF7A6E6E1039FD008166E135C2753F5AD3AF6"
-				"9B899CD326FFE5B385E4420DF1B33E251A13026B75DA558C85F740A7B55AE7335F1CAA711E648A1B5AE7DC546271BB4C4470DB79B883A280C5C5CC0ABD880ACD"
-				"E7A6F32C15CA6FC31B1E98E70E3C9D93F4EC5FFA91F1C1837837CC715DC8A3E5037C1936DB2880A8A74E3431062A9328841046067A20C71D9C03864376C10B0B"
-				"AD132D7656FB02C62BDD72B9B2B0270FCD0680BA539398792EB11BD84F7D283D2C3295C34493B0E406566E1D1107090D7C0D46C6C9A6CA0B734AB6B1AB11D1E9"
-				"44DA0E06932BD9A2FF114B0AA6963D88BD0AFF31E320B89C82DDA8DDE23C91E28E68616E916570AC7DEA75ADD5A8E6F67F08229411E2AC6D85D42F05E79BFE43"
-				"0629344120922C1130FFC44EE6380EB5AA9C53E0501F905988BCB61294EEF2860BF139442E492F7808FCD7A869CE11979A91346A206F05A58B7164C93983619B"
-				"AB9D3B382C83B12DA778D9E9739D372D83F727A4AC7DD264C4E2B92FDC06C3C3D53A2EB0ED34DD47D7A21553F76D5067"),
-			std::string("7C9935A0B07694AA0C6D10E4DB6B1ADD2FD81A25CCB148032DCD739936737F2D3E784CCB7EBCDCFD45542B7F6AF778742E0F4479175084AA488B3B74340678AA"
-				"73FD5E3FE6FB80FA8471C08C6882F71D862184C35F5576C06597D8DCFA36A80B2C255A599A55B074AF36E8DB7923F76891B47909C5154E10B20D120D98660B08"
-				"AB6CE8EA09A63614ACE0C041381311C9D5146A71C0DA41A249916E6D12F2C26AD24C558C86616201D83212C30424264BB2A2ADE6DA2E36A9E8288E2CD3CD5D22"
-				"6D66C6BA020C31196943E4046E7167891314744A47B050C3618D01222A5A6B6A346026000168A6890D95102004820C6B709489507326D4B50B4048823112C202"
-				"0DE278D0202E4A0741582C479CBB152E8D247310D6E86601B31CA575B9D4D5844E08B9C946C48426E99AAE6B3394207935169058D4B25E46C7290947A019B016"
-				"2AC6E1C04270046243E1CD6E522586CA8A15512C69B1621289C989152C8DB1012C1CB214055B1B95CC412927C34AC851CC651952135E3844808C322B56CF1A68"
-				"0D80D3DA6DB1D5F59850853830426A739A4BCD50350D5B4B869022D84E55A8239D15255035089131DA08CF2AB3154333C85D415943D499309445D43C6016B214"
-				"45ABD1D5147B85C88A1B6C6640490269AA4583B266748168952D51196B90AB228455C971AA44001C43A96247930EA6D2A2C638A5172F4A253A04B75491380742"
-				"9445F3A245E836C6488A08824D971BDD36AC4385D6D24D5D88699BD44E8C0CC3A556B3540A266C216B5D3D529E5D0D9A00144D32085809D3D938351DD0B16929"
-				"571A43C932D385A8900C6D1A2B743AB916A765551C111E956C9030798B678E0A3672CA502798E5466CA214163302112CC3A96DA386A9AEA110275008D9B3B9C0"
-				"511D139E5A66E00C767685A60B128F93D04802282C1E9D8C5B011474606643C20D421BA38A442592449041068AA92441A681D5053AD46C93455D8C1888D45A20"
-				"3DAACDA0A6AC5445B30B13B1611A08566D6D8DA6DAC08D0D33CE9996B48BDB8DC88C856E03B2C12CAA43602760C19554CA2E8D021983803A431DCCD182398190"
-				"D1C240C6286CB58C6A15EAC818426A6B010593B15315AACD96CDC47900648A24B62EC610B03238BA66A26AD9122C74C9155844D145D4C9846D97555C39DC40C2"
-				"83DA468248331402A6B15878A365538D2507DC145B7339B228B6D1B65402859C009537D16BB4A932B9D50B44B4036A0CA9214E8195360CC0726559C409423993"
-				"48D203449BA542A4D99A19E46C1AAAC4111B412DF3B0CCAC39A5190547A0515651578C5BEDD662DA5A75506C1311633452232546782C93C5202080592AC2A4E6"
-				"7A4E9C70CEA48E865D7361CAD113D2C5F6EA952AB86C906923ABD559005293515937342BBAB0B41493E1AAA820080EA9CA3051B160AAA840C13A5AC5B0021AAE"
-				"1E2C9B6CD70E3239065092A97192560226CE9C416E501C964CA07A136199010B72814545521A0A6C3157136A71428D92E560C89992429A91A6E94A94A258338E"
-				"8AAA80C88923313B6E3376441B57121037ADA6360E43D619BB58EDE291831A100AB7B90BD32A435C4F341853E4E294DEE4C18AA50AA5914E45B96CE4C64CAA64"
-				"0063DD1A33DC8142C70D4B80825829937881962F23E65B5C42DDCE0B7D97D3536BA3D90BB36F47DB3FB138A03A8DCE079071658BBBF2557E54D6FD7C88FBBDBD"
-				"7371033C865F24821CB686C724A075F234EBAF37AB7CDC57ABFBE37AA60A44291C66008F224E3B1A0E5E17C5F3ECE3112344499031B21F50ED5BB5FF840C1316"
-				"456BDC825EB9039A8F627E81A3BC3954F4A4FFF57371B46B17F5B684532CFDFA647C73242C82C1244CC141D3972B2CAD8814FE61EC80F0783CE0C419B6736EA6"
-				"D7FAB2189501FF3778115603D94ABFFF5D61E281D8C1AF332B63F9CA134CD00BB94F6B33672E92D421EFDA706E4704D38976E339124A7BFC218561D3B9325C09"
-				"69EA0D0FD83C38D8F98416DB585BF16CAA1E11D8CF2B9A9147A114342D6A40AF35CB145CF62855AD3196BE6CA9B88C88E3036B33007B831067EE4608FD38F11F"
-				"102ACB3090FE7C1124F8164F99E75FF97EA0DBAA2078F59058DD9F4D1573FEA0E728600ABB63A9B999D1D915271CE75B1205A62025691FA4F8AD8A8374946525"
-				"8134131C01BF3D436A829EA4FF36A406A8912AB60413CB67E127E6A1F3B6CF3D8C70F2B56FE457816E17308C60053724D0970F7F41CD4CB4F440BFE4E60DF688"
-				"B536CA57C8F015D8FD8DFDC4564BF17940711DA724A9B986530058C42137D5CE52401C26FA5992939660DC652DF1DD919959C7D115CD1964B04EF03C30D1EA29"
-				"47DC2E945DB878B4D7302798AFB93F26EA9A95BF20EF05837DF6DCC0D9624BF0D4DF28E0B6AF9D98C221961AFE1E728C35AF7C6B42CC1870AC27AE90DB78CB48"
-				"8507E8561E13D5B172B2DE086644B39C1944715D26318E72F3219179186A9FE02E41FE64A955CA044D1DC797D48A8F74DFF4177539020E52207F018D07A5ED88"
-				"D72DC6F1E92B3672594AEEF37EAE5EF5E1BFC87F4A9836B2642A4C8ADEDCC51CF070EA4FF8BFD8121B5D43ADE5E17EAF2C60B20D3611FDC3DFFF3214E3C654AC"
-				"B97E0EE72F416A5083A34C44B6E6C44BC10E925F61370F1806DF77CFC68D4080285229087AB6B1115CABDE982F1163A0B240AF6A5B9457CCED75D21B72C728BA"
-				"904D07394193DD596D75E32133DF3EAF89DA68AD8AD116C00F54D551BE762982A22A3DEAE62D34D204D2CB06C1A84EB47AC9495513C1726020D88213509CC8F0"
-				"12FA704D2FFBE6FCB8D80D947CFBD20FEF290AD627185437D024A9A15E4366249610BB752D4A86F5472C23467895F3AD79F23717D12FA1AFE1694D6A4B518E7E"
-				"030A2144D82CAC6503BE53560648D6EAC3AA194701765B2BD9EE9B2AAA5362BC79A02C2BF73AA5411CBD04B916B138FC7B0D550E705E503A42D30B220D608C83"
-				"CF2EEF627950B829DF3344A6A957B297184BA669C2250AD42938E4F922925F22887DF79E954336A3C0B7462284B4F380115CE7C32537644789F42A31DB5C847C"
-				"C065A3DF0354789A2E184975151DFB96A9592697DEC9F9A8DDDE895163BCFA4831485D2C98FDA5C83C7EEAEDC1BB1C038127E792915AC53D47628AF38B30FC3B"
-				"B914FD7A4C29833C949EF1C0AC5FF3BF3C76C9F659359652145ABCBED47BCF3BD54FF682452ED751E298629364D8633D248B3000967C75847C617653CB44C57C"
-				"CF34F4D9EED83FD287A11AB86FFB4CA01FD82B0496E6FCED8DC6D1F6C7DD1E2A8FF3C31A361C779DE76F009D18EF19743F1FFFA60492BE1D0146E6AD13C38187"
-				"0E6CDBDE7E5E71121A892626E2EBB89F6F0C55C04F9BCBAFB3F905D46D0544108C58497D44C640BCBFE391DCDFEEEE3D8159E97353FE1B42F8D7099E16D73A44"
-				"F3A707D048B19C6F84B37044131456F6CF52694C5F391EE3DDFD7CBE360B7299BC99FADFF692BEADBB31394333C1FA8DEB490FB654EA0C0EA9CA798DF28656ED"
-				"4C60F6BD0CB2419B87A9149FC8EA236DB08D5CB5B7DC6E61A9ECB0000602AF03B449E7ABD92A9DF6420C049124D76484C922926891057174FCDEEA072F7DE38E"
-				"A3CFAB50AC5BD4AAD7CAC3589772A132B2510B627A9EE160ACB7A35524DEE9498B71FF65E962930693AB8CD25484A50843FEE484D6B6C1CA9D85F97D807DFE9E"
-				"3962C1F0EEFC001707644BE2522CFA0426737393936D2FE1E2897579A068FE2965DE40214B94A51608FFF6DF2D15DCE9A5B30A11014ED90C44466FDFE05C084C"
-				"3C7247DF2C7274F1879F39111F61BB98BBDB03458DFABA7DEBC744DB04CD84E879BBB0C070E54B6296AB48D5117F91700128C786B01C891CC081896D40BF876A"
-				"5D1822DDC3F06BCA942D46D849389655C8DEC2AAC2EAF61D11C7F71523367ED4564C0F98D5B03866618C3DE37D566E8C0F8F7A5665688739861F784292578B72"
-				"803F7A4B8D031830E0EF9447009C839FD694EB4F2B4908B84D11CC2DF447A1C7B484A6142534D5623E86E6FAD178A4A60D4C8FE11EE15385AC791B69084896C1"
-				"F150D50C24F5078F80FEAD9B4F518649B6B409502B38E07BEF587735E8CBA9FF4D96850763A47437B2DA8F40725EC646DEC727A8811D4E668EA97BC0237F4E4A"
-				"25A2FA198C3A774B57917B72075A421A73900B7561EE436F07753109F922C0551F591FB546A881B11C8C836BF83EC42FF7451BF3E0CBC87C97297D8FD11E5344"
-				"1E4B744AFEE4AA0B723B806C3485BBFB6731069205101CFFCC2CE263F3ECFE8D930BF49AD28A7E6CEA75C569906B5F9355971DF4033D008665DDD0628811990B"
-				"13047A6B2EECE18C625582D60E087B134737BBC926039CFA9CABAB8E3BD631907A331F1B08C09DCA05CEB149A0DF0E9A4306A049C90647C0EEE7BF84CAF91C1B"
-				"E71DF4A32369896DF8BB3DA8E8544DD5C1D5CBA1340B56B6B518AA62F983A271BA389204E19536AC988687A2DC0C5DECC1F01433B701CE27B5CA70273822FC8A"
-				"3F58E522EE8B8BD0B75642729D9D4CEEDBE3E8F900691ACA096C927AC34E94E2C7B85D18745E4263A160FCC7873681F0DCC036C18DD00F521A8B88D48F71D2C5"
-				"E769D6E4443570E98C8CF670C6AF9746A8C287F75CC26BD336BEEC5AD8CA35D16770CF093FAC7881E822AF2DADB72779AB3ED8BC7999957C0D8ABD71B204F0FD"
-				"BBAC658217E883CABB6ABAC80CF4BA090B05711BB37B140DBB374DA289D7A93434497DA9F81671345704EC03BB86825289373F723C838313C8787C1FAD5729B9"
-				"E66DDA710DD9FEB8B5BA241A0BC402DD9C300068F50F94475EF2F4ADD6671192075AD24202F8D773665CDA7D2979656EFC489418FD679929D5EB584A6C184DFF"
-				"E3F99F2671D54EC348322FA1AEC467F55791229F030353AF0F633A34596EC04CEC58C250E09940D489EF4BB54734F764699A453C43764D1CFD4A618FC9EDE9E3"
-				"45663E9B208954B5918C610DB7F5BAD1C5DB8A4BCCA1D64392C7380536F09C0ACC61AAC4629944DC6442E2308C5AD7426E1FAE75E8A3A0BBB7F34FB40F414AC7"
-				"97E0B70F6965FCD3E0ED07DA8B752F992D3CD2C05887848577A028127228694A8DD5573A736EA7F87506F932B2F14B5386BD071704305482813CF11AD4250EC5"
-				"79E8FF734E0795C503B62D6E447BEDFDD14344E18DD3FB95F072ECF7C0E5517C18C0A63526DADDC9BCAF8B8B6A2675581B9D46563ADA1C93AA27F7A2F2C4B5EE"
-				"8AED3D925C6A6547F6672C058E5D959B6B9E326AFC36E89C14E6812B5CDDAB386B13F5D1441A78987BD19EBEEA91EFE472C2F8C20DE21173ADB5AAF917C60376"
-				"C2776DD0C658E948F346C2CA2B77DC6B8B84C396787E62DF470E94D8AB87CA4537CE65070DA5A1BA4D224D2107FF604B1D142545958C11A3FFEF368554694F2B"
-				"FA6BFF57F549988CA91E87C9DFC47476")
-		};
-		HexConverter::Decode(priexp, 3, m_priexp);
-
-		const std::vector<std::string> rngseed =
-		{
-			std::string("061550234D158C5EC95595FE04EF7A25767F2E24CC2BC479D09D86DC9ABCFDE7056A8C266F9EF97ED08541DBD2E1FFA1"),
-			std::string("64335BF29E5DE62842C941766BA129B0643B5E7121CA26CFC190EC7DC3543830557FDD5C03CF123A456D48EFEA43C868"),
-			std::string("BFF58FDA9DB4C2D8BD02E4647868D4A2FA12500A65CA4C9F918B505707FA775951018D9149C97D443EA16B07DD68435B"),
-			std::string("58C094D217BC13EDFDBEA57EDBF3A536F8F69FED1D54648CE3D0CCB4847A5C9917C2E2BC4D5F620E937F0D329FCF8A16")
-		};
-		HexConverter::Decode(rngseed, 4, m_rngseed);
-
-		const std::vector<std::string> sigexp =
-		{
-			// DLTMS1N256Q8380417
-			std::string("A785B7DB95D555880DBB8A49FD02E8D1891EB3396344C330AE81441F3CA8E275B58395CBF4E80DC3768480063C464764783C360EB289666D168C18C0D07C8BCA"
-				"53D29987E697CD6F2CF282C03F2A16C303411FAEB95068C7397476A34905341B658F89A0EC26B838E5331F92A23A460ECB6D231DAD5EC48E02B90D3248196342"
-				"BA254A0A7C26572C744D43001DC4A9CE797B033D37114E38716B607EC563546076BBA867F5BB45D9B8A8C9128E533C6A484B66ACFEFD57400BB13DA67E1DA170"
-				"03D3523E3843A6450928ABE65D0681E6CC4DCD07B2A87DB7C4D9284EF55AA99593E50E89F608F303A2E2A4BC36E60F5557162FC20EE05F45CCFA6728C194BDAE"
-				"EC3B92CF0DED67CD67E47A100BAB7E6B0859FAD8BEEB28C3AC8E83E05BB653D26657A6DBC721CA19132B16EE4D57D0A532792AD22780113667EEEECCD9F13DE3"
-				"EF0814165A8FC53D4BE55462DFFF41E2E1CE8B46A9AD2B66F2FF9FF798CC29FD33427EE6DFFF0D499880EA3E10AF1779541B9256C61BD94A04EE96D7D487AE23"
-				"17BDD630FDC6681C2DF00F1368F7812BBDEDC8553BB5341A931F8C3DA77C6A9601E34BE08EB95989F9A0DAAAEC8B0AD66724922F5D0AE1258662A15AEDFFC247"
-				"F6E85433DCFB2177315995082D1201DE44EA0534E3547F005C5EEF35F6C7A1BEAD4322E26EA1F3CFEC26CEE9761230D656827D1D25751F036FD682396A08CBEC"
-				"CDE7D042E7E124FC1263B01DF17003C174AA83D3685A65BD66A4B8FD76CE3604E60D061A4B7A5079CDF87B0BD2816DC9D6D2F2E8F5B9CA9E4B5B999C7B9302A1"
-				"3FF23ECE9481E68E297414A9BA2C7C35FE5B38A2917B45E6935B4323A8AB709B4D673CCF32E84F25AF7C2A5AF32CFD3C4E7846CBC240CB31521084BCC8635972"
-				"C121FD02093D754A2B6EE5A4507C98D2AABAD9B0F0FABC523056C5CE474B365710BD3DDD7F56C55B813865419DC2DFEAEB591066E5C97AA1067C07D0C78EB8DB"
-				"DBB3493D4C8F4A6E5F457DB3921C173AA61358976451B6BD11AB6A8DA1216D1E2927EF819040A8AAB6D4995B91C9A7C0D68CDEE64FBDDBDFE8449A9DF088E944"
-				"E8136BD224FF517282C4539AB53F3E98B3D470601C8606D73794E8628B26E0241F3D80BB677698FCBF1CAE0430E15CE3E7B383DD71F022052786556035699B86"
-				"274816CC4D2106864A4EC2779DBB1DBDF3C65B49138F571543F0061922E71FE3C5311F026A0319921BC76B0E2311760B3FBCC37C9DB7B1B366E066C2133C4CF6"
-				"F067EDD06BCCD1BD567803DEBD38415EEFFE65D43FEE1ADD8DAB68E9AADE2EA21E39C02364F7A448888929B79586899F9069019B1146C66658EF6D552A37656C"
-				"43830E5B70F99EFDE761A23769C76EDAA7E7B1E754FE1D16C5C69DA6C7580BFEC05016C2EE5B9CBCF7BD12E59B3F92A9E92F32BB4960B2400669CFC8D8EE9044"
-				"0AD7ECE4D8FDD30A9869CA3CB27793692A14AB65059468506C0221F9348F903EEDB9D3DE765F11AE89F5F34C43265E49BFEE260C3995AFBB2C0FC2C478B62D09"
-				"EDBADE29FD9DADF4E20D581D560C0C68C0C80D200574C4103D1C441C81B43927DD7C3D900BFCDDB7B952B48ACEC2E3CEE9921EB73A978A1C3EAA8566D8D3F60C"
-				"9EF0B2DC581D0BCE030D57D346D5FF4D4DC3EDAD48C296A0B004F6C8A6C58FDE34970362B3D053A34312FC0D97195E95306952E2FBCAB1DDE9D8024F4AEFC054"
-				"609A34197EBAF6DA0056C69FF7FB3A8F130FF4037B8C47CBB2F8FE5C0BAF84D7FDD10F262F00E0203CC465FB4E309E9EE8759E58A3DB8348086F261F555E486C"
-				"8551A786152300343FEBCBA13C9A0BE7C3B470D730D4E73C216F2F7335BFBC47D588451CE45DD15FD14CB24C1BDAE5040316CE01AEC3BA159FD4301A30C1F337"
-				"93690CE6CC84F2F5489B860F2BF97FEDC67C6C2C3C798AD96733A7BDD2F23046C138DDC9414E23AE5B065A7E6B3E252E6E51FA1E05D3F0AE13402676D272696B"
-				"3C6BB2DB2F53236195B1A4C722E4B08ABC54AFBEF6F6F48B3DCE1FF4838290D676E469626D0B4A2A4895AF808D2248C8F8AD145B5E1B9CBF573C897B4E78649F"
-				"87BB4D9AEF8ED336E1FBFE38840E91ABA7D6088266FDE1A7FF636849CE1DC6493C0B09C7FDBA70F996373C5500E4CA56A011CB47A13762603F8BBD7E16F1F00C"
-				"E74EF80EC2B4BCC866164CE9D47D3351BD9C293B4DBFE4956CD70BFD0067FF6E8965EE17EF82D5AEA3286584A1B60093703876E792CE763327FA928B3B9CC2A7"
-				"D7E080D88575F623040B2DC16561625BCD1F711987089026926FB0982E6040D233CB6C214B176A5596CAE600C2ED28060FE7959466AE6925F1864BD963478C17"
-				"3D59E2BA515156D3661851E287BDAE21F72B1F89843F37D4CB42E910AFCAC9B5523C6E89AE1000CFF8597A53B56121FE00BC75A29C891F2C5BF6C0C377C2A75D"
-				"7F8ABF90BACD2040D1E498267D0BE37878603CC136A88428973C1EA83DCA57A8C64AE99397B6AEC4F06680B747B75730F7F62D3294B66842597D65756F3894EF"
-				"DBE628A70E78B9AA613ECC7475F13BDA94209289E340852D345820EF3F7AC414F3EFECDBB7226CAD9DB33B66B19D8ADC3A4B0D3ABCE1EE6A7D399C9909339FB1"
-				"D31C23A8EC2AD6551799733486F7466163A73622E35D2ED1E162716FCE401FAF32ACFE80AA20618AE977EC41CCF92C5B33EE4D7C98E4BEDED1C797A6D4A705E0"
-				"22292A3B52668788C5D8DFE3E8F7FC050E1B333C444F5153808AA1BABDC0D4D5DF3C40909597A0C9CED4EDF4F8213D41A5B8E8E9F90000000000000000000000"
-				"000000000000000000000000000000000F212D35824104160280DE0000A80E00020903CC088CA02A48040218E21228800400064282FE377C1B2A0C0BD81C4D8D"
-				"734FCBFBEADE3D3F8A039FAA2A2C9957E835AD55B22E75BF57BB556AC8"),
-			std::string("6790669C7386865419C3EAF67F992DADD8A04E7EE475CEE6FAF2EC8C9A7D65D1CE0F2CDE0023CC9D592C83146BB689CB3CF1DC65F28E79526D5F41741CBBE59A"
-				"251A0F0D9FB55F11353D56F0D048E6D70AC747EA428CA6A3E1E78B50CE5D6C14D3895D0EEC1A8AC4A6CF6E30C7BDDC0DA26072C42C2F0288E08CA6E2D6D57C37"
-				"15FAECFD4E1BB516A4C481B0D3766CC78F8DDF0028A418E9333A00C38BC31B3DF3A10434D28B3175569335BE6A218D8AA7A78293126AB802544357D8FE141445"
-				"EFB086763BDCCAF32901D439CAB37D2B5AB617A073A13EC40B71C50966C90E8FEE9AD4C3C54795313CC294130E616029A0D5567894C009DE61DC73577E43F738"
-				"408D631A7E9B3329FF666067857BF8F76D1ECC78CD07AA0E9B6A0F88E658333969DDC97E81DF8D832A3DA46C07CC71D88714C6908E3DD5AD80B919AB0F7F4DA3"
-				"90C45281867BCADFAA797648BDC852390D4A044763BAEE17ECA8C1F868713F8460A73727EEF53BB6A02E1BAF253BC191DF88945FD182526425B04CFA3AD9DFD6"
-				"2401D26A775BF64145187EA8ED789E58C27ABE954F221ACD2391F0444B2A5C573E7FCBF0DBA3DBF08E78C5646DE07443E13A8390FA0BB0EE7BD1507FFEDEBA24"
-				"0FA8F2CA6FFBD73524BC2AD060CBAAE93E244A08945C98DB95F202E1FA7614A2A58222A658974260564FF46AB35469F041D507C27F5AB556C843BBE7F11086C8"
-				"F5F7C407EE7939C98237E8AA2CA59A4439EC7F776117287C766F97F8E0E81FA03BDCCD510C316344394C69238E273BD590F52715D4CDE83F5605E80E85C5D7B7"
-				"BD0C33B759545DFA89A97FF5A4E721229BD7F943CE2065D040DED60C66AA639EFEC2AB2F7F1CFCAD44298C212672996FF1038848FDE20D5BD25F76A21CB0768B"
-				"59BD5D42B052BDF64A4BB5EB4E39252382302E1CFBA67827495A42E9D3720F357C44EB2DBD83B0F3A912EFE6C87049A97961E8DBB0928DD724A46C2EC603BE30"
-				"2841282491C37BA4A15CAB8B02EDAEBBDB3C438CF67DD84283B53604CB5D9BF01508B88FC19064A889B59D00D8A73C4D943EAA3607245D8EB95C66236B3F1548"
-				"56AA8D16854D92961A78184BF113898BC3D1CD533028D8D8D993754929F1CBAF227CED71A386EF819E64AC984EDAFA1792CA0A6CCEF883415DF8230C98CDF44B"
-				"1F7A3910DDCD5CC550A9CB4A403EF6C014C0A8C230EA7775173BD066C04D3D22220CB42DF7008B870BDF2C8DBA1B52FEB4AA545B1B28D6A6DC2953B5E1D2589F"
-				"8B3695BAB8D37FFDD3836B3920C0D126FAEF0FAEC9ACC8A65A52DE9A39717F9020DCBD1FD6A8C78DAB7D2D68E29DAA474A25684E017C80BA8C60F625FC96482B"
-				"CCF3A5F61929364CF506A4CF0E118DDEB0A7D12CA43737E7889C5F0CED5EC72E245818F1747E48079B0D60ECF659C8DF0887E975919E040704E0EFE83E0DFF1E"
-				"E1BAF566BE3FF97D2FF40791D2EE8093C1AB8C0545B2EBB193FDEBCCC44716E85089C259430D96F0EF478D0E3254DACFD1C2A866B7586C4B7FBB1EE6DFEDD8ED"
-				"11599CB44E8BA212560B1EDE90056F76779C0E09C7BF743F4F8EF750AD35123717EEB0BAF73EDE7B04518BD075D81D499DAE3E8B698ECBC5BC7C1988204C9ADF"
-				"DBBF98514FB61D2A3CDE7FDF01A136906ED8F66081E31C37B40DD3909FC30A2EBFA7301E0253B5AC296BEE378DAD2CE399E0B3A27CFD9B130B71637C1A0E2CC6"
-				"CB12454E9119F017171E3484240237FDAC20A9DDCC7FA1E87FBCC3A8268C17495EA27D6519B32407925E811D39BF5C07173BC5CAF15C03D3EA064B45386B868D"
-				"3DE2CE9470549F9DD76901852C29D6C938C57DAF3FCFEF18C57091BC1689F578E8BDB7DE0F0655A90234D388DD37DEBA3731A584A00AB816EA896FB317803589"
-				"AB5ADC393607D60383B0558EEA29D57F2CD6D34A1C36A9DE61B9C4199D27A893D395258C4C55CE6183D5CE1B6CC0B51EB4B300D5631CD43F72383AE8B2B16C48"
-				"326266DE5F885A5CDB402FDF59066DB409D10C1E5C3824423F7E487856184A9BFEC9B311CB1CF5457734ECD764BA96F0F670222F282A64A2677EED4006CF4BFC"
-				"B590F6D8DCBB996B532C9B9D1435A8C9F84D5CA32A867F69FDCD5E2EDB8D44CCEDF3E693E3AF107FAAFBE8ABBDEE2FDEFC6606D477D8CC12062C1403CCE8B7E7"
-				"8F6FF62A34069B47DB123A448F204D985570D19C915BEACA49A65DC011B03AC1A3719F54FBCC2D4FEF48BF920D82A064C64B94E528084A6B3EAC4682485B9D85"
-				"82061C476E1F28B8E7E86D3C19D7FDFB4D3092A307A8B66C89988601F74C71E733B235479BF2A95A72017A678065EBFD844EEDE3ED45B3F325BA1A27C8A300C6"
-				"F33C6B057FAF44561E8C3358C8F9EC4CF76E4F8758D41C3955F5D3E417384D381C1CFE3E72D89CB9C356A31345255D204F219F16D581E4E3AFF23A8606198D6B"
-				"6E893D53DCBF7E9C09F0B201AF00D16C6DD6CCF8E8C17D52BA2AB703FF6BC2696F46A6B2D4085F7814A1305CE9F561EF6BA1EDA88BF2682DEEA789BBFD9C14CF"
-				"B0E0D049B875F0369470708D6AD81033A1E5C689C903677C5A4CB81C6E05130D5764BC56FA3B0D9E961D2A4CCD8E30775BB5BEAF42EC824CCC3BB86F1826F9BD"
-				"7FAC5CC900BAD62F9508D284D42FF1A6030471E65B6C8C67BE4BE2DA774D5E2F9E8544B47201C0B62694D364375709E9EEA7AE164DF2B8F767A43F9F74DEFE5B"
-				"02141B1E475153677073797B83B0E1ECFB0F3A57727B8B96B4C4E80C5258757FA1AFB3C4C6D134374674A7A8B8BBFF0000000000000000000000000000000000"
-				"00000000000000000000000000000000111B262F54195100880744900090C290C8612000C8880108018803C0C418122000C090246EA54E1546ECA908225D5CE2"
-				"CEAC61930A07503FB59F7C2F936A3E075481DA3CA299A80F8C5DF9223A073E7B90E02EBF98CA2227EBA38C1AB2568209E46DBA961869C6F83983B17DCD49"),
-			std::string("AB62D26683758518C6B1E9DF2CEC0A992A3F8D15E44BD11CC3CDE55AF5E7FC345C18EAA91179F0D0C456F4E0500D351227C20580CA417FBFD0DE2635ECEA1342"
-				"9914F65D24ACF5B955D3ECF4F70D141BC2C5E4C57F5CD5A0624DC56C5500B83E88E38974303CA90D1575650B9A1D008D32B255C8F753756FABF715C35CDF22C5"
-				"CBB523ECD7FFC8A8A038878F172335BE1F7D03ED40F810501F79D48C6080AFF10793A9E86ADE0319FD684B7F15426C2F2EF007A53E0EF9E9CD131A61A133B9CE"
-				"08DB72F257F826029DC72C4FF46BAC2F0D638454872F8A2569230D2B3BB0E8C38AA43E824F33F4BA32A0D7E9594D551FF87387292187878EA778759E94070305"
-				"464676EE8F6A7286E97F0FB977EA7261D402EA620ED269A77046D2CC5192C973C8DD7959D2E5EB1D219C359CF2856BA4B33F06740AEBF4814D2A8B52895F9612"
-				"8F3B2396F8AFAB5F89A5790746CB349BDB1942FFDA0C53D6789BABF68D4FE33B722F22BB3F49A9D15437F0090FF7434EC99BF9AE4D9FB6D82593FF6E0421A936"
-				"252914D19B3E675EC7C7220E0D7C77304AF40AA8B4B0E4D6BA6D43129AC26CA417752E22C50310B2F11A7ACF3A60C0585D7B886EFFF20D814126F9A549907232"
-				"175A1B1DCF89BAC4F6C26BC9959E6EBC79A96D60AFE4872ED7B6FE73F38DBE80C93F31A0C6D1FC5BF10BF3B62812EE5E21F3312CD4DE84AAE4D36CF55FB2E540"
-				"0EEAC2755793AFA020FCC9EF18126E1FC0D0C4BFD561CEB17B5E45EF81B3C0CCBBFBF44660F29AB0C7D1DF984D4B2C89DB118B6ADCB1D7304931BA44248EA22F"
-				"B5BCCD718DF2049CD795C88004104A83E5DC3C7E24656294D559A1653D374ECB9775676A841FF9DF70036DD271C81F2484831B38D7ABA1B4B6DCA703A81F9132"
-				"2718B3358DB2D5F4E5A5C58BCC9B10FF9418E7F270AA4662E8858922C0FA35323F828E623DC9E62302117C4475573CC066F878E60B91C5319B91E82319D30503"
-				"0721315BA5C1EA195266A0675562145520091B3C79BE83CF698591D301FB3CFEA4B7D88B1EF4D16F44FDFD6D01C70F5A786B8483A16A93AE758432F6BEC8E3EE"
-				"AD78E2DDA8F687720C5CB5EB3A6C8AA7F6BDBC657424E596188F8DAB3E39D02F8A504110BF41D7D743F52E85FA9321F1163657F5F9E00323CF958A8DDC26CC57"
-				"18CCDB38F59B62D9AED1326B88B87943F39E74B5E686BFDDF7E0B006F13B7D7E9B3887B2DC8987BEDF70D431CD30F2838D3758C84F199503CB7EFBF964C8C7BF"
-				"143AEF652892821F0A4805CAF583C2D470EE3FE42FE8405B343E9A07F31F44C5BBD18BF0C9D162860906554FACFA1F6A057CAA5E69004A477AA74367955B2DC2"
-				"526966D458C3776FA5FE4269FBD2AA346B0F9B2A9B96183EB9CFC0A207DA52E7A5039C3F5B80B13C577E06D67C1A5F45F7DB773E6FE7F1139B9F85D88B9AE997"
-				"8283EA0699A01E0849D85F14539BA15591B846EFF859628F36C4B869D978E367FF721FBB4320744CA9CA18F3C885119559D9CF71463500D4F7CB111A761A63A3"
-				"1DA1D347FC99F6083D7366ECE2E8BC408F96721E5740D9E0F8CBEC0C23A4A5EF76E04447DA6AD43E67326AC60DD7F67C6D42D80A402489F469F180C76DCCC983"
-				"FAE0413ECCD1708E47E35B150824DD0438280E6D12F9812DB2DEF6EA5B965887286AB2EF642D64D59689241E01F582410CC17927854C9592FD1FEE31C521F1DA"
-				"84B1CD2CD5BBBD8031047103381AA5D7C3C576DDCE9C47EE0C99A7B68D900E43DA5CDBF835C85D4B44BB40D11E48AF014B1B56DFABC7B6A060D7AB455F4D42FA"
-				"DE3CFAE210C3ED0FA67D01D2B5B56C4C8D85DBF2D74A0E72A4149474755115153B4C40C0D56A48605FBA9DF1F297D22C7EF304EED11DA276FA8DBFD42B4788B8"
-				"2E604542FFD644071B772A6E4065AB92F6AEAD59E928752CF2CCC66F2835DBC8401EC2F052A16F427802BF7880AEA4E31411938CDF8D7EF85C6ABEA6AB82B85F"
-				"2BA609C8A9B0797A79F9254136702B32B8B8EE15E1FBD96DF54DC27EEC92CE673F7DFAFBB4C86A87FF232D4B52712139A6016918DFC89330A65895928D9F517A"
-				"D4CBFD30643F24ED940A8EDFA2536473506225C81685FF5E548B5612F4FD472062703BCDC5E08D8BA53CA9F51B02065AD52FC834B861637853CCAC3B2E009543"
-				"05A1D08E141C340FEA6667A40B11713CEAF6E5BE0482979B752D6ECEEF433FA4D54202856302C57AFF84EFC2AF8B2309D694B101F88C429467B16D477CF82851"
-				"4068878DE22B10459751779CE88D2C01C1EB0D6E4EC9CDD7AC2507FE7888B6402D8294503E349DD5F1E9573714152F2E4C1F1662484DFD5E689F20C6D6F1F847"
-				"BF0999805AB7C8F41122F78EB83D5A385189860E501ADB9B72E74E37AB0AE6910681BCED7AE60F5E138AE1E6DA29C2E3FE34DFC2AB102C05670BFA484917F25F"
-				"B15764A3D446A249F22321539EAC5910E15EC154E6EDFD44E3359BF3B9F79CD0E471FAED0E50E409DF05B1686E62EFCABAAD1DA13CB32A2C082EFEE5B8C98472"
-				"9DDC6D307D4A340496D1B3B8FA99D3B96894DF14FCFE2354E7F339F00D47A3580B3A3FFBB9A7A3C0DF9E0044803AB10BD1D4421306E8151CA672D71DF5385508"
-				"C69426F74823FA233326610B535243B6768C065C2596F2E123F6FB4FBE8D5BB847FDDF8EA9192D98F8D792F2BCC91265773EA15FDD750A073710901EACB63C93"
-				"2C324D7584B2C6D9DBECEEF40304161D3A415C606A848CAFB2CCCDE3E6F60B0C4B4F50545758737D869AA9BBC0CDF2FA2A353B43474E5B6E7D7F969FA6B7F8FD"
-				"000000000000000000000000000000000C1E30400104F8006045250044080141C480820A0529706000114524042D03000010544364FA1C062077960B2B8C4B0F"
-				"29363EAEE469A7E33524538AA066AE98980EAA19D1F10593203DA2143B9E9E1973F7FF0E6C6AAA3C0B900E50D003412EFE96DEECE3046D8C46BC770922878977"
-				"5ABDF56AED6416C90033780CB7A4984815DA1B14660DCF34AA34BF82CEBBCF"),
-			std::string("5B5EB8073B1E75E2E084AEC1B4FBD8A4BBAAB09420C315FE0632AB5635F35E988B4EF3784B8F05426AA5FE2559726B3629046A5159447F8B6222A87D3A8503AD"
-				"8BC33A1ACF055D988021AA06949964294EB5D8A5F4129C3C1040BA94FC5298EECA1A4BBE379933822AA141B0567188C5E52B430DAA4A47677B6C9438FEF53041"
-				"092AF01920A27E2A6DD8CF1BAD7E2114635BD997892A95BBB0A93497323C58398DFBDD78B851BFD6E98D6C70C699879CE84112C40CCC163153C2ED2A2C705432"
-				"A7CA77183D7A79FE949BEC01021BA65ECC257EEC1A341402510EDE16EB452CD4BF946787824523AD0299233A0DE4DB851E64226A500458D23B485BF275378AE6"
-				"0B05162B91C6A337C9C4C42AE19D5117AF8BCDCDFD109E24CC3E3D5D2D0817B575B38FA936274C069F965B1BF9B039C48636FB16E01968CB440A187708C73DC5"
-				"C0C959E566BA3C3E9E32E8EB561976334F5543F4FEB69A78098124E6A9BC5AD726C1577F2AE885332CC78AF4D17B337A7A22EB25E8E3C97F4647874B3732FA69"
-				"9B05CF4C230D9A9E8493707C2695D0EBE1F4CF257D20F591DF071F0D3C66036B9B956DB08E7E35E1737708A5FC031C2B552EAFAA48AE74F4CA07D5414CEDBAC3"
-				"6E11B9E6ABFDD478D9CC01FEC932D946254FCF7804C05E1A2210A155F48B930F1518BABCB027B0A88197082C505EE4C934D1A1AFAAF208AB203970E36BA0B890"
-				"3C2A46888989E897A6D5FDBD3B1F1A8FD3DB089115C4D5675C0FCBFE464FE597B49E3329A3844A032648E1B5E085167062267D1B0E879395EFD7A53A993720C3"
-				"64CE854669FA37FDA3548EB053E7685879001BDA2B7EEC9DF437D5C2E1047F3C1ECFB15D0B8247DEA96FABF5C02D2A91409CEAE6F7FDCFCFFB792BE444ED9085"
-				"4130D362BBD89FE4AAAE1F93FE7981B89300362DECC173A628356ED7B8B149EAE542848198450B50A4D2C860656138E498BE71FCA8C485F0DA0AAA476B49FE65"
-				"F8DFECAC68E07EF6B519C69561BD2F7B46D478AC2D7EFA3D20040498A8F67919834C679C43E35D9C0C79E7705CF88E3D0EEBA4E98C965E7310E8827099387CF8"
-				"568E332E15F2F704248C97FC7331ADCE38049D31FE08C49D5C83A99B5938D8FC605526375D2E2CBBC6A25FA2B03D368E929CBEB7EFAC8464067D0832D0C8146F"
-				"D02A7FB30FE2333440579A1D67ECA4B743C9DBC42BB929E36F16D0A558A3E5388EF52830BE215A03A2D41703BDEB289EC524CC6EFCAEDE628A4E174901948A2A"
-				"37C107B183AE27E5174272019B4E71F92C9F19BDBF4847D4BFE1EA032F8159C905E1F2E06D1ED168ADE8F58D6F84291FA83150F15EB370BBD9A0903D31E9EFA8"
-				"F160F5014DA2755AC7B06223186F289622E121B19706E46A3B9C3CF1DC929EFD26E37CD02EB546D2B5CFB3AB8C788C46F18380DBB83E62F0B95DEA4B9624247A"
-				"8783F2CF6A208BB964A28933DCA5D6AFF7337FFB88FBA6E77D0C06E443DD1F2C9F74D9C463E1CADC137108C3DAAF2BEA8E0D37CF0ECB4D82A93EB8E6A906DA83"
-				"45C3F47FDC8232EAB0831CED93CB900332D1C31896B81F0F82A95E29AA973D3F0922733832BC79B8CD8B43F0D9DD36FAA0BBA8B5416969A4F021EEA0B0450F88"
-				"9B08BD25A9313041F05B2095DDFF01E504509FC801DD389A1E93F23AA126868D18F2155C2BC0D58E8E8919E7B3A969A38080F52DA0A5BF90371012CCB8E0A3E8"
-				"D264435EDF3A1F03A35D7DD4EE8AD5FA201178F59369F13BAA51C8B8FCEAECF38FA996BA84680FE3CD61DAEBFEE44CC3B7CB7BA70827C5FB3875A014683C60F9"
-				"9770FC9CEFD231562954CD32A0D37BE584272E11160F7D77CDF02B34CB163FC72EF19EDBD9FC2EA72126CA9A3B3F4FB968CE139BACA43D188C306B5E61C543FA"
-				"E6FDFBEA49CB43DA4CF4F80727B27CC7A624250B1AAA082E63A4EAF4078C4AFA7549E62280BC3D043214F905B37EE233FA86E6FDB5ABB6D0D9319055018DCC3D"
-				"8F3EAD0B035948B2E97130D4776E1E0590F23451393A7059E37C240CCF20177A3EE47F776D15626986A628176B9408E0AF65A5FB1139D49D967DF77760734CE9"
-				"776AC93F51982B88505E8DBFF376A58BA7029C3E026673B905C65D797E22F597A7DF381B2D9B9B5A35C428D171BA0228F303EE8BF231E1493306A7FCF0415820"
-				"7ED6E40D118BE71339AF6A63B847A9E5FE5D3F5468F9937AF31E49D2885BA192BFB4E6DB928EEF013F5518ACCF376048565E8C4A3334ABBBA111F0527E881630"
-				"231221034AD1CCBCC33C8CE03F6D76D234A969F7333D19EE402530F1CBDF055919A35515456C2D30A9960178ACBA4F840B1A63259D6AAB542E8766950F00BC5B"
-				"79B56F98ED85122F7065B3D44DF5034BBE947B466E87BAD8DDA4EDD2CED3D35AF6A06CACC1073A7CEB6AB7A809EB49FC660CBACF0839C48E702069D6D0F9D9D8"
-				"B18614EABC2166BC8336A5265F5418C1E406EAA09AE943D5D1AF473E985AEC88D113BA7F1E513D07AEBE62E265B053348949BD0D5C439A59473C6F865E41200D"
-				"935CDBD5866DC145E42E33FBB07BE20DB98F45343E947A1EBE5371F6AD80C47C925010370B566707AD2522F7973FD78E3B3DF7A99A560956CDE3950C7B81725C"
-				"163A05BCD157B00C3D2E468992A13445218A3F8CF99C2BF6C316E36469C135009C150B31B8F6A82435621F29DDEA92807F0CD05C8C4B0523D2E37D495280228E"
-				"131432707273869EAAC8CDD2DFE2F70E24283A4146678A8C9899A9DDF1F30E222326292E303D404F54557383989EA4A5D902161F333A4F5A6D77798183898FB9"
-				"BCEFFD000000000000000000000000000F1E3143088078032001C40062162424241510F10320884B66800400F0104080501100008CCA4DD293A4FC012F7AF5B5"
-				"2A046471EFCD720C9384919BE05A61CDE8E8B01251C5AB885E820FD36ED9FF6FDF45783EC81A86728CBB74B426ADFF96123C08FAC2BC6C58A9C0DD7176129226"
-				"2C65F20DF47751F0831770A6BB7B3760BB7F5EFFFB6E11AC35F353A6F24400B80B287834E92C9CF0D3C949D6DCA31B0B94E0E3312E8BD02174B170C2CA9355FE"),
-			// DLTMS1N256Q8380417
-			std::string("F21B63C5CB868F1932B5D92B34758845E0123E40F7987C10643C3420D352BB2CFFC0BC3B1ADBD774D150EE4580537B06057D115D12E6331A10D3B31A5ED370D7"
-				"368D566798B4C4E6725602B39AB1548F7772D985892A901907A8E9D6C6C1B55207ECD8A30F1E2965A171E121CD94D26F8447A89B2F3BC555CB87F9E22FB112DD"
-				"63A565B4E289B420099B24F5E4F8F3778D49CDAB369BA335B3609A0D40AE746B7749955DE80BA51779AC91EAC7E6595D1F82C263DAC3A5945C05D642A19BDEC0"
-				"E833D99C8AED9CE1979B1018103D6990DAB520D52C946B246F07E8DC6285DC510F1353A04EEC62607970841BEAED9BB83A367FCCF0145DCF522F7CB2E633665A"
-				"EED8D5DECA872C9F7E78EECDDFD6EAC3AD2FC372AEBED4C33E7D6371A1D99154937568CF7E4C7249A5DC9E62EC3508C489C83F5448C72C44FDE4F86234D94197"
-				"49FB561E5449E1751FF1C4EB4D148132C2931E14B29E30397B81475BFBCC9B93F659EDF395691E69A8CBDFAFB1DDD6692481973EB11601F6122EBEA9D44B845A"
-				"1F4EF84D177854E0E73234C7161923845AAEC5E5B5603317DDC26492B6392E8B5A954AAD539B3F215D37242BFC48BD99ED17D767F8590F4D31C85664732E4ABD"
-				"EA1EB4E6CF9056F1332A232EBC95F5F5F306D6EA867D223F2B7CE135C54E133579DA4E08321A8AEC905AA586095DF7AE2FEB9D37F7455F3E1C2C04F0CF47F294"
-				"28664EB0F100E015A71D97ED40D9D8E4F36BAFB152872CFE42DBDB3494420E9023F40A5831695C02BF15999E636A3592D07AB63F5C91E8353F33FDE10BCA5464"
-				"026E0A8A18FE72AA533263A4DAE0094BE6CA57C5901E0EC4F94AB41F607A42076067AA760E19AB4593FF503A0DC4097B671835905EA10E8274DF89687ED185D0"
-				"48688935F4187752D2122CC1E7D45B4CB5B6DC54F7BA98AC73D717BA3DA1B25E95A78AFF6014D355F614BE753CD921AD2D3F4C8AE146030B79AEA094F8B16925"
-				"9280EB39FFD4E358E144197EB352AA230BB4A2DA8CE961FC2F85F2C60794B335D4888E9DD476A70472AB263057DBA8CBB1F69BCAC15C1E99DFEB3E3748C12065"
-				"89116FC6E762C59F661AFDD0D6FAF1F7735C68E18CBF340C949F382C070BFF3DAD1C40291A400CA01199FCF1DDFE3DEBB18C9E8E2D7F578B2E412F7A71439B9E"
-				"C54ED15B640E3B92D3DCD7F377A4BCDAA43104713D405C7825AFFA46AAF43FECC01D73362138213FEE17C68EF7AA9B5AC6E414A49641AC2C7775E299D51861F1"
-				"C57C9B66687DC0BB7E3E4D4EB110D6D29C59B1DE07EB68EE4DDD02884719D7B4C1D9C5064DB743EC4E85859CC391DA78737969C040D8F0B0ACBD6A4B2B31F662"
-				"2834E3D20E721147F49CE5129EFA45F8EE800B3A23CF4CF14C61F6C79AD35B1D04B503AC678825481F26EF4C9A5041A9AFAA1925228A41C6B94ABB5833B35629"
-				"9621E0EA368932784BC8F55F860963928C07F454350E43926BF68F1CE330409A9D0C288F1276FDA7D13020A2930358A6EC6425DD93188256B0DC2F55E69F30F3"
-				"631E9BE7086B02BB2B40F5ED670ECC96B31E3A4B5B1B84288BE0EDE0B2FEF33BB017B7941D5F2109D1958C5EA5F6259551A44C94B157EEE065FA369DEF66B88C"
-				"8200B6919FD7B029C7DB6BF11A0884AF868EE5097796A39789C64DFFD55288917F0F3E81F507C2B9869E80074AD288F15968F7A60492B3647D2B0D9FD367B1F7"
-				"BD082F545A263A76E2E0667EE76C844FD8A2F4E4E07EBF88D3FEFD355B888867EFE94EB2A0B231489C07FFBE204451B45709E012B47590D9770B22E23FE7CB02"
-				"430466FA08A1CFF9FBECD6A8C6FF7CDA75C10C121B06E88F4DD0BF42BB96EA58AFAA087028050C3CC10FD3575CB0F7B85EE8B5A0B4F1F8798FDB493EEE3FA942"
-				"DFB21585ECE878E3C433337BD6C93FB4B98EA24C4CE10A92254952220B4C7281E5C4381D53CCD20D18F45C51A661FDB2D3312B79B85E3E07A0DE6646855872C8"
-				"15038CFC2887B0E48417175CD781D4E358778A3E8BAAA2BE570E1B93349F70123E0332B70C6C1811867485D2F321BF41674AC91688880D36BA4D1A8A0C89C8A2"
-				"D7F204B4809EA1CD137F0DB45CE1B17247F7C6A68BF9736F561FA3A86440AF1E520CE8ABCD40BA68D796C2EF57B1DFB2105A84C604DF0B93FED3E1E662A495BC"
-				"E63B51E8349E58D191B2E527E0F8F04CD75CB475291F3AF974D1239AE146D292338F5F320F3541159CC8D3A1D87D20D5790808595F12626030A497091DD2D53A"
-				"F680B16599D91B111BFB97FA95FD5B3FEEA0682AF563D5962DCC70132FDE4889ED1CA30FCC65EB1F326360528C0F0408C40722DF988C58B6B8A5EC596AB9CB87"
-				"689BBBD5F7D7A4D00031586D6D748B601A957BCA8E07939FBE70BA777382311F4F34A584B0851CEFE2BD660E32A232866DF1EF1461CBA9FF3F38B1F81443DC3D"
-				"A352B835743CB7CBAFB499F497BB1C9D7A5E94EDD028EE8F118AD75BDC09650D04FB4DD249B931E006AF78C280BD2A6A7254735758EAC8DF3AA7B9354656D9C5"
-				"A0379F5508D4B5FD0C975D00623AFF22AD79AB9BC2BACB8444B59BBC1369EE8E481C4E6E17A539869277114086FB4501292C1B739777F4EBF133BF02ADE2CFB5"
-				"3BFFE94358CEC5F3F1D6443AC849ADC78969556DF43FD41ADAEA15139C2411860487AFA0109872E912BFE1DEFF84F6F372F4D63B2C09E1B944898601BAA48628"
-				"C4E64D7B5AB419F6409C6874D0697472F4A925F2869130BB09D105514DFDC48EE5C8D2598B867A38C959E79CE2323FA5042B0C9FC0A85021C933ECC4AE071F94"
-				"2D8FAE5610A44DE177644117F160BFC66306C418273FDB41D695B569B17CB79F96317D0BA86F789282C6629EAD3D031840F2731D090AFB611335BB5D4FEBAB9B"
-				"7508F4EB555B82F7F5E892ABB3EBE72E84B6B837E228CAB77B268837CAED768DF367E9057201C1059CF5DEE84B3B280E71CBDB087C7391B4D9FBD0B9927B1FCB"
-				"5D590CA8F7B1BF0BA75862D38ED3A5D3825C9600E55BD5EC54D34ECDDE23B3398EFAED143E31658D820181566AE658A41FB9286EE39BDFB13DD427037D67C1D4"
-				"1888FBD0E7799974D776C0123CC7D77DBDD1C9CCD9AB827C042AC52E1014CC87452780DD6D2CD3B98EDB688D6980EC454FBA5F8DE9A32EA313F7547495921B7F"
-				"5E29078751C1F7C777C53543003103501F9CE50DEFCA040A592858EF9A87B314060465FC99007AA8BAF2194A9385DD8F165071BC2636CE33BAEF71D19DDD3FDD"
-				"AD96C197F9245540FE1778C9CE4506A990D21805712EB91EE5C8ED84EB27ADE8A1E2E1261C6AD7CEDDCF17097E2B87544096AA9642F8B9D2E28D5DA7A344F58F"
-				"0FF77532E30E41F25AE98E022E15A654C775914198A5FF2E7A7216B6AC733E2B498DDD533CA2D779878B2A27D5194FB445EE28FAC9206BF0142365CA403453B0"
-				"74896EE6706151EB706948D8D1C5795E595384E66545146D0865CCEF3BD43C43C45ABC3AF288A664BFB6D49D1A4705F7CBBE796E72230E085AD6C90367B9B9E0"
-				"2E4228A65B2B6F50E66669D5E3A0AC47B3B618571409AFE7A0AA1503971F85549594BD165F5F25289B648768F0C15A365B815A894240CF2A9607852C62A835B8"
-				"010616191C48496A6E929FA0B2CBD1D2E622232F353C4A51585A5C647291A3ACBDC1E5EAEE04132930315C6676ACD4D8DBE80D13182228343C42477C87909AA8"
-				"C8E5EE0215161935454650718690969CABBFC3CCD5E8E900000000000000000011253243570D1420A265006023101014006A50808010011830D0080452409500"
-				"0006C64243BADBDC8E1C015A0DD81C4D8D734FCBFBEADE3D3F8A039FAA2A2C9957E835AD55B22E75BF57BB556AC8"),
-			std::string("603E68AC50CEF74A3B3AA0EF2A5E44A8E8F9A376CF7C38EDE21EAD33E9394C18F19A39D663AA7C197D16AC7CBA97260B7852C2CB7D357773860582DA9E5629FA"
-				"710A4534B269F9187EAA242D2E3F1746FA54B6724B5908DA75253FDAF670E4CD283050E6BDE8739BFEA17483D90FDC0EB15DD3A24C9A0E23210870F21ACE2A7F"
-				"F1AB1FBD7DDB15A5540A54A5A48324EAF716070A5EA7DF5DB4E9873290BDFCAF492127551E1C140078E839DDE851E8DEE7CB50E4B1331FB0A831225CD5625A65"
-				"EEA6D9E1CE946761C0AB5615D0D7C3354E0763F5EE3D518CBB9FEB7D13066CC0B3ED1F38023AA989AC10CCB106F94BF6D6DAFB31D5BE24980DD9750DCD0BFA9F"
-				"817A347ABB8428CC7AC5A30B3856DFB26D37636F26E341BB0104778A2B1C97C06135B9304934DA04FA45DD7F9A359575EB018BB9766CAB660D4718F4BDC0BF95"
-				"111FE88CB298CF2CA60C65EA4C7D0471E9C299B2C85ABC490752C146ECCEF6D1797C2FAF87D0EB55E82BA811240117B29401385314DCB16A7D4A6F9FC37EBE9C"
-				"1BFF6B3BF27C17F78DAD79C87F63F66AD3C2A8BE7E4A75AA9B20AB1C0F55C8BE374750AD766BB262D2F7A55F4BC3663CC06DA07C567D7F208EFB0585CE81E3CA"
-				"10B99AD9BEAA09AE1FFEA813E7619F5A6BE040C625382E94EE5B1EBCFF69DB6BC644933B1D777310DC2897BBD62F0CC46BBFD223F7625ECB09DC53FF357CC38E"
-				"28FDCD3F5240431122BED56567DCCCB338A9E6A8090EABFAE12FAA45D8247E3D89919E7C6E70108D21C60512DB1A6C596A531A66A5A60BB7A4E447C3BA5ED863"
-				"75D50F9178606AFC5B9E4ADF70AFB6D98C9D79B17631BEE5A5BFD4B53E9F9EE59E06CFD3176F1DC4BC764AD6462A49A1D6EEF811D5E63CD18AF8BE94CD1D48D1"
-				"2928FBDCA2AA719D655F237DE6E203C3C56E7BBE0403F2D612667683623557CE95BE529CAC17F44766709C58A5C0FAB27CEFCC1B78230F8EF3890B0A1927F4A3"
-				"95C7BC6459E2AAB60E606F9283DAED2209F52314FB6B4656175BD23FB22C667E9F5832CD1A7C6302DA3F12D3A0EBEABDBA7140C3BC838B06DDCAF75278CF6B1A"
-				"38ADB6BD33B17B9644DABEA40E775C7D2D094E8C0A50794D91F462D6CE4F3FF5D5E0FFD8D190F20FB34DC66FD9703091C00C96149D3C372F3F14C14DD7E75333"
-				"F4C6E50045EAA2957403210C05654E9520BD52BB455A8E10284784AD5E23635FE4FBAA3D710C39F197FD3C8AB45312734CA899BA0E8A9C05503E283820C7BB8D"
-				"BA00EE6D9A487E66FED4000779538F21411669643C839A547DB427847A5B61BE7478B967661522015289BE48BDAEDCA6D702AA03470D53A1DAF4FA81D389ECBC"
-				"B65A7E4ED78F954CCEED0A880328AD1F04BC7415A6BEC9E63B61C19CB574D4D76BBEEA025B9AB555424F4F8F961617FB89B9E51DB0A78CD9081AE814A12254CD"
-				"EB8B148840B29514A4153790E6D34340BA7FCD77B75391165E7F323F91D563C8AE59C4C3CAC7659A4E0082D6DD73AC5FD797799D2A5659A00CA6C098B5F1D545"
-				"D86713AA04A87EEDB91875CB69666D3ACD60604BA56EFDBBFE3C12D8B661B2B3AC31591C6B565859462CAD506B0B2E84E06C750D2BAEAA185E38DBB1D1AD6B18"
-				"B5C401FF2562458FA0506DACFC51BB2C6F46CBEDD233DB24F420313B6AC479F281A477DA675384FF02393CB48DCFDFA5B2CCC270693EBE9D174DDB55FEEADD46"
-				"35345D187EBDDB2A9EAEC741208F5A30D9E6177E84DEF63ACBC9D1B12ABBEA008202854994BEEE1F87D42764B8D865E328994E72238B4DAD1780FA62ABC3D1EC"
-				"EDA61C57B3CA7AC5388751156C2AE3A9DF9C488E271DC9E320AE1C2694658EDCBEB5A0068595287A277A48648F922DE7B7A784AD8B4DBDA6E107289FB1E25460"
-				"3FFDFD8A87D64291F4E543AC040F5D1DAB082A50C2069C3850B2886043FA55A5063BBA26FD4AC1CE381BFF40FE29C2A27632D49350D0BDFA4295C375F6ABF674"
-				"25BFFA6B216790D9BB62AE702E03488F21B8E70E45D30CC94088DA4802A900DD050A2E608566A5B950540E604C166275532F459A77E98F23BB26A40C63CC0732"
-				"98E7AA23A4DD44378B9574A3C6E563107DD933E0BE05FE34AEE4EFD27DF3095A62AA04CC2BB495740D9671E44E16F22C0A882AFDB0A9E7831CEF0D43A79D0394"
-				"B7C0C9D448B684F7FE85DE7214F7A255E694A2492DFB6CC59FBBC4D5B871159395FCADEF525D64F8E176A79FB2BEB2989BEC4F6EA6B7D645D66E3FB05E0B29EE"
-				"CBD9404EF56ED14BE749B8C11FA51F87374A818EF5CBA5CD7F0F50877515D91E3FFA52762DFAF139355A4DAF81A0D93F87BF1B0E747615A9F29823B43ED5E6D1"
-				"C82EABB7EBA2A99FBD498772487E6F6BB6C02BBB9C0218987A470CC2640AD21D729A16EED8CCD1ED3FC78D4BE30E38C2CB3BE5FBD24D257C00C4A31F8F5D8555"
-				"974F4BD2580C829689FDD8A9A8AEFCF3FC358571F3AF52591C815301E9DC47F6BA9431128914E455E019869629C560F2D3A3A2F89930F86A721061CDF8396F7A"
-				"C9471F1097172D34DD80E91DB0993FBB6334BC5CA2DCF01A2F76212F1EEECACE4FD11650843F3113136015413C685859F61A883ED2F23255D2B725196BD57823"
-				"E7AFAF5F35D7F5AFC8B75DFE01E97FDAA4CC9585CEB14EDF142550C68920ECDA6C020A8F9BE1FE6BE5B1811A92DFC6F82CA58BC19B79067F81F5BE2C8F577FEF"
-				"862769DE7521C8402CA45A2EE59FE23083ACE004FD7FE022F7E9F519E1BD67E8738A7972F49EDA68A0E9E6C216B2AA6E7F5281E0CC9FF427D2191DA78220BB90"
-				"DB55FF7763D82B1F10583FCCD3F5DD0B48B3F1B1496D76FDD66AF0AEC465F57A7FDC7CD74D97C7FF4425CBB95038833DCFAFD8904A2BB9B6AB0038248681624B"
-				"27031F7101942EC38ECE5D13DC5BC677A0173F6A19FF777B9A295557CB3A4B38C0C9852D78E9297BC04293E1EE0F27C33D0D7A5343C8A208D6CBD7E21D50A812"
-				"D31B0D823C7DC09DFBD2FD6323E1140D4D5F9FF853A52E52A9FD7D46A9DCF6FDA4E59DE0F6D2C1DB94546A2812C8DA32321853C148830915E2EFD5C3846C4C69"
-				"8C93E97B175F76A7710A85AC4DE21C734104BDEFAE3A04E432A161E727B8AAEFBEC9620F0E138F12E749FE9BADE742355A92B89F6E6B468E3471DD3D217D6106"
-				"8293C7354A17F282195827EBDA3EE2CB401520FB90DF511ED20D8F8C69F92318C3F278FFE815A5117E92C571181B61F67D72088D2F89E096A0CAED00A1F7D41A"
-				"B3C15D5EB6E094028D2674AF6A3C0289CC29818A3F677CE71B6DD173695D5D2ED0DAC57C7E8A18CB92696657FE0B29C0A92092C1BDE7AA00D281F8D324BE3310"
-				"2221C3E5588A2772A27C751E974381F208F7B6FE23DC4C0BF45A121440CD9B2336B41B00E396439346116247EDD19F228D9F6A243D8C7B56FF37C5D072991F04"
-				"D5D198AD17D70DD1919A66C4F8EB54259E96F1A58CFE644AA0E39C9C0F2F370452C20B1D3F37669FB8F65AC8E9CBCA5B0A8E68A67A0D6E54A42FD44CDEB4B811"
-				"E2613BFCF97DA98457CC74AB779528A8DBED07044759DF33892C2BE88F5D93D7E821745E03F4428FC1D132A6F3FC5959B4F4F188807D7A5FC6606E6DCC08148C"
-				"080D20354B696A70737A819AACB7CCD9E9F5F6FE031D3C5258636D92A2A5F03D4850595E7992A3A7BAFA224C52616768738A9FA2C1D1EBF9FA03081E23253336"
-				"46496D6F70839DB1BAC6D9FB0000000000000000000000000000000000000000141F2A394C034081988E861040202840000640282808C00C30064498A0880410"
-				"ADB4A10000F29A6AEC2CF2EC0F225D5CE2CEAC61930A07503FB59F7C2F936A3E075481DA3CA299A80F8C5DF9223A073E7B90E02EBF98CA2227EBA38C1AB25682"
-				"09E46DBA961869C6F83983B17DCD49"),
-			std::string("8B23B9DB901844755B5BB6B89DA9CC386F6A9EAE36E5E49251884FC1EDCFCB69F06D02AAA5AC4CFECAEEFD0371C280B93ED365A6C3866DE55DC9625385C9B4C4"
-				"00A4618F51CE7D37DB88C361A532091E80C85B28854A806CF824BB81F391A88BE096B6648BE5143A5D620376E4DE9ABD16B7584F686743E4FAC24F5A3D6C3C3A"
-				"F1E0CFF8C724582BB714A234716E156BBD318B3875CB8B4BA53661B007F5ED2BD0A968E74E83B9026C9680874889F003E63517582D51D3C2F1E90C8EF89BB7FD"
-				"68612A7AC9F9F0C04C1623BDAE8DCCD487DAC46F8BD048C609221580686FEA689914113524B8196ABC049394A45903FFBAED0F941D6146B8442974BF707921AE"
-				"2FCCFAF9E276CE834B1CCDED8D45B56ECDF813186432C5A68197FB70D503C0C87BFA9E8296E3BBE19F0FEC50392C92ED40A8851582AEDA9E10A2A293FD5B8E1F"
-				"07AD2096407FC86328776D72F70C2B2F8CA0352D5AC90F4F3BB4D6D866B3F0C69A8CDA394EDEE9F19D5B5E853C3CE7DF25616BC9520483AD35435545BBFCBACE"
-				"5BC0851DB4A16DD2B980E6CBD8F8E586F8F9E295AA2DE544150275059A0855C9BCEA15E316F7722C08E81797B30DB31AA29F7FF955CB4BCE7DE9F3FC5F88D063"
-				"48A861826BA5812E39DE25A039224647B753AC9E61491C42711E06D4822D4A39071B911FD4FD3D060DC87FFD4C8D0810DAEF8ED044AD57B8E7D4F70CA6A7432E"
-				"78BE0E87B254EBFBCBA817A496B57A6647B32161CADCF02EB4CD34BEDDBC5AC89D73969CDD938833D2546CA4D3001069BE87DA357BFD18DAC83FBDCE19F7E01B"
-				"991FAD4D7BC04D5A5DD03EE8AA68E389803404000524EF1B5B228D0DF93CDE832B3AA1F6108949420C896CFDDF79848F759AC0097F6E13C5A9B57D924F7817AA"
-				"DC87ADBB1EB73309AAFF775234EB001F26B98D6041488AFD6EC3E61DDC0945CE10FF7B878107C61FC5BC359F8C1AEEF7C20334218DF32ABB51C39546FAAC733C"
-				"ED28E41D6468242E186C8F7F9C1A80A7DEDE9490790DF2EC1752A8A212C8C3AF45A9F075D5731D41269E562C9C3243B0F5CFE3BA77BF71AED5EEFB141BCE9396"
-				"4EF73052F20E06F23C73F6D5A0CDD6E29B2B47E79B11E71B31CC060507472D9A87009418A992D20303BBE66DEC4F05391260B86673B4A012250DA65511F7B27B"
-				"289DE368C264FF4B5533E1B9D679693DACCF31F2424D2AA8854F377987196FE1D212EA298D149CF5543DB8624F1EF4455FA57A00283BCFC2A3778B0974A41CD8"
-				"70138EAD10CA9DC12E994FBD24988817F75D237B3EA1A5BE3AB8D8AFD3878348AC02B566F6B8610C504991E9FF47E4FAD7445B69E1E606C939F10CD09E0E2A7C"
-				"DD510D2EC3DA8870F0FAA9FE5D5CB6EA3BD5E162C3503991DA8A413C0AB10B06E8EB8CC32A76743D18ED13AFF81044BA58F9B6D5CF610AB28E1F08BB463E2249"
-				"00402EEBBD2CA483DFB2FEAB53F9AC06B6DB25D71F3C2874B692769ABBE1FC1C10D705077F0DA1D6485C5CDCC266CA1AE677178D7139C3205CAD0A9E6A05D979"
-				"012F7D9888117DAAD010B61ECEC8AE71ABBCD483F0302F2CA886AAA3D285F80D6CDDA0139B4A29C5F367BA24F80E4E0E930A2F9A13C46B3CA8F8151BD07C3376"
-				"224DF08D58805F18EEA63391CC494D4BE33D098357A8C29FAF30EA8DA67E2A6A29F7C28128AF27A001B302D9A34349037D969E9EEFA526E59B4675585F67FAAC"
-				"3FD768472909123887645C3A34371535B03A4B1C3787C25EBCD695F528923D0A03C7D63147454F3168D8AA3274B74F21FFA96FC892135388F1398FFB86988B01"
-				"243C6E9174DD205235CD5C7A2ED200315F81B13F1BDAFC2B757E8F45A21ED16BDC9C205CEDDAB695C76EDBE9328A716A5450AD2E95BF7BE984A1FDB5851F1E3D"
-				"FBD7D0FC6279499C95870D0962C650F2C06915CE9FC77A3E002053CC773A99B2AA23D0041FFDAE5D6A4A9ED226614FD4918D83BF89DE076CC40A4E4AB4BFE92A"
-				"8DFC5B77CBEFA79F04CF4B57777C0FE1B9558E1667695953A70BB6E0B898ED7E4509FF35BD1AD692FD2DDCBCC1CF4A0F10719D2B3AACB1C8EC8DDF4471312032"
-				"EA3A3D8543FBE11853B871AB8FC15EF24DFB2EBF8EB0994859799FFA324A6EF7BF2E808231531AC099CB13BB3F91289339C9FFA4A3597612BDC9985A20CA5C13"
-				"120E00F6858A6FE169EAC60FA85F871869DD9D6270B1C952C5E7DCBA2F0FC8C00925AB6AD44161669F7F21C4BA7B33CECC07933DDB3FEAD47671605C42055C48"
-				"C6C3DA587FEC3DE9F19090E2C5FC080193B6E869A28E370FA1767BBE64EC9958DFA06529B389E187EAEF0F70685A7D869AC9C8BCC2602FAF08256C1C7B773D60"
-				"A472DB35BE49FF1FD8C5BB21D13909A10A2578171BE4BD7A573D494D7ED26ABF5F385F356D65EDB63551A157178B4673CB9C39299D94E6DE135E6DF8E901F094"
-				"0DC888DFFACE6B33E70F7430AA8D9D98A0BB3C466F9A682C91F1A88115771DF81EFFB4D702BFD50D8C857D7BEC11879695FC9AA6FAAF217EA5FE4D0BCAB77C5D"
-				"C48B80B5CFC5ACD0B38ABC55A0634666F009B37E5BA4CFF556A48FD91C86A9FCD36650F5BA56DFA0BFFA4608294083EFF33D8E8BA0CA083A7E655BF475F2EBAB"
-				"073F08A870A1625AD4584FAB902FA28EA5D5E5025B490A7150E5C4BC39DD7B8E1990BDABDC44547105FD2AD17D508FAF20395D8C268E6F1001F3C4718E9CC62C"
-				"FD2E32E897B6A921D15B870DFB09F9B3FC1CCEF4927149A7C22B688571BF4A3F59A3576DEA12BF2D43A265E2142335818DD20C33EFAFF023C27A1F64A2C425C2"
-				"0F31DBDBFD0CF6D746AFC4D2CFE2FECB43FE0C098DEE8862D658A8C88471E8AF7528372134AD9F8BC4480B425BFC7BE9C7F7EC6B1333C1D11ACD0CE4F9C23BF1"
-				"0CF7F429EDDBC87CA20E7CC8D2F874263F81E081BC1F22431ECB429FEEFEF8D197D91278F492035F642E206AFAF189D5B5BACE135265A65BC0E8331C97CB1E24"
-				"2C6543B2BA5187A16AEE1EB5E39C6C4A5DAF2065895B49AFDE7A3714BF9AFDA8A9534B492CFF51C72DF81854A1B399146B3A1F7DCF8E8346B1F85FC73CEDD5A1"
-				"3F6CCC7243E889E3A009C2F2B5B29A996F218469E8E58ED9BD2F87FFBC8C24AF70AE1ADC7251D2A74D9709E12900EC86BF024759F1732A9A42A303DE205F7988"
-				"2A50BDEB025979977155417D004CC29D40D27D103DD9C5FCF362F2D75EB02261AE52D664A9006FF86079ED38B74583F8E422AC6A9E928D20D17236329A2FD38D"
-				"3AD6F832A582D108B001EFFDD341026FB8097A374BA8118F24D9D262A0058B00F30077E8E1AC96E3691C7EE0F94627E466EB4B36A4A0EFDAC9F4842F5F763B75"
-				"0251AB0F0C747281E26B872F86C3A58F55BDB47D5E0E66BB6DBBB1F973692528F4F7003D6FF7E678CC7318B6CB70FF78F7BEDE1249AFF086415B8CC097150855"
-				"83BF9D9B65E89E0DB4D961DA7FB4CECE45DF45740D88FB129276F174F9BAA835C34E16207BE5BDE58E1E8C4599F1BAB723CDCA05D67925AD2DF6DC0EDD6882E7"
-				"B63602AA3D7550A9846752E68E724F6133E433B84D91029C3A4C21AC4A14697C29693D5C7BD28E146FAE8C9BF452300AD7C028B51C763CF04BA5305E4728F9EE"
-				"2227595DC2C3C7D0D60A1061758AACB3C5CFD3E0E8EB0B0D1214172E2F3D5B5D797ED0D3F30310283C3D3F5576858891A8A9CBD5F00B0D2326417174899CB3B5"
-				"FCFE0000000000000000000000000000000000000000000000000000000000000916253542128409510040D94056204036208004818888800025218840000451"
-				"03810C608BD02AF3D78266850B2B8C4B0F29363EAEE469A7E33524538AA066AE98980EAA19D1F10593203DA2143B9E9E1973F7FF0E6C6AAA3C0B900E50D00341"
-				"2EFE96DEECE3046D8C46BC7709228789775ABDF56AED6416C90033780CB7A4984815DA1B14660DCF34AA34BF82CEBBCF"),
-			std::string("49D72E0F9E37720153B8988D8CC3F879CA70483DC236BD3AE9E55C372CAABC672FFE77674A18C04DCCD879E97A1C5A049AA4667BE3D26270B94247954DD02F57"
-				"1B2FFCF415C5FB948FC326BD38B8B20A434E92B779D7C1733A3E47203782C4E63CA97878E71519AA489F05C54E54B85B2E87E97B0CC3A4B9B818E14AD1749B77"
-				"A168BA98914A33222B8D75A503AFEDDDAE3FD84DEFDC99EDDE6F730E0FDE6A36AB804827E93EDDFA8A11A79267EBDCF2519A788FD4378A5C2591EA8FBE80596E"
-				"82D841209B8F3B56E76A165F8ECDB44350B12C1CF4FC1301E1141E2E1A8B8718C819BFC244B2531A436D19A052CD77B3F3EF8D444B316D28ED654EEB55F4DD68"
-				"4402465072B02600F3570A06C9298B7F20B41A211ECE780007980E17BEAD6D8D237BF85B512448574008B92178898F17326D156DAEB46AA7193940C94CA98ACB"
-				"BB7101190C2EA10EBBA91ED9AB043F664EE1A3BDC43B754A0E6BD5051EBD063B02DC8D3D0A2DE8E86C840719E13681C844FAD64643086E386FEBA40819C86A0F"
-				"666C4E4313D55367E6359C2D0A098C818F79B5E19E8B0BDCD2E0DDA9D4F8098D72A82EE755E593BEE9B9DCBFED2196E2462D853A60901F8AFFEE92FD95F15FBE"
-				"61B6D95BD02604FBE5A55C7D880002C5FEFB9A60EFCD30F1DE2F212D59FE47CDEC29AD939093AE41CF96C831762DB134CAD675B6E494DB0766FCE9087F38E8B5"
-				"CC02675209B29F83AD8D5F8B62B143F0DD478458E0542BCA47F21A1ADF1F09B8A57AD796FA3F1BFB3AE42E017FCA7E8FEC0ECDBCA13C09E58243F4B30EFBABF5"
-				"C6381119CE3CEBD5240954A3EBE75405FCAB358036CDEBAE3B4311B4C23FD56C3B0038EDF689B99139B2C79D8170ABFD4EA8F7502AC99C16EAC060397B603A0D"
-				"D782E992E3AC6CEB30B7D3C3B205A799D2ADECF88C89E255C9C1B83CD85D9E32702BEB62699F3A48422B88C6E0D4EB0B728C93AFEC1C00D7C0CC1C1DAA0E0602"
-				"73F8C68924D94F7CC91C873BB667A6510603342A40CF592DDB6172FC244E750C2699E7E2AA4C938EA3B961680210A87E3248FA74A1CE1BC91909F05452D3DB8E"
-				"C305029D9DE77F79432F950CD0498FA34E1A4E80B800B4A499D0523A041D9FADD34CB24F9B1435FA4BFA1B309A1CDC552F9850B4A51550DC49FB7A112F0C333B"
-				"43C68DC55E44C4990AB31FE452DE2AA745036CC6BC14652EB0B7B65CDC3700BDC0B7A4544FA2AA832B0B4781CF9E23FC5E97C94EE8959CF2F77D0AFD258CB99A"
-				"1C33230D6FE59C3A347E88C166618728AF9799BF80DD3907F0EA2C8D228EEB31B4457F12109160EDBFC80709249DB26BCD97A40F980A2E232B0EF8C2AF2F7AA4"
-				"8296808D5F5AEC847524834DF083EDA77EC5285BE1404338F06836D729368F9A3A2038F86386288439D00896EB0186F0D9976F41022160D481AEE3F579214BDC"
-				"5F3645F3CCBCCCEDB1F0AF91DB14763C2F6D90C42884AB9D2D567D07CEB86AFE17E9BB60C816F8F8CECEF1D86FE88549EB577C00F7F6B2DD4AAFEED0DD400B2C"
-				"DDF3F237952A1A3DA4D553F918E32147FF77CBF348F8B56E00A01B2293E2C7457A75AA23E9CB6B1AC913C24CE783904BF2A3A04F719DC0DD9D5E392EA731DDE9"
-				"48F5CBE3B1910F4E0B29F4CA52BAAA0FBDB20D819F7AF9750A80761979BF539AF2CB7DCF2279B859FFE29BEFBEF0C4608D3592C55B8C0DD8F57E1BEC4332F82F"
-				"ACE446E5D4C96A5AAA8252441872DC5F90FCE5BA35DF6FD39C70DEE704BC28367FE43FBFCF74D67DF44B604FDC312DA5AD01376B666683EC552D694387F4DC23"
-				"056C2F9320D45B07F51AB106CA6996D60824C105BFA60B781A6E0401CE1EFE8731C58A9DE4CE0936DC916B8246444BDF2F3F3B0B6C893C3C62CD58D08CDA99AB"
-				"F6A757CC9414A3487192109DA7B8A29FD20787097A45D0B14980485119FC45725CBE90329833D076547D8FDE9518D248F7467D33BAA9FFE3C76E4B0781D15C61"
-				"2162AA69A938437343CDD8E7E0F7BEC094D568DAAD171752D8D73334E28725FEA31DA5BB4C1D63E654BF6E32A4D2F025F73B0E226439084D36DB9E8961626175"
-				"EBEF295854950761CE1EFB901C28EE701EE8E693B01BE4A2B72D0691CE7C6ACB9A0F41210FE0AB2BC79F9976CF506DB2962C5B05439A5C5DE382C3E1501FD941"
-				"5E920D5206F4742392C5E9F2E9284D65A1D40B1109AAD0168B3792F7D03F7B136518B4796C93443EAF2318AB011CE45A602A1D5E0AC1CF21AE45065C6E84EAFD"
-				"BB7314A5F6116A11A4C4C6C897A6863E863D4FAAC0B024862A775F3FDFA04E33B0781A3D60D9BDDEE07FEF569475860CBED688586E9B1245BDBC208D74AD4F50"
-				"72383DD7D273E42A1FED161F2BD1621905B01FE571815CAEF4DCA7AAB050740FC8C66BE034B41ABAEA18956DDA95455060187A064158729E5CB7115CBDA12F8A"
-				"F079EF3D83E36CD7EA951EDAABD32C88B27A9B2BFA9DBB3704809E7A71057E6BCFD8C5F53AD64232CED0AE9C3A2072CA3A94651C163134AE3E960D3BEED1B771"
-				"3BEB9CBD691F4DF84D39D174ABCC730728FD329ED44D71DEF56AFEC8C0F5115DC6A488CFD342BB4416A7CCF9C3C2E6F8B5DC9A57EE8A8941AD5C469C5EF9F885"
-				"9875AB870E4F8941C12694C9C45EE2F1028170802C54C82CB7BEFFF816EAA2668D5F10A43F6C8DE020248961B9AB0DC16AEDF3364F7D787AF1B363FB2C28DCCD"
-				"2AF94DCCAF32AD82CC45943DC92EEFEB0A9726AFCEA1AA3CE1BA3EAD67D1F47F9B5F547A276B6FE35B27D08D506CD61C8678BBE58D09C009F31294F0DE178099"
-				"D13920B116633670FFE8910103ED5347BCB04DC3909D41468AE11D3A81249901E198E9D9A2C9ED03A6505681BF67A73E9807FE183E8991945D7BFAB8AF2A0726"
-				"042FFF5375F8B68324D2B4D6D762186B01ADA1E62ECDC2CEAB206982F77A8A38355D6065928EF612411A3A11AC7A49F077F221927596FA25223E04ABC84E8C9C"
-				"A4935C37BC1F5BF13B2FAA98627438106F401C0DC5998711665FB95CE2DF466EBEAD28E2677DE5B234007495C50B6CDC2D58FAC541FFA6D0AA86D247A915CBC0"
-				"7AC5B8D31D4BF7EC1800D85496EF59F67304D0CE944BFD56D879A1FFC306E75A96C3A7EE3FD78A177529B6416FD7CB1E151CCC23FD3585067F7324F94B793918"
-				"5E8AD07C994DF1E9057C959F95827029595905055B4101B203E6B7C4980C5EBBB9F3F46D87DE09E7B6F0876F109C01B4E2409876875AD81FF0466476B741277B"
-				"3EFA08528EE6DC6E04848278930F9349FF8F64A9B657B0D6FE369E88069F284B2208BF9FE8ECFC9807C7CAA2DEEBAF1A20F13DC3BD489DD810AA44D1AEE012B2"
-				"23F965D460266B40CD6AF6EF2D04CC2404F182D9C240142F756DC9B0C95967189A793D84A5A72AD96CB026747F896FD6FAF9E613720581D51C00C5A6DE1F0A92"
-				"BC11CFE7E483B6CD712127587D78431CCD8A0BDF575783E732C6E26F2046E26504922B9D3687CBB8EB2B5DD21C698077B89ADA5E2070A99D4142A056403C7414"
-				"70E7343E0D55C88063C07AB97DC06A4D8DD62DCFF2AEA12A0CE1996AC263A1D3F693BFF67838FE2A83F559E61C23AD0565C10E6818BF565F9D1A7E46ABA130C5"
-				"020C30919DA2A5CBE9F41C23265053696B878A9193979C9DB6C0C3D3D8E4F5FE01050C0D24334552657D86898B989BBDC1C9D3E9FA0A0B2B323B40417F9EB3EC"
-				"0F141E24303C444765A8CFD1D8000000000000000000000000000000000000000A2035404D00E2102308A0A4828001E024462800012210C10A082011006A02A8"
-				"8082908895EF931570675A20082F7AF5B52A046471EFCD720C9384919BE05A61CDE8E8B01251C5AB885E820FD36ED9FF6FDF45783EC81A86728CBB74B426ADFF"
-				"96123C08FAC2BC6C58A9C0DD71761292262C65F20DF47751F0831770A6BB7B3760BB7F5EFFFB6E11AC35F353A6F24400B80B287834E92C9CF0D3C949D6DCA31B"
-				"0B94E0E3312E8BD02174B170C2CA9355FE"),
-			// DLTMS3N256Q8380417
-			std::string("D78758C8992B2D0FC51A03D76B071796F915D6B2415F610758D188AC94048C530D81B2C1BC7B9519B3EB4F0CFA97DA66B8D14470711D1A851A52B372C2BEB4A3"
-				"FEA33A293BC18347D151477D197BD9397AB2741AA65E37C172EF29DDA2700ECFB9DF478FF94CAC216BDDD67E2A52A283312A2B09927BA1737FBDEC1385978371"
-				"A1A199543B8B369110EBE2B6DF441AEE27B5207CDD3AF2F77109F2A3DB89D300E27D9A484733F6085D21A3C4D7D27F243789FEBE361DE4829C20441CD1938ED9"
-				"F283AC3C9A2D1FE8FE6055ED3C511C8307411B65DECDFC6DDFB5EB0E1BDFC70AD909EB11B3897DF70E40656E8D869C24C4393153F38C7F5851EFDB40D8023F6D"
-				"37518FBAFE3444A884D6D76E8E995422A28CA13C223200F3B51DD4A06234A69FAB90F3380A125A632459E489D9214E837A16A82D5F289DD60006034AD2C2A82C"
-				"7E684ECED1584E95E6625507B1A659C0B3463B9A11BB7C0AB60433A785C9CCB7941DEACB0BEB510B39500A4C6E36DF964C8236481E73BD5642CB1012DD5E91D2"
-				"DA28BD293058B8C49E8168AA9F16EA459387314CB61665CA621D42D682A3489323F472844BE5EB6DD17A0BE4A1181B5557B3B42F9020DC3A7D1E550C85B1B2A8"
-				"5F02312C0103BA75B7092CC13A9CA68A7B56A55828FD70356481D4BA156BAFFCE3EA26C5914882F55AB3FA73B4BF18330DB548200D7DFE0FE7E84FBE50B99B37"
-				"EABE3250B9458ABBA6019EA54A49190DCA0B627C3D4FE443CEFD8528E493AABFF8493267581FECF80274BEE4DC5BDF954FB03EA8F0963FEDA3D1A1AEAE115FA2"
-				"97576A12F9F2390C9CAB869B225437642360724F3F0A9F71979AE4E3031E83B2765263F491400E9B908854B916A12F67465A4601F4932FA711F1B097C13B886E"
-				"0DDED9E7AAEE74FADCDDF38D610649555E7A13A4DD0284703A6D147FDCE86FC1F35DD70DF9B69BB4C3A076BFA46B05743DE63DB337D20C143C647B86CF8FF2E2"
-				"267CC95E0AC5575DEFCDD2A5692EB88450B3498778CA1F48FA2A590321D57B76D53C2A1129A3F20B42B3DDC7B5DC5FFCB4C5EEE0E3DD629E381CE8A95A65D8C5"
-				"AD29E786DAA58EA2C12905EAD9C10406EC50E9EB9FB3682F1C33AD48730CDB6D4773DEFE7D07D3C9ACF7B40F0E3D572C0A102D28B52DBEBBAF403A25411964F3"
-				"5552B0DA4280EA60A68C29A31FD499FF48987BD8328E843DEBEA22219BAB0807D14F783460847034F4AC3881CA7CA674D44998E0AC04E9042AAA1FA674495FA0"
-				"8B0D43E035CD6F18981D7B96BE617C2FFF3F3B7750749460A4BA1752FB71375B10D9BEA55BBE86AD9D9DE254DB42D76838FA813A4D765D1A6F29024DFCA613F6"
-				"18BA263E97DBD0F472FA5C0114BE0E57BA50586DB31B6858A6261E11EB08AE66EC3BF97007D60B3731A13A60E6BAB149C1FD1FD660BB113C502ECF67653DB1E2"
-				"80EBCB15221CED2C2ECF94C229AD50394DD7CCFCE9B1F6402D49B7AFE37EF3270B19A728D45BE7DB716C86A6843FB964FDEBD7A6FE30E8F30F1F3A7931F68529"
-				"C0CE9BA4750232E052FE8B61221AED890BF49D15BDA3368F096A9E088F9475D5403CCD267B9C5BE52A54BA818BC6D99B4D383F1ADB5889CCBD29E2268C3526E5"
-				"853195DE86119F2176EF1A25906E8E74B046E6FA42B466BA0D5B217C1474F6756C8F874469CD9F1D41151BAC70620884D3354F22F7441453590A6B934F1BC6B5"
-				"6139830DAB8EE971EFD0C161A9D0F283F344A42327FA532D1E4523C5C2A12A801E0F923513FD7CB735E3B2B250CF541444515ECE10F6ED7C3AA41DBAB0F4E2D0"
-				"0F6A32B2B2FFD86FD5F4FE1A10C7DD10BEA31BE8EB9B82CF72C200156FE53737BF003174FFBC72A09C10B4A435135DCDE575B056229CCBD26A111AB45E3F864A"
-				"BFEF431486C8A471A227F514819B0B139C4C7298B5D807953E8640FEDE284F1A96A832ABA11000AB726D30D3CB0CB779E5504572F2DAFAF82E59B819380B4CEC"
-				"D17BC7C33BBA1E64521DB2D238743C5A6375817829415B97DAD134AC400AA0E41B8B27364756AEF832E88E5A2971DB85792852DF55A7E8527D42B4C1AB8F80A3"
-				"84A8F37C0950415BE715795C884C882FDEA111F667D4656C10A5CF5AF6BEB5BE27FAB2D6DDC481EFA74AA78FA566E837EFDE77BCCF785ED7CAD64B1E1FD519F3"
-				"826074B4D28677B0B1B99A1D46E7FF7075D24478D37EA5430C6EE8C501BFF4E8703F065B83601B31B90DE5014AD4558BF8806990EDDCC85084A0ACCDC1497C8C"
-				"699F8B0C75743B66FB4E2AE799A0BD3A9C3F2297487B86334A73A909FDD788E9CC02FAAB7757EEE597896C9CD310BE5F3E4FFDA80447EB4C4E58EFCB00908BAA"
-				"B3F3645223196973439AFAAF533985AB813B2E1978B3AD7A1900D9CB644F7E28995DCE47C879BA1DC27B3B14832288C908CA10D72599176B1558C8CA1AF95144"
-				"16A760F3F7462159EF9579563EF6E3BE10B854CDD7E824DAE13CEE70C871FB6F9BCC2C62AA416FCF57A4DC22CAC3198AE5ADF6E957635C95A8C1F8EDE8F5B514"
-				"D681CA9BF96443958DDC00F06E38D8B495864D5DF56C32D23EA93D721C66E649B25F5B0244684B58B1012605550894A28DAD1892966A560E89AD7C1E4BD1766E"
-				"637A4FFF642C8B14FEB7AE5241AA4C9035EC02F17888737ADE490FA792E7F7625E141F9595E9F262ADF418AB6B31FBFE3B2E974AB6F52C960B8F729CF5E84978"
-				"60125CA6229952C071DB258EFADC6DBA70A102D5B0847B166F21466EBAACF5199A8A9B68933DED39B64487130F9C33B51FA7BD533A1704E48342D6A5C0BB5397"
-				"2AD9F7E63B53915B3D87949EDC6C344338DA7B15E07E18FFF55BE25D8ABB06822CD95FB1A326C7B5D0FD0C97104BEF067AA30016A133254D02BA56523E80E3B6"
-				"BAF9216E0B1CEF65E2B8E46D85697FCAF03EAB80C77445CB10366BD0B8B1C3B4DF32EDC06CF3AF70FE2995517E69FD2AE0BAF9585F21F925504ADF8E8C91FBF2"
-				"101CBBE797A26640D08CD1F8C64181E3828EF2EE46208B93123536D06EAB4A29CE334F43D471EA157FF7A8F31A387ACD03EA4B5296B4971420E1830EA0EDE81C"
-				"8B96543A9FE28763FCF56B9AF43F777BCACBECC8AE13C3D41266558BEA428EAA10BBACDEA944CDA59A1AEFB482548171C42FF9C0E9D246935BB80B3E347EA1EF"
-				"9D1C51EF455DA2DE90C87CDBBCE13D2FBAC8B4D4624C36F613490FE5F97E44F91DAE674B09C278A00A952523993E92C60396E99F916726A9B7115FE9E2495BD7"
-				"102D9B61961AEE0254B327BFC0644655A85D35918CA7D5667EAFAE113A121280504EAC122C041DB2141AA0853815C149962B4D9C5599ACC72A9E15F006A25196"
-				"09800AB4EB116D7B36BEB2597E15A554263BD3B0E78CE38B7F608311AB7BC3CAF438C506B3231743FE3E29F93DF35B34401087041CEE3B75AEFA0AFEAF09A6EB"
-				"F6D2FE4185BCC6B39AED79F3389212FDC09FA48A71FE6A2DE33D40ACB6EB59E199B1CD7619AFE96ED546EEC564395FAC3B49A5E7AC20606806F19127C6381EE3"
-				"47936B35E3074E23EB9EB0B0872D673054BF4FAB46D9C3C27582318A0556AA6F5DCF79259FF847C0A6B528D049EE85E5E2D0572349438912515AA946CD2AD7F8"
-				"93A9C4D0160A24EFAAE9E2891AD962B962080A0665FCF54BA3E37A830A1E595ECBD0E0AC37012E97DE3D4DAE2CA84275259988FC839E0D59C159A51853DF57C6"
-				"22CA74CB71FDC2D52001D4F804734EC09B090CDE8371E26BC57F768C5FA02BC66C6AECB044DA59F2CF5293B8D86E61B86E84EB6BA4DE6F44ACC5662E347BE838"
-				"EAB6A03B3F1EA990A322B0CB13092287E7FF52F93510455DD2AF811FBAE2194801A90DCC2D6990591FF90AF81730C7DD1391E78D9B0E42646155EF4C53FCF623"
-				"9CAE7CADEC2E8DB1FBAA911524454C49184CC1A77E572A0167E291C0A1ECBD9D31709C277CE541D325563C2EC31E0A8B542CAE34DC134F667996D8271CA6E90B"
-				"B8446FB66DBE61D2742C38CAB4064D2B40B653725B976D37D266AA6FA8B29963058E06EFAD9907359DE3DBC22705FE6AB7D5FDAEB90233EB94CB20400B5A68C9"
-				"CEAB1A16BBBD5F1B90556AC93850ADFCCA90588A1AAD3E7167EE2690EE58C1DE36D27BDEEAB9D819D69DFAF9EAE55E1CD3A97A5FB3FD10BBA29D84C69C14B22E"
-				"DDD991CD4EF29FA35DDBDEE6C9A0096D4E7FDFCF7E283C89917310C890BEEC2C8C6CC0E6EE4AB5C28FAACB2E00BB93D97E5CFBFAF8F78BDF902D25DFB506A3B1"
-				"0C0648AABBC5D4CA8B1A466F041BF7E10EF51E0D7A3FF5B180ACBAF236A38151B956CB56357565D71E4260F2F63512DCDBD3C35E540F87726326AF2A3CD6EED2"
-				"DA8E519F9F60581A582013BC93BE25A01371DC8C34BE1E8824A2D2120339D6E287EC0CC43D586A04F80875B3766483B884A9202C1CDB4DF4C11B1D79B1E4F2AE"
-				"886E81A1FF7BCAC8988953214DAFE779A79DF51A651A512DB2562B7C1D4671D52C517081D53A792270B1C305515FB7B6C461BD4CD0D7C3175B146FE962A4C9A9"
-				"081E394960689BA9BCC6CAD5EAEDF81E345361646E9EAFB8BAECF1FC01121C293D58687D7E81A4A8AEC90F161D738797ACAEBEC1181958679DA1A7AAB0EBEEF0"
-				"F1FF18323C475D6A727F808293ADBDCCDFE6ECF0FD00000000000000000000000000000000000000000000000000000000000000000000000F1C2A3442558016"
-				"150078782C25100C02018208D8808202C40201202780844A001282020050644AB2B416BF7C04D81C4D8D734FCBFBEADE3D3F8A039FAA2A2C9957E835AD55B22E"
-				"75BF57BB556AC8"),
-			std::string("87EA127AB4773285195643CA0662880D52DC2353260A4081509425A88C179CBA80676A6731CEA1B0FAC6818CF55463656F05FB361E636BE995D95CC1F9D56541"
-				"A0FDD75A0515FF000453F5FE20F70ADB33AB5F27590AEA3569323B6008FBA8830AFBAFCB5059102DF00863C58C81D74970F108728D26547CAB5EC0A3E43DEE5A"
-				"71BED31AFCA6E2038B2055ACC621CD353650CB2CE58A8A28C3F54C955F920C63938EC449E39D0F02A9BD83C6067590B488CF5AB23A99F2088A62C7002D8B9F55"
-				"E27163B8C4EE6978631068EBEAEE9826CCAE32E578AADFED7577C255DDB64871F6DF40657D5DCE56F72DBFF8CC6EA686157C9DFD9931A50E9CF4E9137B3B5F61"
-				"6615C87065F94AC074F9EDB06D750BBBCBA451F41F45FED6575A38A613304068FE1D822AF26216EE6B98D0778C334830885F8FBE0772F1B72EEAA2BC48E0A9CC"
-				"B0453316ECAE7FE994C0770A30B48E2576993A53DCC568BB658FE6CD684B6EA459F2244E8C645C49B760DF7B63D37835F71D0E4C66FF639C690C13D1FF80541A"
-				"C2DFCF5B546AB03AB76430954C0C5C64C212C559036DE2A5C8D9D696725ACB62EF5920CA40502D98EB3C3459C6600CB301797DB1EF4134872A507001DEA3210B"
-				"296E0EAD2DF85647AB791CFE175FC179A7E1860DCEC0D471F169123BF47A40FAEBAE3B63BA30787ED75A7C2447A87B0B4D2ED8AB761BBE5A08A613B971BE42D6"
-				"404D0DAB907E2715208BF134B84B5CE3A16D611BF574D712F3378FA2EB8C100E11E4107DA98DB32D54FD5B0E6658AC2DB1265BB9B9C67CB21FAE42D5CD659D38"
-				"1A50FEA1D1014B27C51D9FA88B726B15162E15BE9FFFEB18F01D31384247A6619B33206A97678F53FE1A89A0B758E0F7C6938F9A2AF0ECD1A38625945280C3CA"
-				"AB44DB009DAD5B6229CD7B6EA3E0FAB606AAFA007C8FC1D3611BED9AFA137FE53376372292BFCBC80626B178BEC5BA0277ED6FB62E1896C9E95E6A2090449EA6"
-				"A276C7BDF2E82CD30481ED2FA47E2F8524023EDCA812BF31807E717EBFF712B5C9CD56A099B94B2C3E9BB7151931EE69C2FBEEEBC80DF9D4080187370C723329"
-				"A091FBD3710F36934CFFD2EB0690374023D25CA34E1B12DD9926078B9CFBBFF495D83404036C0611CC8C8EC7E4DB5D01597AB9A989CFD2CDE6819B6F926A9781"
-				"24033659487E9E9FDE71FE191C4A6D6742F92C9F6F8976E549165D5BE8973272FBF997373E346498F62773942F42D23A8A59D1FC22A7728493205D46252AEE6E"
-				"1A8BD70F3690921126891298D719A443B8E2514C8569682B981E4A9544BD2F635A060F9E9375FDC2C7D8393C5393F986F88133CC3096F4D5BA5BE67EA2E4B411"
-				"A54547D3522FE0311668C20D79C6108D554079C05FB22986B7BC16BF434FD86396F66AE65036A73F470408B970D992D7D1A6A036C481A11EA5C9AC1CD5C722EF"
-				"6E59D818AE5D8A110FB745B021DD21D472F74FE01F359E4C5E6B544ADD4DF3B885EDB68368A567FAC86AF82FF67966CFBD3995B2A0ABDB77986D78C9192ACFEB"
-				"51C2EE5F7EB8D2B6A302EE3F138C308B9754A2DF9524290EBA8781908AA8242AE61D001FB447D76939EC4CF051E50E4E9979DA6C2DAFE3531918C298D5EA8DD4"
-				"175B5223FCC92410B3132A6A261606B4EB972EDD49BEC83894BF02A6E1751CEECBD3C37D5BB1163CDA73D6B8A47E37E1F18D79CD36E643F6D5A9B408C658C08F"
-				"16D280AF2EF41202E9B3F79B238E1A388977493A9598F2F24DEBF6013F5BAD3F87E691744DFE507BB749233BC89104D84C44341F918DFF37A02902149F1CE53D"
-				"CB7AAC78A6315AB05674617356E84BC00B7477E89859A2EE216B77EBE303CDBECB2A1C41C4638701DA8BB786D784F648D3754A8D86AC0F7FCB0D65F01262BA8A"
-				"6CED25ED9E5A6D65BA761559A9EB8AC2CD71EEA2BACFB29783D91358F23CF5C3C6104E1AEFF4E3C608ED770A9B3C530A0448D81DDE61D599FD83C5BAB51CB052"
-				"4EE8D5379BDC7FB77FD6FC6929ED59DA393EBAFCC507056FE906A95EE514FEAD89740AD2575F81C5B2DFC95FFDE580F3848AFCBB5D59B1F7CCB8E89808EAD408"
-				"F706DC89FFCD2BA65231F3EBF1E83E4BCF6EE08ACE2A15161E788659C18F05C96A9185831D87A6636519BB790B5E1AE3CFE7AC583D05C3E78B4DC1A0267B2013"
-				"3D52A5DA145BED9552589C576039D619606B436170D420C05FCF71FA772FBAD78F42E43E1D8D1914A5B0BF8F210B85670544D8D525FCA293B5D7A84669EC6F58"
-				"AAA720B19FA95E17773D46999A7EC4F26E3D6FA7A06AF3171426831ED4CC0E244D8EF881414CC4DE523253634D76119521BE2A7CBCE961B100F5B60999CFA901"
-				"E5728239EB6F842DC80238607AE05F720B98B1152E8B034E7F5545EFE4E12397DDAA933BADDBEF7A2579EAA68CA31B1C89DF5DE42AE958E451D939F17E9BDB69"
-				"332801AB415BF230D1D90CDE060B01BAE1D74C4CAF5F02E2F185ECC942D0C16CFC8C8D308DEA241EE97A9B023C1F59809A49799ABC9EA03B65E66147CAEFC315"
-				"D22AE26EE3D1E3692847BCFB8752D5CF698F973251191691A6FB3600B1EDA90579785EA30B2D27166A7201DFA839187F2B3D3E488AF22740221594D25361A769"
-				"14B8A5A6E1BDE6AEAFBA10E95D71BDDC51F60C384AADDF34F6F226AA06C070DF0A1E65E87A2CA1FD3289D3CE9A197D8FB34461BA8B530CF796A35600AFEE5CE2"
-				"4CFC02BDE09C7F14E15413A089915D2D5EF0A978DD53198DC0753040C26685519EFEF093DEF1EB0A1516D3272218B20EF02FE105FACE037A3FC164D95DDD3AD0"
-				"78E80285478949D12FFEA1CAF230434EFED6508BBAC7819DD5F7DC278C2E906083F31586A91435ECFC33E99C639CE03C5CD217EB14663D67C1DE952D1A8A7E52"
-				"A26AEDA4A580AEFAE8E0C75AF1D9B2E89F9F43CA67123A0507A48E63D431346EE134ECB2313381924EEC3229F44AB2689365069E79D3FBF46EA0532422A0F11C"
-				"4F21B9137F885F14E833B1C8590761DD715380FAAC2B3C3BA949F1C5D06CD55FDA8D333F32D9B944C6FFE46CDBDB6B96B963FC943A15CF218307784FBF385D77"
-				"099730FF162F70EBDBB6C62ED11F434B3973F930B738425B4A7875BBEDAD971406313AAC4057CA065BCE948D60FD145AE0CA62BED944E6007BD88B6C0541DE8A"
-				"7166791DCEECA62DCBD6721162A27E588607BA536518CE8EDB194CAF9346660281D4575CAB89569452CD6857F6C030C870AFBBA867D324769107567EFD6F35CC"
-				"0E180A03B60ABED34594136D802D11336835F54E9894FBC937C75E078A236BE56D7193A474C5961442E392C2EB658193EE8144EDF2C8DE6A1D9A55342BB9CAEA"
-				"75EE8B7FED8AD57DC6B78DCB379F998A6955D45B62C1844EE5FD544E7715E069AB7D2E39A5F085524F3BC31B6748ED7449855604897CAE79B850DF992809A570"
-				"9A0BD6DF6B0681B5EA36FB5209A65358BB6380A4369ADD2AB737AB11C1C0D24B429A3F27A0EF51E0E30218CCA19A713CB18C9946AAAE0CA0C3B5A0D61BF7CE00"
-				"8F3391C30F2EBCD046801A28026C04F0F5748B9DA99FD4F47334CABFA38263A953D87C15AE86C7DC28D6F8A9E90B108A8A24DD8F86A147527A8933F0D10370C4"
-				"DACEE59BB5B2FA84D99207EBD6B6AF81F5FF28D99751475EF7ACD87C7251A125B16800F15DD2B9DDC88E7B83D4E2630CC4F0BA2A5047DD06DAC4A94660EBB954"
-				"CD98CF5C3725D803BF9DE78E5DD54A2158292BD8113472496D2A067A54A5DDDBC0E572ABD77947C6D3D17A9C7E1BF8B9925B578348B9309D6042D636D749ED00"
-				"A0BB734D140D73D9F437892EE45655452DF86DA5F26B03A247A7C062BB31CB8E0757826DBCE1C4CFCB5D02B17C18757A97369236B566EE485BC48B26BDA2A03B"
-				"30877751732E5AA4043896897180ADC2606393978F7F615D6EFEF4C7A5671921072F33EF0D9ADADDDDDECEE38DE0A831ADF67824374F18BAB4360921D8261709"
-				"167D371968F8872945ACAF5BECADC4E70268253DDD7C9A1FA3E8AF616F312337FDED95911A8D0507461DC01E5E6F19E94893A39481E5F29081C2AA266879382C"
-				"461A5A79E71DBE9D89509F0253E1C6437CF6B8D5D088BF4F8C6AC04939D7D529E997B336264ED0A696359E4F7CB0F9F7AB715578CFA1BF77B3F4E3DF08879C7D"
-				"9699F93223C48F62DD2113B5F5A1D122FAF1E00DE8F1BC6BA17FBC571A43BC1D150AA750D1C47F7C963F7925B7EF0D2E15710094EEE3644D07EB5D05CBD91227"
-				"960E31B86A3E625446A50CEB58563A0EED4D06B777C22AC85244F18E31EDCC4A94A0A6F741727C88BD74E442D6C2479CDF46A8F057632546027DFA4C0E69468A"
-				"65957D41067EEC424DE43C14A084F535CB9B0BFEF43C52839ADD144CA755E6D81F474C66DAE7A5DA8523A34835988FBA6798D190BE94FCA1FC32F7B81E67897F"
-				"0216C5202347F758611749883AB839733C7AF06D2387FF200A3F76334A5F92DE1406B002A0B5B138E73666FE7A74D14A10828C5D558C211CE65CD8608822C711"
-				"10353F4280ACAEB0B1B7C8E3F8FBFD013638435B637E868A9EA8C7D8DDEBFB1A24263744477491B2B4B7CCD1F9121B202B2D373C5C70717F83868B97BDC4C5CE"
-				"D7F41B1E36548C9499B2E1F5223654888A8C9CB3CCD5DDDFE5F40000000000000000000000000000000000000000000000000000000000000F1F2D424C5A4004"
-				"502A24C0000500C4040004EA7100370F8A48208820012114418000C14094B5DFBE9BEF907E07225D5CE2CEAC61930A07503FB59F7C2F936A3E075481DA3CA299"
-				"A80F8C5DF9223A073E7B90E02EBF98CA2227EBA38C1AB2568209E46DBA961869C6F83983B17DCD49"),
-			std::string("C455E91787F1D8716682F60E0BA9AB0BB1D8AE6ACAEBFDE64B41E558AA826086D6432FCADCF7A7018F5A5F3E5CF8D9586AD51B34EFAC0A2F098EADB5C6E59CC9"
-				"D0BD5BD52A090B100480AF2CB4FCAC8657101DCA87185DC5AC4F5A09F8E4AE6E5E2C60F12F4A71FFCE695A196827104856ABB40D3CD520DEC843F7B6CAB39214"
-				"0BB64E9DFCBC2C66509849E97F3582DF7C03A040E11AFE042BDE85C938894D2C829F84FFAEE67D6DBEC2185F3430891F1A834D3EB02831DA7EC3CCC9F8314A42"
-				"CF481A5BD7C6A7E9743883A399F46A4E920C0E8670932E1A156509F34714B0CA151147EFD3A42B5681BE655112442668067BF0F31145D19C407CB0FB628E0CF2"
-				"DF8B688285E0F3FAF5D4C15F37123E93F294EBF6A19A206D460B2F10B1B952454198478BF38A59FA8E72573B20E8EED2920153BE940B9F4C8973E4B65DC839F3"
-				"E8A2417FACAF60B495FCD921DE33B4042CF236C400E364DF2F2BFFEA43A5794CE82379DDC57F4DE68EBD060C19739CDE2C16A9892B54D769D768EF35F0B2F1E8"
-				"F9B4C20739C8B2EB13AFE10E1FC231983AF56D4FB3DF18CC9BCCB43B6442ABCAC22E52DD642B616F17215FF7F0B0BAAD2C660C50B479B67B638EE2A5EDA462A1"
-				"BAF25AF1D19D0E240AC095AD69887B49D2FB69CA5D5F878B47FE89BF5D1CDA21E11FBDF207ADC9EB80D1A5DF8E629E581B019F16FCE6572725CBD6664AD013AC"
-				"2C9E0E4A4B01F90DEBDDB6C5C1A8125E0F08F1297159DF2F606B31AC837851EAADA6280051BBF595374C2F51CDA2FD7A98586C21E47C53AD3E8B840C36ABD720"
-				"E9B322A0B5B56902BECA7763B1E1A0DE8DEE4D7D55AFCFED15AC416A280722BF3AF0047EFF65873406D7FE27589473C7ACFDD770C59844D85B99098883F27DE2"
-				"0CB783C47771F8FF892682052D672C7ECB606379E70F01502A86D3F6AD70A2ED9464A658C8D40B0B83991FD069F2188924782326A42F7B8D967934D962FBDC6E"
-				"897D6E5B134246B4A18E2EF77EF03D837FBEDAA8CE129576442E94094A114CDB92754334AA7336E78CFA5CE9ED9D6427A43B6908076C97A9A687C51EE90DE71E"
-				"B51D1500FF067FC281076DD0F1E22B6E10ADA17136BE0CF589D215E54789AE5664490DBDAAC0F8BFCA564AF40E8FFC8001B7EC71DE860E57A459E61ED5269032"
-				"8EADE88564AF3C7640188959773DD0F4ECD862B402211E3C298FA648C4545772BBE4BE0DE3190CF9B90C42EFA9956EDE18C5C4542397EC861451D8F903DF6028"
-				"B8E6F76544C93DA8AE44DCD2D3F945F04C95D1B42988EA2DD5DA3C33CF83BF4D59D26E55E6D15AC6214DA7C6FE584B907DDBADCE1FEB3763CA0B10A48AC862CC"
-				"D786DCEB0A0EF9D5459AA3BC2B18879F7389033855F22E37FDEC71838A4677D7B40EC960CF71850F152B52A84881768199F859E361E7F16793ED19256C399066"
-				"B576537E1911F3C94E09C9FAAA7FED6A59D1A27D0AD6D1722B9889056CF91EAB271FDE4F6B1DBD1F68DCC63242E066CBE574BF6FFBB609774A171AEB72971135"
-				"52EA2E850072423400ED3E7010BB0EE04D0E8059E5D36FEA1D20A00342CF2F3EB056BEBF640CEDDECF3FBFB7DA478674D66892B48BB1E808AF3B9403ED26FF4B"
-				"D9009EA9A87F83A65D36FC44ABF19670120DAE2FBD1901A37F0DD0B11B190AB78843C55BDE72C03E903184E716DB224F716F85B6DE97A004961A9EA8F724F3FD"
-				"D133B8D30732EDE9E57CF8F3817E0D24570ED2BA4773EE60BE0E722A02BCE3B8ABE25EBC1FE061507EE544833B1EF4A5488BAB62E6E331CAFDF3D3F8475F4545"
-				"E0C3DCF1214BFE215CF4DD9209AA0D2B5D5A5584A54C5B04E43D374BCB51CF4945934E4F54BF99617402CDBDDBD903A86F4D5D65F9237548062620AA08179420"
-				"367A5B0E4833DD4D44985BF8A3B35280E945A43E6C26ABDF355DF103F9A5BCAE408639BBDA71A47A69E6781F28698BA2E382EFBC13376D9D21599DB304D4869E"
-				"DC5A93E56DF5339113F6F32CA2732301F5227293142C842D9F98E5382A2540B2443466BDA5EA752F4C500FB9EA6DD8136F67F8703930AC24C872AB5CC2654FF4"
-				"5753C7B12EF090C02D407F6E1EF8529ED2B7B73D3B15EED9E79C221960EB7978EA208F3667715A8FAC3EEE4510F61B29C9D28F64079F4AC50AD8D4464CBA72E4"
-				"37B3C3A47B29F70002DB3B6CC8135FAC602C6EC131CC58C7B18C4FB3EDF71278EE08D85964AACAB4122FE0F80B7F0965B3F42110A39A2EBE891139B067D9176E"
-				"777A0CD7B1DB440969216BAC942B94A2252E74A54406B3F069954DD56B27B38B9F4BC21538C8EA8269AE87C933EED7C0263AE2320A7F564E8EB5B82F20DFD2AA"
-				"8E2F685D6F479515746239777B6A3B5CD8DDE3E9F29C21348BDEA427A640ECA24AEB612CA7E395BFC05093512EF5F36806703A46E41484A515B46AEEB568766A"
-				"030444BCE0DB63B8A7726A4D494CC627E4E2F5B9F9E0C54DCF49558D7F8FF036BF64882AA3DF78EAC1A75D4AB3F3265DAF9192074FE56F300F33F024107DD286"
-				"02C7065C27AA261AD6F9AC29DC6DE2FAD29D1C7A80AF3F421A68BC226E584160E4C00811988C75A5F1441FFE5AAAAE47BFBCC4C1D9B78C25FB4DA3D11802EBD3"
-				"7B994A9EB23F782765EF6FB0731BFFAA79AE7B1509587FA89DD75D659CCA03A5C3EAFEA85F199E5325E42C88F96BD8891464BE73ACFE8A494D015E70E685B906"
-				"EC7304BDF16C5931C9BCA0956800D577D63445926A2DE43418F6DE9EAF49A5B27435E6D17344712946FC8BBDC1EE23C3573AC2F849C3627DF923D90CF5FBA5D8"
-				"586054CEC2382260F142A14900322319987CFF4D42E62C8B197BE82DC99BF3EAA20EA8703486145E10EA245FC13696F461F53236107F5D82D3001A381AC789D9"
-				"7DAE88AAEE36AD69CF42C2AF0B1DE80CECF024FB7C80BD608892891A64C2D528E7B45C8DD9F84196EA24AE90083618B14F3D33E6B0F55B0D24907E8F3CA8B61E"
-				"1D71EE5CAC6EE2CA685F08831DBA09938D2CE18F04E0E4891BB78D1BE58F97E572C14E89E279A0D99674E58481E895D1DDAF14F4700F81961D83B09F53C86B7D"
-				"C1CBDC74A693EFD943E3B53F69BEE6260E66D9ECD3218503062C4387AD86740D8ADA600F4390D750A4C332BFBA617D710BCD3FDE78AA1AA32003C74D8EB1862C"
-				"7C21CE467DA6BE4C89B81C3680E65CEED8F7C443CE42ADC2184ABF0A8ABD101F5F8183B9B7C94C1ADAAE4906025B10C95BA92079884C8102A6EB4169740E2EF9"
-				"0FDEAE64A02B3704446A88BC08E117EA4A8E9EE3137CE543F22B886D6F13128B83CFAD1AF5C4C36D329843D410C98694FE62EA45FC47391D893A2502A5FBA063"
-				"8D1EFFE455AAA3389ECAB3697C5A008E4F4B4F11D6CF7B1E35DEB9C7D771682E3E7F2F8675C4C65D8834DFB6F110402F1CAA0A25C95F889E007685E20603C23E"
-				"8C8BDFA31A6338CCE6F258C3A7527720DF14B76A42345D3B28711CEC8660532CE9E0CE81FE0A5CBFAD71BAF8459EE32AE106093A89E63D0FA3B1A8CCC08A9F8F"
-				"8927CEB4939A49EBD41410F1602086203943C176B77831507131AD6297DFC80346D935BB3679117537C1CA5658C63CABBB4B7E5AF9270A85DFF651799B8C1916"
-				"7111BD1E9A233947AF211EFD9322708D6FA57D8C8485424AE4995B2709A891D40DCE55231947521F8F5BE514452BDBF68B18BCE92EAD81A59BB852B0B2B28601"
-				"75E617311050FECB30E2A953E58017B73B28F846FE8CD05E337AAF575AFB367BECFEFA38EB1BD8C0179E6D40CA51FB21A817897D91767CC64DAA745C3AA61547"
-				"8CC93AF64829749CBF7948B208E081F7B9691A847803EB2F5D3210009A2FE641B9FEAB45581462C5461108C8DB98AE725C442D67DE8ECFE47F9831A353376CB9"
-				"8D47AE902B2963F6A79DB8F9F9DF064566695DE0A8A49ED8ACBE07A2CCF2224BD0BA94FA7FB9686ACEA539ADACB61768070611D238E0469CE6F571E655B7986B"
-				"CA38695FE245ABF6A17B15491C4849BB2E275CE37FDD895BF36B7C6E15E322C688456CB59BB0B94B960D692A43A08007AB30659722719285B4F83937D3204174"
-				"10B6500ACD20C2302BCC503B43B78761EEACA0E0CEE81B619FB68694A3588AEF2D36D118D1E707B6F5C7F5916A218A86A10AAD0D75A54AF7CE419048E1BE4EAC"
-				"8A9B0FE6A4A2B00E24AA9E37A36A1A8751EDA2E0BEF8A3610EBB46EBAC88DE271CA6B54B78E84FE5105875444EDE32356E0046C25F0D110340B835B476ADC23D"
-				"A0F12E201D71D3DF5A75BAC76057844EDBF5C576FB9B8D3322AEA82B6826636B35AE9161740F8F7ABBAD09C020D27183DF5156F7B7C7327593AA105522F9D4A8"
-				"9D99EA6E2A0AA1CBA6216509B50F24359911340514D53875644EF2BEE93F2BD0755BD507D9177B19969A882C6F836403B69BDA2EA9525D8C9C47FAB91176A77A"
-				"52B0BA7D817B8AE8935914812AD8C488173BD276BC704D741F49837BD17109EE41CD9705102F3F59325F52F31D05EAFDF7FB1A8CAFB32B7E215BC478B57D3E99"
-				"334E545B76B7B8BBBDDFF80A0B19535C5F79A3E2E5E8FB080A1224325E8D99ACC1CDEBF5000D1D25485E6B718FBDD9E4E5F9292C3A3F474B597AB5D9E9F72538"
-				"3A4045464D525761717DADB5BFD6E1F8000000000000000000000000000000000000000000000000000000000000000000000000000000000B1724323E500320"
-				"4C8205100085489024608E029514081C1240B112008386028800010440816AEF8A07B174A20E2B8C4B0F29363EAEE469A7E33524538AA066AE98980EAA19D1F1"
-				"0593203DA2143B9E9E1973F7FF0E6C6AAA3C0B900E50D003412EFE96DEECE3046D8C46BC7709228789775ABDF56AED6416C90033780CB7A4984815DA1B14660D"
-				"CF34AA34BF82CEBBCF"),
-			std::string("14743BD1DC6F0B4264CF3E0E8FA1D20D8C34B821A7ADB6AD7F49C117078AC14F201E40794EC44A05DF03E57649A8A1FB55934FB19305995F7C1B136F1CACBA4D"
-				"E195A9C994D919D3B5E4FCCBE5A044DCAD2587714949778D383FDF991023018EE39362A30CFBF0EEA57A32843CE390CAE77F7A345428A2CCA6A0DA8180AEC158"
-				"6B3FA58B68BF508DBE37B085F811E5FE4CD98F6FC474A6072EAB91A399785CAC37E3B890DBDE706387133F805A2048EE4FFDFCAE344659CC1D42F39B851C027B"
-				"F90AAC40C86A266F77128A66483EC9C0491A3187FA5A37A35BD4730752DB84DED63C34CBA3B2583123441E5244878612A70C50A5842171FCD349DBC4AB6D6011"
-				"FB5E825AD8F0908DBA72125400E3820DAC818ED5A01B1BCAB8A100D97EE5B4398A7D8CD70E9DE2FF50497263A58AEABC982A8F714132D9F4247C2FD02BA392FC"
-				"54A8CE38718C83ADF6E62D22E0F4B84E96A20C0854D6EDBDF6AC7A74409E18F9C4866FEBC697782CC4BAF0342E0ADCEF13868EE39BF638B88CDAD53FFB44D0B8"
-				"2315AC5A9088701B8088087963489748FEC40137486ED27CAFCDE6F76BCEA8C0903EDB9CE9F0A70F0CC31171F044CA07EC3B64A026B5EF6520CDBF4DED7E8448"
-				"F24187225AD40128638B6A36BCF69F9AC2A3003CCD8F66284A40FEB5208710C7FCDEFD99D430D0C4F34244654D6A50A16AAFE8911C8ADEDE71DB57CCA1059C9B"
-				"FB041A6DB258D114B7DCA9B04D923921BDFEF8AA5662C9CE02E9C15DDF39A8510ABBBAA962BA57834A07BF9966D77EBE6A68C47FA5D39A12C1FEE32CE7AB8369"
-				"722ACF084B7ABE6799F22078A56118571A6D4BB5F5EF193DC04001E6925A0037B645BF105118D8D75A325DABB683BE8731203CC825650BBCE5900AD7EF1C1370"
-				"0046A824E5C65EF3DE675F6A6B9E02101DAD29552DBA214562ED9153687D7AB034E514F257A6DDA58EE2DEC154DBCEED1C180B615CD2DF84C942F3F37A6E21BC"
-				"B97E883E762A95CF2715544D9C5E92701EF3D6BBD1676BF95B60469E53B2E8012534D747C25AEB67EAAA8F59C421A4292A97DE0ECBC360833F17DBFE20BC4EB7"
-				"3C26939CF481FA470928F72DF897263F666CE4228E11C49A9B572F77FAB7FDA4B7231CDD60C3274CE024971D4B278D853EA5BB0EE581166EC4E33D6ADFDE7948"
-				"7CAD3AAEC2330685B77B2AE1840A581BC782B1BF8179047C400ACF62FE6B36D2ABE1E7593C4228297B91DD6C0BCD42DC021F75C31A46F43797B4540C869EA0C1"
-				"0A633A1106D0C8A3FE76CB01810A61F77F04333F6D1702F1C143B055F6ADF1F383CA989DD440D48FB5C35D374E873287343CF27C48A7958FE95D26FB6475E298"
-				"973587DBD9223DBC63A9E078C704419301B7AAF0B130F3581A3E9C9124A7691E83937F7D6E67A13562E98356952A809991200F02097D87718E64572AD69BDDDF"
-				"5BF6385BCD673F841A5240660D244AF2E9CF9CB379E61D8E79D490A09497C9AE83B13062AB91D293BCFD05F68A28297365330A6CEC72C2804105B269B50C1D1D"
-				"AF7E231540E925F99050A628B140B266262BBC29C01ACD2E8E96AA2C34081F22417282BF9F2E731ECC307D18FD919F1442599364426E72C93EF9A9C4B232A5F3"
-				"582E4D8C48BF9BA069B93CE0B345531311141D1620C4AEB90E151A7748361CE1999EC5B02A4CDA57F95C1C393A4BADE2289B8B5118AB977FD14EBFED378BA071"
-				"A14AEE0DCC04D8596A1ECC14980B2C019EB7B32B17A4C1A4D38B4FED29B7D84C3EC3B759BD3416565521C57DAF3F9343F5CCE3E3F659C81E9BD3645A8E377E7A"
-				"E82A3E4ACF6C89A6EB144364535D510DC6F64746A73A0C089C4157AFDDB730B958CD75DB72DCEAE8F11DE5FA997D62F5C852A958FE328DB52B657B20C3467DFC"
-				"D90EE23E7C9346BF97DFE1D09123FDBC1FCED4ACCD0630EF29DD7CD541DACC505691C08A116DAEE62EBF8F252945FB38308779E4C9E2A9E8ED682CEA91B440F3"
-				"C7128B5934EF22B6AF96EC7C755B483BF40AAE49CE04CFA1CFE4F0664D5DBC48E5AC94C03382220952EE3A990EB531C27917DD6A6BD217132684851113B65286"
-				"B49A804011948F718F9CF1F9BCD3AE56B20C5E4C2A6F9D04FF6BD3D59D21E848DDC2A30DCEF453058F3FE1942237BB2EF3FC8172CFCB1ADA6C0AD1842CB5A0AD"
-				"F0B89395C1CB83199F1F109C3FD2837330895F41FAACD861665E55D655E9A00584F138F491767C7BDFCE065455D3CF41ADD7436319E3FA38238E0B590B38F4EC"
-				"8BA42E7A2FD78871A3B0698B620DE7F511630D79AD616B0D323E8426F3CAC03B78767657C63EDC1DC61D625D1026BE76597E3F005D7E6E26391AADA9BF6B764F"
-				"88AF540D5A4F8862987601F42468C7D6EC696713C3F1AE7563ECF303772AB16CF3B881D1F8255461D5357CF7FF8278CFD0AC2BD5839AD49E4E0B99BE1DA53D64"
-				"9428C9769350E1FD7F60A79B51ED6B5810EC41C173BBDEDCBEF2DDE88E835BB53F630ECD126D3FB8E1F998AE0FE8A9581CBA617239B6FF479387E716451C8FD2"
-				"21815B26C9E2DF696E7499C1F73DB43716A9863A3B7C6D3DAAE6AB13C3F5F6216B44CE4C80C458AF4AADE474E1E291344F38A9F46DD1D28BBDB0DC84F972312A"
-				"F4F2651369C586F5C9C668BD0DD9AE2070835E4929D651A24D846DE0769F91F6913D4CB9DB091AAAAE670A86BA6D340898A7430CBE9C1210055D791492A97117"
-				"DDF98827A3BAA75F8D65909D967752F51E7374FBE09744730ABA2ECC441C934EA278B06CB73C04ADC0F9E96981FD782746E811909A39C4C40CB9062DC989C132"
-				"2C592381B3EF6B0CA192384D3EC8FD3CBFC3EE24FDD0BF1E77E6AB4FBA7258F63C5F954972931CABF824FB07A64B53A778FFBBCA6F81F5494948BCEB3FA44E4A"
-				"FB34C3FCA59EB366580D4B24F4BDB8B64CB90F888ED3C91FC9A51C63B40C5ED4AB3BCEC3A65DFDBEF5BDB3F429ACBF469D407DE9493090E919C7B1A0F04A0C45"
-				"86C46161144A994AB92097BB18A9001E249C63ED78BAD93F29EF49125DD14E5B30EDE73B066D23C0BA4887983581C5AEC18D87DE917AD74307F1CE44645B7273"
-				"30375377E55FE211EE2EFC1701A6E530FD8F2F0BFE93107AD5DE69963160316DAC115DECFEB18F4BA6E0E3C880E2ECE0847B9449346E57F84855073F0410FE66"
-				"F52BCD350AB6A1C14A8FA374B1F1F633ECE5CC8644DE59958CB7EBAFB27A21D236FE422050BF097307181C32568DF5E7111CBF8D1D67AE4F088BB4AE8A44DEAE"
-				"6DE8162131DB7639E6D25CDB4988370950B10883763B9746D2901D7E5255AD3A58521247EC0E1FFB76BBBF79A19ABB4DCB0C48BB050A5B90497C0CB33737B29F"
-				"EA7957F863332F1DDC09865A4AA10B58775F951763672681163D6D264FB086AF83F76CB8E1232BDE5459499A61E2661C5BC9B076FB7F6DC0116BF819441EB833"
-				"A77FBCB612A14C316A6FB24209B1DF60C3B5CAE5684F6E0351DB35FE33D884A6B9561EB556765EB7014CDD8348775779B67A2AF68EC5448A37650C9E04CCE62F"
-				"7DF2A81C8F5921C56CA05147B065AAE19D47D40B6A43BF6391D85BBA159A78554E904B6B2117E935A7EB517DD19365B2C65BA0BD3AB82AF44C6D1D564B498452"
-				"46095489067B8265F6412660B92BDD041FEAFBE59E0727B3BE71742D4D07852D695C6F17A557D98FA8F7B61689B8E72EA493660EE23DF88B4B79CE7C73D089C1"
-				"E5945C295E51521C649F6593C69BF691AC32A532EC000F076EF0CC5F51DCFA011CF2056213159E01DB52F00A72EB6CD21D8D9FC5A5B0514F0A249E4D5B12F1A8"
-				"B4EF9B5203BCA5556D069B9A9654C788C7653EB07A107EDA1008EFF9FF8361AE3B43ED6B69E5CEDA95B38F5EEE9A2DDCFD86B1104BCD8C78BE9C865E2EE7794D"
-				"F253A917FFA9FFBB1176A22D287299B431568CFD96704DF04E5A6397F46502F08F0D3B6A37C6B13EDB44EFF1CEEE94981FC25369291CD2B564E413BAFB5ED798"
-				"CBC7F52C04365A58EA598B15910014007F89F59C3B45487D104EF34E928DC0C285B4AFEEF4F64154521CE19260778D172910BE6ACCC2E21C2A8283C7A220191B"
-				"4E15F14AF337CE0053F16E1DD75112107C46F9A42164FBFB359165599CC4759CDF891B8D0D5C1DABEE31064C0ECF2531EB34CAEF9863576D6E9CB787962304A9"
-				"DA90C1DC53B49BD5D90C34B4EE6942CA0EA85F42829961C31AFFC38FCA9AB7DEF8A1208CE8C32637FC2A19E6C3ABEF78238FA8FCBF5BF154429BE507A9E80556"
-				"0115C12E83FC860F51E5C89547DC8F096D01F86964932F922DCE435B8CA5CE89D7A35754E64DF926A866D8157203D6AA5594E6D9F3F0EB71F1DB3E6980E4A7E8"
-				"E386FE80452172271BF83D2CC7EBD9BF2E11AB79B2DA76471354E6E023F88A66406AB097C8507E950B80D1141A33D2DC4B15DA9A0EE336582B279833F5E0418C"
-				"9300D4935DD1465C1B3E5A121CF8ABC62DCB240C8DBFB061AC6103605E02ECBD1B226DF361CF63B613CF07C70872F626C132A2AE5EB89FB111F02FC3ABA3A7C2"
-				"020E142A50525A5E7B8D9FBEC20335393C525F8CA3D4DBE2F5FD151C2C768385899598BFD2F001021B353F67737B8CDDF3021419202562687D87A7A8ABBCE0F1"
-				"F92D8C8E94BFCAD40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D1A263141480060"
-				"0E000404081AE61008040C3582011136261105018144050A00C0A011813041C8E48BF517DD0C2F7AF5B52A046471EFCD720C9384919BE05A61CDE8E8B01251C5"
-				"AB885E820FD36ED9FF6FDF45783EC81A86728CBB74B426ADFF96123C08FAC2BC6C58A9C0DD71761292262C65F20DF47751F0831770A6BB7B3760BB7F5EFFFB6E"
-				"11AC35F353A6F24400B80B287834E92C9CF0D3C949D6DCA31B0B94E0E3312E8BD02174B170C2CA9355FE")
-		};
-		HexConverter::Decode(sigexp, 12, m_sigexp);
-
-		/*lint -restore */
 	}
 
 	void DilithiumTest::OnProgress(const std::string &Data)

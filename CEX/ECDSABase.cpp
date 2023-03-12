@@ -10,11 +10,11 @@ using Tools::IntegerTools;
 using Tools::MemoryTools;
 using Asymmetric::Encrypt::ECDH::EC25519;
 
-bool ECDSABase::Ed25519Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<IDigest> &Digest)
+bool ECDSABase::Ed25519Sign(std::vector<uint8_t> &Signature, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &PrivateKey, std::unique_ptr<IDigest> &Digest)
 {
-	std::vector<byte> az(64);
-	std::vector<byte> nonce(64);
-	std::vector<byte> hram(64);
+	std::vector<uint8_t> az(64);
+	std::vector<uint8_t> nonce(64);
+	std::vector<uint8_t> hram(64);
 	EC25519::ge25519p3 R = { 0 };
 
 	// hash 1st half of sk to az
@@ -55,10 +55,10 @@ bool ECDSABase::Ed25519Sign(std::vector<byte> &Signature, const std::vector<byte
 	return true;
 }
 
-bool ECDSABase::Ed25519Verify(const std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PublicKey, std::unique_ptr<IDigest> &Digest)
+bool ECDSABase::Ed25519Verify(const std::vector<uint8_t> &Signature, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &PublicKey, std::unique_ptr<IDigest> &Digest)
 {
-	std::vector<byte> h(64);
-	std::vector<byte> rcheck(32);
+	std::vector<uint8_t> h(64);
+	std::vector<uint8_t> rcheck(32);
 	EC25519::ge25519p3 A = { 0 };
 	EC25519::ge25519p2 R = { 0 };
 	bool res;
@@ -99,7 +99,7 @@ bool ECDSABase::Ed25519Verify(const std::vector<byte> &Signature, const std::vec
 	return res;
 }
 
-void ECDSABase::GenerateKeyPair(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::vector<byte> &Seed, std::unique_ptr<IDigest> &Digest)
+void ECDSABase::GenerateKeyPair(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &PrivateKey, std::vector<uint8_t> &Seed, std::unique_ptr<IDigest> &Digest)
 {
 	EC25519::ge25519p3 A = { 0 };
 
@@ -113,7 +113,7 @@ void ECDSABase::GenerateKeyPair(std::vector<byte> &PublicKey, std::vector<byte> 
 	MemoryTools::Copy(PublicKey, 0, PrivateKey, EC25519::EC25519_SEED_SIZE, PublicKey.size());
 }
 
-bool ECDSABase::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<IDigest> &Digest)
+bool ECDSABase::Sign(std::vector<uint8_t> &Signature, const std::vector<uint8_t> &Message, const std::vector<uint8_t> &PrivateKey, std::unique_ptr<IDigest> &Digest)
 {
 	bool res;
 
@@ -129,10 +129,10 @@ bool ECDSABase::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mess
 	return res;
 }
 
-bool ECDSABase::Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, std::unique_ptr<IDigest> &Digest)
+bool ECDSABase::Verify(std::vector<uint8_t> &Message, const std::vector<uint8_t> &Signature, const std::vector<uint8_t> &PublicKey, std::unique_ptr<IDigest> &Digest)
 {
 	const size_t MSGLEN = Signature.size() - EC25519::EC25519_SIGNATURE_SIZE;
-	std::vector<byte> tmpm(MSGLEN);
+	std::vector<uint8_t> tmpm(MSGLEN);
 	bool res;
 
 	MemoryTools::Copy(Signature, EC25519::EC25519_SIGNATURE_SIZE, tmpm, 0, tmpm.size());

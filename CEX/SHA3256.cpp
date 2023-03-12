@@ -15,7 +15,7 @@ class SHA3256::SHA3256State
 {
 public:
 
-	std::array<ulong, Keccak::KECCAK_STATE_SIZE> H = { 0 };
+	std::array<uint64_t, Keccak::KECCAK_STATE_SIZE> H = { 0 };
 
 	SHA3256State()
 	{
@@ -28,7 +28,7 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(H, 0, H.size() * sizeof(ulong));
+		MemoryTools::Clear(H, 0, H.size() * sizeof(uint64_t));
 	}
 };
 
@@ -45,7 +45,7 @@ SHA3256::SHA3256(bool Parallel)
 	m_msgLength(0),
 	m_parallelProfile(Keccak::KECCAK256_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
 	m_treeParams(Parallel ? 
-		KeccakParams(Keccak::KECCAK256_DIGEST_SIZE, static_cast<byte>(Keccak::KECCAK256_RATE_SIZE), static_cast<byte>(m_parallelProfile.ParallelMaxDegree())) :
+		KeccakParams(Keccak::KECCAK256_DIGEST_SIZE, static_cast<uint8_t>(Keccak::KECCAK256_RATE_SIZE), static_cast<uint8_t>(m_parallelProfile.ParallelMaxDegree())) :
 		KeccakParams(Keccak::KECCAK256_DIGEST_SIZE, 0x00, 0x00))
 {
 	Reset();
@@ -119,7 +119,7 @@ ParallelOptions &SHA3256::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void SHA3256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void SHA3256::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (Output.size() < Keccak::KECCAK256_DIGEST_SIZE)
 	{
@@ -130,7 +130,7 @@ void SHA3256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Finalize(Output, 0);
 }
 
-void SHA3256::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void SHA3256::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (Output.size() - OutOffset < Keccak::KECCAK256_DIGEST_SIZE)
 	{
@@ -233,36 +233,36 @@ void SHA3256::Reset()
 
 		if (m_parallelProfile.IsParallel())
 		{
-			m_treeParams.NodeOffset() = static_cast<uint>(i);
+			m_treeParams.NodeOffset() = static_cast<uint32_t>(i);
 			Keccak::FastAbsorb(m_treeParams.ToBytes(), 0, Keccak::KECCAK256_RATE_SIZE, m_dgtState[i].H);
 			Permute(m_dgtState[i].H);
 		}
 	}
 }
 
-void SHA3256::Update(byte Input)
+void SHA3256::Update(uint8_t Input)
 {
-	std::vector<byte> one(1, Input);
+	std::vector<uint8_t> one(1, Input);
 	Update(one, 0, 1);
 }
 
-void SHA3256::Update(uint Input)
+void SHA3256::Update(uint32_t Input)
 {
-	std::vector<byte> tmp(sizeof(uint));
+	std::vector<uint8_t> tmp(sizeof(uint32_t));
 	IntegerTools::Le32ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void SHA3256::Update(ulong Input)
+void SHA3256::Update(uint64_t Input)
 {
-	std::vector<byte> tmp(sizeof(ulong));
+	std::vector<uint8_t> tmp(sizeof(uint64_t));
 	IntegerTools::Le64ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void SHA3256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void SHA3256::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too int16_t!");
 
 	if (Length != 0)
 	{
@@ -356,7 +356,7 @@ void SHA3256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Len
 
 //~~~Private Functions~~~//
 
-void SHA3256::Permute(std::array<ulong, 25> &State)
+void SHA3256::Permute(std::array<uint64_t, 25> &State)
 {
 #if defined(CEX_DIGEST_COMPACT)
 	Keccak::PermuteR24P1600C(State);
@@ -365,13 +365,13 @@ void SHA3256::Permute(std::array<ulong, 25> &State)
 #endif
 }
 
-void SHA3256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA3256State &State)
+void SHA3256::HashFinal(std::vector<uint8_t> &Input, size_t InOffset, size_t Length, SHA3256State &State)
 {
 	Keccak::Absorb(Input, InOffset, Length, Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, State.H);
 	Permute(State.H);
 }
 
-void SHA3256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA3256State &State, ulong Length)
+void SHA3256::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, SHA3256State &State, uint64_t Length)
 {
 	do
 	{

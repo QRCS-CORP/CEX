@@ -20,32 +20,28 @@ class HCG::HcgState
 {
 public:
 
-	std::vector<byte> Buffer;
-	std::vector<byte> Code;
-	std::vector<byte> Nonce;
+	std::vector<uint8_t> Buffer;
+	std::vector<uint8_t> Code;
+	std::vector<uint8_t> Nonce;
 
-	size_t Cached;
-	size_t Counter;
+	size_t Cached = 0;
+	size_t Counter = 0;
 	size_t Rate;
-	size_t Reseed;
+	size_t Reseed = 0;
 	size_t Strength;
 	size_t Threshold;
 	bool IsDestroyed;
-	bool IsInitialized;
+	bool IsInitialized = false;
 
 	HcgState(size_t BlockSize, size_t ReseedMax, bool Destroyed)
 		:
 		Buffer(BlockSize / 2),
 		Code(0),
 		Nonce(COUNTER_SIZE),
-		Cached(0),
-		Counter(0),
 		Rate(BlockSize),
-		Reseed(0),
 		Strength((BlockSize / 4) * 8),
 		Threshold(ReseedMax),
-		IsDestroyed(Destroyed),
-		IsInitialized(false)
+		IsDestroyed(Destroyed)
 	{
 	}
 
@@ -186,17 +182,17 @@ const size_t HCG::SecurityStrength()
 
 //~~~Public Functions~~~//
 
-void HCG::Generate(std::vector<byte> &Output)
+void HCG::Generate(std::vector<uint8_t> &Output)
 {
 	Generate(Output, 0, Output.size());
 }
 
-void HCG::Generate(SecureVector<byte> &Output)
+void HCG::Generate(SecureVector<uint8_t> &Output)
 {
 	Generate(Output, 0, Output.size());
 }
 
-void HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void HCG::Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -237,14 +233,14 @@ void HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 }
 
-void HCG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
+void HCG::Generate(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if ((Output.size() - OutOffset) < Length)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
-	std::vector<byte> tmpr(Length);
+	std::vector<uint8_t> tmpr(Length);
 	Generate(tmpr, 0, tmpr.size());
 	SecureMove(tmpr, 0, Output, OutOffset, tmpr.size());
 }
@@ -268,7 +264,7 @@ void HCG::Initialize(ISymmetricKey &Parameters)
 	// assign the library name, the formal class name, and the security-strength to the information-code parameter
 	ArrayTools::AppendVector(CEX_PREFIX, m_hcgState->Code);
 	ArrayTools::AppendString(Name(), m_hcgState->Code);
-	ArrayTools::AppendValue(static_cast<ushort>(SecurityStrength()), m_hcgState->Code);
+	ArrayTools::AppendValue(static_cast<uint16_t>(SecurityStrength()), m_hcgState->Code);
 	// add the optional custom distribution code
 	ArrayTools::AppendVector(Parameters.Info(), m_hcgState->Code); 
 
@@ -284,7 +280,7 @@ void HCG::Initialize(ISymmetricKey &Parameters)
 	m_hcgGenerator->Initialize(kp);
 
 	// increment the counter by the code size
-	IntegerTools::BeIncrease8(m_hcgState->Nonce, static_cast<uint>(m_hcgState->Code.size()));
+	IntegerTools::BeIncrease8(m_hcgState->Nonce, static_cast<uint32_t>(m_hcgState->Code.size()));
 	// update HMAC with the code and nonce
 	m_hcgGenerator->Update(m_hcgState->Code, 0, m_hcgState->Code.size());
 	m_hcgGenerator->Update(m_hcgState->Nonce, 0, m_hcgState->Nonce.size());
@@ -294,7 +290,7 @@ void HCG::Initialize(ISymmetricKey &Parameters)
 	m_hcgState->IsInitialized = true;
 }
 
-void HCG::Update(const std::vector<byte> &Key)
+void HCG::Update(const std::vector<uint8_t> &Key)
 {
 #if defined(CEX_ENFORCE_LEGALKEY)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
@@ -315,7 +311,7 @@ void HCG::Update(const std::vector<byte> &Key)
 		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::MaxExceeded);
 	}
 
-	std::vector<byte> tmpk(m_hcgState->Rate);
+	std::vector<uint8_t> tmpk(m_hcgState->Rate);
 
 	// update the HMAC with the new key
 	m_hcgGenerator->Update(Key, 0, Key.size());
@@ -338,9 +334,9 @@ void HCG::Update(const std::vector<byte> &Key)
 	Fill(m_hcgGenerator, m_hcgState);
 }
 
-void HCG::Update(const SecureVector<byte> &Key)
+void HCG::Update(const SecureVector<uint8_t> &Key)
 {
-	std::vector<byte> tmpk(Key.size());
+	std::vector<uint8_t> tmpk(Key.size());
 	MemoryTools::Copy(Key, 0, tmpk, 0, tmpk.size());
 	Update(tmpk);
 	MemoryTools::Clear(tmpk, 0, tmpk.size());
@@ -350,7 +346,7 @@ void HCG::Update(const SecureVector<byte> &Key)
 
 void HCG::Derive(std::unique_ptr<HMAC> &Generator, std::unique_ptr<IProvider> &Provider, std::unique_ptr<HcgState> &State)
 {
-	std::vector<byte> tmpk(State->Rate);
+	std::vector<uint8_t> tmpk(State->Rate);
 
 	// fill first half of the HMAC key with new random
 	Provider->Generate(tmpk, 0, tmpk.size() / 2);
@@ -371,7 +367,7 @@ void HCG::Derive(std::unique_ptr<HMAC> &Generator, std::unique_ptr<IProvider> &P
 	Fill(Generator, State);
 }
 
-void HCG::Expand(std::unique_ptr<HMAC> &Generator, std::unique_ptr<HcgState> &State, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void HCG::Expand(std::unique_ptr<HMAC> &Generator, std::unique_ptr<HcgState> &State, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (State->Cached < Length)
 	{
@@ -422,7 +418,7 @@ void HCG::Fill(std::unique_ptr<HMAC> &Generator, std::unique_ptr<HcgState> &Stat
 	// update HMAC with the info string
 	Generator->Update(State->Code, 0, State->Code.size());
 	// increment and update HMAC with the counter
-	IntegerTools::BeIncrease8(State->Nonce, static_cast<uint>(State->Rate));
+	IntegerTools::BeIncrease8(State->Nonce, static_cast<uint32_t>(State->Rate));
 	Generator->Update(State->Nonce, 0, State->Nonce.size());
 	// generate the block
 	Generator->Finalize(State->Buffer, 0);

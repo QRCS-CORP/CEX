@@ -18,7 +18,7 @@ class ECDH::EcdhState
 {
 public:
 
-	std::vector<byte> DomainKey;
+	std::vector<uint8_t> DomainKey;
 	bool Destroyed;
 	bool Encryption;
 	bool Initialized;
@@ -114,7 +114,7 @@ ECDH::~ECDH()
 
 //~~~Accessors~~~//
 
-std::vector<byte> &ECDH::DomainKey()
+std::vector<uint8_t> &ECDH::DomainKey()
 {
 	return m_ecdhState->DomainKey;
 }
@@ -157,9 +157,9 @@ const size_t ECDH::SharedSecretSize()
 
 //~~~Public Functions~~~//
 
-bool ECDH::KeyExchange(AsymmetricKey* PublicKey, AsymmetricKey* PrivateKey, std::vector<byte> &SharedSecret)
+bool ECDH::KeyExchange(AsymmetricKey* PublicKey, AsymmetricKey* PrivateKey, std::vector<uint8_t> &SharedSecret)
 {
-	std::vector<byte> sec(EC25519::EC25519_SECRET_SIZE);
+	std::vector<uint8_t> sec(EC25519::EC25519_SECRET_SIZE);
 	bool res;
 
 	res = ECDHBase::Ed25519KeyExchange(sec, PublicKey->Polynomial(), PrivateKey->Polynomial());
@@ -182,9 +182,9 @@ bool ECDH::KeyExchange(AsymmetricKey* PublicKey, AsymmetricKey* PrivateKey, std:
 
 AsymmetricKeyPair* ECDH::Generate()
 {
-	std::vector<byte> pk(EC25519::EC25519_PUBLICKEY_SIZE);
-	std::vector<byte> sk(EC25519::EC25519_PRIVATEKEY_SIZE);
-	std::vector<byte> seed(EC25519::EC25519_SEED_SIZE);
+	std::vector<uint8_t> pk(EC25519::EC25519_PUBLICKEY_SIZE);
+	std::vector<uint8_t> sk(EC25519::EC25519_PRIVATEKEY_SIZE);
+	std::vector<uint8_t> seed(EC25519::EC25519_SEED_SIZE);
 
 	m_rndGenerator->Generate(seed);
 	ECDHBase::Ed25519GenerateKeyPair(pk, sk, seed, m_rndDigest);
@@ -195,15 +195,15 @@ AsymmetricKeyPair* ECDH::Generate()
 	return new AsymmetricKeyPair(ask, apk);
 }
 
-AsymmetricKeyPair* ECDH::Generate(std::vector<byte> &Seed)
+AsymmetricKeyPair* ECDH::Generate(std::vector<uint8_t> &Seed)
 {
 	if (Seed.size() != EC25519::EC25519_SEED_SIZE)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The seed size is invalid!"), ErrorCodes::InvalidParam);
 	}
 
-	std::vector<byte> pk(EC25519::EC25519_PUBLICKEY_SIZE);
-	std::vector<byte> sk(EC25519::EC25519_PRIVATEKEY_SIZE);
+	std::vector<uint8_t> pk(EC25519::EC25519_PUBLICKEY_SIZE);
+	std::vector<uint8_t> sk(EC25519::EC25519_PRIVATEKEY_SIZE);
 
 	ECDHBase::Ed25519GenerateKeyPair(pk, sk, Seed, m_rndDigest);
 
@@ -213,10 +213,10 @@ AsymmetricKeyPair* ECDH::Generate(std::vector<byte> &Seed)
 	return new AsymmetricKeyPair(ask, apk);
 }
 
-void ECDH::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
+void ECDH::CXOF(const std::vector<uint8_t> &Domain, const std::vector<uint8_t> &Key, std::vector<uint8_t> &Secret, size_t Rate)
 {
-	std::vector<byte> tmpn(Name().begin(), Name().end());
-	Keccak::CXOFR24P1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
+	std::vector<uint8_t> tmpn(Name().begin(), Name().end());
+	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
 NAMESPACE_ECDHEND

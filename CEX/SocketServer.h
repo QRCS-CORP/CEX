@@ -19,8 +19,8 @@ class SocketServer
 {
 private:
 
-	static const uint DEF_BACKLOG = SOCKET_MAX_CONN;
-	static const uint MAX_SOCKETS = 10000;
+	static const uint32_t DEF_BACKLOG = SOCKET_MAX_CONN;
+	static const uint32_t MAX_SOCKETS = 10000;
 
 	class SocketServerState;
 
@@ -33,19 +33,19 @@ public:
 	/// Raised when an asynchronous socket connection from a remote host has been accepted.
 	/// <para>The event transmits an instance counter, and the address of the remote host<para>
 	/// </summary>
-	event<int, Socket&> OnAsyncSocketAccepted;
+	event<int32_t, Socket&> OnAsyncSocketAccepted;
 
 	/// <summary>
 	/// Raised when a socket connection from a remote host has been accepted.
 	/// <para>The event transmits an instance counter, and the address of the remote host<para>
 	/// </summary>
-	event<int, Socket&> OnSocketAccepted;
+	event<int32_t, Socket&> OnSocketAccepted;
 
 	/// <summary>
 	/// Raised when a socket has been closed.
 	/// <para>The event transmits an instance counter, and the address of the remote host<para>
 	/// </summary>
-	event<int, const std::string&> OnSocketClosed;
+	event<int32_t, const std::string&> OnSocketClosed;
 
 	/// <summary>
 	/// Raised when a socket encounters an error.
@@ -81,7 +81,7 @@ public:
 	/// <summary>
 	/// Get/Set: The maximum number of connections waiting in the listening queue
 	/// </summary>
-	uint &Backlog();
+	uint32_t &Backlog();
 
 	/// <summary>
 	/// Get: The listener operating state
@@ -96,7 +96,7 @@ public:
 	/// <summary>
 	/// Get/Set: The maximum number of simultaneous socket connections
 	/// </summary>
-	uint &MaxConnections();
+	uint32_t &MaxConnections();
 
 	/// <summary>
 	/// Get: The socket protocol type
@@ -123,7 +123,7 @@ public:
 	/// <remarks><para>If the socket can not be created, the error code returned in the exception is SocketInvalid.
 	/// If the socket can not be placed in the listening state the exception code is SocketFailure.
 	/// If the connection to the remote socket is refused, the exception code is SocketRefused.</para></remarks>
-	Socket Listen(const ipv4_address &Address, ushort Port);
+	Socket Listen(const ipv4_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// Places the socket in a blocking listening state, and waits for a connection.
@@ -138,7 +138,7 @@ public:
 	/// <remarks><para>If the socket can not be created, the error code returned in the exception is SocketInvalid.
 	/// If the socket can not be placed in the listening state the exception code is SocketFailure.
 	/// If the connection to the remote socket is refused, the exception code is SocketRefused.</para></remarks>
-	Socket Listen(const ipv6_address &Address, ushort Port);
+	Socket Listen(const ipv6_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// Start Non-Blocking listen on a port for an incoming connection
@@ -148,7 +148,7 @@ public:
 	/// <param name="Port">The application port number</param>
 	/// 
 	/// <exception cref="CryptoSocketException">Thrown if the Tcp listen operation has failed</exception>
-	void ListenAsync(const ipv4_address &Address, ushort Port);
+	void ListenAsync(const ipv4_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// Start Non-Blocking listen on a port for an incoming connection
@@ -158,7 +158,7 @@ public:
 	/// <param name="Port">The application port number</param>
 	///
 	/// <exception cref="CryptoSocketException">Thrown if the Tcp listen operation has failed</exception>
-	void ListenAsync(const ipv6_address &Address, ushort Port);
+	void ListenAsync(const ipv6_address &Address, uint16_t Port);
 
 	/// <summary>
 	/// Stop listening for a connection
@@ -178,7 +178,7 @@ private:
 	void AcceptBegin();
 	void AcceptEnd();
 	void AcceptCallback(IAsyncResult* Result);
-	uint PollSockets();
+	uint32_t PollSockets();
 	void SetOptions();
 };
 

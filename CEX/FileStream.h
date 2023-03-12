@@ -20,7 +20,7 @@ public:
 	/// <summary>
 	/// File access type flags
 	/// </summary>
-	enum class FileAccess : int
+	enum class FileAccess : int32_t
 	{
 		Read = std::ios::in,
 		ReadWrite = std::ios::out | std::ios::in,
@@ -30,7 +30,7 @@ public:
 	/// <summary>
 	/// File operation mode flags
 	/// </summary>
-	enum class FileModes : int
+	enum class FileModes : int32_t
 	{
 		Append = std::ios::app,
 		AtEnd = std::ios::ate,
@@ -40,14 +40,14 @@ public:
 
 private:
 
-	static const uint CHUNK_SIZE = 4096;
+	static const uint32_t CHUNK_SIZE = 4096;
 	static const std::string CLASS_NAME;
 
 	bool m_isDestroyed;
 	std::string m_fileName;
-	ulong m_filePosition;
-	ulong m_fileSize;
-	ulong m_fileWritten;
+	uint64_t m_filePosition;
+	uint64_t m_fileSize;
+	uint64_t m_fileWritten;
 	std::fstream m_fileStream;
 	FileAccess m_fileAccess;
 	FileModes m_fileMode;
@@ -127,7 +127,7 @@ public:
 	/// <summary>
 	/// Read Only: The stream length
 	/// </summary>
-	const ulong Length() override;
+	const uint64_t Length() override;
 
 	/// <summary>
 	/// Read Only: The streams class name
@@ -137,7 +137,7 @@ public:
 	/// <summary>
 	/// Read Only: The streams current position
 	/// </summary>
-	const ulong Position() override;
+	const uint64_t Position() override;
 
 	/// <summary>
 	/// Read/Write: The underlying stream
@@ -179,7 +179,7 @@ public:
 	/// <param name="FileName">The full path and file name</param>
 	///
 	/// <returns>Returns the file size</returns>
-	static ulong FileSize(const std::string &FileName);
+	static uint64_t FileSize(const std::string &FileName);
 
 	/// <summary>
 	/// Write the stream to disk
@@ -195,14 +195,14 @@ public:
 	/// <param name="Length">The number of bytes to read</param>
 	///
 	/// <returns>The number of bytes read</returns>
-	size_t Read(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	size_t Read(std::vector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Read a single byte from the stream
+	/// Read a single uint8_t from the stream
 	/// </summary>
 	///
-	/// <returns>The read byte value</returns>
-	byte ReadByte() override;
+	/// <returns>The read uint8_t value</returns>
+	uint8_t ReadByte() override;
 
 	/// <summary>
 	/// Reset and initialize the underlying stream to zero
@@ -215,14 +215,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	void Seek(ulong Offset, SeekOrigin Origin) override;
+	void Seek(uint64_t Offset, SeekOrigin Origin) override;
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	void SetLength(ulong Length) override;
+	void SetLength(uint64_t Length) override;
 
 	/// <summary>
 	/// Writes an input buffer to the stream
@@ -233,14 +233,14 @@ public:
 	/// <param name="Length">The number of bytes to write</param>
 	///
 	/// <returns>The number of bytes written</returns>
-	void Write(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
+	void Write(const std::vector<uint8_t> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Write a single byte from the stream
+	/// Write a single uint8_t from the stream
 	/// </summary>
 	///
-	/// <param name="Value">The byte value to write</param>
-	void WriteByte(byte Value) override;
+	/// <param name="Value">The uint8_t value to write</param>
+	void WriteByte(uint8_t Value) override;
 };
 
 NAMESPACE_IOEND

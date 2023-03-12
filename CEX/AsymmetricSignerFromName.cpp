@@ -1,6 +1,5 @@
 #include "AsymmetricSignerFromName.h"
 #include "Dilithium.h"
-#include "Rainbow.h"
 #include "SphincsPlus.h"
 #include "XMSS.h"
 
@@ -24,11 +23,6 @@ IAsymmetricSigner* AsymmetricSignerFromName::GetInstance(AsymmetricSigners Signe
 			case AsymmetricSigners::Dilithium:
 			{
 				mptr = new DLTM::Dilithium(static_cast<Enumeration::DilithiumParameters>(Parameters)); 
-				break;
-			}
-			case AsymmetricSigners::Rainbow:
-			{
-				mptr = new RNBW::Rainbow(static_cast<Enumeration::RainbowParameters>(Parameters)); 
 				break;
 			}
 			case AsymmetricSigners::SphincsPlus:

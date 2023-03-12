@@ -9,7 +9,7 @@ NAMESPACE_CIPHER
 using Exception::CryptoSymmetricException;
 
 /// <summary>
-/// Contains the legal byte lengths for SymmetricKey and SymmetricSecureKey pseudo-random keying material
+/// Contains the legal uint8_t lengths for SymmetricKey and SymmetricSecureKey pseudo-random keying material
 /// </summary> 
 struct SymmetricKeySize
 {
@@ -37,15 +37,15 @@ public:
 	/// <param name="KeyArray">Array containing a serialized SymmetricKeySize structure</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if the key array is too small</exception>
-	explicit SymmetricKeySize(const std::vector<byte> &KeyArray);
+	explicit SymmetricKeySize(const std::vector<uint8_t> &KeyArray);
 
 	/// <summary>
 	/// Initialize this structure with parameters
 	/// </summary>
 	/// 
-	/// <param name="KeySize">The key parameters byte length</param>
-	/// <param name="IVSize">The nonce parameters byte length</param>
-	/// <param name="InfoSize">The info parameters byte length</param>
+	/// <param name="KeySize">The key parameters uint8_t length</param>
+	/// <param name="IVSize">The nonce parameters uint8_t length</param>
+	/// <param name="InfoSize">The info parameters uint8_t length</param>
 	SymmetricKeySize(size_t KeySize, size_t IVSize, size_t InfoSize);
 
 	//~~~Accessors~~~//
@@ -85,11 +85,11 @@ public:
 	void Reset();
 
 	/// <summary>
-	/// Convert the SymmetricKeySize structure serialized to a byte array
+	/// Convert the SymmetricKeySize structure serialized to a uint8_t array
 	/// </summary>
 	/// 
-	/// <returns>The byte array containing the SymmetricKeySize</returns>
-	std::vector<byte> ToBytes();
+	/// <returns>The uint8_t array containing the SymmetricKeySize</returns>
+	std::vector<uint8_t> ToBytes();
 };
 
 NAMESPACE_CIPHEREND

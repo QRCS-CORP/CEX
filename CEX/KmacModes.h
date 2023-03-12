@@ -9,28 +9,24 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The type of KMAC MAC variant.
 /// </summary>
-enum class KmacModes : byte
+enum class KmacModes : uint8_t
 {
 	/// <summary>
 	/// No KMAC mode is selected
 	/// </summary>
-	None = static_cast<byte>(Macs::None),
+	None = static_cast<uint8_t>(Macs::None),
 	/// <summary>
 	/// The KMAC128 MAC function
 	/// </summary>
-	KMAC128 = static_cast<byte>(Macs::KMAC128),
+	KMAC128 = static_cast<uint8_t>(Macs::KMAC128),
 	/// <summary>
 	/// The KMAC256 MAC function
 	/// </summary>
-	KMAC256 = static_cast<byte>(Macs::KMAC256),
+	KMAC256 = static_cast<uint8_t>(Macs::KMAC256),
 	/// <summary>
 	/// The KMAC512 MAC function
 	/// </summary>
-	KMAC512 = static_cast<byte>(Macs::KMAC512),
-	/// <summary>
-	/// The KMAC1024 MAC function
-	/// </summary>
-	KMAC1024 = static_cast<byte>(Macs::KMAC1024)
+	KMAC512 = static_cast<uint8_t>(Macs::KMAC512),
 };
 
 class KmacModeConvert

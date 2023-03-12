@@ -66,7 +66,7 @@ public:
 	/// <param name="PolicyType">The asymmetric keys security policy</param>
 	///
 	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters or an empty polynomial vector are passed</exception>
-	AsymmetricSecureKey(const std::vector<byte> &Polynomial, const std::vector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters Parameters, SecurityPolicy PolicyType);
+	AsymmetricSecureKey(const std::vector<uint8_t> &Polynomial, const std::vector<uint8_t> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters Parameters, SecurityPolicy PolicyType);
 
 	/// <summary>
 	/// Initialize this class with an asymmetric secure-vector polynomial and the asymmetric primitives parameter settings
@@ -80,7 +80,7 @@ public:
 	/// <param name="PolicyType">The asymmetric keys security policy</param>
 	///
 	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters or an empty polynomial vector are passed</exception>
-	AsymmetricSecureKey(const SecureVector<byte> &Polynomial, const SecureVector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters Parameters, SecurityPolicy PolicyType);
+	AsymmetricSecureKey(const SecureVector<uint8_t> &Polynomial, const SecureVector<uint8_t> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters Parameters, SecurityPolicy PolicyType);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -107,12 +107,12 @@ public:
 	/// <summary>
 	/// Read Only: The asymmetric keys standard-vector polynomial
 	/// </summary>
-	const std::vector<byte> Polynomial() override;
+	const std::vector<uint8_t> Polynomial() override;
 
 	/// <summary>
 	/// Read Only: The asymmetric keys secure-vector polynomial
 	/// </summary>
-	const void SecurePolynomial(SecureVector<byte> &Output);
+	const void SecurePolynomial(SecureVector<uint8_t> &Output);
 
 	//~~~Public Functions~~~//
 
@@ -130,7 +130,7 @@ public:
 	/// <param name="KeyStream">Stream containing the serialized AsymmetricKey</param>
 	/// 
 	/// <returns>A populated AsymmetricKey container</returns>
-	static AsymmetricKey* DeSerialize(SecureVector<byte> &KeyStream);
+	static AsymmetricKey* DeSerialize(SecureVector<uint8_t> &KeyStream);
 
 	/// <summary>
 	/// Serialize and convert an AsymmetricSecureKey into an AsymmetricKey key-stream
@@ -139,14 +139,14 @@ public:
 	/// <param name="KeyParams">The AsymmetricKey key container</param>
 	/// 
 	/// <returns>A key-stream containing a serialized AsymmetricKey key</returns>
-	static SecureVector<byte> Serialize(AsymmetricSecureKey &KeyParams);
+	static SecureVector<uint8_t> Serialize(AsymmetricSecureKey &KeyParams);
 
 	//~~~Private Functions~~~//
 
 	static void Encipher(std::unique_ptr<AsymmetricSecureKeyState> &State);
-	static void Extract(std::unique_ptr<AsymmetricSecureKeyState> &State, SecureVector<byte> &Output, size_t Length);
+	static void Extract(std::unique_ptr<AsymmetricSecureKeyState> &State, SecureVector<uint8_t> &Output, size_t Length);
 	static IStreamCipher* GetStreamCipher(SecurityPolicy Policy);
-	static void GetSystemKey(SecurityPolicy Policy, const SecureVector<byte> &Salt, SecureVector<byte> &Output);
+	static void GetSystemKey(SecurityPolicy Policy, const SecureVector<uint8_t> &Salt, SecureVector<uint8_t> &Output);
 };
 
 NAMESPACE_ASYMMETRICEND

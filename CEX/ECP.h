@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by January 28, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_ECP_H
 #define CEX_ECP_H
@@ -38,7 +38,7 @@ using Enumeration::ShakeModes;
 /// <example>
 /// <description>Example of getting a seed value:</description>
 /// <code>
-/// std::vector&lt;byte&gt; output(32);
+/// std::vector&lt;uint8_t&gt; output(32);
 /// ECP gen;
 /// gen.Generate(output);
 /// </code>
@@ -106,7 +106,7 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes
@@ -115,7 +115,7 @@ public:
 	/// <param name="Output">The destination SecureVector to fill</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(SecureVector<byte> &Output) override;
+	void Generate(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
@@ -126,7 +126,7 @@ public:
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes using offset and length parameters
@@ -137,7 +137,7 @@ public:
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the internal state
@@ -150,18 +150,18 @@ private:
 
 	bool FipsTest();
 
-	static std::vector<byte> Collect();
-	static std::vector<byte> Compress(std::vector<byte> &State);
-	static std::vector<byte> DriveInfo();
-	static void Filter(std::vector<byte> &State);
-	static void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator);
-	static std::vector<byte> MemoryInfo();
-	static std::vector<byte> NetworkInfo();
-	static std::vector<byte> ProcessInfo();
-	static std::vector<byte> ProcessorInfo();
-	static std::vector<byte> SystemInfo();
-	static std::vector<byte> TimeInfo();
-	static std::vector<byte> UserInfo();
+	static std::vector<uint8_t> Collect();
+	static std::vector<uint8_t> Compress(std::vector<uint8_t> &State);
+	static std::vector<uint8_t> DriveInfo();
+	static void Filter(std::vector<uint8_t> &State);
+	static void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator);
+	static std::vector<uint8_t> MemoryInfo();
+	static std::vector<uint8_t> NetworkInfo();
+	static std::vector<uint8_t> ProcessInfo();
+	static std::vector<uint8_t> ProcessorInfo();
+	static std::vector<uint8_t> SystemInfo();
+	static std::vector<uint8_t> TimeInfo();
+	static std::vector<uint8_t> UserInfo();
 };
 
 NAMESPACE_PROVIDEREND

@@ -25,7 +25,7 @@ const std::string ZeroOne::Name()
 	return CLASS_NAME; 
 }
 
-void ZeroOne::AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length)
+void ZeroOne::AddPadding(std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (Length > Input.size())
 	{
@@ -42,13 +42,13 @@ void ZeroOne::AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length)
 	}
 }
 
-size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input)
+size_t ZeroOne::GetBlockLength(const std::vector<uint8_t> &Input)
 {
 	const size_t BLKSZE = Input.size();
 	size_t ctr = BLKSZE;
 	size_t pos = BLKSZE;
-	byte inp;
-	byte seen;
+	uint8_t inp;
+	uint8_t seen;
 
 	ctr = BLKSZE;
 	inp = 0;
@@ -57,9 +57,9 @@ size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input)
 
 	while (ctr != 0)
 	{
-		seen |= IntegerTools::IsEqual<byte>(Input[ctr - 1], 0x80);
-		pos -= IntegerTools::Select<byte>(~seen, 1, 0);
-		inp |= ~IntegerTools::IsZero<byte>(Input[ctr - 1]) & ~seen;
+		seen |= IntegerTools::IsEqual<uint8_t>(Input[ctr - 1], 0x80);
+		pos -= IntegerTools::Select<uint8_t>(~seen, 1, 0);
+		inp |= ~IntegerTools::IsZero<uint8_t>(Input[ctr - 1]) & ~seen;
 		--ctr;
 	}
 	inp |= ~seen;
@@ -69,7 +69,7 @@ size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input)
 	return pos;
 }
 
-size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input, size_t Offset, size_t Length)
+size_t ZeroOne::GetBlockLength(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (Length > Input.size())
 	{
@@ -79,8 +79,8 @@ size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input, size_t Offset, si
 	const size_t BLKSZE = Length;
 	size_t ctr = BLKSZE;
 	size_t pos = BLKSZE;
-	byte inp;
-	byte seen;
+	uint8_t inp;
+	uint8_t seen;
 
 	ctr = BLKSZE;
 	inp = 0;
@@ -89,9 +89,9 @@ size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input, size_t Offset, si
 
 	while (ctr != Offset)
 	{
-		seen |= IntegerTools::IsEqual<byte>(Input[ctr - 1], 0x80);
-		pos -= IntegerTools::Select<byte>(~seen, 1, 0);
-		inp |= ~IntegerTools::IsZero<byte>(Input[ctr - 1]) & ~seen;
+		seen |= IntegerTools::IsEqual<uint8_t>(Input[ctr - 1], 0x80);
+		pos -= IntegerTools::Select<uint8_t>(~seen, 1, 0);
+		inp |= ~IntegerTools::IsZero<uint8_t>(Input[ctr - 1]) & ~seen;
 		--ctr;
 	}
 	inp |= ~seen;

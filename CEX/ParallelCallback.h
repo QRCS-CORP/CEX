@@ -17,7 +17,7 @@ typedef std::function<void()> Callback;
 struct ParallelCallbackData
 {
     Callback callback;
-    std::atomic<int> counter;
+    std::atomic<int32_t> counter;
     std::atomic<bool> started;
 
     ParallelCallbackData(const Callback& callback) 

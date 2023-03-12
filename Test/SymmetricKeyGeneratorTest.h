@@ -69,7 +69,7 @@ namespace Test
 
 	private:
 
-		void Evaluate(const std::string &Name, std::vector<byte> &Sample);
+		void Evaluate(const std::string &Name, std::vector<uint8_t> &Sample);
 		void OnProgress(const std::string &Data);
 	};
 }

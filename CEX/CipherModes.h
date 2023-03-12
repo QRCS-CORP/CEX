@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Symmetric cipher mode enumeration names
 /// </summary>
-enum class CipherModes : byte
+enum class CipherModes : uint8_t
 {
 	/// <summary>
 	/// No cipher mode is specified
@@ -59,17 +59,13 @@ enum class CipherModes : byte
 	/// </summary>
 	HBAS512 = 11,
 	/// <summary>
-	/// HBA AEAD mode, parameters: CTR(RHXS-1024) with KMAC-1024 Authentication
-	/// </summary>
-	HBAS1024 = 12,
-	/// <summary>
 	/// Little Endian Integer Counter Mode
 	/// </summary>
-	ICM = 13,
+	ICM = 12,
 	/// <summary>
 	/// Output FeedBack Mode
 	/// </summary>
-	OFB = 14
+	OFB = 13
 };
 
 class CipherModeConvert

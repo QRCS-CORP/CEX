@@ -114,7 +114,7 @@ namespace Test
 		{
 			KDF2 gen(SHA2Digests::SHA2256);
 			// invalid key size
-			std::vector<byte> key(1);
+			std::vector<uint8_t> key(1);
 			SymmetricKey kp(key);
 			gen.Initialize(kp);
 
@@ -132,7 +132,7 @@ namespace Test
 		try
 		{
 			KDF2 gen(SHA2Digests::SHA2256);
-			std::vector<byte> otp(32);
+			std::vector<uint8_t> otp(32);
 			// generator was not initialized
 			gen.Generate(otp);
 
@@ -150,9 +150,9 @@ namespace Test
 		try
 		{
 			KDF2 gen(SHA2Digests::SHA2256);
-			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> otp(32);
+			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[0];
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> otp(32);
 
 			SymmetricKey kp(key);
 			gen.Initialize(kp);
@@ -173,10 +173,10 @@ namespace Test
 		try
 		{
 			KDF2 gen(SHA2Digests::SHA2256);
-			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
-			std::vector<byte> key(ks.KeySize());
+			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[0];
+			std::vector<uint8_t> key(ks.KeySize());
 			// output exceeds maximum
-			std::vector<byte> otp(256 * 32);
+			std::vector<uint8_t> otp(256 * 32);
 			SymmetricKey kp(key);
 			gen.Initialize(kp);
 			gen.Generate(otp, 0, otp.size());
@@ -209,9 +209,9 @@ namespace Test
 		HexConverter::Decode(expected, 2, m_expected);
 	}
 
-	void KDF2Test::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected)
+	void KDF2Test::Kat(IKdf* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> otp(Expected.size());
+		std::vector<uint8_t> otp(Expected.size());
 		SymmetricKey kp(Key);
 		
 		Generator->Initialize(kp);
@@ -230,10 +230,10 @@ namespace Test
 
 	void KDF2Test::Params(IKdf* Generator)
 	{
- 		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
-		std::vector<byte> otp1;
-		std::vector<byte> otp2;
-		std::vector<byte> key(ks.KeySize());
+ 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
+		std::vector<uint8_t> otp1;
+		std::vector<uint8_t> otp2;
+		std::vector<uint8_t> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -264,9 +264,9 @@ namespace Test
 
 	void KDF2Test::Stress(IKdf* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
-		std::vector<byte> otp;
-		std::vector<byte> key(ks.KeySize());
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
+		std::vector<uint8_t> otp;
+		std::vector<uint8_t> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
 

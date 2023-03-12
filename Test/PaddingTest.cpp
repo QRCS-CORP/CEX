@@ -84,9 +84,9 @@ namespace Test
 	void PaddingTest::Kat(Padding::IPadding* Padding)
 	{
 		const size_t MSGBLK = 16;
-		std::vector<byte> fill(MSGBLK * 2);
-		std::vector<byte> msg1(0);
-		std::vector<byte> msg2(0);
+		std::vector<uint8_t> fill(MSGBLK * 2);
+		std::vector<uint8_t> msg1(0);
+		std::vector<uint8_t> msg2(0);
 		SecureRandom gen;
 		size_t i;
 		size_t len;

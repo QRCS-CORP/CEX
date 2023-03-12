@@ -9,24 +9,24 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The type of KBA MAC variant.
 /// </summary>
-enum class KpaModes : byte
+enum class KpaModes : uint8_t
 {
 	/// <summary>
 	/// No KMAC mode is selected
 	/// </summary>
-	None = static_cast<byte>(Macs::None),
+	None = static_cast<uint8_t>(Macs::None),
 	/// <summary>
 	/// The KPA128 MAC function
 	/// </summary>
-	KPA128 = static_cast<byte>(Macs::KPA128),
+	KPA128 = static_cast<uint8_t>(Macs::KPA128),
 	/// <summary>
 	/// The KPA256 MAC function
 	/// </summary>
-	KPA256 = static_cast<byte>(Macs::KPA256),
+	KPA256 = static_cast<uint8_t>(Macs::KPA256),
 	/// <summary>
 	/// The KPA512 MAC function
 	/// </summary>
-	KPA512 = static_cast<byte>(Macs::KPA512)
+	KPA512 = static_cast<uint8_t>(Macs::KPA512)
 };
 
 class KbaModeConvert

@@ -24,11 +24,11 @@ namespace Test
 		static const size_t MINM_ALLOC = 1024;
 		static const size_t TEST_CYCLES = 100;
 
-		std::vector<std::vector<byte>> m_expected;
-        std::vector<std::vector<byte>> m_key;
-        std::vector<std::vector<byte>> m_info;
+		std::vector<std::vector<uint8_t>> m_expected;
+        std::vector<std::vector<uint8_t>> m_key;
+        std::vector<std::vector<uint8_t>> m_info;
 		TestEventHandler m_progressEvent;
-        std::vector<std::vector<byte>> m_salt;
+        std::vector<std::vector<uint8_t>> m_salt;
         
     public:
 
@@ -71,8 +71,8 @@ namespace Test
 		/// <param name="Key">The input key</param>
 		/// <param name="Info">The info array</param>
 		/// <param name="Expected">The expected output</param>
-		void Kat(IKdf* Generator, const std::vector<byte> &Salt, const std::vector<byte> &Key, 
-			const std::vector<byte> &Info, const std::vector<byte> &Expected);
+		void Kat(IKdf* Generator, const std::vector<uint8_t> &Salt, const std::vector<uint8_t> &Key, 
+			const std::vector<uint8_t> &Info, const std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Test the different initialization options

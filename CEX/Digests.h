@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Cryptographic hash functions enumeration names
 /// </summary>
-enum class Digests : byte
+enum class Digests : uint8_t
 {
 
 	/// <summary>
@@ -32,33 +32,25 @@ enum class Digests : byte
 	/// </summary>
 	SHA3512 = 4,
 	/// <summary>
-	/// The SHA-3 digest based on Keccak with a 1024 bit return size
-	/// </summary>
-	SHA31024 = 5,
-	/// <summary>
 	///The SHA-2 digest with a 256 bit return size
 	/// </summary>
-	SHA2256 = 6,
+	SHA2256 = 5,
 	/// <summary>
 	/// The SHA-2 digest with a 512 bit return size
 	/// </summary>
-	SHA2512 = 7,
+	SHA2512 = 6,
 	/// <summary>
 	/// The SHAKE-128 digest with a 128 bit return size
 	/// </summary>
-	SHAKE128 = 9,
+	SHAKE128 = 8,
 	/// <summary>
 	/// The SHAKE-256 digest with a 256 bit return size
 	/// </summary>
-	SHAKE256 = 10,
+	SHAKE256 = 9,
 	/// <summary>
 	/// The SHAKE-512 digest with a 512 bit return size
 	/// </summary>
-	SHAKE512 = 11,
-	/// <summary>
-	/// The SHAKE-1024 digest with a 1024 bit return size
-	/// </summary>
-	SHAKE1024 = 12,
+	SHAKE512 = 10,
 	/// <summary>
 	/// The Skein digest with a 256 bit return size
 	/// </summary>

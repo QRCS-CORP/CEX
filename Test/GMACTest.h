@@ -23,10 +23,10 @@ namespace Test
 		static const size_t MINM_ALLOC = 1024;
 		static const size_t TEST_CYCLES = 100;
 
-		std::vector<std::vector<byte>> m_expected;
-		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_message;
-		std::vector<std::vector<byte>> m_nonce;
+		std::vector<std::vector<uint8_t>> m_expected;
+		std::vector<std::vector<uint8_t>> m_key;
+		std::vector<std::vector<uint8_t>> m_message;
+		std::vector<std::vector<uint8_t>> m_nonce;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -69,7 +69,7 @@ namespace Test
 		/// <param name="Nonce">The generator nonce</param>
 		/// <param name="Message">The message array</param>
 		/// <param name="Expected">The expected mac code</param>
-		void Kat(std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void Kat(std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Test the different initialization options

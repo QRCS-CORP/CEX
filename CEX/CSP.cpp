@@ -61,7 +61,7 @@ CSP::~CSP()
 
 //~~~Public Functions~~~//
 
-void CSP::Generate(std::vector<byte> &Output)
+void CSP::Generate(std::vector<uint8_t> &Output)
 {
 	if (IsAvailable() == false)
 	{
@@ -75,7 +75,7 @@ void CSP::Generate(std::vector<byte> &Output)
 	Generate(Output.data(), Output.size());
 }
 
-void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
+void CSP::Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (IsAvailable() == false)
 	{
@@ -93,7 +93,7 @@ void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	Generate(&Output[Offset], Length);
 }
 
-void CSP::Generate(SecureVector<byte> &Output)
+void CSP::Generate(SecureVector<uint8_t> &Output)
 {
 	if (IsAvailable() == false)
 	{
@@ -107,7 +107,7 @@ void CSP::Generate(SecureVector<byte> &Output)
 	Generate(Output.data(), Output.size());
 }
 
-void CSP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
+void CSP::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (IsAvailable() == false)
 	{
@@ -125,7 +125,7 @@ void CSP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 	Generate(&Output[Offset], Length);
 }
 
-void CSP::Generate(byte* Output, size_t Length)
+void CSP::Generate(uint8_t* Output, size_t Length)
 {
 	size_t poff = 0;
 
@@ -165,8 +165,8 @@ void CSP::Generate(byte* Output, size_t Length)
 		{
 			do
 			{
-				const size_t PRCRMD = IntegerTools::Min(sizeof(uint), Length);
-				uint rnd = arc4random();
+				const size_t PRCRMD = IntegerTools::Min(sizeof(uint32_t), Length);
+				uint32_t rnd = arc4random();
 				MemoryTools::Copy(rnd, Output, poff, PRCRMD);
 				poff += PRCRMD;
 				Length -= PRCRMD;
@@ -182,7 +182,7 @@ void CSP::Generate(byte* Output, size_t Length)
 
 	if (Length != 0)
 	{
-		int fdhandle = ::open(CEX_SYSTEM_RNG_DEVICE, O_RDONLY | O_NOCTTY);
+		int32_t fdhandle = ::open(CEX_SYSTEM_RNG_DEVICE, O_RDONLY | O_NOCTTY);
 
 		if (fdhandle <= 0)
 		{
@@ -191,7 +191,7 @@ void CSP::Generate(byte* Output, size_t Length)
 
 		do
 		{
-			int rlen = ::read(fdhandle, Output + poff, Length);
+			int32_t rlen = ::read(fdhandle, Output + poff, Length);
 
 			if (rlen < 0)
 			{
@@ -242,7 +242,7 @@ bool CSP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	SecureVector<byte> smp(m_pvdSelfTest->SELFTEST_LENGTH);
+	SecureVector<uint8_t> smp(m_pvdSelfTest->SELFTEST_LENGTH);
 
 	Generate(smp.data(), smp.size());
 

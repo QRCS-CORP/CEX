@@ -1,8 +1,10 @@
 #include "McEliece.h"
+#include "Keccak.h"
+#include "MPKCN4608T96.h"
+#include "MPKCN6688T128.h"
 #include "MPKCN6960T119.h"
 #include "MPKCN8192T128.h"
 #include "IntegerTools.h"
-#include "Keccak.h"
 #include "PrngFromName.h"
 #include "SymmetricKey.h"
 
@@ -17,7 +19,7 @@ class McEliece::MpkcState
 {
 public:
 
-	std::vector<byte> DomainKey;
+	std::vector<uint8_t> DomainKey;
 	bool Destroyed;
 	bool Encryption;
 	bool Initialized;
@@ -47,8 +49,10 @@ public:
 
 McEliece::McEliece(McElieceParameters Parameters, Prngs PrngType)
 	:
-	m_mpkcState(new MpkcState(Parameters == McElieceParameters::MPKCS2N6960T119 || 
-		Parameters == McElieceParameters::MPKCS3N8192T128 ? 
+	m_mpkcState(new MpkcState(Parameters == McElieceParameters::MPKCS3N4608T96 ||
+		Parameters == McElieceParameters::MPKCS3N6960T119 ||
+		Parameters == McElieceParameters::MPKCS4N6688T128 ||
+		Parameters == McElieceParameters::MPKCS5N8192T128 ?
 			Parameters :
 			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::McEliece), std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
@@ -61,8 +65,10 @@ McEliece::McEliece(McElieceParameters Parameters, Prngs PrngType)
 
 McEliece::McEliece(McElieceParameters Parameters, IPrng* Prng)
 	:
-	m_mpkcState(new MpkcState(Parameters == McElieceParameters::MPKCS2N6960T119 ||
-		Parameters == McElieceParameters::MPKCS3N8192T128 ? 
+	m_mpkcState(new MpkcState(Parameters == McElieceParameters::MPKCS3N4608T96 ||
+		Parameters == McElieceParameters::MPKCS3N6960T119 ||
+		Parameters == McElieceParameters::MPKCS4N6688T128 ||
+		Parameters == McElieceParameters::MPKCS5N8192T128 ?
 			Parameters :
 			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::McEliece), std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
@@ -101,15 +107,26 @@ McEliece::~McEliece()
 const size_t McEliece::CipherTextSize()
 {
 	size_t clen;
-
+	
 	switch (m_mpkcState->Parameters)
 	{
-		case (McElieceParameters::MPKCS2N6960T119):
+		case (McElieceParameters::MPKCS3N4608T96):
+		{
+			clen = MPKCN4608T96::CIPHERTEXT_SIZE;
+			break;
+		}
+
+		case (McElieceParameters::MPKCS3N6960T119):
 		{
 			clen = MPKCN6960T119::CIPHERTEXT_SIZE;
 			break;
 		}
-		case (McElieceParameters::MPKCS3N8192T128):
+		case (McElieceParameters::MPKCS4N6688T128):
+		{
+			clen = MPKCN6688T128::CIPHERTEXT_SIZE;
+			break;
+		}
+		case (McElieceParameters::MPKCS5N8192T128):
 		{
 			clen = MPKCN8192T128::CIPHERTEXT_SIZE;
 			break;
@@ -124,7 +141,7 @@ const size_t McEliece::CipherTextSize()
 	return clen;
 }
 
-std::vector<byte> &McEliece::DomainKey()
+std::vector<uint8_t> &McEliece::DomainKey()
 {
 	return m_mpkcState->DomainKey;
 }
@@ -166,12 +183,22 @@ const size_t McEliece::PrivateKeySize()
 
 	switch (m_mpkcState->Parameters)
 	{
-		case (McElieceParameters::MPKCS2N6960T119):
+		case (McElieceParameters::MPKCS3N4608T96):
+		{
+			klen = MPKCN4608T96::PRIVATEKEY_SIZE;
+			break;
+		}
+		case (McElieceParameters::MPKCS3N6960T119):
 		{
 			klen = MPKCN6960T119::PRIVATEKEY_SIZE;
 			break;
 		}
-		case (McElieceParameters::MPKCS3N8192T128):
+		case (McElieceParameters::MPKCS4N6688T128):
+		{
+			klen = MPKCN6688T128::PRIVATEKEY_SIZE;
+			break;
+		}
+		case (McElieceParameters::MPKCS5N8192T128):
 		{
 			klen = MPKCN8192T128::PRIVATEKEY_SIZE;
 			break;
@@ -192,12 +219,22 @@ const size_t McEliece::PublicKeySize()
 
 	switch (m_mpkcState->Parameters)
 	{
-		case (McElieceParameters::MPKCS2N6960T119):
+		case (McElieceParameters::MPKCS3N4608T96):
+		{
+			klen = MPKCN4608T96::PUBLICKEY_SIZE;
+			break;
+		}
+		case (McElieceParameters::MPKCS3N6960T119):
 		{
 			klen = MPKCN6960T119::PUBLICKEY_SIZE;
 			break;
 		}
-		case (McElieceParameters::MPKCS3N8192T128):
+		case (McElieceParameters::MPKCS4N6688T128):
+		{
+			klen = MPKCN6688T128::PUBLICKEY_SIZE;
+			break;
+		}
+		case (McElieceParameters::MPKCS5N8192T128):
 		{
 			klen = MPKCN8192T128::PUBLICKEY_SIZE;
 			break;
@@ -219,21 +256,32 @@ const size_t McEliece::SharedSecretSize()
 
 //~~~Public Functions~~~//
 
-bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+bool McEliece::Decapsulate(const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret)
 {
 	CEXASSERT(m_mpkcState->Initialized, "The cipher has not been initialized");
 
-	std::vector<byte> sec(SECRET_SIZE, 0x00);
+	std::vector<uint8_t> sec(SECRET_SIZE, 0x00);
 	bool res;
-
+	
 	switch (m_mpkcState->Parameters)
 	{
-		case McElieceParameters::MPKCS2N6960T119:
+		case McElieceParameters::MPKCS3N4608T96:
+		{
+			res = MPKCN4608T96::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
+			break;
+		}
+
+		case McElieceParameters::MPKCS3N6960T119:
 		{
 			res = MPKCN6960T119::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
 			break;
 		}
-		case McElieceParameters::MPKCS3N8192T128:
+		case McElieceParameters::MPKCS4N6688T128:
+		{
+			res = MPKCN6688T128::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
+			break;
+		}
+		case McElieceParameters::MPKCS5N8192T128:
 		{
 			res = MPKCN8192T128::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
 			break;
@@ -261,22 +309,42 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 	return res;
 }
 
-void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+void McEliece::Encapsulate(std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret)
 {
 	CEXASSERT(m_mpkcState->Initialized, "The cipher has not been initialized");
 	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
-	std::vector<byte> sec(SECRET_SIZE);
+	std::vector<uint8_t> sec(SECRET_SIZE);
 
 	switch (m_mpkcState->Parameters)
 	{
-		case McElieceParameters::MPKCS2N6960T119:
+		case McElieceParameters::MPKCS3N4608T96:
 		{
-			CipherText.resize(MPKCN6960T119::CIPHERTEXT_SIZE);
-			MPKCN6960T119::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
+			CipherText.resize(MPKCN4608T96::CIPHERTEXT_SIZE);
+			MPKCN4608T96::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
 			break;
 		}
-		case McElieceParameters::MPKCS3N8192T128:
+		case McElieceParameters::MPKCS3N6960T119:
+		{
+			bool res;
+
+			CipherText.resize(MPKCN6960T119::CIPHERTEXT_SIZE);
+			res = MPKCN6960T119::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
+
+			if (res == false)
+			{
+				throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The McEliece encasulation padding is invalid!"), ErrorCodes::InvalidState);
+			}
+
+			break;
+		}
+		case McElieceParameters::MPKCS4N6688T128:
+		{
+			CipherText.resize(MPKCN6688T128::CIPHERTEXT_SIZE);
+			MPKCN6688T128::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
+			break;
+		}
+		case McElieceParameters::MPKCS5N8192T128:
 		{
 			CipherText.resize(MPKCN8192T128::CIPHERTEXT_SIZE);
 			MPKCN8192T128::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
@@ -302,31 +370,55 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 
 AsymmetricKeyPair* McEliece::Generate()
 {
-	std::vector<byte> pk(0);
-	std::vector<byte> sk(0);
+	std::vector<uint8_t> pk(0);
+	std::vector<uint8_t> sk(0);
 
 	switch (m_mpkcState->Parameters)
 	{
-		case McElieceParameters::MPKCS2N6960T119:
+		case McElieceParameters::MPKCS3N4608T96:
 		{
-			pk.resize(MPKCN6960T119::PUBLICKEY_SIZE);
-			sk.resize(MPKCN6960T119::PRIVATEKEY_SIZE);
+			pk.resize(MPKCN4608T96::PUBLICKEY_SIZE);
+			sk.resize(MPKCN4608T96::PRIVATEKEY_SIZE);
 
-			if (!MPKCN6960T119::Generate(pk, sk, m_rndGenerator))
+			if (MPKCN4608T96::Generate(pk, sk, m_rndGenerator) == false)
 			{
-				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS2N6960T119"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS3N4608T96"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
 			}
 
 			break;
 		}
-		case McElieceParameters::MPKCS3N8192T128:
+		case McElieceParameters::MPKCS3N6960T119:
+		{
+			pk.resize(MPKCN6960T119::PUBLICKEY_SIZE);
+			sk.resize(MPKCN6960T119::PRIVATEKEY_SIZE);
+
+			if (MPKCN6960T119::Generate(pk, sk, m_rndGenerator) == false)
+			{
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS3N6960T119"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			}
+
+			break;
+		}
+		case McElieceParameters::MPKCS4N6688T128:
+		{
+			pk.resize(MPKCN6688T128::PUBLICKEY_SIZE);
+			sk.resize(MPKCN6688T128::PRIVATEKEY_SIZE);
+
+			if (MPKCN6688T128::Generate(pk, sk, m_rndGenerator) == false)
+			{
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS4N6688T128"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			}
+
+			break;
+		}
+		case McElieceParameters::MPKCS5N8192T128:
 		{
 			pk.resize(MPKCN8192T128::PUBLICKEY_SIZE);
 			sk.resize(MPKCN8192T128::PRIVATEKEY_SIZE);
 
-			if (!MPKCN8192T128::Generate(pk, sk, m_rndGenerator))
+			if (MPKCN8192T128::Generate(pk, sk, m_rndGenerator) == false)
 			{
-				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS3N8192T128"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS5N8192T128"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
 			}
 
 			break;
@@ -372,10 +464,10 @@ void McEliece::Initialize(AsymmetricKey* Key)
 	m_mpkcState->Initialized = true;
 }
 
-void McEliece::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
+void McEliece::CXOF(const std::vector<uint8_t> &Domain, const std::vector<uint8_t> &Key, std::vector<uint8_t> &Secret, size_t Rate)
 {
-	std::vector<byte> tmpn(Name().begin(), Name().end());
-	Keccak::CXOFR24P1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
+	std::vector<uint8_t> tmpn(Name().begin(), Name().end());
+	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
 NAMESPACE_MCELIECEEND

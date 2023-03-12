@@ -15,8 +15,8 @@ class SHA2512::SHA2512State
 {
 public:
 
-	std::array<ulong, 8> H = { 0 };
-	std::array<ulong, 2> T = { 0 };
+	std::array<uint64_t, 8> H = { 0 };
+	std::array<uint64_t, 2> T = { 0 };
 
 	SHA2512State()
 	{
@@ -24,8 +24,8 @@ public:
 
 	~SHA2512State()
 	{
-		MemoryTools::Clear(H, 0, H.size() * sizeof(ulong));
-		MemoryTools::Clear(T, 0, T.size() * sizeof(ulong));
+		MemoryTools::Clear(H, 0, H.size() * sizeof(uint64_t));
+		MemoryTools::Clear(T, 0, T.size() * sizeof(uint64_t));
 	}
 
 	void Increase(size_t Length)
@@ -34,7 +34,7 @@ public:
 
 		if (T[0] > 0x1FFFFFFFFFFFFFFFULL)
 		{
-			T[1] += static_cast<ulong>(T[0] >> 61);
+			T[1] += static_cast<uint64_t>(T[0] >> 61);
 			T[0] &= 0x1FFFFFFFFFFFFFFFULL;
 		}
 	}
@@ -43,7 +43,7 @@ public:
 	{
 		T[0] = 0;
 		T[1] = 0;
-		MemoryTools::Copy(SHA2::SHA2512State, 0, H, 0, H.size() * sizeof(ulong));
+		MemoryTools::Copy(SHA2::SHA2512State, 0, H, 0, H.size() * sizeof(uint64_t));
 	}
 };
 
@@ -59,7 +59,7 @@ SHA2512::SHA2512(bool Parallel)
 		SHA2::SHA2512_RATE_SIZE),
 	m_msgLength(0),
 	m_parallelProfile(SHA2::SHA2512_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_treeParams(Parallel ? SHA2Params(SHA2::SHA2512_DIGEST_SIZE, static_cast<byte>(SHA2::SHA2512_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) :
+	m_treeParams(Parallel ? SHA2Params(SHA2::SHA2512_DIGEST_SIZE, static_cast<uint8_t>(SHA2::SHA2512_RATE_SIZE), static_cast<uint8_t>(DEF_PRLDEGREE)) :
 		SHA2Params(SHA2::SHA2512_DIGEST_SIZE, 0UL, 0x00))
 {
 	Reset();
@@ -135,7 +135,7 @@ ParallelOptions &SHA2512::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void SHA2512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void SHA2512::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (Output.size() < SHA2::SHA2512_DIGEST_SIZE)
 	{
@@ -146,7 +146,7 @@ void SHA2512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Finalize(Output, 0);
 }
 
-void SHA2512::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void SHA2512::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (Output.size() - OutOffset < SHA2::SHA2512_DIGEST_SIZE)
 	{
@@ -238,7 +238,7 @@ void SHA2512::Reset()
 	m_msgBuffer.clear();
 	m_msgBuffer.resize(m_parallelProfile.IsParallel() ? m_parallelProfile.ParallelMaxDegree() * SHA2::SHA2512_RATE_SIZE : SHA2::SHA2512_RATE_SIZE);
 	m_msgLength = 0;
-	std::vector<byte> params(SHA2::SHA2512_RATE_SIZE, 0x1F);
+	std::vector<uint8_t> params(SHA2::SHA2512_RATE_SIZE, 0x1F);
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
 	{
@@ -246,36 +246,36 @@ void SHA2512::Reset()
 
 		if (m_parallelProfile.IsParallel())
 		{
-			m_treeParams.NodeOffset() = static_cast<uint>(i);
+			m_treeParams.NodeOffset() = static_cast<uint32_t>(i);
 			MemoryTools::Copy(m_treeParams.ToBytes(), 0, params, 0, m_treeParams.GetHeaderSize());
 			Permute(params, 0, m_dgtState[i]);
 		}
 	}
 }
 
-void SHA2512::Update(byte Input)
+void SHA2512::Update(uint8_t Input)
 {
-	std::vector<byte> inp(1, Input);
+	std::vector<uint8_t> inp(1, Input);
 	Update(inp, 0, 1);
 }
 
-void SHA2512::Update(uint Input)
+void SHA2512::Update(uint32_t Input)
 {
-	std::vector<byte> tmp(sizeof(uint));
+	std::vector<uint8_t> tmp(sizeof(uint32_t));
 	IntegerTools::Le32ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void SHA2512::Update(ulong Input)
+void SHA2512::Update(uint64_t Input)
 {
-	std::vector<byte> tmp(sizeof(ulong));
+	std::vector<uint8_t> tmp(sizeof(uint64_t));
 	IntegerTools::Le64ToBytes(Input, tmp, 0);
 	Update(tmp, 0, tmp.size());
 }
 
-void SHA2512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void SHA2512::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too int16_t!");
 
 	if (Length != 0)
 	{
@@ -364,10 +364,10 @@ void SHA2512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Len
 
 //~~~Private Functions~~~//
 
-void SHA2512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA2512State &State)
+void SHA2512::HashFinal(std::vector<uint8_t> &Input, size_t InOffset, size_t Length, SHA2512State &State)
 {
 	State.Increase(Length);
-	ulong bitLen = (State.T[0] << 3);
+	uint64_t bitLen = (State.T[0] << 3);
 
 	if (Length == SHA2::SHA2512_RATE_SIZE)
 	{
@@ -396,7 +396,7 @@ void SHA2512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length
 	Permute(Input, InOffset, State);
 }
 
-void SHA2512::Permute(const std::vector<byte> &Input, size_t InOffset, SHA2512State &State)
+void SHA2512::Permute(const std::vector<uint8_t> &Input, size_t InOffset, SHA2512State &State)
 {
 #if defined(CEX_DIGEST_COMPACT)
 	SHA2::PermuteR80P1024C(Input, InOffset, State.H);
@@ -407,7 +407,7 @@ void SHA2512::Permute(const std::vector<byte> &Input, size_t InOffset, SHA2512St
 	State.Increase(SHA2::SHA2512_RATE_SIZE);
 }
 
-void SHA2512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA2512State &State, ulong Length)
+void SHA2512::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, SHA2512State &State, uint64_t Length)
 {
 	do
 	{

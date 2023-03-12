@@ -35,7 +35,7 @@ RDP::~RDP()
 
 //~~~Public Functions~~~//
 
-void RDP::Generate(std::vector<byte> &Output)
+void RDP::Generate(std::vector<uint8_t> &Output)
 {
 	if (IsAvailable() == false)
 	{
@@ -53,7 +53,7 @@ void RDP::Generate(std::vector<byte> &Output)
 	Generate(Output.data(), Output.size(), m_randType);
 }
 
-void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
+void RDP::Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (IsAvailable() == false)
 	{
@@ -75,7 +75,7 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	Generate(&Output[Offset], Length, m_randType);
 }
 
-void RDP::Generate(SecureVector<byte> &Output)
+void RDP::Generate(SecureVector<uint8_t> &Output)
 {
 	if (IsAvailable() == false)
 	{
@@ -93,7 +93,7 @@ void RDP::Generate(SecureVector<byte> &Output)
 	Generate(Output.data(), Output.size(), m_randType);
 }
 
-void RDP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
+void RDP::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (IsAvailable() == false)
 	{
@@ -157,7 +157,7 @@ bool RDP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	SecureVector<byte> smp(m_pvdSelfTest->SELFTEST_LENGTH);
+	SecureVector<uint8_t> smp(m_pvdSelfTest->SELFTEST_LENGTH);
 
 	Generate(smp.data(), smp.size(), m_randType);
 
@@ -171,12 +171,12 @@ bool RDP::FipsTest()
 	return (fail == false);
 }
 
-void RDP::Generate(byte* Output, size_t Length, DrandEngines DrandType)
+void RDP::Generate(uint8_t* Output, size_t Length, DrandEngines DrandType)
 {
 	size_t fctr;
 	size_t i;
 	size_t poff;
-	int res;
+	int32_t res;
 
 #if defined(CEX_AVX_INTRINSICS)
 
@@ -186,7 +186,7 @@ void RDP::Generate(byte* Output, size_t Length, DrandEngines DrandType)
 
 #	if defined(CEX_IS_X64)
 
-	ulong rnd64;
+	uint64_t rnd64;
 
 	while (Length != 0)
 	{
@@ -203,11 +203,11 @@ void RDP::Generate(byte* Output, size_t Length, DrandEngines DrandType)
 
 		if (res == RDR_SUCCESS)
 		{
-			const size_t RMDLEN = IntegerTools::Min(sizeof(ulong), Length);
+			const size_t RMDLEN = IntegerTools::Min(sizeof(uint64_t), Length);
 
 			for (i = 0; i < RMDLEN; ++i)
 			{
-				Output[poff + i] = static_cast<byte>(rnd64 >> (i * 8));
+				Output[poff + i] = static_cast<uint8_t>(rnd64 >> (i * 8));
 			}
 
 			poff += RMDLEN;
@@ -227,7 +227,7 @@ void RDP::Generate(byte* Output, size_t Length, DrandEngines DrandType)
 
 #	else
 
-	uint rnd32;
+	uint32_t rnd32;
 
 	while (Length != 0)
 	{
@@ -244,11 +244,11 @@ void RDP::Generate(byte* Output, size_t Length, DrandEngines DrandType)
 
 		if (res == RDR_SUCCESS)
 		{
-			const size_t RMDLEN = IntegerTools::Min(sizeof(uint), Length);
+			const size_t RMDLEN = IntegerTools::Min(sizeof(uint32_t), Length);
 
 			for (i = 0; i < RMDLEN; ++i)
 			{
-				Output[poff + i] = static_cast<byte>(rnd32 >> (i * 8));
+				Output[poff + i] = static_cast<uint8_t>(rnd32 >> (i * 8));
 			}
 
 			poff += RMDLEN;

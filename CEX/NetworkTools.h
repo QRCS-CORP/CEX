@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -103,7 +103,7 @@ public:
 	/// <param name="Protocol">The protocol name</param>
 	///
 	/// <returns>The port number, or zero on failure</returns>
-	static ushort PortNameToNumber(const std::string &Name, const std::string &Protocol);
+	static uint16_t PortNameToNumber(const std::string &Name, const std::string &Protocol);
 
 	//~~~HTTP~~~//
 

@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Block cipher padding mode enumeration names
 /// </summary>
-enum class PaddingModes : byte
+enum class PaddingModes : uint8_t
 {
 	/// <summary>
 	/// No padding mode is specified

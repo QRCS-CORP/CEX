@@ -12,12 +12,12 @@ TimeStamp::TimeStamp()
 {
 }
 
-ulong TimeStamp::Elapsed()
+uint64_t TimeStamp::Elapsed()
 {
 	return SystemTools::TimeStamp(m_hasTsc) - m_msCounter;
 }
 
-ulong TimeStamp::Frequency()
+uint64_t TimeStamp::Frequency()
 {
 	return m_tmFrequency;
 }

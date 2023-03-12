@@ -231,8 +231,8 @@ const size_t XMSS::SignatureSize()
 
 AsymmetricKeyPair* XMSS::Generate()
 {
-	std::vector<byte> pk(0);
-	std::vector<byte> sk(0);
+	std::vector<uint8_t> pk(0);
+	std::vector<uint8_t> sk(0);
 
 	XMSSCore::Generate(pk, sk, m_rndGenerator, m_xmssState->Parameters);
 
@@ -269,7 +269,7 @@ const void XMSS::Initialize(AsymmetricKey* Key)
 	m_xmssState->Initialized = true;
 }
 
-size_t XMSS::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature)
+size_t XMSS::Sign(const std::vector<uint8_t> &Message, std::vector<uint8_t> &Signature)
 {
 	if (!m_xmssState->Initialized)
 	{
@@ -293,7 +293,7 @@ size_t XMSS::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature
 	return slen;
 }
 
-bool XMSS::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message)
+bool XMSS::Verify(const std::vector<uint8_t> &Signature, std::vector<uint8_t> &Message)
 {
 	if (!m_xmssState->Initialized)
 	{

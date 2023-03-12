@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Implementations of the SHA2 family of message digests
 /// </summary>
-enum class SHA2Digests : byte
+enum class SHA2Digests : uint8_t
 {
 	/// <summary>
 	/// No message digest is specified
@@ -18,11 +18,11 @@ enum class SHA2Digests : byte
 	/// <summary>
 	/// The SHA2-256 digest
 	/// </summary>
-	SHA2256 = static_cast<byte>(Digests::SHA2256),
+	SHA2256 = static_cast<uint8_t>(Digests::SHA2256),
 	/// <summary>
 	/// The SHA2-512 digest
 	/// </summary>
-	SHA2512 = static_cast<byte>(Digests::SHA2512)
+	SHA2512 = static_cast<uint8_t>(Digests::SHA2512)
 };
 
 class SHA2DigestConvert

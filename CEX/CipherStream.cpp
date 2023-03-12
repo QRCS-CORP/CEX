@@ -147,7 +147,7 @@ void CipherStream::ParallelMaxDegree(size_t Degree)
 void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 {
 	CEXASSERT(m_cipherState->Initialized, "The cipher has not been initialized");
-	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The Input stream is too short");
+	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The Input stream is too int16_t");
 	CEXASSERT(InStream->CanRead(), "The Input stream is set to write only!");
 	CEXASSERT(OutStream->CanRead() || OutStream->CanWrite(), "The Output stream is to read only!");
 
@@ -159,18 +159,18 @@ void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 	}
 }
 
-void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CipherStream::Write(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(m_cipherState->Initialized, "The cipher has not been initialized");
-	CEXASSERT(Input.size() - InOffset > 0, "The input array is too short");
-	CEXASSERT(Input.size() - InOffset <= Output.size() - OutOffset, "The output array is too short!");
+	CEXASSERT(Input.size() - InOffset > 0, "The input array is too int16_t");
+	CEXASSERT(Input.size() - InOffset <= Output.size() - OutOffset, "The output array is too int16_t!");
 
 	BlockTransform(Input, InOffset, Output, OutOffset);
 }
 
 //~~~Private Functions~~~//
 
-void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CipherStream::BlockTransform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	const size_t INPLEN = Input.size() - InOffset;
 	size_t plen;
@@ -216,9 +216,9 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 		if (m_cipherState->CounterMode)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
-			std::vector<byte> inp(BLKLEN);
+			std::vector<uint8_t> inp(BLKLEN);
 			MemoryTools::Copy(Input, InOffset, inp, 0, FNLLEN);
-			std::vector<byte> otp(BLKLEN);
+			std::vector<uint8_t> otp(BLKLEN);
 			m_cipherEngine->Transform(inp, 0, otp, 0, FNLLEN);
 			MemoryTools::Copy(otp, 0, Output, OutOffset, FNLLEN);
 			plen += FNLLEN;
@@ -226,7 +226,7 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 		else if (m_cipherState->Encryption)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
-			std::vector<byte> inp(BLKLEN);
+			std::vector<uint8_t> inp(BLKLEN);
 			MemoryTools::Copy(Input, InOffset, inp, 0, FNLLEN);
 			if (FNLLEN != BLKLEN)
 			{
@@ -243,7 +243,7 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 		}
 		else
 		{
-			std::vector<byte> otp(BLKLEN);
+			std::vector<uint8_t> otp(BLKLEN);
 			m_cipherEngine->DecryptBlock(Input, InOffset, otp, 0);
 			const size_t FNLLEN = m_cipherPadding->GetBlockLength(otp);
 			MemoryTools::Copy(otp, 0, Output, OutOffset, FNLLEN);
@@ -264,8 +264,8 @@ void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 	const size_t INPLEN = InStream->Length() - InStream->Position();
 	size_t plen;
 	size_t pread;
-	std::vector<byte> inp(0);
-	std::vector<byte> otp(0);
+	std::vector<uint8_t> inp(0);
+	std::vector<uint8_t> otp(0);
 
 	plen = 0;
 	pread = 0;
@@ -359,18 +359,18 @@ void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 
 		if (IsParallel())
 		{
-			ProgressPercent(static_cast<int>(progress));
+			ProgressPercent(static_cast<int32_t>(progress));
 		}
 		else
 		{
 			size_t block = Length / 100;
 			if (block == 0)
 			{
-				ProgressPercent(static_cast<int>(progress));
+				ProgressPercent(static_cast<int32_t>(progress));
 			}
 			else if (Processed % block == 0)
 			{
-				ProgressPercent(static_cast<int>(progress));
+				ProgressPercent(static_cast<int32_t>(progress));
 			}
 			else
 			{

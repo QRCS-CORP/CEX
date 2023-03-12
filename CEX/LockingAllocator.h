@@ -16,7 +16,7 @@ class LockingAllocator final
 {
 private:
 
-	byte* m_lockedPages;
+	uint8_t* m_lockedPages;
 	size_t m_lockedPagesSize;
 	std::unique_ptr<MemoryPool> m_memoryPool;
 

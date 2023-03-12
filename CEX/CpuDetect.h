@@ -17,7 +17,7 @@ public:
 	/// <summary>
 	/// Enumeration of cpu vendors
 	/// </summary>
-	enum class CpuVendors : uint
+	enum class CpuVendors : uint32_t
 	{
 		UNKNOWN = 0,
 		AMD = 1,
@@ -27,7 +27,7 @@ public:
 	/// <summary>
 	/// The L2 cache associativity setting
 	/// </summary>
-	enum class CacheAssociations : uint
+	enum class CacheAssociations : uint32_t
 	{
 		Disabled = 0,
 		DirectMapped = 1,
@@ -40,7 +40,7 @@ public:
 
 private:
 
-	enum class CpuidFlags : uint
+	enum class CpuidFlags : uint32_t
 	{
 		// EAX=1
 		CPUID_SSE3 = 0, // ecx 0
@@ -82,12 +82,12 @@ private:
 	static const size_t KB128 = 128 * KB1;
 	static const size_t KB256 = 256 * KB1;
 
-	uint m_busRefFrequency;
+	uint32_t m_busRefFrequency;
 	size_t m_cacheLineSize;
 	CpuVendors m_cpuVendor;
 	std::string m_cpuVendorString;
-	uint m_frequencyBase;
-	uint m_frequencyMax;
+	uint32_t m_frequencyBase;
+	uint32_t m_frequencyMax;
 	bool m_hyperThread;
 	size_t m_l1CacheLineSize;
 	size_t m_l1CacheSize;
@@ -97,7 +97,7 @@ private:
 	size_t m_physCores;
 	std::string m_serialNumber;
 	size_t m_virtCores;
-	std::vector<uint> m_x86CpuFlags;
+	std::vector<uint32_t> m_x86CpuFlags;
 
 public:
 
@@ -461,18 +461,18 @@ private:
 
 
 	void BusInfo();
-	static void Cpuid(int Flag, std::array<uint, 4> &Output);
-	static void CpuidSublevel(int Flag, int Level, std::array<uint, 4> &Output);
+	static void Cpuid(int32_t Flag, std::array<uint32_t, 4> &Output);
+	static void CpuidSublevel(int32_t Flag, int32_t Level, std::array<uint32_t, 4> &Output);
 	bool HasFeature(CpuidFlags Flag);
 	void Initialize();
 	static size_t MaxCoresPerPackage();
 	size_t MaxLogicalPerCores();
 	void PrintCpuStats();
-	static uint ReadBits(uint Value, int Index, int Length);
+	static uint32_t ReadBits(uint32_t Value, int32_t Index, int32_t Length);
 	void StoreSerialNumber();
 	void StoreTopology();
 	const CpuVendors VendorName(std::string &Name);
-	std::string VendorString(std::array<uint, 4> &CpuInfo);
+	std::string VendorString(std::array<uint32_t, 4> &CpuInfo);
 };
 
 NAMESPACE_ROOTEND

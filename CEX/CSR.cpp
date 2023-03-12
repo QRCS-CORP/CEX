@@ -16,15 +16,14 @@ class CSR::CsrState
 {
 public:
 
-	SecureVector<byte> Buffer;
-	size_t Position;
+	SecureVector<uint8_t> Buffer;
+	size_t Position = 0;
 	Providers ProviderType;
 	ShakeModes ShakeType;
 
 	CsrState(ShakeModes ShakeType, Providers ProviderType)
 		:
 		Buffer(BUFFER_SIZE),
-		Position(0),
 		ProviderType(ProviderType),
 		ShakeType(ShakeType)
 	{
@@ -72,33 +71,33 @@ CSR::~CSR()
 
 //~~~Public Functions~~~//
 
-void CSR::Generate(std::vector<byte> &Output)
+void CSR::Generate(std::vector<uint8_t> &Output)
 {
-	SecureVector<byte> tmp(Output.size());
+	SecureVector<uint8_t> tmp(Output.size());
 
 	Generate(tmp, 0, Output.size(), m_rngGenerator);
 	SecureMove(tmp, 0, Output, 0, tmp.size());
 }
 
-void CSR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
+void CSR::Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if ((Output.size() - Offset) < Length)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
-	SecureVector<byte> tmp(Length);
+	SecureVector<uint8_t> tmp(Length);
 
 	Generate(tmp, 0, Output.size(), m_rngGenerator);
 	SecureMove(tmp, 0, Output, Offset, tmp.size());
 }
 
-void CSR::Generate(SecureVector<byte> &Output)
+void CSR::Generate(SecureVector<uint8_t> &Output)
 {
 	Generate(Output, 0, Output.size(), m_rngGenerator);
 }
 
-void CSR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
+void CSR::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if ((Output.size() - Offset) < Length)
 	{
@@ -119,9 +118,9 @@ void CSR::Reset()
 	}
 
 	// use the provider to generate the key
-	Cipher::SymmetricKeySize ks = m_rngGenerator->LegalKeySizes()[1];
-	std::vector<byte> key(ks.KeySize());
-	std::vector<byte> cust(ks.IVSize());
+	Cipher::SymmetricKeySize ks = m_rngGenerator->LegalKeySizes()[0];
+	std::vector<uint8_t> key(ks.KeySize());
+	std::vector<uint8_t> cust(ks.IVSize());
 	pvd->Generate(key);
 	pvd->Generate(cust);
 	delete pvd;
@@ -138,7 +137,7 @@ void CSR::Reset()
 
 //~~~Private Functions~~~//
 
-void CSR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
+void CSR::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
 	const size_t BUFLEN = m_csrState->Buffer.size() - m_csrState->Position;
 

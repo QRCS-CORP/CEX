@@ -108,7 +108,7 @@ namespace Test
 
 	void HMACTest::Ancillary()
 	{
-		std::vector<byte> otp(0);
+		std::vector<uint8_t> otp(0);
 
 		// HMAC-256
 
@@ -202,7 +202,7 @@ namespace Test
 		{
 			HMAC gen(SHA2Digests::SHA2256);
 			// invalid key size
-			std::vector<byte> k(1);
+			std::vector<uint8_t> k(1);
 			SymmetricKey kp(k);
 			gen.Initialize(kp);
 
@@ -220,7 +220,7 @@ namespace Test
 		try
 		{
 			HMAC gen(SHA2Digests::SHA2256);
-			std::vector<byte> code(gen.TagSize());
+			std::vector<uint8_t> code(gen.TagSize());
 			// generator was not initialized
 			gen.Finalize(code, 0);
 
@@ -287,9 +287,9 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void HMACTest::Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void HMACTest::Kat(IMac* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> code(Generator->TagSize());
+		std::vector<uint8_t> code(Generator->TagSize());
 		SymmetricKey kp(Key);
 
 		Generator->Initialize(kp);
@@ -311,10 +311,10 @@ namespace Test
 	void HMACTest::Params(IMac* Generator)
 	{
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> msg;
-		std::vector<byte> otp1(Generator->TagSize());
-		std::vector<byte> otp2(Generator->TagSize());
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> otp1(Generator->TagSize());
+		std::vector<uint8_t> otp2(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -345,9 +345,9 @@ namespace Test
 	void HMACTest::Stress(IMac* Generator)
 	{
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
-		std::vector<byte> msg;
-		std::vector<byte> otp(Generator->TagSize());
-		std::vector<byte> key(ks.KeySize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> otp(Generator->TagSize());
+		std::vector<uint8_t> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
 

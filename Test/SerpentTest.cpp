@@ -124,7 +124,7 @@ namespace Test
 		{
 			SHX cpr;
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> k(ks.KeySize() + 1);
+			std::vector<uint8_t> k(ks.KeySize() + 1);
 			SymmetricKey kp(k);
 
 			cpr.Initialize(true, kp);
@@ -140,11 +140,11 @@ namespace Test
 		}
 	}
 
-	void SerpentTest::Kat(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void SerpentTest::Kat(std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> exp(16);
-		std::vector<byte> otp(16);
-		std::vector<byte> msg = Message;
+		std::vector<uint8_t> exp(16);
+		std::vector<uint8_t> otp(16);
+		std::vector<uint8_t> msg = Message;
 		SHX cpr;
 		Cipher::SymmetricKey kp(Key);
 
@@ -168,38 +168,38 @@ namespace Test
 	void SerpentTest::Kat128()
 	{
 		// 128 bit keys
-		std::vector<byte> cip(16);
-		std::vector<byte> key(16);
-		std::vector<byte> pln(16);
-		std::vector<byte> mnt(16);
+		std::vector<uint8_t> cip(16);
+		std::vector<uint8_t> key(16);
+		std::vector<uint8_t> pln(16);
+		std::vector<uint8_t> mnt(16);
 		std::string cipstr = "";
 		std::string keystr = "";
 		std::string plnstr = "";
 		std::string mntstr = "";
 		std::string mnt1kstr = "";
 
-		TestUtils::Read(SERPENTCTEXT128, cipstr);
+		TestUtils::FileRead(SERPENTCTEXT128, cipstr);
 
 		if (cipstr.size() == 0)
 		{
 			throw TestException(std::string("Kat128"), std::string("SERPENTCTEXT128"), std::string("Could not find the test file! -SKS1"));
 		}
-		TestUtils::Read(SERPENTKEY128, keystr);
+		TestUtils::FileRead(SERPENTKEY128, keystr);
 		if (keystr.size() == 0)
 		{
 			throw TestException(std::string("Kat128"), std::string("SERPENTKEY128"), std::string("Could not find the test file! -SKS2"));
 		}
-		TestUtils::Read(SERPENTPTEXT128, plnstr);
+		TestUtils::FileRead(SERPENTPTEXT128, plnstr);
 		if (plnstr.size() == 0)
 		{
 			throw TestException(std::string("Kat128"), std::string("SERPENTPTEXT128"), std::string("Could not find the test file! -SKS3"));
 		}
-		TestUtils::Read(SERPENTM100X128, mntstr);
+		TestUtils::FileRead(SERPENTM100X128, mntstr);
 		if (mntstr.size() == 0)
 		{
 			throw TestException(std::string("Kat128"), std::string("SERPENTM100X128"), std::string("Could not find the test file! -SKS4"));
 		}
-		TestUtils::Read(SERPENTM1000X128, mnt1kstr);
+		TestUtils::FileRead(SERPENTM1000X128, mnt1kstr);
 		if (mnt1kstr.size() == 0)
 		{
 			throw TestException(std::string("Kat128"), std::string("SERPENTM1000X128"), std::string("Could not find the test file! -SKS5"));
@@ -234,10 +234,10 @@ namespace Test
 
 	void SerpentTest::Kat192()
 	{
-		std::vector<byte> cip(16);
-		std::vector<byte> key(16);
-		std::vector<byte> pln(16);
-		std::vector<byte> mnt(16);
+		std::vector<uint8_t> cip(16);
+		std::vector<uint8_t> key(16);
+		std::vector<uint8_t> pln(16);
+		std::vector<uint8_t> mnt(16);
 		std::string cipstr = "";
 		std::string keystr = "";
 		std::string plnstr = "";
@@ -245,31 +245,31 @@ namespace Test
 		std::string mnt1kstr = "";
 
 		// 192 bit keys
-		TestUtils::Read(SERPENTCTEXT192, cipstr);
+		TestUtils::FileRead(SERPENTCTEXT192, cipstr);
 		if (cipstr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTCTEXT192"), std::string("Could not find the test file! -SKM1"));
 		}
 
-		TestUtils::Read(SERPENTKEY192, keystr);
+		TestUtils::FileRead(SERPENTKEY192, keystr);
 		if (keystr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTKEY192"), std::string("Could not find the test file! -SKM2"));
 		}
 
-		TestUtils::Read(SERPENTPTEXT192, plnstr);
+		TestUtils::FileRead(SERPENTPTEXT192, plnstr);
 		if (plnstr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTPTEXT192"), std::string("Could not find the test file! -SKM3"));
 		}
 
-		TestUtils::Read(SERPENTM100X192, mntstr);
+		TestUtils::FileRead(SERPENTM100X192, mntstr);
 		if (mntstr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTM100X192"), std::string("Could not find the test file! -SKM4"));
 		}
 
-		TestUtils::Read(SERPENTM1000X192, mnt1kstr);
+		TestUtils::FileRead(SERPENTM1000X192, mnt1kstr);
 		if (mnt1kstr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTM1000X192"), std::string("Could not find the test file! -SKM5"));
@@ -301,10 +301,10 @@ namespace Test
 
 	void SerpentTest::Kat256()
 	{
-		std::vector<byte> cip(16);
-		std::vector<byte> key(16);
-		std::vector<byte> pln(16);
-		std::vector<byte> mnt(16);
+		std::vector<uint8_t> cip(16);
+		std::vector<uint8_t> key(16);
+		std::vector<uint8_t> pln(16);
+		std::vector<uint8_t> mnt(16);
 		std::string cipstr = "";
 		std::string keystr = "";
 		std::string plnstr = "";
@@ -312,31 +312,31 @@ namespace Test
 		std::string mnt1kstr = "";
 
 		// 256 bit keys
-		TestUtils::Read(SERPENTCTEXT256, cipstr);
+		TestUtils::FileRead(SERPENTCTEXT256, cipstr);
 		if (cipstr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTCTEXT256"), std::string("Could not find the test file! -SKL1"));
 		}
 
-		TestUtils::Read(SERPENTKEY256, keystr);
+		TestUtils::FileRead(SERPENTKEY256, keystr);
 		if (keystr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTKEY256"), std::string("Could not find the test file! -SKL2"));
 		}
 
-		TestUtils::Read(SERPENTPTEXT256, plnstr);
+		TestUtils::FileRead(SERPENTPTEXT256, plnstr);
 		if (plnstr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTPTEXT256"), std::string("Could not find the test file! -SKL3"));
 		}
 
-		TestUtils::Read(SERPENTM100X256, mntstr);
+		TestUtils::FileRead(SERPENTM100X256, mntstr);
 		if (mntstr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTM100X256"), std::string("Could not find the test file! -SKL4"));
 		}
 
-		TestUtils::Read(SERPENTM1000X256, mnt1kstr);
+		TestUtils::FileRead(SERPENTM1000X256, mnt1kstr);
 		if (mnt1kstr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTM1000X256"), std::string("Could not find the test file! -SKL5"));
@@ -366,11 +366,11 @@ namespace Test
 		}
 	}
 
-	void SerpentTest::KatEx(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void SerpentTest::KatEx(IBlockCipher* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> enc(MSGLEN);
-		std::vector<byte> dec(MSGLEN);
+		std::vector<uint8_t> enc(MSGLEN);
+		std::vector<uint8_t> dec(MSGLEN);
 		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
@@ -390,12 +390,12 @@ namespace Test
 		}
 	}
 
-	void SerpentTest::MonteCarloEx(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void SerpentTest::MonteCarloEx(IBlockCipher* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> msg = Message;
-		std::vector<byte> enc(MSGLEN);
-		std::vector<byte> dec(MSGLEN);
+		std::vector<uint8_t> msg = Message;
+		std::vector<uint8_t> enc(MSGLEN);
+		std::vector<uint8_t> dec(MSGLEN);
 		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
@@ -425,10 +425,10 @@ namespace Test
 		}
 	}
 
-	void SerpentTest::MonteCarlo(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected, size_t Count)
+	void SerpentTest::MonteCarlo(std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected, size_t Count)
 	{
-		std::vector<byte> otp(16);
-		std::vector<byte> msg = Message;
+		std::vector<uint8_t> otp(16);
+		std::vector<uint8_t> msg = Message;
 		SHX cpr;
 		Cipher::SymmetricKey kp(Key);
 
@@ -450,12 +450,12 @@ namespace Test
 		const size_t MINSMP = 2048;
 		const size_t MAXSMP = 16384;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
-		std::vector<byte> cpt1;
-		std::vector<byte> cpt2;
-		std::vector<byte> inp;
-		std::vector<byte> otp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.IVSize());
+		std::vector<uint8_t> cpt1;
+		std::vector<uint8_t> cpt2;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> otp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> iv(ks.IVSize());
 		Prng::SecureRandom rnd;
 		size_t prlSize = Cipher->ParallelProfile().ParallelBlockSize();
 
@@ -510,16 +510,16 @@ namespace Test
 
 	void SerpentTest::Stress(ICipherMode* Cipher)
 	{
-		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
-		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
+		const uint32_t MINPRL = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXPRL = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
-		std::vector<byte> cpt;
-		std::vector<byte> inp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.IVSize());
-		std::vector<byte> otp;
+		std::vector<uint8_t> cpt;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> iv(ks.IVSize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 

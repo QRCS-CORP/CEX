@@ -24,69 +24,42 @@ class RWS::RwsState
 {
 public:
 
-	SecureVector<uint> RoundKeys;
-	SecureVector<byte> Custom;
-	SecureVector<byte> MacKey;
-	SecureVector<byte> MacTag;
-	SecureVector<byte> Name;
-	std::vector<SymmetricKeySize> LegalKeySizes;
-	std::vector<byte> Nonce;
-	ulong Counter;
-	uint Rounds;
-	KmacModes Authenticator;
-	ShakeModes Mode;
-	bool IsAuthenticated;
-	bool IsEncryption;
-	bool IsInitialized;
+	SecureVector<uint32_t> RoundKeys;
+	SecureVector<uint8_t> Custom;
+	SecureVector<uint8_t> MacKey;
+	SecureVector<uint8_t> MacTag;
+	SecureVector<uint8_t> Name;
+	std::vector<SymmetricKeySize> LegalKeySizes = { SymmetricKeySize(IK128_SIZE, BLOCK_SIZE, INFO_SIZE),
+		SymmetricKeySize(IK256_SIZE, BLOCK_SIZE, INFO_SIZE),
+		SymmetricKeySize(IK512_SIZE, BLOCK_SIZE, INFO_SIZE)};
+	std::vector<uint8_t> Nonce;
+	uint64_t Counter = 0;
+	uint32_t Rounds = 0;
+	KmacModes Authenticator = KmacModes::None;
+	ShakeModes Mode = ShakeModes::None;
+	bool IsAuthenticated = false;
+	bool IsEncryption = false;
+	bool IsInitialized = false;
 
 	RwsState(bool Authenticate)
 		:
 		RoundKeys(0),
 		Custom(0),
 		MacKey(0),
-		MacTag(0),
 		Name(0),
-		LegalKeySizes{
-			SymmetricKeySize(IK256_SIZE, BLOCK_SIZE, INFO_SIZE),
-			SymmetricKeySize(IK512_SIZE, BLOCK_SIZE, INFO_SIZE),
-			SymmetricKeySize(IK1024_SIZE, BLOCK_SIZE, INFO_SIZE) },
-		Nonce(BLOCK_SIZE, 0x00),
-		Counter(0),
-		Rounds(0),
-		Authenticator(KmacModes::None),
-		Mode(ShakeModes::None),
-		IsAuthenticated(Authenticate),
-		IsEncryption(false),
-		IsInitialized(false)
+		Nonce(BLOCK_SIZE),
+		IsAuthenticated(Authenticate)
 	{
 	}
 
-	RwsState(SecureVector<byte> &State)
-		:
-		RoundKeys(0),
-		Custom(0),
-		MacKey(0),
-		MacTag(0),
-		Name(0),
-		LegalKeySizes{
-			SymmetricKeySize(IK256_SIZE, BLOCK_SIZE, INFO_SIZE),
-			SymmetricKeySize(IK512_SIZE, BLOCK_SIZE, INFO_SIZE),
-			SymmetricKeySize(IK1024_SIZE, BLOCK_SIZE, INFO_SIZE) },
-		Nonce(BLOCK_SIZE, 0x00),
-		Counter(0),
-		Rounds(0),
-		Authenticator(KmacModes::None),
-		Mode(ShakeModes::None),
-		IsAuthenticated(false),
-		IsEncryption(false),
-		IsInitialized(false)
+	RwsState(SecureVector<uint8_t> &State)
 	{
 		DeSerialize(State);
 	}
 
 	~RwsState()
 	{
-		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint32_t));
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
@@ -102,54 +75,54 @@ public:
 		IsInitialized = false;
 	}
 
-	void DeSerialize(SecureVector<byte> &SecureState)
+	void DeSerialize(SecureVector<uint8_t> &SecureState)
 	{
 		size_t soff;
-		ushort vlen;
+		uint16_t vlen;
 
 		soff = 0;
 		vlen = 0;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
-		RoundKeys.resize(vlen / sizeof(uint));
-		soff += sizeof(ushort);
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
+		RoundKeys.resize(vlen / sizeof(uint32_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, RoundKeys, 0, vlen);
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
 		Custom.resize(vlen);
-		soff += sizeof(ushort);
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, Custom, 0, Custom.size());
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
 		MacKey.resize(vlen);
-		soff += sizeof(ushort);
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, MacKey, 0, MacKey.size());
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
 		MacTag.resize(vlen);
-		soff += sizeof(ushort);
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, MacTag, 0, MacTag.size());
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
 		Name.resize(vlen);
-		soff += sizeof(ushort);
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, Name, 0, Name.size());
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
 		Nonce.resize(vlen);
-		soff += sizeof(ushort);
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, Nonce, 0, Nonce.size());
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &Counter, sizeof(ulong));
-		soff += sizeof(ulong);
-		MemoryTools::CopyToObject(SecureState, soff, &Rounds, sizeof(uint));
-		soff += sizeof(uint);
+		MemoryTools::CopyToObject(SecureState, soff, &Counter, sizeof(uint64_t));
+		soff += sizeof(uint64_t);
+		MemoryTools::CopyToObject(SecureState, soff, &Rounds, sizeof(uint32_t));
+		soff += sizeof(uint32_t);
 
 		MemoryTools::CopyToObject(SecureState, soff, &Authenticator, sizeof(KmacModes));
 		soff += sizeof(KmacModes);
@@ -165,7 +138,7 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint32_t));
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
@@ -177,56 +150,56 @@ public:
 		IsInitialized = false;
 	}
 
-	SecureVector<byte> Serialize()
+	SecureVector<uint8_t> Serialize()
 	{
-		const size_t STALEN = (RoundKeys.size() * sizeof(uint)) + Custom.size() + MacKey.size() + MacTag.size() +
-			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(uint) + sizeof(KmacModes) + sizeof(ShakeModes) + (3 * sizeof(bool)) + (7 * sizeof(ushort));
+		const size_t STALEN = (RoundKeys.size() * sizeof(uint32_t)) + Custom.size() + MacKey.size() + MacTag.size() +
+			Name.size() + Nonce.size() + sizeof(uint64_t) + sizeof(uint32_t) + sizeof(KmacModes) + sizeof(ShakeModes) + (3 * sizeof(bool)) + (7 * sizeof(uint16_t));
 
 		size_t soff;
-		ushort vlen;
-		SecureVector<byte> state(STALEN);
+		uint16_t vlen;
+		SecureVector<uint8_t> state(STALEN);
 
 		soff = 0;
-		vlen = static_cast<ushort>(RoundKeys.size() * sizeof(uint));
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(RoundKeys.size() * sizeof(uint32_t));
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(RoundKeys, 0, state, soff, static_cast<size_t>(vlen));
 		soff += vlen;
 
-		vlen = static_cast<ushort>(Custom.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(Custom.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(Custom, 0, state, soff, Custom.size());
 		soff += Custom.size();
 
-		vlen = static_cast<ushort>(MacKey.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(MacKey.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(MacKey, 0, state, soff, MacKey.size());
 		soff += MacKey.size();
 
-		vlen = static_cast<ushort>(MacTag.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(MacTag.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(MacTag, 0, state, soff, MacTag.size());
 		soff += MacTag.size();
 
-		vlen = static_cast<ushort>(Name.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(Name.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(Name, 0, state, soff, Name.size());
 		soff += Name.size();
 
-		vlen = static_cast<ushort>(Nonce.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(Nonce.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(Nonce, 0, state, soff, Nonce.size());
 		soff += Nonce.size();
 
-		MemoryTools::CopyFromObject(&Counter, state, soff, sizeof(ulong));
-		soff += sizeof(ulong);
-		MemoryTools::CopyFromObject(&Rounds, state, soff, sizeof(uint));
-		soff += sizeof(uint);
+		MemoryTools::CopyFromObject(&Counter, state, soff, sizeof(uint64_t));
+		soff += sizeof(uint64_t);
+		MemoryTools::CopyFromObject(&Rounds, state, soff, sizeof(uint32_t));
+		soff += sizeof(uint32_t);
 
 		MemoryTools::CopyFromObject(&Authenticator, state, soff, sizeof(KmacModes));
 		soff += sizeof(KmacModes);
@@ -253,7 +226,7 @@ RWS::RWS(bool Authenticate)
 {
 }
 
-RWS::RWS(SecureVector<byte> &State)
+RWS::RWS(SecureVector<uint8_t> &State)
 	:
 	m_rwsState(State.size() > STATE_THRESHOLD ? new RwsState(State) : 
 		throw CryptoSymmetricException(std::string("RWS"), std::string("Constructor"), std::string("The State array is invalid!"), ErrorCodes::InvalidKey)),
@@ -328,7 +301,7 @@ const std::string RWS::Name()
 	return name;
 }
 
-const std::vector<byte> RWS::Nonce()
+const std::vector<uint8_t> RWS::Nonce()
 {
 	return m_rwsState->Nonce;
 }
@@ -343,7 +316,7 @@ ParallelOptions &RWS::ParallelProfile()
 	return m_parallelProfile;
 }
 
-const std::vector<byte> RWS::Tag()
+const std::vector<uint8_t> RWS::Tag()
 {
 	if (m_rwsState->MacTag.size() == 0 || IsAuthenticator() == false)
 	{
@@ -353,7 +326,7 @@ const std::vector<byte> RWS::Tag()
 	return SecureUnlock(m_rwsState->MacTag);
 }
 
-const void RWS::Tag(SecureVector<byte> &Output)
+const void RWS::Tag(SecureVector<uint8_t> &Output)
 {
 	if (m_rwsState->MacTag.size() == 0 || IsAuthenticator() == false)
 	{
@@ -407,29 +380,29 @@ void RWS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 
 	// cipher key size determines key expansion function and Mac generator type; 256, 512, or 1024-bit
-	m_rwsState->Mode = (Parameters.KeySizes().KeySize() == IK1024_SIZE) ?
-		ShakeModes::SHAKE1024 : 
-		(Parameters.KeySizes().KeySize() == IK512_SIZE) ?
-			ShakeModes::SHAKE512 :
-			ShakeModes::SHAKE256;
+	m_rwsState->Mode = (Parameters.KeySizes().KeySize() == IK128_SIZE) ?
+		ShakeModes::SHAKE128 : 
+		(Parameters.KeySizes().KeySize() == IK256_SIZE) ?
+			ShakeModes::SHAKE256 :
+			ShakeModes::SHAKE512;
 
 	if (m_rwsState->IsAuthenticated)
 	{
-		m_rwsState->Authenticator = (Parameters.KeySizes().KeySize() == IK1024_SIZE) ?
-			KmacModes::KMAC1024 :
-			(Parameters.KeySizes().KeySize() == IK512_SIZE) ?
-			KmacModes::KMAC512 :
-			KmacModes::KMAC256;
+		m_rwsState->Authenticator = (Parameters.KeySizes().KeySize() == IK128_SIZE) ?
+			KmacModes::KMAC128 :
+			(Parameters.KeySizes().KeySize() == IK256_SIZE) ?
+			KmacModes::KMAC256 :
+			KmacModes::KMAC512;
 
 		m_macAuthenticator.reset(new KMAC(m_rwsState->Authenticator));
 	}
 
 	// set the number of rounds
-	m_rwsState->Rounds = (Parameters.KeySizes().KeySize() == IK1024_SIZE) ?
-		RK1024_COUNT :
-		(Parameters.KeySizes().KeySize() == IK512_SIZE) ?
-			RK512_COUNT :
-			RK256_COUNT;
+	m_rwsState->Rounds = (Parameters.KeySizes().KeySize() == IK128_SIZE) ?
+		RK128_COUNT :
+		(Parameters.KeySizes().KeySize() == IK256_SIZE) ?
+			RK256_COUNT :
+			RK512_COUNT;
 
 	// set the initial processed-bytes count to zero
 	m_rwsState->Counter = 0;
@@ -445,14 +418,14 @@ void RWS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	// create the cSHAKE name string
 	std::string tmpn = Name();
 	// add mac counter, key-size bits, and algorithm name to name string
-	m_rwsState->Name.resize(sizeof(ulong) + sizeof(ushort) + tmpn.size());
+	m_rwsState->Name.resize(sizeof(uint64_t) + sizeof(uint16_t) + tmpn.size());
 	// mac counter is always first 8 bytes
 	IntegerTools::Le64ToBytes(m_rwsState->Counter, m_rwsState->Name, 0);
-	// add the cipher key size in bits as an unsigned short integer
-	ushort kbits = static_cast<ushort>(Parameters.KeySizes().KeySize() * 8);
-	IntegerTools::Le16ToBytes(kbits, m_rwsState->Name, sizeof(ulong));
+	// add the cipher key size in bits as an unsigned int16_t integer
+	uint16_t kbits = static_cast<uint16_t>(Parameters.KeySizes().KeySize() * 8);
+	IntegerTools::Le16ToBytes(kbits, m_rwsState->Name, sizeof(uint64_t));
 	// copy the name string to state
-	MemoryTools::CopyFromObject(tmpn.data(), m_rwsState->Name, sizeof(ulong) + sizeof(ushort), tmpn.size());
+	MemoryTools::CopyFromObject(tmpn.data(), m_rwsState->Name, sizeof(uint64_t) + sizeof(uint16_t), tmpn.size());
 
 	// copy the nonce to state
 	MemoryTools::Copy(Parameters.IV(), 0, m_rwsState->Nonce, 0, BLOCK_SIZE);
@@ -462,17 +435,17 @@ void RWS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	gen.Initialize(Parameters.SecureKey(), m_rwsState->Custom, m_rwsState->Name);
 
 	// size the round key array
-	const size_t RNKLEN = (BLOCK_SIZE / sizeof(uint)) * static_cast<size_t>(m_rwsState->Rounds + 1UL);
+	const size_t RNKLEN = (BLOCK_SIZE / sizeof(uint32_t)) * static_cast<size_t>(m_rwsState->Rounds + 1UL);
 	m_rwsState->RoundKeys.resize(RNKLEN);
-	// generate the round keys to a temporary byte array
-	SecureVector<byte> tmpr(RNKLEN * sizeof(uint));
+	// generate the round keys to a temporary uint8_t array
+	SecureVector<uint8_t> tmpr(RNKLEN * sizeof(uint32_t));
 	// generate the ciphers round-keys
 	gen.Generate(tmpr);
 
 	// realign in big endian format for [future] AES-NI test vectors; RWS will be the fallback to the AES-NI implementation
-	for (i = 0; i < tmpr.size() / sizeof(uint); ++i)
+	for (i = 0; i < tmpr.size() / sizeof(uint32_t); ++i)
 	{
-		m_rwsState->RoundKeys[i] = IntegerTools::BeBytesTo32(tmpr, i * sizeof(uint));
+		m_rwsState->RoundKeys[i] = IntegerTools::BeBytesTo32(tmpr, i * sizeof(uint32_t));
 	}
 
 	MemoryTools::Clear(tmpr, 0, tmpr.size());
@@ -480,8 +453,8 @@ void RWS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	if (IsAuthenticator()) 
 	{
 		// generate the mac key
-		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[1];
-		SecureVector<byte> mack(ks.KeySize());
+		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[0];
+		SecureVector<uint8_t> mack(ks.KeySize());
 		gen.Generate(mack);
 		// initialize the mac
 		SymmetricKey kpm(mack);
@@ -506,7 +479,7 @@ void RWS::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void RWS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
+void RWS::SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -523,15 +496,15 @@ void RWS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 
 	if (IsAuthenticator() == true)
 	{
-		std::vector<byte> code(sizeof(uint));
+		std::vector<uint8_t> code(sizeof(uint32_t));
 		// version 1.1a add AD and encoding to hash
 		m_macAuthenticator->Update(Input, Offset, Length);
-		IntegerTools::Le32ToBytes(static_cast<uint>(Length), code, 0);
+		IntegerTools::Le32ToBytes(static_cast<uint32_t>(Length), code, 0);
 		m_macAuthenticator->Update(code, 0, code.size());
 	}
 }
 
-void RWS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void RWS::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the block-size!");
@@ -542,7 +515,7 @@ void RWS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 		{
 			if (Output.size() < Length + OutOffset + m_macAuthenticator->TagSize())
 			{
-				throw CryptoSymmetricException(Name(), std::string("Transform"), std::string("The vector is not long enough to add the MAC code!"), ErrorCodes::InvalidSize);
+				throw CryptoSymmetricException(Name(), std::string("Transform"), std::string("The vector is not int64_t enough to add the MAC code!"), ErrorCodes::InvalidSize);
 			}
 
 			// add the starting position of the nonce
@@ -591,8 +564,8 @@ void RWS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 void RWS::Finalize(std::unique_ptr<RwsState> &State, std::unique_ptr<IMac> &Authenticator)
 {
-	std::vector<byte> mctr(sizeof(ulong));
-	ulong mlen;
+	std::vector<uint8_t> mctr(sizeof(uint64_t));
+	uint64_t mlen;
 
 	// 1.1a: add the number of bytes processed by the mac, including the nonce and this terminating string
 	mlen = State->Counter + State->Nonce.size() + mctr.size();
@@ -605,7 +578,7 @@ void RWS::Finalize(std::unique_ptr<RwsState> &State, std::unique_ptr<IMac> &Auth
 	Authenticator->Finalize(State->MacTag, 0);
 }
 
-void RWS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
+void RWS::Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::vector<uint8_t> &Counter)
 {
 	size_t bctr;
 
@@ -622,7 +595,7 @@ void RWS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVX512BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX512BLK);
-		std::vector<byte> tmpc(AVX512BLK);
+		std::vector<uint8_t> tmpc(AVX512BLK);
 
 		// stagger counters and process 8 blocks with avx512
 		while (bctr != PBKALN)
@@ -671,7 +644,7 @@ void RWS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVX2BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX2BLK);
-		std::vector<byte> tmpc(AVX2BLK);
+		std::vector<uint8_t> tmpc(AVX2BLK);
 
 		// stagger counters and process 8 blocks with avx2
 		while (bctr != PBKALN)
@@ -704,7 +677,7 @@ void RWS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
-		std::vector<byte> tmpc(AVXBLK);
+		std::vector<uint8_t> tmpc(AVXBLK);
 
 		// 4 blocks with avx
 		while (bctr != PBKALN)
@@ -735,7 +708,7 @@ void RWS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 
 	if (bctr != Length)
 	{
-		std::vector<byte> otp(BLOCK_SIZE);
+		std::vector<uint8_t> otp(BLOCK_SIZE);
 		Transform512(Counter, 0, otp, 0);
 		IntegerTools::LeIncrement(Counter, 16);
 		const size_t RMDLEN = Length % BLOCK_SIZE;
@@ -751,7 +724,7 @@ void RWS::PrefetchSbox()
 }
 CEX_OPTIMIZE_RESUME
 
-void RWS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void RWS::Process(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	size_t i;
 
@@ -780,19 +753,19 @@ void RWS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<b
 	}
 }
 
-void RWS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void RWS::ProcessParallel(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
-	std::vector<byte> tmpc(BLOCK_SIZE);
+	std::vector<uint8_t> tmpc(BLOCK_SIZE);
 
 	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
-		std::vector<byte> thdc(BLOCK_SIZE);
+		std::vector<uint8_t> thdc(BLOCK_SIZE);
 		// offset counter by chunk size / block size  
-		IntegerTools::LeIncrease8(m_rwsState->Nonce, thdc, static_cast<uint>(CTRLEN * i));
+		IntegerTools::LeIncrease8(m_rwsState->Nonce, thdc, static_cast<uint32_t>(CTRLEN * i));
 		const size_t STMPOS = i * CNKLEN;
 		// generate random at output offset
 		this->Generate(Output, OutOffset + STMPOS, CNKLEN, thdc);
@@ -827,7 +800,7 @@ void RWS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	}
 }
 
-void RWS::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void RWS::ProcessSequential(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	// get block aligned
 	const size_t ALNLEN = Length - (Length % BLOCK_SIZE);
@@ -863,16 +836,16 @@ void RWS::Reset()
 	m_parallelProfile.Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
 }
 
-SecureVector<byte> RWS::Serialize()
+SecureVector<uint8_t> RWS::Serialize()
 {
-	SecureVector<byte> tmps = m_rwsState->Serialize();
+	SecureVector<uint8_t> tmps = m_rwsState->Serialize();
 
 	return tmps;
 }
 
-void RWS::Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RWS::Transform512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
-	SecureVector<byte> state(BLOCK_SIZE, 0x00);
+	SecureVector<uint8_t> state(BLOCK_SIZE, 0x00);
 	size_t i;
 
 	MemoryTools::Copy(Input, InOffset, state, 0, BLOCK_SIZE);
@@ -898,7 +871,7 @@ void RWS::Transform512(const std::vector<byte> &Input, size_t InOffset, std::vec
 	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
 }
 
-void RWS::Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RWS::Transform2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	Transform512(Input, InOffset, Output, OutOffset);
 	Transform512(Input, InOffset + 64, Output, OutOffset + 64);
@@ -906,13 +879,13 @@ void RWS::Transform2048(const std::vector<byte> &Input, size_t InOffset, std::ve
 	Transform512(Input, InOffset + 192, Output, OutOffset + 192);
 }
 
-void RWS::Transform4096(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RWS::Transform4096(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	Transform2048(Input, InOffset, Output, OutOffset);
 	Transform2048(Input, InOffset + 256, Output, OutOffset + 256);
 }
 
-void RWS::Transform8192(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RWS::Transform8192(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	Transform4096(Input, InOffset, Output, OutOffset);
 	Transform4096(Input, InOffset + 512, Output, OutOffset + 512);

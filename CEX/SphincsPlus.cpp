@@ -1,9 +1,7 @@
 #include "SphincsPlus.h"
 #include "MemoryTools.h"
 #include "PrngFromName.h"
-#include "SPXPS128SHAKE.h"
-#include "SPXPS192SHAKE.h"
-#include "SPXPS256SHAKE.h"
+#include "SPXBase.h"
 
 NAMESPACE_SPHINCSPLUS
 
@@ -115,21 +113,28 @@ const size_t SphincsPlus::PrivateKeySize()
 {
 	size_t klen;
 
+	klen = 0;
+
 	switch (m_sphincsState->Parameters)
 	{
 		case SphincsPlusParameters::SPXPS1S128SHAKE:
 		{
-			klen = SPXPS128SHAKE::SPHINCS_SECRETKEY_SIZE;
+			klen = SPXBase::ParamsS1P128::SPX_SECRETKEY_SIZE;
 			break;
 		}
-		case SphincsPlusParameters::SPXPS2S192SHAKE:
+		case SphincsPlusParameters::SPXPS3S192SHAKE:
 		{
-			klen = SPXPS192SHAKE::SPHINCS_SECRETKEY_SIZE;
+			klen = SPXBase::ParamsS3P192::SPX_SECRETKEY_SIZE;
 			break;
 		}
-		case SphincsPlusParameters::SPXPS3S256SHAKE:
+		case SphincsPlusParameters::SPXPS5S256SHAKE:
 		{
-			klen = SPXPS256SHAKE::SPHINCS_SECRETKEY_SIZE;
+			klen = SPXBase::ParamsS5P256::SPX_SECRETKEY_SIZE;
+			break;
+		}
+		case SphincsPlusParameters::SPXPS6S512SHAKE:
+		{
+			klen = SPXBase::ParamsS6P512::SPX_SECRETKEY_SIZE;
 			break;
 		}
 		default:
@@ -146,21 +151,28 @@ const size_t SphincsPlus::PublicKeySize()
 {
 	size_t klen;
 
+	klen = 0;
+
 	switch (m_sphincsState->Parameters)
 	{
 		case SphincsPlusParameters::SPXPS1S128SHAKE:
 		{
-			klen = SPXPS128SHAKE::SPHINCS_PUBLICKEY_SIZE;
+			klen = SPXBase::ParamsS1P128::SPX_PUBLICKEY_SIZE;
 			break;
 		}
-		case SphincsPlusParameters::SPXPS2S192SHAKE:
+		case SphincsPlusParameters::SPXPS3S192SHAKE:
 		{
-			klen = SPXPS192SHAKE::SPHINCS_PUBLICKEY_SIZE;
+			klen = SPXBase::ParamsS3P192::SPX_PUBLICKEY_SIZE;
 			break;
 		}
-		case SphincsPlusParameters::SPXPS3S256SHAKE:
+		case SphincsPlusParameters::SPXPS5S256SHAKE:
 		{
-			klen = SPXPS256SHAKE::SPHINCS_PUBLICKEY_SIZE;
+			klen = SPXBase::ParamsS5P256::SPX_PUBLICKEY_SIZE;
+			break;
+		}
+		case SphincsPlusParameters::SPXPS6S512SHAKE:
+		{
+			klen = SPXBase::ParamsS6P512::SPX_PUBLICKEY_SIZE;
 			break;
 		}
 		default:
@@ -177,21 +189,28 @@ const size_t SphincsPlus::SignatureSize()
 {
 	size_t slen;
 
+	slen = 0;
+
 	switch (m_sphincsState->Parameters)
 	{
 		case SphincsPlusParameters::SPXPS1S128SHAKE:
 		{
-			slen = SPXPS128SHAKE::SPHINCS_SIGNATURE_SIZE;
+			slen = SPXBase::ParamsS1P128::SPX_SIGNATURE_SIZE;
 			break;
 		}
-		case SphincsPlusParameters::SPXPS2S192SHAKE:
+		case SphincsPlusParameters::SPXPS3S192SHAKE:
 		{
-			slen = SPXPS192SHAKE::SPHINCS_SIGNATURE_SIZE;
+			slen = SPXBase::ParamsS3P192::SPX_SIGNATURE_SIZE;
 			break;
 		}
-		case SphincsPlusParameters::SPXPS3S256SHAKE:
+		case SphincsPlusParameters::SPXPS5S256SHAKE:
 		{
-			slen = SPXPS256SHAKE::SPHINCS_SIGNATURE_SIZE;
+			slen = SPXBase::ParamsS5P256::SPX_SIGNATURE_SIZE;
+			break;
+		}
+		case SphincsPlusParameters::SPXPS6S512SHAKE:
+		{
+			slen = SPXBase::ParamsS6P512::SPX_SIGNATURE_SIZE;
 			break;
 		}
 		default:
@@ -206,30 +225,41 @@ const size_t SphincsPlus::SignatureSize()
 
 AsymmetricKeyPair* SphincsPlus::Generate()
 {
-	std::vector<byte> pk(0);
-	std::vector<byte> sk(0);
+	std::vector<uint8_t> pk(0);
+	std::vector<uint8_t> sk(0);
 
 	switch (m_sphincsState->Parameters)
 	{
 		case SphincsPlusParameters::SPXPS1S128SHAKE:
 		{
-			pk.resize(SPXPS128SHAKE::SPHINCS_PUBLICKEY_SIZE);
-			sk.resize(SPXPS128SHAKE::SPHINCS_SECRETKEY_SIZE);
-			SPXPS128SHAKE::Generate(pk, sk, m_rndGenerator);
+			pk.resize(SPXBase::ParamsS1P128::SPX_PUBLICKEY_SIZE);
+			sk.resize(SPXBase::ParamsS1P128::SPX_SECRETKEY_SIZE);
+			SPXBase::ParamsS1P128 x;
+			SPXBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
-		case SphincsPlusParameters::SPXPS2S192SHAKE:
+		case SphincsPlusParameters::SPXPS3S192SHAKE:
 		{
-			pk.resize(SPXPS192SHAKE::SPHINCS_PUBLICKEY_SIZE);
-			sk.resize(SPXPS192SHAKE::SPHINCS_SECRETKEY_SIZE);
-			SPXPS192SHAKE::Generate(pk, sk, m_rndGenerator);
+			pk.resize(SPXBase::ParamsS3P192::SPX_PUBLICKEY_SIZE);
+			sk.resize(SPXBase::ParamsS3P192::SPX_SECRETKEY_SIZE);
+			SPXBase::ParamsS3P192 x;
+			SPXBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
-		case SphincsPlusParameters::SPXPS3S256SHAKE:
+		case SphincsPlusParameters::SPXPS5S256SHAKE:
 		{
-			pk.resize(SPXPS256SHAKE::SPHINCS_PUBLICKEY_SIZE);
-			sk.resize(SPXPS256SHAKE::SPHINCS_SECRETKEY_SIZE);
-			SPXPS256SHAKE::Generate(pk, sk, m_rndGenerator);
+			pk.resize(SPXBase::ParamsS5P256::SPX_PUBLICKEY_SIZE);
+			sk.resize(SPXBase::ParamsS5P256::SPX_SECRETKEY_SIZE);
+			SPXBase::ParamsS5P256 x;
+			SPXBase::Generate(x, pk, sk, m_rndGenerator);
+			break;
+		}
+		case SphincsPlusParameters::SPXPS6S512SHAKE:
+		{
+			pk.resize(SPXBase::ParamsS6P512::SPX_PUBLICKEY_SIZE);
+			sk.resize(SPXBase::ParamsS6P512::SPX_SECRETKEY_SIZE);
+			SPXBase::ParamsS6P512 x;
+			SPXBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
 		default:
@@ -252,6 +282,7 @@ const void SphincsPlus::Initialize(AsymmetricKey* Key)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
+
 	if (Key->KeyClass() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyClass() != AsymmetricKeyTypes::SignaturePrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
@@ -273,7 +304,7 @@ const void SphincsPlus::Initialize(AsymmetricKey* Key)
 	m_sphincsState->Initialized = true;
 }
 
-size_t SphincsPlus::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature)
+size_t SphincsPlus::Sign(const std::vector<uint8_t> &Message, std::vector<uint8_t> &Signature)
 {
 	if (!m_sphincsState->Initialized)
 	{
@@ -296,17 +327,26 @@ size_t SphincsPlus::Sign(const std::vector<byte> &Message, std::vector<byte> &Si
 	{
 		case SphincsPlusParameters::SPXPS1S128SHAKE:
 		{
-			slen = SPXPS128SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
+			SPXBase::ParamsS1P128 x;
+			slen = SPXBase::Sign(x, Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
-		case SphincsPlusParameters::SPXPS2S192SHAKE:
+		case SphincsPlusParameters::SPXPS3S192SHAKE:
 		{
-			slen = SPXPS192SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
+			SPXBase::ParamsS3P192 x;
+			slen = SPXBase::Sign(x, Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
-		case SphincsPlusParameters::SPXPS3S256SHAKE:
+		case SphincsPlusParameters::SPXPS5S256SHAKE:
 		{
-			slen = SPXPS256SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
+			SPXBase::ParamsS5P256 x;
+			slen = SPXBase::Sign(x, Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
+			break;
+		}
+		case SphincsPlusParameters::SPXPS6S512SHAKE:
+		{
+			SPXBase::ParamsS6P512 x;
+			slen = SPXBase::Sign(x, Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
 		default:
@@ -319,7 +359,7 @@ size_t SphincsPlus::Sign(const std::vector<byte> &Message, std::vector<byte> &Si
 	return slen;
 }
 
-bool SphincsPlus::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message)
+bool SphincsPlus::Verify(const std::vector<uint8_t> &Signature, std::vector<uint8_t> &Message)
 {
 	if (!m_sphincsState->Initialized)
 	{
@@ -337,17 +377,26 @@ bool SphincsPlus::Verify(const std::vector<byte> &Signature, std::vector<byte> &
 	{
 		case SphincsPlusParameters::SPXPS1S128SHAKE:
 		{
-			res = SPXPS128SHAKE::Verify(Message, Signature, m_publicKey->Polynomial());
+			SPXBase::ParamsS1P128 x;
+			res = SPXBase::Verify(x, Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
-		case SphincsPlusParameters::SPXPS2S192SHAKE:
+		case SphincsPlusParameters::SPXPS3S192SHAKE:
 		{
-			res = SPXPS192SHAKE::Verify(Message, Signature, m_publicKey->Polynomial());
+			SPXBase::ParamsS3P192 x;
+			res = SPXBase::Verify(x, Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
-		case SphincsPlusParameters::SPXPS3S256SHAKE:
+		case SphincsPlusParameters::SPXPS5S256SHAKE:
 		{
-			res = SPXPS256SHAKE::Verify(Message, Signature, m_publicKey->Polynomial());
+			SPXBase::ParamsS5P256 x;
+			res = SPXBase::Verify(x, Message, Signature, m_publicKey->Polynomial());
+			break;
+		}
+		case SphincsPlusParameters::SPXPS6S512SHAKE:
+		{
+			SPXBase::ParamsS6P512 x;
+			res = SPXBase::Verify(x, Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
 		default:
@@ -360,4 +409,4 @@ bool SphincsPlus::Verify(const std::vector<byte> &Signature, std::vector<byte> &
 	return res;
 }
 
-NAMESPACE_SPHINCSEND
+NAMESPACE_SPHINCSPLUSEND

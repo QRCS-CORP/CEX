@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Message Authentication Code generator enumeration names
 /// </summary>
-enum class Macs : byte
+enum class Macs : uint8_t
 {
 	/// <summary>
 	/// No MAC is specified
@@ -87,13 +87,9 @@ enum class Macs : byte
 	/// </summary>
 	KMAC512 = 18,
 	/// <summary>
-	/// The Keccak based Message Authentication Code generator Keccak-1024
-	/// </summary>
-	KMAC1024 = 19,
-	/// <summary>
 	/// The Poly1305 Message Authentication Code generator
 	/// </summary>
-	Poly1305 = 20
+	Poly1305 = 19
 };
 
 class MacConvert

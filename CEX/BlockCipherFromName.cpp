@@ -1,9 +1,5 @@
 #include "BlockCipherFromName.h"
-#include "CpuDetect.h"
 #include "CryptoSymmetricException.h"
-#if defined(CEX_HAS_AVX)
-#	include "AHX.h"
-#endif
 #include "RHX.h"
 #include "SHX.h"
 
@@ -24,92 +20,31 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 
 	try
 	{ 
-		CpuDetect dtc;
-
 		switch (CipherType)
 		{
 			case BlockCiphers::AES:
 			{
-	#if defined(CEX_HAS_AVX)
-				if (dtc.AESNI())
-				{
-					cptr = new AHX(BlockCipherExtensions::None);
-				}
-				else
-	#endif
-				{
-					cptr = new RHX(BlockCipherExtensions::None);
-				}
+				cptr = new RHX(BlockCipherExtensions::None);
 				break;
 			}
 			case BlockCiphers::RHXH256:
 			{
-	#if defined(CEX_HAS_AVX)
-				if (dtc.AESNI())
-				{
-					cptr = new AHX(BlockCipherExtensions::HKDF256);
-				}
-				else
-	#endif
-				{
-					cptr = new RHX(BlockCipherExtensions::HKDF256);
-				}
+				cptr = new RHX(BlockCipherExtensions::HKDF256);
 				break;
 			}
 			case BlockCiphers::RHXH512:
 			{
-#if defined(CEX_HAS_AVX)
-				if (dtc.AESNI())
-				{
-					cptr = new AHX(BlockCipherExtensions::HKDF512);
-				}
-				else
-#endif
-				{
-					cptr = new RHX(BlockCipherExtensions::HKDF512);
-				}
+				cptr = new RHX(BlockCipherExtensions::HKDF512);
 				break;
 			}
 			case BlockCiphers::RHXS256:
 			{
-#if defined(CEX_HAS_AVX)
-				if (dtc.AESNI())
-				{
-					cptr = new AHX(BlockCipherExtensions::SHAKE256);
-				}
-				else
-#endif
-				{
-					cptr = new RHX(BlockCipherExtensions::SHAKE256);
-				}
+				cptr = new RHX(BlockCipherExtensions::SHAKE256);
 				break;
 			}
 			case BlockCiphers::RHXS512:
 			{
-#if defined(CEX_HAS_AVX)
-				if (dtc.AESNI())
-				{
-					cptr = new AHX(BlockCipherExtensions::SHAKE512);
-				}
-				else
-#endif
-				{
-					cptr = new RHX(BlockCipherExtensions::SHAKE512);
-				}
-				break;
-			}
-			case BlockCiphers::RHXS1024:
-			{
-#if defined(CEX_HAS_AVX)
-				if (dtc.AESNI())
-				{
-					cptr = new AHX(BlockCipherExtensions::SHAKE1024);
-				}
-				else
-#endif
-				{
-					cptr = new RHX(BlockCipherExtensions::SHAKE1024);
-				}
+				cptr = new RHX(BlockCipherExtensions::SHAKE512);
 				break;
 			}
 			case BlockCiphers::Serpent:
@@ -135,11 +70,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			case BlockCiphers::SHXS512:
 			{
 				cptr = new SHX(BlockCipherExtensions::SHAKE512);
-				break;
-			}
-			case BlockCiphers::SHXS1024:
-			{
-				cptr = new SHX(BlockCipherExtensions::SHAKE1024);
 				break;
 			}
 			default:

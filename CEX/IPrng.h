@@ -66,7 +66,7 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination vector</param>
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
-	virtual void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
+	virtual void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Fill a SecureVector array with pseudo-random bytes using offset and length parameters
@@ -75,42 +75,42 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination vector</param>
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
-	virtual void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) = 0;
+	virtual void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The destination standard-vector to fill</param>
-	virtual void Generate(std::vector<byte> &Output) = 0;
+	virtual void Generate(std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Fill a SecureVector array with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The destination standard-vector to fill</param>
-	virtual void Generate(SecureVector<byte> &Output) = 0;
+	virtual void Generate(SecureVector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Get a pseudo-random unsigned 16bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
-	virtual ushort NextUInt16() = 0;
+	virtual uint16_t NextUInt16() = 0;
 
 	/// <summary>
 	/// Get a pseudo-random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt32</returns>
-	virtual uint NextUInt32() = 0;
+	virtual uint32_t NextUInt32() = 0;
 
 	/// <summary>
 	/// Get a pseudo-random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt64</returns>
-	virtual ulong NextUInt64() = 0;
+	virtual uint64_t NextUInt64() = 0;
 
 	/// <summary>
 	/// Reset the generator instance
@@ -128,7 +128,7 @@ public:
 	void Fill(Array &Output, size_t Offset, size_t Elements)
 	{
 		const size_t ELMSZE = sizeof(Array::value_type);
-		std::vector<byte> smp(ELMSZE * Elements);
+		std::vector<uint8_t> smp(ELMSZE * Elements);
 
 		Generate(smp, 0, smp.size());
 		MemoryTools::Copy(smp, 0, Output, Offset, smp.size());

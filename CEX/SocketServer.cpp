@@ -9,8 +9,8 @@ public:
 
 	Socket BaseSocket;
 	std::vector<Socket*> SocketPool;
-	uint BackLog;
-	uint MaxConnections;
+	uint32_t BackLog;
+	uint32_t MaxConnections;
 	std::atomic_uint InstanceCounter;
 	std::atomic_bool IsClosed;
 	std::atomic_bool IsListening;
@@ -98,7 +98,7 @@ SocketAddressFamilies SocketServer::AddressFamily()
 	return m_socketServerState->BaseSocket.AddressFamily;
 }
 
-uint &SocketServer::Backlog()
+uint32_t &SocketServer::Backlog()
 {
 	return m_socketServerState->BackLog;
 }
@@ -113,7 +113,7 @@ bool SocketServer::IsListening()
 	return m_socketServerState->IsListening;
 }
 
-uint &SocketServer::MaxConnections()
+uint32_t &SocketServer::MaxConnections()
 {
 	return m_socketServerState->MaxConnections;
 }
@@ -130,7 +130,7 @@ SocketTransports SocketServer::SocketTransport()
 
 //~~~Public Functions~~~//
 
-Socket SocketServer::Listen(const ipv4_address &Address, ushort Port)
+Socket SocketServer::Listen(const ipv4_address &Address, uint16_t Port)
 {
 	Socket target;
 
@@ -172,7 +172,7 @@ Socket SocketServer::Listen(const ipv4_address &Address, ushort Port)
 	return target;
 }
 
-Socket SocketServer::Listen(const ipv6_address &Address, ushort Port)
+Socket SocketServer::Listen(const ipv6_address &Address, uint16_t Port)
 {
 	Socket target;
 
@@ -214,7 +214,7 @@ Socket SocketServer::Listen(const ipv6_address &Address, ushort Port)
 	return target;
 }
 
-void SocketServer::ListenAsync(const ipv4_address &Address, ushort Port)
+void SocketServer::ListenAsync(const ipv4_address &Address, uint16_t Port)
 {
 	// create the socket
 	if (SocketBase::Create(m_socketServerState->BaseSocket) == false)
@@ -250,7 +250,7 @@ void SocketServer::ListenAsync(const ipv4_address &Address, ushort Port)
 	}
 }
 
-void SocketServer::ListenAsync(const ipv6_address &Address, ushort Port)
+void SocketServer::ListenAsync(const ipv6_address &Address, uint16_t Port)
 {
 	// create the socket
 	if (SocketBase::Create(m_socketServerState->BaseSocket) == false)
@@ -410,10 +410,10 @@ void SocketServer::AcceptEnd()
 	ListenStop();
 }
 
-uint SocketServer::PollSockets()
+uint32_t SocketServer::PollSockets()
 {
 	size_t i;
-	uint ret;
+	uint32_t ret;
 
 	ret = 0;
 
@@ -437,7 +437,7 @@ void SocketServer::SetOptions()
 #if defined(CEX_OS_WINDOWS)
 	char code;
 #else
-	int code;
+	int32_t code;
 #endif
 
 	code = 1;

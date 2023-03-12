@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 // Written by John G. Underhill, January 21, 2015
 // Updated December 9, 2016
 // Updated April 20, 2016
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_CIPHERSTREAM_H
 #define CEX_CIPHERSTREAM_H
@@ -105,10 +105,10 @@ using Cipher::SymmetricKeySize;
 /// <para>The CipherStream class is an easy to use wrapper that initializes and operates a symmetric cipher, automating many complex tasks down to just a couple of methods, 
 /// in an extensible ease of use pattern. \n
 /// Either a block cipher and mode, or a stream cipher can be initialized through the classes constructor, using either the cipher (and options) enumeration members, or a cipher instance. \n
-/// The CipherStream class uses the IByteStream interface, and can encrypt either a byte array using MemoryStream, or a file with FileStream. \n
+/// The CipherStream class uses the IByteStream interface, and can encrypt either a uint8_t array using MemoryStream, or a file with FileStream. \n
 /// This class supports parallel processing; if the cipher configuration supports parallelism (CTR/ICM, and CBC/CFB Decrypt), the IsParallel property will be set to true. \n
 /// The IsParallel property can be overridden and set to false, disabling parallel processing. \n
-/// If using the byte array Write method, the output array should be at least ParallelBlockSize in length to enable parallel processing.</para>
+/// If using the uint8_t array Write method, the output array should be at least ParallelBlockSize in length to enable parallel processing.</para>
 ///
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
@@ -140,7 +140,7 @@ public:
 	/// <summary>
 	/// The Progress Percent event
 	/// </summary>
-	Event<int> ProgressPercent;
+	Event<int32_t> ProgressPercent;
 
 	//~~~Constructor~~~//
 
@@ -252,7 +252,7 @@ public:
 	void Write(IByteStream* InStream, IByteStream* OutStream);
 
 	/// <summary>
-	/// Process using byte arrays.
+	/// Process using uint8_t arrays.
 	/// <para>The Input and Output arrays must be at least ParallelBlockSize to enable parallel processing.</para>
 	/// </summary>
 	/// 
@@ -262,11 +262,11 @@ public:
 	/// <param name="OutOffset">The starting offset within the Output array</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if Write is called before Initialize, or if array sizes are misaligned</exception>
-	void Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void Write(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
 
 private:
 
-	void BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void BlockTransform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
 	void BlockTransform(IByteStream* InStream, IByteStream* OutStream);
 	void CalculateProgress(size_t Length, size_t Processed);
 	static ICipherMode* GetCipherMode(BlockCiphers CipherType, CipherModes CipherModeType);

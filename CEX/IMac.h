@@ -103,7 +103,7 @@ public:
 	///
 	/// <param name="Input">The input vector to process</param>
 	/// <param name="Output">The output vector containing the MAC code</param>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Completes processing and returns the MAC code in a standard-vector
@@ -113,7 +113,7 @@ public:
 	/// <param name="OutOffset">The starting offset within the output array</param>
 	///
 	/// <returns>The size of the MAC code in bytes</returns>
-	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual size_t Finalize(std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Completes processing and returns the MAC code in a secure-vector
@@ -123,7 +123,7 @@ public:
 	/// <param name="OutOffset">The starting offset within the output array</param>
 	///
 	/// <returns>The size of the MAC code in bytes</returns>
-	virtual size_t Finalize(SecureVector<byte> &Output, size_t OutOffset) = 0;
+	virtual size_t Finalize(SecureVector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Initialize the MAC generator with an ISymmetricKey key container.
@@ -147,7 +147,7 @@ public:
 	/// <param name="Input">The input data vector to process</param>
 	/// <param name="InOffset">The starting position with the input array</param>
 	/// <param name="Length">The length of data to process in bytes</param>
-	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
+	virtual void Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length) = 0;
 };
 
 NAMESPACE_MACEND

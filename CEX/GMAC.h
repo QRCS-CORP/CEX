@@ -164,7 +164,7 @@ public:
 	/// <param name="Output">The output vector containing the MAC code</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
-	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Completes processing and returns the MAC code in a standard-vector
@@ -176,7 +176,7 @@ public:
 	/// <returns>The size of the MAC code in bytes</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
-	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
+	size_t Finalize(std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Completes processing and returns the MAC code in a secure-vector
@@ -188,7 +188,7 @@ public:
 	/// <returns>The size of the MAC code in bytes</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
-	size_t Finalize(SecureVector<byte> &Output, size_t OutOffset) override;
+	size_t Finalize(SecureVector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the MAC generator with an ISymmetricKey key container.
@@ -216,15 +216,15 @@ public:
 	/// <param name="Length">The length of data to process in bytes</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the input array is too small</exception>
-	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
+	void Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length) override;
 
 	//~~~Private Functions~~~//
 
-	static void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<GmacState> &State);
+	static void Absorb(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length, std::unique_ptr<GmacState> &State);
 	static bool HasCMUL();
-	static void Multiply(std::unique_ptr<GmacState> &State, std::array<byte, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output);
-	static void Permute(std::array<ulong, Numeric::CMUL::CMUL_STATE_SIZE> &State, std::array<byte, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output);
-	static void PreCompute(std::unique_ptr<GmacState> &State, std::array<byte, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output, size_t Counter, size_t Length);
+	static void Multiply(std::unique_ptr<GmacState> &State, std::array<uint8_t, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output);
+	static void Permute(std::array<uint64_t, Numeric::CMUL::CMUL_STATE_SIZE> &State, std::array<uint8_t, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output);
+	static void PreCompute(std::unique_ptr<GmacState> &State, std::array<uint8_t, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output, size_t Counter, size_t Length);
 };
 
 NAMESPACE_MACEND

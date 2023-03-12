@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 // Updated April 18, 2017
 // Updated October 14, 2017
 // Updated March 1, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_CTR_H
 #define CEX_CTR_H
@@ -193,7 +193,7 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: A vector of allowed cipher-mode input key byte-sizes
+	/// Read Only: A vector of allowed cipher-mode input key uint8_t-sizes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
@@ -205,10 +205,10 @@ public:
 	/// <summary>
 	/// Read Only: The CTR initialization vector
 	/// </summary>
-	const std::vector<byte> &Nonce();
+	const std::vector<uint8_t> &Nonce();
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	const size_t ParallelBlockSize() override;
@@ -228,7 +228,7 @@ public:
 	/// 
 	/// <param name="Input">The input vector of cipher-text bytes</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
-	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
@@ -240,7 +240,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -250,7 +250,7 @@ public:
 	/// 
 	/// <param name="Input">The input vector of plain-text bytes</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
-	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
@@ -262,7 +262,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the cipher-mode instance
@@ -298,14 +298,14 @@ public:
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 private:
 
-	void Encrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter);
-	void ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	void Encrypt(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::vector<uint8_t> &Counter);
+	void ProcessParallel(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
+	void ProcessSequential(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
 };
 
 NAMESPACE_MODEEND

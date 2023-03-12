@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 // Updated April 18, 2017
 // Updated October 14, 2017
 // Updated March 1, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_ICM_H
 #define CEX_ICM_H
@@ -64,7 +64,7 @@ NAMESPACE_MODE
 /// <description><B>Overview:</B></description>
 /// <para>The ICM Counter mode generates a key-stream by encrypting successive values of an incrementing Little Endian ordered, 64bit integer counter array. \n
 /// The key-stream is then XOR'd with the input message block creating a type of stream cipher. \n
-/// The ICM counter mode differs from the standard CTR mode by using a little endian byte ordered counter, allowing the use of 64 bit integers in the counter array on an LE based architecture (e.g AMD, Intel). \n
+/// The ICM counter mode differs from the standard CTR mode by using a little endian uint8_t ordered counter, allowing the use of 64 bit integers in the counter array on an LE based architecture (e.g AMD, Intel). \n
 /// The trend in processors is moving towards little endian format, and with devices that use this bit ordering, ICM can be significantly faster then the standard big endian CTR implementation. \n
 /// In parallel mode, the ICM modes counter is increased by a number factored from the number of message blocks (ParallelBlockSize), allowing for counter pre-calculation and multi-threaded processing. \n
 /// The implementation is further parallelized by constructing a 'staggered' counter array, and processing large sub-blocks using AVX, AVX2, or AVX512 SIMD instructions.</para>
@@ -195,7 +195,7 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: A vector of allowed cipher-mode input key byte-sizes
+	/// Read Only: A vector of allowed cipher-mode input key uint8_t-sizes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
@@ -207,10 +207,10 @@ public:
 	/// <summary>
 	/// Read Only: The ICM initialization vector
 	/// </summary>
-	const std::vector<byte> &Nonce();
+	const std::vector<uint8_t> &Nonce();
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	const size_t ParallelBlockSize() override;
@@ -230,7 +230,7 @@ public:
 	/// 
 	/// <param name="Input">The input vector of cipher-text bytes</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
-	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
@@ -242,7 +242,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -252,7 +252,7 @@ public:
 	/// 
 	/// <param name="Input">The input vector of plain-text bytes</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
-	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
@@ -264,7 +264,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+	void EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the cipher-mode instance
@@ -300,14 +300,14 @@ public:
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 private:
 
-	void Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter);
-	void ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	void Encrypt128(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset);
+	void Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::vector<uint8_t> &Counter);
+	void ProcessParallel(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
+	void ProcessSequential(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
 };
 
 NAMESPACE_MODEEND

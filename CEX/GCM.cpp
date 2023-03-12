@@ -13,11 +13,11 @@ class GCM::GcmState
 {
 public:
 
-	std::vector<byte> AAD;
-	SecureVector<byte> Buffer;
-	SecureVector<byte> Key;
-	std::vector<byte> Nonce;
-	std::vector<byte> Tag;
+	std::vector<uint8_t> AAD;
+	SecureVector<uint8_t> Buffer;
+	SecureVector<uint8_t> Key;
+	std::vector<uint8_t> Nonce;
+	std::vector<uint8_t> Tag;
 	size_t Counter;
 	bool Destroyed;
 	bool Encryption;
@@ -165,12 +165,12 @@ ParallelOptions &GCM::ParallelProfile()
 	return m_parallelProfile;
 }
 
-const std::vector<byte> GCM::Tag()
+const std::vector<uint8_t> GCM::Tag()
 {
 	return m_gcmState->Tag;
 }
 
-const void GCM::Tag(SecureVector<byte> &Output)
+const void GCM::Tag(SecureVector<uint8_t> &Output)
 {
 	SecureInsert(m_gcmState->Tag, 0, Output, 0, m_gcmState->Tag.size());
 }
@@ -228,11 +228,11 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 		// key the block-cipher and create the hash key
 		m_cipherMode->Engine()->Initialize(true, Parameters);
-		std::vector<byte> tmph(BLOCK_SIZE);
-		const std::vector<byte> ZEROES(BLOCK_SIZE, 0x00);
+		std::vector<uint8_t> tmph(BLOCK_SIZE);
+		const std::vector<uint8_t> ZEROES(BLOCK_SIZE, 0x00);
 		m_cipherMode->Engine()->Transform(ZEROES, 0, tmph, 0);
 
-		std::vector<ulong> gkey = 
+		std::vector<uint64_t> gkey = 
 		{
 			IntegerTools::BeBytesTo64(tmph, 0),
 			IntegerTools::BeBytesTo64(tmph, 8)
@@ -258,7 +258,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 	else
 	{
-		std::vector<byte> tmpn(BLOCK_SIZE);
+		std::vector<uint8_t> tmpn(BLOCK_SIZE);
 		m_macAuthenticator->Multiply(SecureUnlock(m_gcmState->Buffer), tmpn, m_gcmState->Buffer.size());
 		m_macAuthenticator->Finalize(tmpn, 0, m_gcmState->Buffer.size());
 		MemoryTools::Copy(tmpn, 0, m_gcmState->Nonce, 0, m_gcmState->Nonce.size());
@@ -270,7 +270,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
 
 	// permute the nonce for ghash
-	std::vector<byte> tmpn(BLOCK_SIZE);
+	std::vector<uint8_t> tmpn(BLOCK_SIZE);
 	m_cipherMode->Transform(tmpn, 0, m_gcmState->Nonce, 0, BLOCK_SIZE);
 
 	// reset the initialization and finalization state
@@ -288,7 +288,7 @@ void GCM::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void GCM::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
+void GCM::SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -304,7 +304,7 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 	m_macAuthenticator->Multiply(m_gcmState->AAD, m_gcmState->Tag, Length);
 }
 
-void GCM::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length)
+void GCM::SetAssociatedData(const SecureVector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -320,7 +320,7 @@ void GCM::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size
 	m_macAuthenticator->Multiply(m_gcmState->AAD, m_gcmState->Tag, Length);
 }
 
-void GCM::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void GCM::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
@@ -353,7 +353,7 @@ void GCM::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 //~~~Private Functions~~~//
 
-void GCM::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void GCM::Finalize(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (Length < MIN_TAGSIZE || Length > BLOCK_SIZE)
 	{
@@ -384,9 +384,9 @@ void GCM::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	m_gcmState->Initialized = false;
 }
 
-bool GCM::Verify(const std::vector<byte> &Input, size_t Offset, size_t Length)
+bool GCM::Verify(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
-	std::vector<byte> code(TagSize());
+	std::vector<uint8_t> code(TagSize());
 	bool ret;
 
 	// finalize the mac-code

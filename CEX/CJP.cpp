@@ -16,11 +16,11 @@ class CJP::JitterState
 {
 public:
 
-	std::vector<byte> MemoryState;
-	ulong LastDelta;
-	ulong LastDelta2;
-	ulong PreviousTime;
-	ulong RandomState;
+	std::vector<uint8_t> MemoryState;
+	uint64_t LastDelta;
+	uint64_t LastDelta2;
+	uint64_t PreviousTime;
+	uint64_t RandomState;
 	size_t MemoryBlocks;
 	size_t MemoryBlockSize;
 	size_t MemoryIterations;
@@ -112,7 +112,7 @@ bool &CJP::SecureCache()
 
 //~~~Public Functions~~~//
 
-void CJP::Generate(std::vector<byte> &Output)
+void CJP::Generate(std::vector<uint8_t> &Output)
 {
 	if (IsAvailable() == false)
 	{
@@ -126,7 +126,7 @@ void CJP::Generate(std::vector<byte> &Output)
 	Generate(m_pvdState, Output.data(), Output.size());
 }
 
-void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
+void CJP::Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (IsAvailable() == false)
 	{
@@ -144,7 +144,7 @@ void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	Generate(m_pvdState, &Output[Offset], Length);
 }
 
-void CJP::Generate(SecureVector<byte> &Output)
+void CJP::Generate(SecureVector<uint8_t> &Output)
 {
 	if (IsAvailable() == false)
 	{
@@ -158,7 +158,7 @@ void CJP::Generate(SecureVector<byte> &Output)
 	Generate(m_pvdState, Output.data(), Output.size());
 }
 
-void CJP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
+void CJP::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (IsAvailable() == false)
 	{
@@ -196,7 +196,7 @@ bool CJP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	SecureVector<byte> smp(m_pvdSelfTest->SELFTEST_LENGTH);
+	SecureVector<uint8_t> smp(m_pvdSelfTest->SELFTEST_LENGTH);
 
 	Generate(m_pvdState, smp.data(), smp.size());
 
@@ -211,13 +211,13 @@ bool CJP::FipsTest()
 }
 
 CEX_OPTIMIZE_IGNORE
-void CJP::FoldTime(std::unique_ptr<JitterState> &State, ulong TimeStamp)
+void CJP::FoldTime(std::unique_ptr<JitterState> &State, uint64_t TimeStamp)
 {
 	// CPU jitter noise source; this is the noise source based on the CPU execution time jitter
 	// this function not only acts as folding operation, but this function's execution is used to measure the CPU execution time jitter
 	const size_t FLDCNT = ShuffleLoop(State, FOLD_LOOP_BIT_MAX, FOLD_LOOP_BIT_MIN);
-	ulong fldt;
-	ulong tmpt;
+	uint64_t fldt;
+	uint64_t tmpt;
 	size_t i;
 	size_t j;
 
@@ -271,7 +271,7 @@ void CJP::Generate(std::unique_ptr<JitterState> &State)
 	}
 }
 
-void CJP::Generate(std::unique_ptr<JitterState> &State, byte* Output, size_t Length)
+void CJP::Generate(std::unique_ptr<JitterState> &State, uint8_t* Output, size_t Length)
 {
 	if (!TimerCheck(State))
 	{
@@ -289,11 +289,11 @@ void CJP::Generate(std::unique_ptr<JitterState> &State, byte* Output, size_t Len
 		{
 			Generate(State);
 
-			const size_t RMDLEN = (Length > sizeof(ulong)) ? sizeof(ulong) : Length;
+			const size_t RMDLEN = (Length > sizeof(uint64_t)) ? sizeof(uint64_t) : Length;
 
 			for (i = 0; i < RMDLEN; ++i)
 			{
-				Output[poff + i] = static_cast<byte>(State->RandomState >> (i * 8));
+				Output[poff + i] = static_cast<uint8_t>(State->RandomState >> (i * 8));
 			}
 
 			Length -= RMDLEN;
@@ -308,14 +308,14 @@ void CJP::Generate(std::unique_ptr<JitterState> &State, byte* Output, size_t Len
 	}
 }
 
-ulong CJP::GetTime()
+uint64_t CJP::GetTime()
 {
 	return SystemTools::TimeStamp(OS_HAS_TSC);
 }
 
 bool CJP::MeasureJitter(std::unique_ptr<JitterState> &State)
 {
-	ulong delta;
+	uint64_t delta;
 
 	// the heart of the entropy generation process; calculate time deltas and use the CPU jitter in the time deltas
 	// the jitter is folded into one bit; this function is the "random bit generator" as it produces one random bit per invocation
@@ -325,7 +325,7 @@ bool CJP::MeasureJitter(std::unique_ptr<JitterState> &State)
 	MemoryJitter(State);
 
 	// get time stamp and calculate time delta to previous invocation to measure the timing variations
-	ulong time = GetTime();
+	uint64_t time = GetTime();
 	delta = time - State->PreviousTime;
 	State->PreviousTime = time;
 	// call the next noise sources which also folds the data
@@ -341,12 +341,12 @@ void CJP::MemoryJitter(std::unique_ptr<JitterState> &State)
 	const size_t WRPLEN = State->MemoryBlockSize * State->MemoryBlocks;
 	const size_t ACLCNT = State->MemoryIterations + ShuffleLoop(State, ACC_LOOP_BIT_MAX, ACC_LOOP_BIT_MIN);
 	size_t i;
-	byte tmps;
+	uint8_t tmps;
 
 	for (i = 0; i < ACLCNT; ++i)
 	{
 		tmps = State->MemoryState[State->MemoryPosition];
-		// memory access; just add 1 to one byte, wrap at 255; memory access implies read from and write to memory location
+		// memory access; just add 1 to one uint8_t, wrap at 255; memory access implies read from and write to memory location
 		tmps = (tmps + 1) & 0xFF;
 		State->MemoryState[State->MemoryPosition] = tmps;
 		// addition of memBlockSize - 1 to pointer with wrap around logic to ensure that every memory location is hit evenly
@@ -372,7 +372,7 @@ std::unique_ptr<CJP::JitterState> CJP::Prime()
 
 	if (dtc.L1CacheTotal() != 0)
 	{
-		state->MemoryBlockSize = static_cast<uint>(dtc.L1CacheLineSize());
+		state->MemoryBlockSize = static_cast<uint32_t>(dtc.L1CacheLineSize());
 		state->MemoryBlocks = (dtc.L1CacheTotal() / dtc.VirtualCores() / state->MemoryBlockSize);
 		state->MemoryTotalSize = state->MemoryBlocks * state->MemoryBlockSize;
 		state->MemoryIterations = (state->MemoryTotalSize / state->MemoryBlockSize) * 2;
@@ -407,9 +407,9 @@ std::unique_ptr<CJP::JitterState> CJP::Prime()
 size_t CJP::ShuffleLoop(std::unique_ptr<JitterState> &State, size_t LowBits, size_t MinShift)
 {
 	// update of the loop count used for the next round of an entropy collection
-	const uint SHFMSK = (1 << LowBits) - 1;
-	ulong shuffle;
-	ulong time;
+	const uint32_t SHFMSK = (1 << LowBits) - 1;
+	uint64_t shuffle;
+	uint64_t time;
 
 	// store the timestamp
 	time = GetTime();
@@ -428,10 +428,10 @@ size_t CJP::ShuffleLoop(std::unique_ptr<JitterState> &State, size_t LowBits, siz
 	return (static_cast<size_t>(shuffle) + (static_cast<size_t>(1) << MinShift));
 }
 
-bool CJP::StuckCheck(std::unique_ptr<JitterState> &State, ulong CurrentDelta)
+bool CJP::StuckCheck(std::unique_ptr<JitterState> &State, uint64_t CurrentDelta)
 {
-	const ulong DELTA2 = State->LastDelta - CurrentDelta;
-	const ulong DELTA3 = DELTA2 - State->LastDelta2;
+	const uint64_t DELTA2 = State->LastDelta - CurrentDelta;
+	const uint64_t DELTA3 = DELTA2 - State->LastDelta2;
 	bool ret;
 
 	ret = false;
@@ -448,11 +448,11 @@ bool CJP::StuckCheck(std::unique_ptr<JitterState> &State, ulong CurrentDelta)
 
 bool CJP::TimerCheck(std::unique_ptr<JitterState> &State)
 {
-	ulong delta;
-	ulong olddelta;
-	ulong sumdelta;
-	ulong time;
-	ulong time2;
+	uint64_t delta;
+	uint64_t olddelta;
+	uint64_t sumdelta;
+	uint64_t time;
+	uint64_t time2;
 	size_t backctr;
 	size_t varctr;
 	size_t modctr;

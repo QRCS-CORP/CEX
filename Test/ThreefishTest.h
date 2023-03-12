@@ -32,12 +32,12 @@ namespace Test
 		static const size_t MONTE_CYCLES = 10000;
 		static const size_t TEST_CYCLES = 10;
 
-		std::vector<std::vector<byte>> m_code;
-		std::vector<std::vector<byte>> m_expected;
-		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_message;
-		std::vector<std::vector<byte>> m_monte;
-		std::vector<std::vector<byte>> m_nonce;
+		std::vector<std::vector<uint8_t>> m_code;
+		std::vector<std::vector<uint8_t>> m_expected;
+		std::vector<std::vector<uint8_t>> m_key;
+		std::vector<std::vector<uint8_t>> m_message;
+		std::vector<std::vector<uint8_t>> m_monte;
+		std::vector<std::vector<uint8_t>> m_nonce;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -113,7 +113,7 @@ namespace Test
 		/// <param name="Expected">The expected output vector</param>
 		/// <param name="MacCode1">The first expected Mac code array</param>
 		/// <param name="MacCode2">The second expected Mac code array</param>
-		void Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2);
+		void Finalization(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected, std::vector<uint8_t> &MacCode1, std::vector<uint8_t> &MacCode2);
 
 		/// <summary>
 		/// Compare known answer test vectors to cipher output
@@ -124,7 +124,7 @@ namespace Test
 		/// <param name="Key">The input cipher key</param>
 		/// <param name="Nonce">The cipher initialization vector</param>
 		/// <param name="Expected">The expected output vector</param>
-		void Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected);
+		void Kat(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compare known answer test vectors to a looping monte carlo output
@@ -135,7 +135,7 @@ namespace Test
 		/// <param name="Key">The input cipher key</param>
 		/// <param name="Nonce">The cipher initialization vector</param>
 		/// <param name="Expected">The expected output vector</param>
-		void MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected);
+		void MonteCarlo(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compares synchronous to parallel processed random-sized, pseudo-random array transformations and their inverse in a looping [TEST_CYCLES] stress-test
@@ -161,7 +161,7 @@ namespace Test
 		/// <param name="Nonce">The cipher initialization vector</param>
 		/// <param name="Expected">The expected ciphertext</param>
 		/// <param name="Mac">The expected mac code</param>
-		void Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac);
+		void Verification(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected, std::vector<uint8_t> &Mac);
 
 	private:
 

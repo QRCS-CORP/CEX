@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -118,10 +118,10 @@ public:
 	static const size_t BLAKE256_RATE_SIZE = 64;
 	static const size_t BLAKE512_RATE_SIZE = 128;
 
-	static const std::vector<uint> IV256;
-	static const std::vector<ulong> IV512;
-	static const std::vector<byte> Sigma256;
-	static const std::vector<byte> Sigma512;
+	static const std::vector<uint32_t> IV256;
+	static const std::vector<uint64_t> IV512;
+	static const std::vector<uint8_t> Sigma256;
+	static const std::vector<uint8_t> Sigma512;
 
 	/// <summary>
 	/// The compact form of the Blake2-256 permutation function.
@@ -136,8 +136,8 @@ public:
 	template<typename ArrayU8, typename ArrayU32x8>
 	static void PermuteR10P512C(const ArrayU8 &Input, size_t InOffset, ArrayU32x8 &State, const ArrayU32x8 &IV)
 	{
-		std::array<uint, 16> M;
-		std::array<uint, 16> R{
+		std::array<uint32_t, 16> M;
+		std::array<uint32_t, 16> R{
 			State[0],
 			State[1],
 			State[2],
@@ -289,38 +289,38 @@ public:
 	template<typename ArrayU8, typename ArrayU32x8>
 	static void PermuteR10P512U(const ArrayU8 &Input, size_t InOffset, ArrayU32x8 &State, const ArrayU32x8 &IV)
 	{
-		uint M0 = IntegerTools::LeBytesTo32(Input, InOffset);
-		uint M1 = IntegerTools::LeBytesTo32(Input, InOffset + 4);
-		uint M2 = IntegerTools::LeBytesTo32(Input, InOffset + 8);
-		uint M3 = IntegerTools::LeBytesTo32(Input, InOffset + 12);
-		uint M4 = IntegerTools::LeBytesTo32(Input, InOffset + 16);
-		uint M5 = IntegerTools::LeBytesTo32(Input, InOffset + 20);
-		uint M6 = IntegerTools::LeBytesTo32(Input, InOffset + 24);
-		uint M7 = IntegerTools::LeBytesTo32(Input, InOffset + 28);
-		uint M8 = IntegerTools::LeBytesTo32(Input, InOffset + 32);
-		uint M9 = IntegerTools::LeBytesTo32(Input, InOffset + 36);
-		uint M10 = IntegerTools::LeBytesTo32(Input, InOffset + 40);
-		uint M11 = IntegerTools::LeBytesTo32(Input, InOffset + 44);
-		uint M12 = IntegerTools::LeBytesTo32(Input, InOffset + 48);
-		uint M13 = IntegerTools::LeBytesTo32(Input, InOffset + 52);
-		uint M14 = IntegerTools::LeBytesTo32(Input, InOffset + 56);
-		uint M15 = IntegerTools::LeBytesTo32(Input, InOffset + 60);
-		uint R0 = State[0];
-		uint R1 = State[1];
-		uint R2 = State[2];
-		uint R3 = State[3];
-		uint R4 = State[4];
-		uint R5 = State[5];
-		uint R6 = State[6];
-		uint R7 = State[7];
-		uint R8 = IV[0];
-		uint R9 = IV[1];
-		uint R10 = IV[2];
-		uint R11 = IV[3];
-		uint R12 = IV[4];
-		uint R13 = IV[5];
-		uint R14 = IV[6];
-		uint R15 = IV[7];
+		uint32_t M0 = IntegerTools::LeBytesTo32(Input, InOffset);
+		uint32_t M1 = IntegerTools::LeBytesTo32(Input, InOffset + 4);
+		uint32_t M2 = IntegerTools::LeBytesTo32(Input, InOffset + 8);
+		uint32_t M3 = IntegerTools::LeBytesTo32(Input, InOffset + 12);
+		uint32_t M4 = IntegerTools::LeBytesTo32(Input, InOffset + 16);
+		uint32_t M5 = IntegerTools::LeBytesTo32(Input, InOffset + 20);
+		uint32_t M6 = IntegerTools::LeBytesTo32(Input, InOffset + 24);
+		uint32_t M7 = IntegerTools::LeBytesTo32(Input, InOffset + 28);
+		uint32_t M8 = IntegerTools::LeBytesTo32(Input, InOffset + 32);
+		uint32_t M9 = IntegerTools::LeBytesTo32(Input, InOffset + 36);
+		uint32_t M10 = IntegerTools::LeBytesTo32(Input, InOffset + 40);
+		uint32_t M11 = IntegerTools::LeBytesTo32(Input, InOffset + 44);
+		uint32_t M12 = IntegerTools::LeBytesTo32(Input, InOffset + 48);
+		uint32_t M13 = IntegerTools::LeBytesTo32(Input, InOffset + 52);
+		uint32_t M14 = IntegerTools::LeBytesTo32(Input, InOffset + 56);
+		uint32_t M15 = IntegerTools::LeBytesTo32(Input, InOffset + 60);
+		uint32_t R0 = State[0];
+		uint32_t R1 = State[1];
+		uint32_t R2 = State[2];
+		uint32_t R3 = State[3];
+		uint32_t R4 = State[4];
+		uint32_t R5 = State[5];
+		uint32_t R6 = State[6];
+		uint32_t R7 = State[7];
+		uint32_t R8 = IV[0];
+		uint32_t R9 = IV[1];
+		uint32_t R10 = IV[2];
+		uint32_t R11 = IV[3];
+		uint32_t R12 = IV[4];
+		uint32_t R13 = IV[5];
+		uint32_t R14 = IV[6];
+		uint32_t R15 = IV[7];
 
 		// round 0
 		R0 += R4 + M0;
@@ -2309,8 +2309,8 @@ public:
 	template<typename ArrayU8, typename ArrayU64x8>
 	static void PermuteR12P1024C(const ArrayU8 &Input, size_t InOffset, ArrayU64x8 &State, const ArrayU64x8 &IV)
 	{
-		std::array<ulong, 16> M;
-		std::array<ulong, 16> R{
+		std::array<uint64_t, 16> M;
+		std::array<uint64_t, 16> R{
 			State[0],
 			State[1],
 			State[2],
@@ -2462,38 +2462,38 @@ public:
 	template<typename ArrayU8, typename ArrayU64x8>
 	static void PermuteR12P1024U(const ArrayU8 &Input, size_t InOffset, ArrayU64x8 &State, const ArrayU64x8 &IV)
 	{
-		ulong M0 = IntegerTools::LeBytesTo64(Input, InOffset);
-		ulong M1 = IntegerTools::LeBytesTo64(Input, InOffset + 8);
-		ulong M2 = IntegerTools::LeBytesTo64(Input, InOffset + 16);
-		ulong M3 = IntegerTools::LeBytesTo64(Input, InOffset + 24);
-		ulong M4 = IntegerTools::LeBytesTo64(Input, InOffset + 32);
-		ulong M5 = IntegerTools::LeBytesTo64(Input, InOffset + 40);
-		ulong M6 = IntegerTools::LeBytesTo64(Input, InOffset + 48);
-		ulong M7 = IntegerTools::LeBytesTo64(Input, InOffset + 56);
-		ulong M8 = IntegerTools::LeBytesTo64(Input, InOffset + 64);
-		ulong M9 = IntegerTools::LeBytesTo64(Input, InOffset + 72);
-		ulong M10 = IntegerTools::LeBytesTo64(Input, InOffset + 80);
-		ulong M11 = IntegerTools::LeBytesTo64(Input, InOffset + 88);
-		ulong M12 = IntegerTools::LeBytesTo64(Input, InOffset + 96);
-		ulong M13 = IntegerTools::LeBytesTo64(Input, InOffset + 104);
-		ulong M14 = IntegerTools::LeBytesTo64(Input, InOffset + 112);
-		ulong M15 = IntegerTools::LeBytesTo64(Input, InOffset + 120);
-		ulong R0 = State[0];
-		ulong R1 = State[1];
-		ulong R2 = State[2];
-		ulong R3 = State[3];
-		ulong R4 = State[4];
-		ulong R5 = State[5];
-		ulong R6 = State[6];
-		ulong R7 = State[7];
-		ulong R8 = IV[0];
-		ulong R9 = IV[1];
-		ulong R10 = IV[2];
-		ulong R11 = IV[3];
-		ulong R12 = IV[4];
-		ulong R13 = IV[5];
-		ulong R14 = IV[6];
-		ulong R15 = IV[7];
+		uint64_t M0 = IntegerTools::LeBytesTo64(Input, InOffset);
+		uint64_t M1 = IntegerTools::LeBytesTo64(Input, InOffset + 8);
+		uint64_t M2 = IntegerTools::LeBytesTo64(Input, InOffset + 16);
+		uint64_t M3 = IntegerTools::LeBytesTo64(Input, InOffset + 24);
+		uint64_t M4 = IntegerTools::LeBytesTo64(Input, InOffset + 32);
+		uint64_t M5 = IntegerTools::LeBytesTo64(Input, InOffset + 40);
+		uint64_t M6 = IntegerTools::LeBytesTo64(Input, InOffset + 48);
+		uint64_t M7 = IntegerTools::LeBytesTo64(Input, InOffset + 56);
+		uint64_t M8 = IntegerTools::LeBytesTo64(Input, InOffset + 64);
+		uint64_t M9 = IntegerTools::LeBytesTo64(Input, InOffset + 72);
+		uint64_t M10 = IntegerTools::LeBytesTo64(Input, InOffset + 80);
+		uint64_t M11 = IntegerTools::LeBytesTo64(Input, InOffset + 88);
+		uint64_t M12 = IntegerTools::LeBytesTo64(Input, InOffset + 96);
+		uint64_t M13 = IntegerTools::LeBytesTo64(Input, InOffset + 104);
+		uint64_t M14 = IntegerTools::LeBytesTo64(Input, InOffset + 112);
+		uint64_t M15 = IntegerTools::LeBytesTo64(Input, InOffset + 120);
+		uint64_t R0 = State[0];
+		uint64_t R1 = State[1];
+		uint64_t R2 = State[2];
+		uint64_t R3 = State[3];
+		uint64_t R4 = State[4];
+		uint64_t R5 = State[5];
+		uint64_t R6 = State[6];
+		uint64_t R7 = State[7];
+		uint64_t R8 = IV[0];
+		uint64_t R9 = IV[1];
+		uint64_t R10 = IV[2];
+		uint64_t R11 = IV[3];
+		uint64_t R12 = IV[4];
+		uint64_t R13 = IV[5];
+		uint64_t R14 = IV[6];
+		uint64_t R15 = IV[7];
 
 		// round 0
 		R0 += R4 + M0;

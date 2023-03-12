@@ -14,23 +14,23 @@ using Enumeration::SocketProtocols;
 using Enumeration::SocketStates;
 using Enumeration::SocketTransports;
 
-typedef int socklen_t;
+typedef int32_t socklen_t;
 
 #if defined(CEX_OS_WINDOWS)
 typedef uintptr_t socket_t;
 #else
-typedef int socket_t;
+typedef int32_t socket_t;
 #endif
 
-static const int SOCKET_RET_ERROR = -1;
-static const int SOCKET_RET_SUCCESS = 0;
-static const int SOCKET_MAX_CONN = 0x7FFFFFFFL;
-static const int SOCKET_TIMEOUT_MSEC = 10000;
+static const int32_t SOCKET_RET_ERROR = -1;
+static const int32_t SOCKET_RET_SUCCESS = 0;
+static const int32_t SOCKET_MAX_CONN = 0x7FFFFFFFL;
+static const int32_t SOCKET_TIMEOUT_MSEC = 10000;
 
 #if defined(CEX_OS_WINDOWS)
 static const socket_t UNINITIALIZED_SOCKET = static_cast<uintptr_t>(~0);
 #else
-static const int UNINITIALIZED_SOCKET = -1;
+static const int32_t UNINITIALIZED_SOCKET = -1;
 #endif
 
 /// <summary>
@@ -42,8 +42,8 @@ public:
 
 	socket_t Connection;
 	std::string Address;
-	int InstanceCount;
-	ushort Port;
+	int32_t InstanceCount;
+	uint16_t Port;
 	SocketAddressFamilies AddressFamily;
 	SocketStates ConnectionStatus;
 	SocketProtocols SocketProtocol;

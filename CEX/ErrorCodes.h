@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// A list of library error codes
 /// </summary>
-enum class ErrorCodes : byte
+enum class ErrorCodes : uint8_t
 {
 	/// <summary>
 	/// No error code was specified

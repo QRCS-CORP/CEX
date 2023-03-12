@@ -13,8 +13,8 @@ class Poly1305::Poly1305State
 {
 public:
 
-	std::array<ulong, 8> State = { 0x00 };
-	std::vector<byte> Buffer;
+	std::array<uint64_t, 8> State;
+	std::vector<uint8_t> Buffer;
 	size_t Position;
 	bool IsInitialized;
 
@@ -35,7 +35,7 @@ public:
 	{
 		Position = 0;
 		MemoryTools::Clear(Buffer, 0, Buffer.size());
-		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+		MemoryTools::Clear(State, 0, State.size() * sizeof(uint64_t));
 		IsInitialized = false;
 	}
 };
@@ -49,8 +49,6 @@ Poly1305::Poly1305()
 		Macs::Poly1305, 
 		MacConvert::ToName(Macs::Poly1305), 
 		std::vector<SymmetricKeySize> { 
-			SymmetricKeySize(POLYKEY_SIZE, 0, 0),
-			SymmetricKeySize(POLYKEY_SIZE, 0, 0),
 			SymmetricKeySize(POLYKEY_SIZE, 0, 0)},
 		POLYKEY_SIZE,
 		MINSALT_LENGTH,
@@ -76,7 +74,7 @@ const bool Poly1305::IsInitialized()
 
 //~~~Public Functions~~~//
 
-void Poly1305::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void Poly1305::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -84,22 +82,22 @@ void Poly1305::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 	}
 	if (Output.size() < TagSize())
 	{
-		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
+size_t Poly1305::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
-	ulong c;
-	ulong g0;
-	ulong g1;
-	ulong g2;
-	ulong h0;
-	ulong h1;
-	ulong h2;
+	uint64_t c;
+	uint64_t g0;
+	uint64_t g1;
+	uint64_t g2;
+	uint64_t h0;
+	uint64_t h1;
+	uint64_t h2;
 
 	if (IsInitialized() == false)
 	{
@@ -107,7 +105,7 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 	if ((Output.size() - OutOffset) < TagSize())
 	{
-		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	if (m_poly1305State->Position != 0)
@@ -152,9 +150,9 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	g1 = h1 + c;
 	c = (g1 >> 44);
 	g1 &= 0xFFFFFFFFFFFULL;
-	g2 = h2 + (c - (static_cast<ulong>(1) << 42));
+	g2 = h2 + (c - (static_cast<uint64_t>(1) << 42));
 	// select h if h < p, or h + -p if h >= p
-	c = (g2 >> ((sizeof(ulong) * 8) - 1)) - 1;
+	c = (g2 >> ((sizeof(uint64_t) * 8) - 1)) - 1;
 	g0 &= c;
 	g1 &= c;
 	g2 &= c;
@@ -164,8 +162,8 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	h2 = (h2 & c) | g2;
 
 	// h = h + pad
-	const ulong T0 = m_poly1305State->State[6];
-	const ulong T1 = m_poly1305State->State[7];
+	const uint64_t T0 = m_poly1305State->State[6];
+	const uint64_t T1 = m_poly1305State->State[7];
 	h0 += (T0 & 0xFFFFFFFFFFFULL);
 	c = (h0 >> 44);
 	h0 &= 0xFFFFFFFFFFFULL;
@@ -179,14 +177,14 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	h1 = ((h1 >> 20) | (h2 << 24));
 
 	IntegerTools::Le64ToBytes(h0, Output, OutOffset);
-	IntegerTools::Le64ToBytes(h1, Output, OutOffset + sizeof(ulong));
+	IntegerTools::Le64ToBytes(h1, Output, OutOffset + sizeof(uint64_t));
 
 	return TagSize();
 }
 
-size_t Poly1305::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+size_t Poly1305::Finalize(SecureVector<uint8_t> &Output, size_t OutOffset)
 {
-	std::vector<byte> tag(TagSize());
+	std::vector<uint8_t> tag(TagSize());
 
 	Finalize(tag, 0);
 	SecureMove(tag, 0, Output, OutOffset, tag.size());
@@ -201,8 +199,8 @@ void Poly1305::Initialize(ISymmetricKey &Parameters)
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
 
-	const ulong T0 = IntegerTools::LeBytesTo64(Parameters.Key(), 0);
-	const ulong T1 = IntegerTools::LeBytesTo64(Parameters.Key(), sizeof(ulong));
+	const uint64_t T0 = IntegerTools::LeBytesTo64(Parameters.Key(), 0);
+	const uint64_t T1 = IntegerTools::LeBytesTo64(Parameters.Key(), sizeof(uint64_t));
 
 	if (IsInitialized() == true)
 	{
@@ -217,8 +215,8 @@ void Poly1305::Initialize(ISymmetricKey &Parameters)
 	m_poly1305State->State[4] = 0;
 	m_poly1305State->State[5] = 0;
 	// store pad
-	m_poly1305State->State[6] = IntegerTools::LeBytesTo64(Parameters.Key(), 2 * sizeof(ulong));
-	m_poly1305State->State[7] = IntegerTools::LeBytesTo64(Parameters.Key(), 3 * sizeof(ulong));
+	m_poly1305State->State[6] = IntegerTools::LeBytesTo64(Parameters.Key(), 2 * sizeof(uint64_t));
+	m_poly1305State->State[7] = IntegerTools::LeBytesTo64(Parameters.Key(), 3 * sizeof(uint64_t));
 
 	m_poly1305State->IsInitialized = true;
 }
@@ -229,7 +227,7 @@ void Poly1305::Reset()
 	m_poly1305State->IsInitialized = false;
 }
 
-void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void Poly1305::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -237,7 +235,7 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)
@@ -271,25 +269,25 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-void Poly1305::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, bool IsFinal, std::unique_ptr<Poly1305State> &State)
+void Poly1305::Absorb(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length, bool IsFinal, std::unique_ptr<Poly1305State> &State)
 {
 #if !defined(CEX_NATIVE_UINT128)
 	typedef Numeric::Donna128 uint128_t;
 #endif
 
-	const ulong HIBIT = IsFinal ? 0 : (static_cast<ulong>(1) << 40);
-	const ulong R0 = State->State[0];
-	const ulong R1 = State->State[1];
-	const ulong R2 = State->State[2];
-	const ulong S1 = R1 * (5 << 2);
-	const ulong S2 = R2 * (5 << 2);
+	const uint64_t HIBIT = IsFinal ? 0 : (static_cast<uint64_t>(1) << 40);
+	const uint64_t R0 = State->State[0];
+	const uint64_t R1 = State->State[1];
+	const uint64_t R2 = State->State[2];
+	const uint64_t S1 = R1 * (5 << 2);
+	const uint64_t S2 = R2 * (5 << 2);
 	uint128_t d0;
 	uint128_t d1;
 	uint128_t d2;
-	ulong c;
-	ulong h0;
-	ulong h1;
-	ulong h2;
+	uint64_t c;
+	uint64_t h0;
+	uint64_t h1;
+	uint64_t h2;
 	size_t bctr;
 
 	bctr = Length / BLOCK_SIZE;
@@ -300,8 +298,8 @@ void Poly1305::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Le
 	while (bctr != 0)
 	{
 		// h += m[i]
-		const ulong T0 = IntegerTools::LeBytesTo64(Input, InOffset);
-		const ulong T1 = IntegerTools::LeBytesTo64(Input, InOffset + sizeof(ulong));
+		const uint64_t T0 = IntegerTools::LeBytesTo64(Input, InOffset);
+		const uint64_t T1 = IntegerTools::LeBytesTo64(Input, InOffset + sizeof(uint64_t));
 		h0 += T0 & 0xFFFFFFFFFFFULL;
 		h1 += ((T0 >> 44) | (T1 << 20)) & 0xFFFFFFFFFFFULL;
 		h2 += (((T1 >> 24)) & 0x3FFFFFFFFFFULL) | HIBIT;

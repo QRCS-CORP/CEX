@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Asymmetric key type
 /// </summary>
-enum class AsymmetricKeyTypes : byte
+enum class AsymmetricKeyTypes : uint8_t
 {
 	/// <summary>
 	/// No key type is specified

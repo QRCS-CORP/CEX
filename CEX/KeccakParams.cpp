@@ -21,7 +21,7 @@ KeccakParams::KeccakParams()
 {
 }
 
-KeccakParams::KeccakParams(ulong OutputSize, uint LeafSize, byte Fanout)
+KeccakParams::KeccakParams(uint64_t OutputSize, uint32_t LeafSize, uint8_t Fanout)
 	:
 	m_nodeOffset(0),
 	m_treeVersion(1),
@@ -44,7 +44,7 @@ KeccakParams::KeccakParams(ulong OutputSize, uint LeafSize, byte Fanout)
 	m_dstCode.resize(DistributionCodeMax());
 }
 
-KeccakParams::KeccakParams(const std::vector<byte> &TreeArray)
+KeccakParams::KeccakParams(const std::vector<uint8_t> &TreeArray)
 	:
 	m_nodeOffset(0),
 	m_treeVersion(0),
@@ -55,7 +55,7 @@ KeccakParams::KeccakParams(const std::vector<byte> &TreeArray)
 	m_reserved(0),
 	m_dstCode(0)
 {
-	CEXASSERT(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
+	CEXASSERT(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too int16_t!");
 
 	m_nodeOffset = IntegerTools::LeBytesTo32(TreeArray, 0);
 	m_treeVersion = IntegerTools::LeBytesTo16(TreeArray, 4);
@@ -68,7 +68,7 @@ KeccakParams::KeccakParams(const std::vector<byte> &TreeArray)
 	std::memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 }
 
-KeccakParams::KeccakParams(uint NodeOffset, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &Info)
+KeccakParams::KeccakParams(uint32_t NodeOffset, uint64_t OutputSize, uint16_t Version, uint32_t LeafSize, uint8_t Fanout, uint8_t TreeDepth, std::vector<uint8_t> &Info)
 	:
 	m_nodeOffset(NodeOffset),
 	m_treeVersion(Version),
@@ -86,7 +86,7 @@ KeccakParams::KeccakParams(uint NodeOffset, ulong OutputSize, ushort Version, ui
 
 //~~~Accessors~~~//
 
-std::vector<byte> &KeccakParams::DistributionCode()
+std::vector<uint8_t> &KeccakParams::DistributionCode()
 {
 	return m_dstCode;
 }
@@ -107,32 +107,32 @@ const size_t KeccakParams::DistributionCodeMax()
 	return res;
 }
 
-byte &KeccakParams::FanOut()
+uint8_t &KeccakParams::FanOut()
 {
 	return m_treeFanout;
 }
 
-uint &KeccakParams::LeafSize()
+uint32_t &KeccakParams::LeafSize()
 {
 	return m_leafSize;
 }
 
-uint &KeccakParams::NodeOffset()
+uint32_t &KeccakParams::NodeOffset()
 {
 	return m_nodeOffset;
 }
 
-ulong &KeccakParams::OutputSize()
+uint64_t &KeccakParams::OutputSize()
 {
 	return m_outputSize;
 }
 
-uint &KeccakParams::Reserved()
+uint32_t &KeccakParams::Reserved()
 {
 	return m_reserved;
 }
 
-ushort &KeccakParams::Version()
+uint16_t &KeccakParams::Version()
 {
 	return m_treeVersion;
 }
@@ -161,9 +161,9 @@ bool KeccakParams::Equals(KeccakParams &Input)
 	return res;
 }
 
-int KeccakParams::GetHashCode()
+int32_t KeccakParams::GetHashCode()
 {
-	int result = 31 * m_treeVersion;
+	int32_t result = 31 * m_treeVersion;
 	result += 31 * m_nodeOffset;
 	result += 31 * m_leafSize;
 	result += 31 * m_outputSize;
@@ -196,9 +196,9 @@ void KeccakParams::Reset()
 	m_dstCode.clear();
 }
 
-std::vector<byte> KeccakParams::ToBytes()
+std::vector<uint8_t> KeccakParams::ToBytes()
 {
-	std::vector<byte> config(GetHeaderSize());
+	std::vector<uint8_t> config(GetHeaderSize());
 
 	IntegerTools::Le32ToBytes(m_nodeOffset, config, 0);
 	IntegerTools::Le16ToBytes(m_treeVersion, config, 4);

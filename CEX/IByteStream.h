@@ -59,7 +59,7 @@ public:
 	/// <summary>
 	/// Read Only: The stream length
 	/// </summary>
-	virtual const ulong Length() = 0;
+	virtual const uint64_t Length() = 0;
 
 	/// <summary>
 	/// Read Only: The streams class name
@@ -69,7 +69,7 @@ public:
 	/// <summary>
 	/// Read Only: The streams current position
 	/// </summary>
-	virtual const ulong Position() = 0;
+	virtual const uint64_t Position() = 0;
 
 	//~~~Public Functions~~~//
 
@@ -99,14 +99,14 @@ public:
 	/// <param name="Count">The number of bytes to read</param>
 	///
 	/// <returns>The number of bytes read</returns>
-	virtual size_t Read(std::vector<byte> &Output, size_t Offset, size_t Count) = 0;
+	virtual size_t Read(std::vector<uint8_t> &Output, size_t Offset, size_t Count) = 0;
 
 	/// <summary>
-	/// Read a single byte from the stream
+	/// Read a single uint8_t from the stream
 	/// </summary>
 	///
-	/// <returns>The byte value</returns>
-	virtual byte ReadByte() = 0;
+	/// <returns>The uint8_t value</returns>
+	virtual uint8_t ReadByte() = 0;
 
 	/// <summary>
 	/// Reset and initialize the underlying digest
@@ -119,14 +119,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(ulong Offset, SeekOrigin Origin) = 0;
+	virtual void Seek(uint64_t Offset, SeekOrigin Origin) = 0;
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(ulong Length) = 0;
+	virtual void SetLength(uint64_t Length) = 0;
 
 	/// <summary>
 	/// Writes an input buffer to the stream
@@ -137,14 +137,14 @@ public:
 	/// <param name="Length">The number of bytes to write</param>
 	///
 	/// <returns>The number of bytes written</returns>
-	virtual void Write(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
+	virtual void Write(const std::vector<uint8_t> &Input, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
-	/// Write a single byte from the stream
+	/// Write a single uint8_t from the stream
 	/// </summary>
 	///
-	/// <param name="Value">The byte value to write</param>
-	virtual void WriteByte(byte Value) = 0;
+	/// <param name="Value">The uint8_t value to write</param>
+	virtual void WriteByte(uint8_t Value) = 0;
 };
 
 NAMESPACE_IOEND

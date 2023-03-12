@@ -47,7 +47,7 @@ ECP::~ECP()
 
 //~~~Public Functions~~~//
 
-void ECP::Generate(std::vector<byte> &Output)
+void ECP::Generate(std::vector<uint8_t> &Output)
 {
 	if (IsAvailable() == false)
 	{
@@ -58,13 +58,13 @@ void ECP::Generate(std::vector<byte> &Output)
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	SecureVector<byte> tmp(Output.size());
+	SecureVector<uint8_t> tmp(Output.size());
 
 	Generate(tmp, 0, Output.size(), m_rngGenerator);
 	SecureMove(tmp, 0, Output, 0, tmp.size());
 }
 
-void ECP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
+void ECP::Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (IsAvailable() == false)
 	{
@@ -79,13 +79,13 @@ void ECP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	SecureVector<byte> tmp(Length);
+	SecureVector<uint8_t> tmp(Length);
 
 	Generate(tmp, 0, Output.size(), m_rngGenerator);
 	SecureMove(tmp, 0, Output, Offset, tmp.size());
 }
 
-void ECP::Generate(SecureVector<byte> &Output)
+void ECP::Generate(SecureVector<uint8_t> &Output)
 {
 	if (IsAvailable() == false)
 	{
@@ -99,7 +99,7 @@ void ECP::Generate(SecureVector<byte> &Output)
 	Generate(Output, 0, Output.size(), m_rngGenerator);
 }
 
-void ECP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
+void ECP::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length)
 {
 	if (IsAvailable() == false)
 	{
@@ -115,7 +115,7 @@ void ECP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 
 void ECP::Reset()
 {
-	std::vector<byte> seed;
+	std::vector<uint8_t> seed;
 
 	try
 	{
@@ -134,7 +134,7 @@ void ECP::Reset()
 
 	CSP cvd;
 	// use the system provider to create the customization string
-	std::vector<byte> cust(64);
+	std::vector<uint8_t> cust(64);
 	cvd.Generate(cust);
 	// initialize cSHAKE-512
 	m_rngGenerator->Initialize(seed, cust);
@@ -142,12 +142,12 @@ void ECP::Reset()
 
 //~~~Private Functions~~~//
 
-std::vector<byte> ECP::Collect()
+std::vector<uint8_t> ECP::Collect()
 {
 	const size_t SMPLEN = 64;
-	std::vector<byte> state(0);
-	std::vector<byte> buffer(SMPLEN);
-	ulong ts = SystemTools::TimeStamp(HAS_TSC);
+	std::vector<uint8_t> state(0);
+	std::vector<uint8_t> buffer(SMPLEN);
+	uint64_t ts = SystemTools::TimeStamp(HAS_TSC);
 
 	CSP pvd;
 	pvd.Generate(buffer);
@@ -181,10 +181,10 @@ std::vector<byte> ECP::Collect()
 	return state;
 }
 
-std::vector<byte> ECP::Compress(std::vector<byte> &State)
+std::vector<uint8_t> ECP::Compress(std::vector<uint8_t> &State)
 {
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE512);
-	std::vector<byte> seed(gen.SecurityLevel() / 8);
+	std::vector<uint8_t> seed(gen.SecurityLevel() / 8);
 
 	gen.Initialize(State);
 	gen.Generate(seed);
@@ -192,12 +192,12 @@ std::vector<byte> ECP::Compress(std::vector<byte> &State)
 	return seed;
 }
 
-void ECP::Filter(std::vector<byte> &State)
+void ECP::Filter(std::vector<uint8_t> &State)
 {
 	// filter zero bytes and shuffle
 	if (State.size() != 0)
 	{
-		ArrayTools::Remove(static_cast<byte>(0), State);
+		ArrayTools::Remove(static_cast<uint8_t>(0), State);
 	}
 }
 
@@ -209,7 +209,7 @@ bool ECP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	SecureVector<byte> smp(m_pvdSelfTest->SELFTEST_LENGTH);
+	SecureVector<uint8_t> smp(m_pvdSelfTest->SELFTEST_LENGTH);
 
 	Generate(smp, 0, smp.size(), m_rngGenerator);
 
@@ -223,9 +223,9 @@ bool ECP::FipsTest()
 	return (fail == false);
 }
 
-std::vector<byte> ECP::DriveInfo()
+std::vector<uint8_t> ECP::DriveInfo()
 {
-	std::vector<byte> state(0);
+	std::vector<uint8_t> state(0);
 
 #if defined(CEX_OS_WINDOWS)
 	std::vector<std::string> drives = SystemTools::LogicalDrives();
@@ -244,14 +244,14 @@ std::vector<byte> ECP::DriveInfo()
 	return state;
 }
 
-void ECP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
+void ECP::Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
 {
 	Generator->Generate(Output, Offset, Length);
 }
 
-std::vector<byte> ECP::MemoryInfo()
+std::vector<uint8_t> ECP::MemoryInfo()
 {
-	std::vector<byte> state(0);
+	std::vector<uint8_t> state(0);
 
 #if defined(CEX_OS_WINDOWS)
 	try
@@ -281,9 +281,9 @@ std::vector<byte> ECP::MemoryInfo()
 	return state;
 }
 
-std::vector<byte> ECP::NetworkInfo()
+std::vector<uint8_t> ECP::NetworkInfo()
 {
-	std::vector<byte> state(0);
+	std::vector<uint8_t> state(0);
 
 #if defined(CEX_OS_WINDOWS)
 
@@ -293,10 +293,10 @@ std::vector<byte> ECP::NetworkInfo()
 
 		for (size_t i = 0; i < info.size(); ++i)
 		{
-			ArrayTools::AppendString(ArrayTools::ToString(info[i]->AdapterName, sizeof(info[i]->AdapterName)), state);
+			ArrayTools::AppendString(ArrayTools::ToString(info[i]->AdapterName, ArrayTools::StringSize(info[i]->AdapterName, sizeof(info[i]->AdapterName))), state);
 			ArrayTools::AppendVector(ArrayTools::ToByteArray(info[i]->Address, 8), state);
 			ArrayTools::AppendValue(info[i]->ComboIndex, state);
-			ArrayTools::AppendString(ArrayTools::ToString(info[i]->Description, sizeof(info[i]->Description)), state);
+			ArrayTools::AppendString(ArrayTools::ToString(info[i]->Description, ArrayTools::StringSize(info[i]->Description, sizeof(info[i]->Description))), state);
 			ArrayTools::AppendValue(info[i]->DhcpServer.IpAddress.String, state);
 			ArrayTools::AppendValue(info[i]->IpAddressList.IpAddress.String, state);
 			ArrayTools::AppendValue(info[i]->LeaseExpires, state);
@@ -324,9 +324,9 @@ std::vector<byte> ECP::NetworkInfo()
 	return state;
 }
 
-std::vector<byte> ECP::ProcessInfo()
+std::vector<uint8_t> ECP::ProcessInfo()
 {
-	std::vector<byte> state(0);
+	std::vector<uint8_t> state(0);
 	size_t i;
 
 #if defined(CEX_OS_WINDOWS)
@@ -339,7 +339,7 @@ std::vector<byte> ECP::ProcessInfo()
 			for (i = 0; i < info.size(); ++i)
 			{
 				ArrayTools::AppendValue(info[i].pcPriClassBase, state);
-				ArrayTools::AppendString(ArrayTools::ToString(info[i].szExeFile, sizeof(info[i].szExeFile)), state);
+				ArrayTools::AppendString(ArrayTools::ToString(info[i].szExeFile, ArrayTools::StringSize(info[i].szExeFile, sizeof(info[i].szExeFile)), true), state);
 				ArrayTools::AppendValue(info[i].th32ParentProcessID, state);
 				ArrayTools::AppendValue(info[i].th32ProcessID, state);
 			}
@@ -362,7 +362,7 @@ std::vector<byte> ECP::ProcessInfo()
 				ArrayTools::AppendValue(info[i].modBaseAddr, state);
 				ArrayTools::AppendValue(info[i].modBaseSize, state);
 				ArrayTools::AppendValue(info[i].ProccntUsage, state);
-				ArrayTools::AppendString(ArrayTools::ToString(info[i].szExePath, sizeof(info[i].szExePath)), state);
+				ArrayTools::AppendString(ArrayTools::ToString(info[i].szExePath, ArrayTools::StringSize(info[i].szExePath, sizeof(info[i].szExePath)), true), state);
 				ArrayTools::AppendValue(info[i].szModule, state);
 				ArrayTools::AppendValue(info[i].th32ModuleID, state);
 				ArrayTools::AppendValue(info[i].th32ProcessID, state);
@@ -411,9 +411,9 @@ std::vector<byte> ECP::ProcessInfo()
 	return state;
 }
 
-std::vector<byte> ECP::ProcessorInfo()
+std::vector<uint8_t> ECP::ProcessorInfo()
 {
-	std::vector<byte> state(0);
+	std::vector<uint8_t> state(0);
 	CpuDetect dtc;
 
 	ArrayTools::AppendValue(dtc.BusRefFrequency(), state);
@@ -425,9 +425,9 @@ std::vector<byte> ECP::ProcessorInfo()
 	return state;
 }
 
-std::vector<byte> ECP::SystemInfo()
+std::vector<uint8_t> ECP::SystemInfo()
 {
-	std::vector<byte> state(0);
+	std::vector<uint8_t> state(0);
 
 #if defined(CEX_OS_WINDOWS)
 
@@ -465,9 +465,9 @@ std::vector<byte> ECP::SystemInfo()
 	return state;
 }
 
-std::vector<byte> ECP::TimeInfo()
+std::vector<uint8_t> ECP::TimeInfo()
 {
-	std::vector<byte> state(0);
+	std::vector<uint8_t> state(0);
 
 	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC), state);
 	ArrayTools::AppendValue(SystemTools::TimeCurrentNS(), state);
@@ -476,9 +476,9 @@ std::vector<byte> ECP::TimeInfo()
 	return state;
 }
 
-std::vector<byte> ECP::UserInfo()
+std::vector<uint8_t> ECP::UserInfo()
 {
-	std::vector<byte> state(0);
+	std::vector<uint8_t> state(0);
 
 	ArrayTools::AppendString(SystemTools::UserName(), state);
 	ArrayTools::AppendString(SystemTools::UserId(), state);

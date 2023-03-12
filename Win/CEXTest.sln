@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}"
 EndProject
@@ -19,8 +19,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Debug|ARM.ActiveCfg = Release|x64
 		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Debug|ARM.Build.0 = Release|x64
-		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Debug|x64.ActiveCfg = Release|x64
-		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Debug|x64.Build.0 = Release|x64
+		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Debug|x64.ActiveCfg = Debug|x64
+		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Debug|x64.Build.0 = Debug|x64
 		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Debug|x86.ActiveCfg = Debug|Win32
 		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Debug|x86.Build.0 = Debug|Win32
 		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Release|ARM.ActiveCfg = Release|x64

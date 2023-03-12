@@ -48,13 +48,13 @@ namespace Test
 	private:
 
 		template<class T>
-		T rol(T x, unsigned int c)
+		T rol(T x, uint32_t c)
 		{
 			return (x << c) | (x >> ((sizeof(T) * 8) - c));
 		}
 
 		template<class T>
-		T ror(T x, unsigned int c)
+		T ror(T x, uint32_t c)
 		{
 			return (x >> c) | (x << ((sizeof(T) * 8) - c));
 		}

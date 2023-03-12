@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -70,9 +70,9 @@ public:
 	virtual const BlockCiphers AuthenticationEngine() = 0;
 
 	/// <summary>
-	/// The byte size of the output ciphertext
+	/// The uint8_t size of the output ciphertext
 	/// </summary>
-	virtual const uint CipherTextSize() = 0;
+	virtual const uint32_t CipherTextSize() = 0;
 
 	/// <summary>
 	/// The asymmetric transform parameter
@@ -80,19 +80,19 @@ public:
 	virtual const AsymmetricParameters AsymmetricTransform() = 0;
 
 	/// <summary>
-	/// The byte size of the base secret key polynomial
+	/// The uint8_t size of the base secret key polynomial
 	/// </summary>
-	virtual const uint PrivateKeySize() = 0;
+	virtual const uint32_t PrivateKeySize() = 0;
 
 	/// <summary>
-	/// The byte size of the public key polynomial
+	/// The uint8_t size of the public key polynomial
 	/// </summary>
-	virtual const uint PublicKeySize() = 0;
+	virtual const uint32_t PublicKeySize() = 0;
 
 	/// <summary>
-	/// The byte size of the secret seed array
+	/// The uint8_t size of the secret seed array
 	/// </summary>
-	virtual const uint SeedSize() = 0;
+	virtual const uint32_t SeedSize() = 0;
 
 	/// <summary>
 	/// Load the parameter values
@@ -108,11 +108,11 @@ public:
 	virtual void Reset() = 0;
 
 	/// <summary>
-	/// Convert the ParamSet structure to a byte array
+	/// Convert the ParamSet structure to a uint8_t array
 	/// </summary>
 	/// 
-	/// <returns>The byte array containing the ParamSet</returns>
-	virtual std::vector<byte> ToBytes() = 0;
+	/// <returns>The uint8_t array containing the ParamSet</returns>
+	virtual std::vector<uint8_t> ToBytes() = 0;
 };
 
 NAMESPACE_ASYMMETRICEND

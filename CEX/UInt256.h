@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -83,7 +83,7 @@ public:
 	/// Initialize with an integer array
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 256 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
 	explicit UInt256(const Array &Input, size_t Offset)
@@ -103,7 +103,7 @@ public:
 	/// <param name="X5">uint32 5</param>
 	/// <param name="X6">uint32 6</param>
 	/// <param name="X7">uint32 7</param>
-	explicit UInt256(uint X0, uint X1, uint X2, uint X3, uint X4, uint X5, uint X6, uint X7)
+	explicit UInt256(uint32_t X0, uint32_t X1, uint32_t X2, uint32_t X3, uint32_t X4, uint32_t X5, uint32_t X6, uint32_t X7)
 	{
 		ymm = _mm256_set_epi32(X0, X1, X2, X3, X4, X5, X6, X7);
 	}
@@ -112,8 +112,8 @@ public:
 	/// Initialize with 1 * 32bit unsigned integer; copied to every register
 	/// </summary>
 	///
-	/// <param name="X">The uint assignment value</param>
-	explicit UInt256(uint X)
+	/// <param name="X">The uint32_t assignment value</param>
+	explicit UInt256(uint32_t X)
 	{
 		ymm = _mm256_set1_epi32(X);
 	}
@@ -132,7 +132,7 @@ public:
 	/// Load an integer array into a register
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 256 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template <typename Array>
 	inline void Load(const Array &Input, size_t Offset)
@@ -145,7 +145,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="X">Set all uint32 integers to this value</param>
-	inline void Load(uint X)
+	inline void Load(uint32_t X)
 	{
 		ymm = _mm256_set1_epi32(X);
 	}
@@ -162,7 +162,7 @@ public:
 	/// <param name="X5">uint32 5</param>
 	/// <param name="X6">uint32 6</param>
 	/// <param name="X7">uint32 7</param>
-	inline void Load(uint X0, uint X1, uint X2, uint X3, uint X4, uint X5, uint X6, uint X7)
+	inline void Load(uint32_t X0, uint32_t X1, uint32_t X2, uint32_t X3, uint32_t X4, uint32_t X5, uint32_t X6, uint32_t X7)
 	{
 		ymm = _mm256_set_epi32(X0, X1, X2, X3, X4, X5, X6, X7);
 	}
@@ -177,8 +177,8 @@ public:
 	template <typename Array>
 	inline void LoadUL(const Array &Input, size_t Offset)
 	{
-		ymm = _mm256_set_epi32(static_cast<uint>(Input[Offset]), static_cast<uint>(Input[Offset + 1]), static_cast<uint>(Input[Offset + 2]), static_cast<uint>(Input[Offset + 3]),
-			static_cast<uint>(Input[Offset + 4]), static_cast<uint>(Input[Offset + 5]), static_cast<uint>(Input[Offset + 6]), static_cast<uint>(Input[Offset + 7]));
+		ymm = _mm256_set_epi32(static_cast<uint32_t>(Input[Offset]), static_cast<uint32_t>(Input[Offset + 1]), static_cast<uint32_t>(Input[Offset + 2]), static_cast<uint32_t>(Input[Offset + 3]),
+			static_cast<uint32_t>(Input[Offset + 4]), static_cast<uint32_t>(Input[Offset + 5]), static_cast<uint32_t>(Input[Offset + 6]), static_cast<uint32_t>(Input[Offset + 7]));
 	}
 
 	/// <summary>
@@ -286,10 +286,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotL32(int Shift)
+	inline void RotL32(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
-		ymm = _mm256_or_si256(_mm256_slli_epi32(ymm, static_cast<int>(Shift)), _mm256_srli_epi32(ymm, static_cast<int>(32 - Shift)));
+		ymm = _mm256_or_si256(_mm256_slli_epi32(ymm, static_cast<int32_t>(Shift)), _mm256_srli_epi32(ymm, static_cast<int32_t>(32 - Shift)));
 	}
 
 	/// <summary>
@@ -300,10 +300,10 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt256</returns>
-	inline static UInt256 RotL32(const UInt256 &X, const int Shift)
+	inline static UInt256 RotL32(const UInt256 &X, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
-		return UInt256(_mm256_or_si256(_mm256_slli_epi32(X.ymm, static_cast<int>(Shift)), _mm256_srli_epi32(X.ymm, static_cast<int>(32 - Shift))));
+		return UInt256(_mm256_or_si256(_mm256_slli_epi32(X.ymm, static_cast<int32_t>(Shift)), _mm256_srli_epi32(X.ymm, static_cast<int32_t>(32 - Shift))));
 	}
 
 	/// <summary>
@@ -311,7 +311,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotR32(int Shift)
+	inline void RotR32(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
@@ -325,7 +325,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt256</returns>
-	inline static UInt256 RotR32(const UInt256 &X, const int Shift)
+	inline static UInt256 RotR32(const UInt256 &X, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return RotL32(X, 32 - Shift);
@@ -339,7 +339,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt256</returns>
-	inline static UInt256 ShiftRA(const UInt256 &Value, const int Shift)
+	inline static UInt256 ShiftRA(const UInt256 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt256(_mm256_sra_epi32(Value, _mm_set1_epi32(Shift)));
@@ -353,17 +353,17 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt256</returns>
-	inline static UInt256 ShiftRL(const UInt256 &Value, const int Shift)
+	inline static UInt256 ShiftRL(const UInt256 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt256(_mm256_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 4 unsigned integers
+	/// Performs a uint8_t swap on 4 unsigned integers
 	/// </summary>
 	/// 
-	/// <returns>The byte swapped UInt256</returns>
+	/// <returns>The uint8_t swapped UInt256</returns>
 	UInt256 Swap() const
 	{
 		__m256i tmpX = ymm;
@@ -375,12 +375,12 @@ public:
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 4 unsigned integers
+	/// Performs a uint8_t swap on 4 unsigned integers
 	/// </summary>
 	/// 		
 	/// <param name="X">The UInt256 to process</param>
 	/// 
-	/// <returns>The byte swapped UInt256</returns>
+	/// <returns>The uint8_t swapped UInt256</returns>
 	inline static UInt256 Swap(UInt256 &X)
 	{
 		__m256i tmpX = X.ymm;
@@ -452,7 +452,7 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	inline UInt256 operator ++ (int)
+	inline UInt256 operator ++ (int32_t)
 	{
 		return UInt256(ymm) + UInt256::ONE();
 	}
@@ -488,7 +488,7 @@ public:
 	/// <summary>
 	/// Decrease postfix operator
 	/// </summary>
-	inline UInt256 operator -- (int)
+	inline UInt256 operator -- (int32_t)
 	{
 		return UInt256(ymm) - UInt256::ONE();
 	}
@@ -520,8 +520,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline UInt256 operator / (const UInt256 &X) const
 	{
-		std::array<uint, 8> tmpa;
-		std::array<uint, 8> tmpb;
+		std::array<uint32_t, 8> tmpa;
+		std::array<uint32_t, 8> tmpb;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(tmpa.data()), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(tmpb.data()), X.ymm);
 		CEXASSERT(tmpb[0] != 0 && tmpb[1] != 0 && tmpb[2] != 0 && tmpb[3] != 0 && tmpb[4] != 0 && tmpb[5] != 0 && tmpb[6] != 0 && tmpb[7] != 0, "Division by zero");
@@ -540,8 +540,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UInt256 &X)
 	{
-		std::array<uint, 8> tmpa;
-		std::array<uint, 8> tmpb;
+		std::array<uint32_t, 8> tmpa;
+		std::array<uint32_t, 8> tmpb;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(tmpa.data()), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(tmpb.data()), X.ymm);
 		CEXASSERT(tmpb[0] != 0 && tmpb[1] != 0 && tmpb[2] != 0 && tmpb[3] != 0 && tmpb[4] != 0 && tmpb[5] != 0 && tmpb[6] != 0 && tmpb[7] != 0, "Division by zero");
@@ -658,9 +658,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UInt256 operator << (int Shift) const
+	inline UInt256 operator << (int32_t Shift) const
 	{
-		return UInt256(_mm256_slli_epi32(ymm, static_cast<int>(Shift)));
+		return UInt256(_mm256_slli_epi32(ymm, static_cast<int32_t>(Shift)));
 	}
 
 	/// <summary>
@@ -668,7 +668,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator <<= (int Shift)
+	inline void operator <<= (int32_t Shift)
 	{
 		ymm = _mm256_slli_epi32(ymm, Shift);
 	}
@@ -678,9 +678,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UInt256 operator >> (int Shift) const
+	inline UInt256 operator >> (int32_t Shift) const
 	{
-		return UInt256(_mm256_srli_epi32(ymm, static_cast<int>(Shift)));
+		return UInt256(_mm256_srli_epi32(ymm, static_cast<int32_t>(Shift)));
 	}
 
 	/// <summary>
@@ -688,7 +688,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator >>= (int Shift)
+	inline void operator >>= (int32_t Shift)
 	{
 		ymm = _mm256_srli_epi32(ymm, Shift);
 	}

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 // 
 // Written by John G. Underhill, January 21, 2015
 // Updated April 21, 2016
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_MACSTREAM_H
 #define CEX_MACSTREAM_H
@@ -83,7 +83,7 @@ public:
 	/// <summary>
 	/// The Progress Percent event
 	/// </summary>
-	Event<int> ProgressPercent;
+	Event<int32_t> ProgressPercent;
 
 	//~~~Constructor~~~//
 
@@ -141,7 +141,7 @@ public:
 	/// <param name="InStream">The source stream to process</param>
 	/// 
 	/// <returns>The Mac output code</returns>
-	std::vector<byte> Compute(IByteStream* InStream);
+	std::vector<uint8_t> Compute(IByteStream* InStream);
 
 	/// <summary>
 	/// Process a length of bytes within the source array
@@ -152,7 +152,7 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
 	/// <returns>The Mac output code</returns>
-	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	std::vector<uint8_t> Compute(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Initialize the MAC generator with a SymmetricKey key container.
@@ -169,8 +169,8 @@ private:
 
 	void CalculateInterval(size_t Length);
 	void CalculateProgress(size_t Length, size_t Processed);
-	std::vector<byte> Process(IByteStream* InStream, size_t Length);
-	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	std::vector<uint8_t> Process(IByteStream* InStream, size_t Length);
+	std::vector<uint8_t> Process(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length);
 };
 
 NAMESPACE_PROCESSINGEND

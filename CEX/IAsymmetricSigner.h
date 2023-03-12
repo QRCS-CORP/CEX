@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -134,21 +134,21 @@ public:
 	/// Sign a message array and return the message and attached signature
 	/// </summary>
 	/// 
-	/// <param name="Message">The message byte array containing the data to process</param>
+	/// <param name="Message">The message uint8_t array containing the data to process</param>
 	/// <param name="Signature">The output signature array containing the signature and message</param>
 	/// 
 	/// <returns>Returns the size of the signed message</returns>
-	virtual size_t Sign(const std::vector<byte> &Message, std::vector<byte> &Signature) = 0;
+	virtual size_t Sign(const std::vector<uint8_t> &Message, std::vector<uint8_t> &Signature) = 0;
 
 	/// <summary>
 	/// Verify a signed message and return the message array
 	/// </summary>
 	/// 
 	/// <param name="Signature">The output signature array containing the signature and message</param>
-	/// <param name="Message">The message byte array containing the data to process</param>
+	/// <param name="Message">The message uint8_t array containing the data to process</param>
 	/// 
 	/// <returns>Returns true if the signature matches</returns>
-	virtual bool Verify(const std::vector<byte> &Signature, std::vector<byte> &Message) = 0;
+	virtual bool Verify(const std::vector<uint8_t> &Signature, std::vector<uint8_t> &Message) = 0;
 };
 
 NAMESPACE_ASYMMETRICSIGNEND

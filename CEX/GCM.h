@@ -21,7 +21,7 @@
 // Written by John G. Underhill, February 3, 2017
 // Updated April 18, 2017
 // Updated October 14, 2017
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_GCM_H
 #define CEX_GCM_H
@@ -216,7 +216,7 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: Array of allowed cipher input key byte-sizes
+	/// Read Only: Array of allowed cipher input key uint8_t-sizes
 	/// </summary>
 	const  std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
@@ -236,7 +236,7 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	const size_t ParallelBlockSize() override;
@@ -259,14 +259,14 @@ public:
 	/// <summary>
 	/// Read Only: The current standard-vector MAC tag value
 	/// </summary>
-	const std::vector<byte> Tag() override;
+	const std::vector<uint8_t> Tag() override;
 
 	/// <summary>
 	/// Copies the internal MAC tag to a secure-vector
 	/// </summary>
 	/// 
 	/// <param name="Output">The secure-vector receiving the MAC code</param>
-	const void Tag(SecureVector<byte> &Output);
+	const void Tag(SecureVector<uint8_t> &Output);
 
 	/// <summary>
 	/// Read Only: The MAC code length in bytes
@@ -309,7 +309,7 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if state has been processed</exception>
-	void SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
+	void SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Add additional data to the message authentication code generator using a memory-locked vector.  
@@ -322,7 +322,7 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if state has been processed</exception>
-	void SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length) override;
+	void SetAssociatedData(const SecureVector<uint8_t> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Transform a length of bytes with offset and length parameters. 
@@ -337,13 +337,13 @@ public:
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">The starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 private:
 
-	void Compute(const std::vector<byte> &Input, size_t Offset, size_t Length);
-	void Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	bool Verify(const std::vector<byte> &Input, size_t Offset, size_t Length);
+	void Compute(const std::vector<uint8_t> &Input, size_t Offset, size_t Length);
+	void Finalize(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length);
+	bool Verify(const std::vector<uint8_t> &Input, size_t Offset, size_t Length);
 };
 
 NAMESPACE_MODEEND

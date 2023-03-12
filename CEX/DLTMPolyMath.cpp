@@ -7,158 +7,1062 @@ NAMESPACE_DILITHIUM
 using Digest::Keccak;
 using Tools::MemoryTools;
 
-const uint DLTMPolyMath::Zetas[DILITHIUM_N] =
+const uint32_t DLTMPolyMath::Zetas[DILITHIUM_N] =
 {
-	0x00000000UL, 0x000064F7UL, 0x00581103UL, 0x0077F504UL, 0x00039E44UL, 0x00740119UL, 0x00728129UL, 0x00071E24UL,
-	0x001BDE2BUL, 0x0023E92BUL, 0x007A64AEUL, 0x005FF480UL, 0x002F9A75UL, 0x0053DB0AUL, 0x002F7A49UL, 0x0028E527UL,
-	0x00299658UL, 0x000FA070UL, 0x006F65A5UL, 0x0036B788UL, 0x00777D91UL, 0x006ECAA1UL, 0x0027F968UL, 0x005FB37CUL,
-	0x005F8DD7UL, 0x0044FAE8UL, 0x006A84F8UL, 0x004DDC99UL, 0x001AD035UL, 0x007F9423UL, 0x003D3201UL, 0x000445C5UL,
-	0x00294A67UL, 0x00017620UL, 0x002EF4CDUL, 0x0035DEC5UL, 0x00668504UL, 0x0049102DUL, 0x005927D5UL, 0x003BBEAFUL,
-	0x0044F586UL, 0x00516E7DUL, 0x00368A96UL, 0x00541E42UL, 0x00360400UL, 0x007B4A4EUL, 0x0023D69CUL, 0x0077A55EUL,
-	0x0065F23EUL, 0x0066CAD7UL, 0x00357E1EUL, 0x00458F5AUL, 0x0035843FUL, 0x005F3618UL, 0x0067745DUL, 0x0038738CUL,
-	0x000C63A8UL, 0x00081B9AUL, 0x000E8F76UL, 0x003B3853UL, 0x003B8534UL, 0x0058DC31UL, 0x001F9D54UL, 0x00552F2EUL,
-	0x0043E6E6UL, 0x00688C82UL, 0x0047C1D0UL, 0x0051781AUL, 0x0069B65EUL, 0x003509EEUL, 0x002135C7UL, 0x0067AFBCUL,
-	0x006CAF76UL, 0x001D9772UL, 0x00419073UL, 0x00709CF7UL, 0x004F3281UL, 0x004FB2AFUL, 0x004870E1UL, 0x0001EFCAUL,
-	0x003410F2UL, 0x0070DE86UL, 0x0020C638UL, 0x00296E9FUL, 0x005297A4UL, 0x0047844CUL, 0x00799A6EUL, 0x005A140AUL,
-	0x0075A283UL, 0x006D2114UL, 0x007F863CUL, 0x006BE9F8UL, 0x007A0BDEUL, 0x001495D4UL, 0x001C4563UL, 0x006A0C63UL,
-	0x004CDBEAUL, 0x00040AF0UL, 0x0007C417UL, 0x002F4588UL, 0x0000AD00UL, 0x006F16BFUL, 0x000DCD44UL, 0x003C675AUL,
-	0x00470BCBUL, 0x007FBE7FUL, 0x00193948UL, 0x004E49C1UL, 0x0024756CUL, 0x007CA7E0UL, 0x000B98A1UL, 0x006BC809UL,
-	0x0002E46CUL, 0x0049A809UL, 0x003036C2UL, 0x00639FF7UL, 0x005B1C94UL, 0x007D2AE1UL, 0x00141305UL, 0x00147792UL,
-	0x00139E25UL, 0x0067B0E1UL, 0x00737945UL, 0x0069E803UL, 0x0051CEA3UL, 0x0044A79DUL, 0x00488058UL, 0x003A97D9UL,
-	0x001FEA93UL, 0x0033FF5AUL, 0x002358D4UL, 0x003A41F8UL, 0x004CDF73UL, 0x00223DFBUL, 0x005A8BA0UL, 0x00498423UL,
-	0x000412F5UL, 0x00252587UL, 0x006D04F1UL, 0x00359B5DUL, 0x004A28A1UL, 0x004682FDUL, 0x006D9B57UL, 0x004F25DFUL,
-	0x000DBE5EUL, 0x001C5E1AUL, 0x000DE0E6UL, 0x000C7F5AUL, 0x00078F83UL, 0x0067428BUL, 0x007F3705UL, 0x0077E6FDUL,
-	0x0075E022UL, 0x00503AF7UL, 0x001F0084UL, 0x0030EF86UL, 0x0049997EUL, 0x0077DCD7UL, 0x00742593UL, 0x004901C3UL,
-	0x00053919UL, 0x0004610CUL, 0x005AAD42UL, 0x003EB01BUL, 0x003472E7UL, 0x004CE03CUL, 0x001A7CC7UL, 0x00031924UL,
-	0x002B5EE5UL, 0x00291199UL, 0x00585A3BUL, 0x00134D71UL, 0x003DE11CUL, 0x00130984UL, 0x0025F051UL, 0x00185A46UL,
-	0x00466519UL, 0x001314BEUL, 0x00283891UL, 0x0049BB91UL, 0x0052308AUL, 0x001C853FUL, 0x001D0B4BUL, 0x006FD6A7UL,
-	0x006B88BFUL, 0x0012E11BUL, 0x004D3E3FUL, 0x006A0D30UL, 0x0078FDE5UL, 0x001406C7UL, 0x00327283UL, 0x0061ED6FUL,
-	0x006C5954UL, 0x001D4099UL, 0x00590579UL, 0x006AE5AEUL, 0x0016E405UL, 0x000BDBE7UL, 0x00221DE8UL, 0x0033F8CFUL,
-	0x00779935UL, 0x0054AA0DUL, 0x00665FF9UL, 0x0063B158UL, 0x0058711CUL, 0x00470C13UL, 0x000910D8UL, 0x00463E20UL,
-	0x00612659UL, 0x00251D8BUL, 0x002573B7UL, 0x007D5C90UL, 0x001DDD98UL, 0x00336898UL, 0x0002D4BBUL, 0x006D73A8UL,
-	0x004F4CBFUL, 0x00027C1CUL, 0x0018AA08UL, 0x002DFD71UL, 0x000C5CA5UL, 0x0019379AUL, 0x00478168UL, 0x00646C3EUL,
-	0x0051813DUL, 0x0035C539UL, 0x003B0115UL, 0x00041DC0UL, 0x0021C4F7UL, 0x0070FBF5UL, 0x001A35E7UL, 0x0007340EUL,
-	0x00795D46UL, 0x001A4CD0UL, 0x00645CAFUL, 0x001D2668UL, 0x00666E99UL, 0x006F0634UL, 0x007BE5DBUL, 0x00455FDCUL,
-	0x00530765UL, 0x005DC1B0UL, 0x007973DEUL, 0x005CFD0AUL, 0x0002CC93UL, 0x0070F806UL, 0x00189C2AUL, 0x0049C5AAUL,
-	0x00776A51UL, 0x003BCF2CUL, 0x007F234FUL, 0x006B16E0UL, 0x003C15CAUL, 0x00155E68UL, 0x0072F6B7UL, 0x001E29CEUL
+	0x00000000L, 0x000064F7L, 0xFFD83102L, 0xFFF81503L, 0x00039E44L, 0xFFF42118L, 0xFFF2A128L, 0x00071E24L,
+	0x001BDE2BL, 0x0023E92BL, 0xFFFA84ADL, 0xFFE0147FL, 0x002F9A75L, 0xFFD3FB09L, 0x002F7A49L, 0x0028E527L,
+	0x00299658L, 0x000FA070L, 0xFFEF85A4L, 0x0036B788L, 0xFFF79D90L, 0xFFEEEAA0L, 0x0027F968L, 0xFFDFD37BL,
+	0xFFDFADD6L, 0xFFC51AE7L, 0xFFEAA4F7L, 0xFFCDFC98L, 0x001AD035L, 0xFFFFB422L, 0x003D3201L, 0x000445C5L,
+	0x00294A67L, 0x00017620L, 0x002EF4CDL, 0x0035DEC5L, 0xFFE6A503L, 0xFFC9302CL, 0xFFD947D4L, 0x003BBEAFL,
+	0xFFC51585L, 0xFFD18E7CL, 0x00368A96L, 0xFFD43E41L, 0x00360400L, 0xFFFB6A4DL, 0x0023D69CL, 0xFFF7C55DL,
+	0xFFE6123DL, 0xFFE6EAD6L, 0x00357E1EL, 0xFFC5AF59L, 0x0035843FL, 0xFFDF5617L, 0xFFE7945CL, 0x0038738CL,
+	0x000C63A8L, 0x00081B9AL, 0x000E8F76L, 0x003B3853L, 0x003B8534L, 0xFFD8FC30L, 0x001F9D54L, 0xFFD54F2DL,
+	0xFFC406E5L, 0xFFE8AC81L, 0xFFC7E1CFL, 0xFFD19819L, 0xFFE9D65DL, 0x003509EEL, 0x002135C7L, 0xFFE7CFBBL,
+	0xFFECCF75L, 0x001D9772L, 0xFFC1B072L, 0xFFF0BCF6L, 0xFFCF5280L, 0xFFCFD2AEL, 0xFFC890E0L, 0x0001EFCAL,
+	0x003410F2L, 0xFFF0FE85L, 0x0020C638L, 0x00296E9FL, 0xFFD2B7A3L, 0xFFC7A44BL, 0xFFF9BA6DL, 0xFFDA3409L,
+	0xFFF5C282L, 0xFFED4113L, 0xFFFFA63BL, 0xFFEC09F7L, 0xFFFA2BDDL, 0x001495D4L, 0x001C4563L, 0xFFEA2C62L,
+	0xFFCCFBE9L, 0x00040AF0L, 0x0007C417L, 0x002F4588L, 0x0000AD00L, 0xFFEF36BEL, 0x000DCD44L, 0x003C675AL,
+	0xFFC72BCAL, 0xFFFFDE7EL, 0x00193948L, 0xFFCE69C0L, 0x0024756CL, 0xFFFCC7DFL, 0x000B98A1L, 0xFFEBE808L,
+	0x0002E46CL, 0xFFC9C808L, 0x003036C2L, 0xFFE3BFF6L, 0xFFDB3C93L, 0xFFFD4AE0L, 0x00141305L, 0x00147792L,
+	0x00139E25L, 0xFFE7D0E0L, 0xFFF39944L, 0xFFEA0802L, 0xFFD1EEA2L, 0xFFC4C79CL, 0xFFC8A057L, 0x003A97D9L,
+	0x001FEA93L, 0x0033FF5AL, 0x002358D4L, 0x003A41F8L, 0xFFCCFF72L, 0x00223DFBL, 0xFFDAAB9FL, 0xFFC9A422L,
+	0x000412F5L, 0x00252587L, 0xFFED24F0L, 0x00359B5DL, 0xFFCA48A0L, 0xFFC6A2FCL, 0xFFEDBB56L, 0xFFCF45DEL,
+	0x000DBE5EL, 0x001C5E1AL, 0x000DE0E6L, 0x000C7F5AL, 0x00078F83L, 0xFFE7628AL, 0xFFFF5704L, 0xFFF806FCL,
+	0xFFF60021L, 0xFFD05AF6L, 0x001F0084L, 0x0030EF86L, 0xFFC9B97DL, 0xFFF7FCD6L, 0xFFF44592L, 0xFFC921C2L,
+	0x00053919L, 0x0004610CL, 0xFFDACD41L, 0x003EB01BL, 0x003472E7L, 0xFFCD003BL, 0x001A7CC7L, 0x00031924L,
+	0x002B5EE5L, 0x00291199L, 0xFFD87A3AL, 0x00134D71L, 0x003DE11CL, 0x00130984L, 0x0025F051L, 0x00185A46L,
+	0xFFC68518L, 0x001314BEL, 0x00283891L, 0xFFC9DB90L, 0xFFD25089L, 0x001C853FL, 0x001D0B4BL, 0xFFEFF6A6L,
+	0xFFEBA8BEL, 0x0012E11BL, 0xFFCD5E3EL, 0xFFEA2D2FL, 0xFFF91DE4L, 0x001406C7L, 0x00327283L, 0xFFE20D6EL,
+	0xFFEC7953L, 0x001D4099L, 0xFFD92578L, 0xFFEB05ADL, 0x0016E405L, 0x000BDBE7L, 0x00221DE8L, 0x0033F8CFL,
+	0xFFF7B934L, 0xFFD4CA0CL, 0xFFE67FF8L, 0xFFE3D157L, 0xFFD8911BL, 0xFFC72C12L, 0x000910D8L, 0xFFC65E1FL,
+	0xFFE14658L, 0x00251D8BL, 0x002573B7L, 0xFFFD7C8FL, 0x001DDD98L, 0x00336898L, 0x0002D4BBL, 0xFFED93A7L,
+	0xFFCF6CBEL, 0x00027C1CL, 0x0018AA08L, 0x002DFD71L, 0x000C5CA5L, 0x0019379AL, 0xFFC7A167L, 0xFFE48C3DL,
+	0xFFD1A13CL, 0x0035C539L, 0x003B0115L, 0x00041DC0L, 0x0021C4F7L, 0xFFF11BF4L, 0x001A35E7L, 0x0007340EL,
+	0xFFF97D45L, 0x001A4CD0L, 0xFFE47CAEL, 0x001D2668L, 0xFFE68E98L, 0xFFEF2633L, 0xFFFC05DAL, 0xFFC57FDBL,
+	0xFFD32764L, 0xFFDDE1AFL, 0xFFF993DDL, 0xFFDD1D09L, 0x0002CC93L, 0xFFF11805L, 0x00189C2AL, 0xFFC9E5A9L,
+	0xFFF78A50L, 0x003BCF2CL, 0xFFFF434EL, 0xFFEB36DFL, 0x003C15CAL, 0x00155E68L, 0xFFF316B6L, 0x001E29CEL
 };
 
-const uint DLTMPolyMath::ZetasInv[DILITHIUM_N] =
+#if defined(CEX_HAS_AVX2)
+
+CEX_ALIGN(64) static const uint8_t RejAvx2[256][8] = 
 {
-	0x0061B633UL, 0x000CE94AUL, 0x006A8199UL, 0x0043CA37UL, 0x0014C921UL, 0x0000BCB2UL, 0x004410D5UL, 0x000875B0UL,
-	0x00361A57UL, 0x006743D7UL, 0x000EE7FBUL, 0x007D136EUL, 0x0022E2F7UL, 0x00066C23UL, 0x00221E51UL, 0x002CD89CUL,
-	0x003A8025UL, 0x0003FA26UL, 0x0010D9CDUL, 0x00197168UL, 0x0062B999UL, 0x001B8352UL, 0x00659331UL, 0x000682BBUL,
-	0x0078ABF3UL, 0x0065AA1AUL, 0x000EE40CUL, 0x005E1B0AUL, 0x007BC241UL, 0x0044DEECUL, 0x004A1AC8UL, 0x002E5EC4UL,
-	0x001B73C3UL, 0x00385E99UL, 0x0066A867UL, 0x0073835CUL, 0x0051E290UL, 0x006735F9UL, 0x007D63E5UL, 0x00309342UL,
-	0x00126C59UL, 0x007D0B46UL, 0x004C7769UL, 0x00620269UL, 0x00028371UL, 0x005A6C4AUL, 0x005AC276UL, 0x001EB9A8UL,
-	0x0039A1E1UL, 0x0076CF29UL, 0x0038D3EEUL, 0x00276EE5UL, 0x001C2EA9UL, 0x00198008UL, 0x002B35F4UL, 0x000846CCUL,
-	0x004BE732UL, 0x005DC219UL, 0x0074041AUL, 0x0068FBFCUL, 0x0014FA53UL, 0x0026DA88UL, 0x00629F68UL, 0x001386ADUL,
-	0x001DF292UL, 0x004D6D7EUL, 0x006BD93AUL, 0x0006E21CUL, 0x0015D2D1UL, 0x0032A1C2UL, 0x006CFEE6UL, 0x00145742UL,
-	0x0010095AUL, 0x0062D4B6UL, 0x00635AC2UL, 0x002DAF77UL, 0x00362470UL, 0x0057A770UL, 0x006CCB43UL, 0x00397AE8UL,
-	0x006785BBUL, 0x0059EFB0UL, 0x006CD67DUL, 0x0041FEE5UL, 0x006C9290UL, 0x002785C6UL, 0x0056CE68UL, 0x0054811CUL,
-	0x007CC6DDUL, 0x0065633AUL, 0x0032FFC5UL, 0x004B6D1AUL, 0x00412FE6UL, 0x002532BFUL, 0x007B7EF5UL, 0x007AA6E8UL,
-	0x0036DE3EUL, 0x000BBA6EUL, 0x0008032AUL, 0x00364683UL, 0x004EF07BUL, 0x0060DF7DUL, 0x002FA50AUL, 0x0009FFDFUL,
-	0x0007F904UL, 0x0000A8FCUL, 0x00189D76UL, 0x0078507EUL, 0x007360A7UL, 0x0071FF1BUL, 0x006381E7UL, 0x007221A3UL,
-	0x0030BA22UL, 0x001244AAUL, 0x00395D04UL, 0x0035B760UL, 0x004A44A4UL, 0x0012DB10UL, 0x005ABA7AUL, 0x007BCD0CUL,
-	0x00365BDEUL, 0x00255461UL, 0x005DA206UL, 0x0033008EUL, 0x00459E09UL, 0x005C872DUL, 0x004BE0A7UL, 0x005FF56EUL,
-	0x00454828UL, 0x00375FA9UL, 0x003B3864UL, 0x002E115EUL, 0x0015F7FEUL, 0x000C66BCUL, 0x00182F20UL, 0x006C41DCUL,
-	0x006B686FUL, 0x006BCCFCUL, 0x0002B520UL, 0x0024C36DUL, 0x001C400AUL, 0x004FA93FUL, 0x003637F8UL, 0x007CFB95UL,
-	0x001417F8UL, 0x00744760UL, 0x00033821UL, 0x005B6A95UL, 0x00319640UL, 0x0066A6B9UL, 0x00002182UL, 0x0038D436UL,
-	0x004378A7UL, 0x007212BDUL, 0x0010C942UL, 0x007F3301UL, 0x00509A79UL, 0x00781BEAUL, 0x007BD511UL, 0x00330417UL,
-	0x0015D39EUL, 0x00639A9EUL, 0x006B4A2DUL, 0x0005D423UL, 0x0013F609UL, 0x000059C5UL, 0x0012BEEDUL, 0x000A3D7EUL,
-	0x0025CBF7UL, 0x00064593UL, 0x00385BB5UL, 0x002D485DUL, 0x00567162UL, 0x005F19C9UL, 0x000F017BUL, 0x004BCF0FUL,
-	0x007DF037UL, 0x00376F20UL, 0x00302D52UL, 0x0030AD80UL, 0x000F430AUL, 0x003E4F8EUL, 0x0062488FUL, 0x0013308BUL,
-	0x00183045UL, 0x005EAA3AUL, 0x004AD613UL, 0x001629A3UL, 0x002E67E7UL, 0x00381E31UL, 0x0017537FUL, 0x003BF91BUL,
-	0x002AB0D3UL, 0x006042ADUL, 0x002703D0UL, 0x00445ACDUL, 0x0044A7AEUL, 0x0071508BUL, 0x0077C467UL, 0x00737C59UL,
-	0x00476C75UL, 0x00186BA4UL, 0x0020A9E9UL, 0x004A5BC2UL, 0x003A50A7UL, 0x004A61E3UL, 0x0019152AUL, 0x0019EDC3UL,
-	0x00083AA3UL, 0x005C0965UL, 0x000495B3UL, 0x0049DC01UL, 0x002BC1BFUL, 0x0049556BUL, 0x002E7184UL, 0x003AEA7BUL,
-	0x00442152UL, 0x0026B82CUL, 0x0036CFD4UL, 0x00195AFDUL, 0x004A013CUL, 0x0050EB34UL, 0x007E69E1UL, 0x0056959AUL,
-	0x007B9A3CUL, 0x0042AE00UL, 0x00004BDEUL, 0x00650FCCUL, 0x00320368UL, 0x00155B09UL, 0x003AE519UL, 0x0020522AUL,
-	0x00202C85UL, 0x0057E699UL, 0x00111560UL, 0x00086270UL, 0x00492879UL, 0x00107A5CUL, 0x00703F91UL, 0x005649A9UL,
-	0x0056FADAUL, 0x005065B8UL, 0x002C04F7UL, 0x0050458CUL, 0x001FEB81UL, 0x00057B53UL, 0x005BF6D6UL, 0x006401D6UL,
-	0x0078C1DDUL, 0x000D5ED8UL, 0x000BDEE8UL, 0x007C41BDUL, 0x0007EAFDUL, 0x0027CEFEUL, 0x007F7B0AUL, 0x00000000UL
+	{ 0,  0,  0,  0,  0,  0,  0,  0}, { 0,  0,  0,  0,  0,  0,  0,  0}, { 1,  0,  0,  0,  0,  0,  0,  0}, { 0,  1,  0,  0,  0,  0,  0,  0},
+	{ 2,  0,  0,  0,  0,  0,  0,  0}, { 0,  2,  0,  0,  0,  0,  0,  0}, { 1,  2,  0,  0,  0,  0,  0,  0}, { 0,  1,  2,  0,  0,  0,  0,  0},
+	{ 3,  0,  0,  0,  0,  0,  0,  0}, { 0,  3,  0,  0,  0,  0,  0,  0}, { 1,  3,  0,  0,  0,  0,  0,  0}, { 0,  1,  3,  0,  0,  0,  0,  0},
+	{ 2,  3,  0,  0,  0,  0,  0,  0}, { 0,  2,  3,  0,  0,  0,  0,  0}, { 1,  2,  3,  0,  0,  0,  0,  0}, { 0,  1,  2,  3,  0,  0,  0,  0},
+	{ 4,  0,  0,  0,  0,  0,  0,  0}, { 0,  4,  0,  0,  0,  0,  0,  0}, { 1,  4,  0,  0,  0,  0,  0,  0}, { 0,  1,  4,  0,  0,  0,  0,  0},
+	{ 2,  4,  0,  0,  0,  0,  0,  0}, { 0,  2,  4,  0,  0,  0,  0,  0}, { 1,  2,  4,  0,  0,  0,  0,  0}, { 0,  1,  2,  4,  0,  0,  0,  0},
+	{ 3,  4,  0,  0,  0,  0,  0,  0}, { 0,  3,  4,  0,  0,  0,  0,  0}, { 1,  3,  4,  0,  0,  0,  0,  0}, { 0,  1,  3,  4,  0,  0,  0,  0},
+	{ 2,  3,  4,  0,  0,  0,  0,  0}, { 0,  2,  3,  4,  0,  0,  0,  0}, { 1,  2,  3,  4,  0,  0,  0,  0}, { 0,  1,  2,  3,  4,  0,  0,  0},
+	{ 5,  0,  0,  0,  0,  0,  0,  0}, { 0,  5,  0,  0,  0,  0,  0,  0}, { 1,  5,  0,  0,  0,  0,  0,  0}, { 0,  1,  5,  0,  0,  0,  0,  0},
+	{ 2,  5,  0,  0,  0,  0,  0,  0}, { 0,  2,  5,  0,  0,  0,  0,  0}, { 1,  2,  5,  0,  0,  0,  0,  0}, { 0,  1,  2,  5,  0,  0,  0,  0},
+	{ 3,  5,  0,  0,  0,  0,  0,  0}, { 0,  3,  5,  0,  0,  0,  0,  0}, { 1,  3,  5,  0,  0,  0,  0,  0}, { 0,  1,  3,  5,  0,  0,  0,  0},
+	{ 2,  3,  5,  0,  0,  0,  0,  0}, { 0,  2,  3,  5,  0,  0,  0,  0}, { 1,  2,  3,  5,  0,  0,  0,  0}, { 0,  1,  2,  3,  5,  0,  0,  0},
+	{ 4,  5,  0,  0,  0,  0,  0,  0}, { 0,  4,  5,  0,  0,  0,  0,  0}, { 1,  4,  5,  0,  0,  0,  0,  0}, { 0,  1,  4,  5,  0,  0,  0,  0},
+	{ 2,  4,  5,  0,  0,  0,  0,  0}, { 0,  2,  4,  5,  0,  0,  0,  0}, { 1,  2,  4,  5,  0,  0,  0,  0}, { 0,  1,  2,  4,  5,  0,  0,  0},
+	{ 3,  4,  5,  0,  0,  0,  0,  0}, { 0,  3,  4,  5,  0,  0,  0,  0}, { 1,  3,  4,  5,  0,  0,  0,  0}, { 0,  1,  3,  4,  5,  0,  0,  0},
+	{ 2,  3,  4,  5,  0,  0,  0,  0}, { 0,  2,  3,  4,  5,  0,  0,  0}, { 1,  2,  3,  4,  5,  0,  0,  0}, { 0,  1,  2,  3,  4,  5,  0,  0},
+	{ 6,  0,  0,  0,  0,  0,  0,  0}, { 0,  6,  0,  0,  0,  0,  0,  0}, { 1,  6,  0,  0,  0,  0,  0,  0}, { 0,  1,  6,  0,  0,  0,  0,  0},
+	{ 2,  6,  0,  0,  0,  0,  0,  0}, { 0,  2,  6,  0,  0,  0,  0,  0}, { 1,  2,  6,  0,  0,  0,  0,  0}, { 0,  1,  2,  6,  0,  0,  0,  0},
+	{ 3,  6,  0,  0,  0,  0,  0,  0}, { 0,  3,  6,  0,  0,  0,  0,  0}, { 1,  3,  6,  0,  0,  0,  0,  0}, { 0,  1,  3,  6,  0,  0,  0,  0},
+	{ 2,  3,  6,  0,  0,  0,  0,  0}, { 0,  2,  3,  6,  0,  0,  0,  0}, { 1,  2,  3,  6,  0,  0,  0,  0}, { 0,  1,  2,  3,  6,  0,  0,  0},
+	{ 4,  6,  0,  0,  0,  0,  0,  0}, { 0,  4,  6,  0,  0,  0,  0,  0}, { 1,  4,  6,  0,  0,  0,  0,  0}, { 0,  1,  4,  6,  0,  0,  0,  0},
+	{ 2,  4,  6,  0,  0,  0,  0,  0}, { 0,  2,  4,  6,  0,  0,  0,  0}, { 1,  2,  4,  6,  0,  0,  0,  0}, { 0,  1,  2,  4,  6,  0,  0,  0},
+	{ 3,  4,  6,  0,  0,  0,  0,  0}, { 0,  3,  4,  6,  0,  0,  0,  0}, { 1,  3,  4,  6,  0,  0,  0,  0}, { 0,  1,  3,  4,  6,  0,  0,  0},
+	{ 2,  3,  4,  6,  0,  0,  0,  0}, { 0,  2,  3,  4,  6,  0,  0,  0}, { 1,  2,  3,  4,  6,  0,  0,  0}, { 0,  1,  2,  3,  4,  6,  0,  0},
+	{ 5,  6,  0,  0,  0,  0,  0,  0}, { 0,  5,  6,  0,  0,  0,  0,  0}, { 1,  5,  6,  0,  0,  0,  0,  0}, { 0,  1,  5,  6,  0,  0,  0,  0},
+	{ 2,  5,  6,  0,  0,  0,  0,  0}, { 0,  2,  5,  6,  0,  0,  0,  0}, { 1,  2,  5,  6,  0,  0,  0,  0}, { 0,  1,  2,  5,  6,  0,  0,  0},
+	{ 3,  5,  6,  0,  0,  0,  0,  0}, { 0,  3,  5,  6,  0,  0,  0,  0}, { 1,  3,  5,  6,  0,  0,  0,  0}, { 0,  1,  3,  5,  6,  0,  0,  0},
+	{ 2,  3,  5,  6,  0,  0,  0,  0}, { 0,  2,  3,  5,  6,  0,  0,  0}, { 1,  2,  3,  5,  6,  0,  0,  0}, { 0,  1,  2,  3,  5,  6,  0,  0},
+	{ 4,  5,  6,  0,  0,  0,  0,  0}, { 0,  4,  5,  6,  0,  0,  0,  0}, { 1,  4,  5,  6,  0,  0,  0,  0}, { 0,  1,  4,  5,  6,  0,  0,  0},
+	{ 2,  4,  5,  6,  0,  0,  0,  0}, { 0,  2,  4,  5,  6,  0,  0,  0}, { 1,  2,  4,  5,  6,  0,  0,  0}, { 0,  1,  2,  4,  5,  6,  0,  0},
+	{ 3,  4,  5,  6,  0,  0,  0,  0}, { 0,  3,  4,  5,  6,  0,  0,  0}, { 1,  3,  4,  5,  6,  0,  0,  0}, { 0,  1,  3,  4,  5,  6,  0,  0},
+	{ 2,  3,  4,  5,  6,  0,  0,  0}, { 0,  2,  3,  4,  5,  6,  0,  0}, { 1,  2,  3,  4,  5,  6,  0,  0}, { 0,  1,  2,  3,  4,  5,  6,  0},
+	{ 7,  0,  0,  0,  0,  0,  0,  0}, { 0,  7,  0,  0,  0,  0,  0,  0}, { 1,  7,  0,  0,  0,  0,  0,  0}, { 0,  1,  7,  0,  0,  0,  0,  0},
+	{ 2,  7,  0,  0,  0,  0,  0,  0}, { 0,  2,  7,  0,  0,  0,  0,  0}, { 1,  2,  7,  0,  0,  0,  0,  0}, { 0,  1,  2,  7,  0,  0,  0,  0},
+	{ 3,  7,  0,  0,  0,  0,  0,  0}, { 0,  3,  7,  0,  0,  0,  0,  0}, { 1,  3,  7,  0,  0,  0,  0,  0}, { 0,  1,  3,  7,  0,  0,  0,  0},
+	{ 2,  3,  7,  0,  0,  0,  0,  0}, { 0,  2,  3,  7,  0,  0,  0,  0}, { 1,  2,  3,  7,  0,  0,  0,  0}, { 0,  1,  2,  3,  7,  0,  0,  0},
+	{ 4,  7,  0,  0,  0,  0,  0,  0}, { 0,  4,  7,  0,  0,  0,  0,  0}, { 1,  4,  7,  0,  0,  0,  0,  0}, { 0,  1,  4,  7,  0,  0,  0,  0},
+	{ 2,  4,  7,  0,  0,  0,  0,  0}, { 0,  2,  4,  7,  0,  0,  0,  0}, { 1,  2,  4,  7,  0,  0,  0,  0}, { 0,  1,  2,  4,  7,  0,  0,  0},
+	{ 3,  4,  7,  0,  0,  0,  0,  0}, { 0,  3,  4,  7,  0,  0,  0,  0}, { 1,  3,  4,  7,  0,  0,  0,  0}, { 0,  1,  3,  4,  7,  0,  0,  0},
+	{ 2,  3,  4,  7,  0,  0,  0,  0}, { 0,  2,  3,  4,  7,  0,  0,  0}, { 1,  2,  3,  4,  7,  0,  0,  0}, { 0,  1,  2,  3,  4,  7,  0,  0},
+	{ 5,  7,  0,  0,  0,  0,  0,  0}, { 0,  5,  7,  0,  0,  0,  0,  0}, { 1,  5,  7,  0,  0,  0,  0,  0}, { 0,  1,  5,  7,  0,  0,  0,  0},
+	{ 2,  5,  7,  0,  0,  0,  0,  0}, { 0,  2,  5,  7,  0,  0,  0,  0}, { 1,  2,  5,  7,  0,  0,  0,  0}, { 0,  1,  2,  5,  7,  0,  0,  0},
+	{ 3,  5,  7,  0,  0,  0,  0,  0}, { 0,  3,  5,  7,  0,  0,  0,  0}, { 1,  3,  5,  7,  0,  0,  0,  0}, { 0,  1,  3,  5,  7,  0,  0,  0},
+	{ 2,  3,  5,  7,  0,  0,  0,  0}, { 0,  2,  3,  5,  7,  0,  0,  0}, { 1,  2,  3,  5,  7,  0,  0,  0}, { 0,  1,  2,  3,  5,  7,  0,  0},
+	{ 4,  5,  7,  0,  0,  0,  0,  0}, { 0,  4,  5,  7,  0,  0,  0,  0}, { 1,  4,  5,  7,  0,  0,  0,  0}, { 0,  1,  4,  5,  7,  0,  0,  0},
+	{ 2,  4,  5,  7,  0,  0,  0,  0}, { 0,  2,  4,  5,  7,  0,  0,  0}, { 1,  2,  4,  5,  7,  0,  0,  0}, { 0,  1,  2,  4,  5,  7,  0,  0},
+	{ 3,  4,  5,  7,  0,  0,  0,  0}, { 0,  3,  4,  5,  7,  0,  0,  0}, { 1,  3,  4,  5,  7,  0,  0,  0}, { 0,  1,  3,  4,  5,  7,  0,  0},
+	{ 2,  3,  4,  5,  7,  0,  0,  0}, { 0,  2,  3,  4,  5,  7,  0,  0}, { 1,  2,  3,  4,  5,  7,  0,  0}, { 0,  1,  2,  3,  4,  5,  7,  0},
+	{ 6,  7,  0,  0,  0,  0,  0,  0}, { 0,  6,  7,  0,  0,  0,  0,  0}, { 1,  6,  7,  0,  0,  0,  0,  0}, { 0,  1,  6,  7,  0,  0,  0,  0},
+	{ 2,  6,  7,  0,  0,  0,  0,  0}, { 0,  2,  6,  7,  0,  0,  0,  0}, { 1,  2,  6,  7,  0,  0,  0,  0}, { 0,  1,  2,  6,  7,  0,  0,  0},
+	{ 3,  6,  7,  0,  0,  0,  0,  0}, { 0,  3,  6,  7,  0,  0,  0,  0}, { 1,  3,  6,  7,  0,  0,  0,  0}, { 0,  1,  3,  6,  7,  0,  0,  0},
+	{ 2,  3,  6,  7,  0,  0,  0,  0}, { 0,  2,  3,  6,  7,  0,  0,  0}, { 1,  2,  3,  6,  7,  0,  0,  0}, { 0,  1,  2,  3,  6,  7,  0,  0},
+	{ 4,  6,  7,  0,  0,  0,  0,  0}, { 0,  4,  6,  7,  0,  0,  0,  0}, { 1,  4,  6,  7,  0,  0,  0,  0}, { 0,  1,  4,  6,  7,  0,  0,  0},
+	{ 2,  4,  6,  7,  0,  0,  0,  0}, { 0,  2,  4,  6,  7,  0,  0,  0}, { 1,  2,  4,  6,  7,  0,  0,  0}, { 0,  1,  2,  4,  6,  7,  0,  0},
+	{ 3,  4,  6,  7,  0,  0,  0,  0}, { 0,  3,  4,  6,  7,  0,  0,  0}, { 1,  3,  4,  6,  7,  0,  0,  0}, { 0,  1,  3,  4,  6,  7,  0,  0},
+	{ 2,  3,  4,  6,  7,  0,  0,  0}, { 0,  2,  3,  4,  6,  7,  0,  0}, { 1,  2,  3,  4,  6,  7,  0,  0}, { 0,  1,  2,  3,  4,  6,  7,  0},
+	{ 5,  6,  7,  0,  0,  0,  0,  0}, { 0,  5,  6,  7,  0,  0,  0,  0}, { 1,  5,  6,  7,  0,  0,  0,  0}, { 0,  1,  5,  6,  7,  0,  0,  0},
+	{ 2,  5,  6,  7,  0,  0,  0,  0}, { 0,  2,  5,  6,  7,  0,  0,  0}, { 1,  2,  5,  6,  7,  0,  0,  0}, { 0,  1,  2,  5,  6,  7,  0,  0},
+	{ 3,  5,  6,  7,  0,  0,  0,  0}, { 0,  3,  5,  6,  7,  0,  0,  0}, { 1,  3,  5,  6,  7,  0,  0,  0}, { 0,  1,  3,  5,  6,  7,  0,  0},
+	{ 2,  3,  5,  6,  7,  0,  0,  0}, { 0,  2,  3,  5,  6,  7,  0,  0}, { 1,  2,  3,  5,  6,  7,  0,  0}, { 0,  1,  2,  3,  5,  6,  7,  0},
+	{ 4,  5,  6,  7,  0,  0,  0,  0}, { 0,  4,  5,  6,  7,  0,  0,  0}, { 1,  4,  5,  6,  7,  0,  0,  0}, { 0,  1,  4,  5,  6,  7,  0,  0},
+	{ 2,  4,  5,  6,  7,  0,  0,  0}, { 0,  2,  4,  5,  6,  7,  0,  0}, { 1,  2,  4,  5,  6,  7,  0,  0}, { 0,  1,  2,  4,  5,  6,  7,  0},
+	{ 3,  4,  5,  6,  7,  0,  0,  0}, { 0,  3,  4,  5,  6,  7,  0,  0}, { 1,  3,  4,  5,  6,  7,  0,  0}, { 0,  1,  3,  4,  5,  6,  7,  0},
+	{ 2,  3,  4,  5,  6,  7,  0,  0}, { 0,  2,  3,  4,  5,  6,  7,  0}, { 1,  2,  3,  4,  5,  6,  7,  0}, { 0,  1,  2,  3,  4,  5,  6,  7}
 };
 
-// ntt.c //
+const int32_t DLTMPolyMath::Avx2Q[8] = { DILITHIUM_Q, DILITHIUM_Q, DILITHIUM_Q, DILITHIUM_Q,
+    DILITHIUM_Q, DILITHIUM_Q, DILITHIUM_Q, DILITHIUM_Q };
+const int32_t DLTMPolyMath::Avx2QINV[8] = { DILITHIUM_QINV, DILITHIUM_QINV, DILITHIUM_QINV, DILITHIUM_QINV,
+    DILITHIUM_QINV, DILITHIUM_QINV, DILITHIUM_QINV, DILITHIUM_Q };
 
-void DLTMPolyMath::InvNttFromInvMont(std::array<uint, 256> &P)
+#define _mm256_blendv_epi32(a,b,mask) \
+  _mm256_castps_si256(_mm256_blendv_ps(_mm256_castsi256_ps(a), \
+                                       _mm256_castsi256_ps(b), \
+                                       _mm256_castsi256_ps(mask)))
+
+void DLTMPolyMath::PolyAdd(std::array<int32_t, 256> &C, const std::array<int32_t, 256> &A, const std::array<int32_t, 256> &B)
 {
-	const uint F = ((static_cast<ulong>(DILITHIUM_MONT) * DILITHIUM_MONT % DILITHIUM_Q) * (DILITHIUM_Q - 1) % DILITHIUM_Q) * ((DILITHIUM_Q - 1) >> 8) % DILITHIUM_Q;
-	size_t j;
-	size_t k;
-	size_t len;
-	size_t start;
-	uint t;
-	uint zeta;
+    __m256i vec0;
+    __m256i vec1;
 
-	k = 0;
+    for (size_t i = 0; i < DILITHIUM_N; i += 8)
+    {
+        vec0 = _mm256_load_si256((__m256i*)&A[i]);
+        vec1 = _mm256_load_si256((__m256i*)&B[i]);
+        vec0 = _mm256_add_epi32(vec0, vec1);
+        _mm256_store_si256((__m256i*)&C[i], vec0);
+    }
+}
 
-	for (len = 1; len < P.size(); len <<= 1)
+void DLTMPolyMath::PolyCaddQ(std::array<int32_t, 256> &A)
+{
+    const __m256i q = _mm256_load_si256((__m256i*)&Avx2Q[0]);
+    const __m256i zero = _mm256_setzero_si256();
+    __m256i f;
+    __m256i g;
+
+    for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
+    {
+        f = _mm256_load_si256((__m256i*)&A[8 * i]);
+        g = _mm256_blendv_epi32(zero, q, f);
+        f = _mm256_add_epi32(f, g);
+        _mm256_store_si256((__m256i*)&A[8 * i], f);
+    }
+}
+
+int32_t DLTMPolyMath::PolyChkNorm(const std::array<int32_t, 256> &A, uint32_t B)
+{
+    const __m256i bound = _mm256_set1_epi32(B - 1);
+    __m256i f;
+    __m256i t;
+    int32_t r;
+
+    if (B > (DILITHIUM_Q - 1) / 8)
+    {
+        r = 1;
+    }
+    else
+    {
+        t = _mm256_setzero_si256();
+
+        for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
+        {
+            f = _mm256_load_si256((__m256i*)&A[8 * i]);
+            f = _mm256_abs_epi32(f);
+            f = _mm256_cmpgt_epi32(f, bound);
+            t = _mm256_or_si256(t, f);
+        }
+
+        r = _mm256_testz_si256(t, t) == 0 ? 1 : 0;
+    }
+
+    return r;
+}
+
+void DLTMPolyMath::PolyDecompose(std::array<int32_t, 256> &A1, std::array<int32_t, 256> &A0, const std::array<int32_t, 256> &A, uint32_t Gamma2)
+{
+	if (Gamma2 == (DILITHIUM_Q - 1) / 32)
 	{
-		for (start = 0; start < P.size(); start = j + len)
-		{
-			zeta = ZetasInv[k];
-			++k;
+		const __m256i q = _mm256_load_si256((__m256i*)&Avx2Q[0]);
+		const __m256i hq = _mm256_srli_epi32(q, 1);
+		const __m256i v = _mm256_set1_epi32(1025);
+		const __m256i alpha = _mm256_set1_epi32(2 * Gamma2);
+		const __m256i off = _mm256_set1_epi32(127);
+		const __m256i shift = _mm256_set1_epi32(512);
+		const __m256i mask = _mm256_set1_epi32(15);
+		__m256i f;
+		__m256i f0;
+		__m256i f1;
 
-			for (j = start; j < start + len; ++j)
-			{
-				t = P[j];
-				P[j] = t + P[j + len];
-				P[j + len] = t + (256 * DILITHIUM_Q) - P[j + len];
-				P[j + len] = MontgomeryReduce(static_cast<ulong>(zeta) * P[j + len]);
-			}
+		for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
+		{
+			f = _mm256_load_si256((__m256i*)&A[8 * i]);
+			f1 = _mm256_add_epi32(f, off);
+			f1 = _mm256_srli_epi32(f1, 7);
+			f1 = _mm256_mulhi_epu16(f1, v);
+			f1 = _mm256_mulhrs_epi16(f1, shift);
+			f1 = _mm256_and_si256(f1, mask);
+			f0 = _mm256_mullo_epi32(f1, alpha);
+			f0 = _mm256_sub_epi32(f, f0);
+			f = _mm256_cmpgt_epi32(f0, hq);
+			f = _mm256_and_si256(f, q);
+			f0 = _mm256_sub_epi32(f0, f);
+			_mm256_store_si256((__m256i*)&A1[8 * i], f1);
+			_mm256_store_si256((__m256i*)&A0[8 * i], f0);
 		}
 	}
-
-	for (j = 0; j < P.size(); ++j)
+	else if (Gamma2 == (DILITHIUM_Q - 1) / 88)
 	{
-		P[j] = MontgomeryReduce(static_cast<ulong>(F) * P[j]);
+		const __m256i q = _mm256_load_si256((__m256i*)&Avx2Q[0]);
+		const __m256i hq = _mm256_srli_epi32(q, 1);
+		const __m256i v = _mm256_set1_epi32(11275);
+		const __m256i alpha = _mm256_set1_epi32(2 * Gamma2);
+		const __m256i off = _mm256_set1_epi32(127);
+		const __m256i shift = _mm256_set1_epi32(128);
+		const __m256i max = _mm256_set1_epi32(43);
+		const __m256i zero = _mm256_setzero_si256();
+		__m256i f;
+		__m256i f0;
+		__m256i f1;
+		__m256i t;
+
+		for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
+		{
+			f = _mm256_load_si256((__m256i*)&A[8 * i]);
+			f1 = _mm256_add_epi32(f, off);
+			f1 = _mm256_srli_epi32(f1, 7);
+			f1 = _mm256_mulhi_epu16(f1, v);
+			f1 = _mm256_mulhrs_epi16(f1, shift);
+			t = _mm256_cmpgt_epi32(f1, max);
+			f1 = _mm256_blendv_epi8(f1, zero, t);
+			f0 = _mm256_mullo_epi32(f1, alpha);
+			f0 = _mm256_sub_epi32(f, f0);
+			f = _mm256_cmpgt_epi32(f0, hq);
+			f = _mm256_and_si256(f, q);
+			f0 = _mm256_sub_epi32(f0, f);
+			_mm256_store_si256((__m256i*)&A1[8 * i], f1);
+			_mm256_store_si256((__m256i*)&A0[8 * i], f0);
+		}
 	}
 }
 
-void DLTMPolyMath::Ntt(std::array<uint, 256> &P)
+uint32_t DLTMPolyMath::PolyMakeHint(std::array<int32_t, 256> &H, const std::array<int32_t, 256> &A0, const std::array<int32_t, 256> &A1, uint32_t Gamma2)
 {
-	size_t j;
-	size_t k;
-	size_t len;
-	size_t start;
-	uint t;
-	uint zeta;
+    const __m256i blo = _mm256_set1_epi32(Gamma2 + 1);
+    const __m256i bhi = _mm256_set1_epi32(DILITHIUM_Q - Gamma2);
+    const __m256i zero = _mm256_setzero_si256();
+    const __m256i one = _mm256_set1_epi32(1);
+    __m256i f0;
+    __m256i f1;
+    __m256i g0;
+    __m256i g1;
+    uint32_t r;
 
-	k = 1;
+    r = 0;
 
-	for (len = 128; len > 0; len >>= 1)
+    for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
+    {
+        f0 = _mm256_load_si256((__m256i*)&A0[8 * i]);
+        f1 = _mm256_load_si256((__m256i*)&A1[8 * i]);
+
+        g0 = _mm256_cmpgt_epi32(blo, f0);
+        g1 = _mm256_cmpgt_epi32(f0, bhi);
+        g0 = _mm256_or_si256(g0, g1);
+        g1 = _mm256_cmpeq_epi32(f0, bhi);
+        f1 = _mm256_cmpeq_epi32(f1, zero);
+        g1 = _mm256_and_si256(g1, f1);
+        g0 = _mm256_or_si256(g0, g1);
+
+        r += _mm_popcnt_u32(_mm256_movemask_ps(_mm256_castsi256_ps(g0)));
+        g0 = _mm256_add_epi32(g0, one);
+        _mm256_store_si256((__m256i*)&H[8 * i], g0);
+    }
+
+    return DILITHIUM_N - r;
+}
+
+void DLTMPolyMath::PolyPower2Round(std::array<int32_t, 256> &A1, std::array<int32_t, 256> &A0, const std::array<int32_t, 256> &A)
+{
+	__m256i f;
+	__m256i f0;
+	__m256i f1;
+	const __m256i mask = _mm256_set1_epi32(-(int32_t)(1U << DILITHIUM_D));
+	const __m256i half = _mm256_set1_epi32((1U << (DILITHIUM_D - 1)) - 1);
+
+	for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
 	{
-		for (start = 0; start < P.size(); start = j + len)
-		{
-			zeta = Zetas[k];
-			++k;
+		f = _mm256_load_si256((__m256i*)&A[8 * i]);
+		f1 = _mm256_add_epi32(f, half);
+		f0 = _mm256_and_si256(f1, mask);
+		f1 = _mm256_srli_epi32(f1, DILITHIUM_D);
+		f0 = _mm256_sub_epi32(f, f0);
+		_mm256_store_si256((__m256i*)&A1[8 * i], f1);
+		_mm256_store_si256((__m256i*)&A0[8 * i], f0);
+	}
+}
 
-			for (j = start; j < start + len; ++j)
-			{
-				t = MontgomeryReduce(static_cast<ulong>(zeta) * P[j + len]);
-				P[j + len] = P[j] + (2 * DILITHIUM_Q) - t;
-				P[j] = P[j] + t;
-			}
+void DLTMPolyMath::PolyReduce(std::array<int32_t, 256> &A)
+{
+    const __m256i q = _mm256_load_si256((__m256i*)&Avx2Q[0]);
+    const __m256i off = _mm256_set1_epi32(1 << 22);
+    __m256i f;
+    __m256i g;
+
+    for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
+    {
+        f = _mm256_load_si256((__m256i*)&A[8 * i]);
+        g = _mm256_add_epi32(f, off);
+        g = _mm256_srai_epi32(g, 23);
+        g = _mm256_mullo_epi32(g, q);
+        f = _mm256_sub_epi32(f, g);
+        _mm256_store_si256((__m256i*)&A[8 * i], f);
+    }
+}
+
+void DLTMPolyMath::PolyShiftL(std::array<int32_t, 256> &A)
+{
+    __m256i vec;
+
+    for (size_t i = 0; i < DILITHIUM_N; i += 8)
+    {
+        vec = _mm256_load_si256((__m256i*)&A[i]);
+        vec = _mm256_slli_epi32(vec, DILITHIUM_D);
+        _mm256_store_si256((__m256i*)&A[i], vec);
+    }
+}
+
+void DLTMPolyMath::PolySub(std::array<int32_t, 256> &C, const std::array<int32_t, 256> &A, const std::array<int32_t, 256> &B)
+{
+    __m256i vec0;
+    __m256i vec1;
+
+    for (size_t i = 0; i < DILITHIUM_N; i += 8)
+    {
+        vec0 = _mm256_load_si256((__m256i*)&A[i]);
+        vec1 = _mm256_load_si256((__m256i*)&B[i]);
+        vec0 = _mm256_sub_epi32(vec0, vec1);
+        _mm256_store_si256((__m256i*)&C[i], vec0);
+    }
+}
+
+void DLTMPolyMath::PolyUseHint(std::array<int32_t, 256> &B, const std::array<int32_t, 256> &A, const std::array<int32_t, 256> &H, uint32_t Gamma2)
+{
+    CEX_ALIGN(32) std::array<int32_t, DILITHIUM_N> a0;
+    __m256i f;
+    __m256i g;
+    __m256i h;
+    __m256i t;
+    const __m256i zero = _mm256_setzero_si256();
+
+	if (Gamma2 == (DILITHIUM_Q - 1) / 32)
+	{
+		const __m256i mask = _mm256_set1_epi32(15);
+		PolyDecompose(B, a0, A, Gamma2);
+
+		for (size_t i = 0; i < DILITHIUM_N / 8; i++)
+		{
+			f = _mm256_load_si256((__m256i*)&a0[8 * i]);
+			g = _mm256_load_si256((__m256i*)&B[8 * i]);
+			h = _mm256_load_si256((__m256i*)&H[8 * i]);
+			t = _mm256_blendv_epi32(zero, h, f);
+			t = _mm256_slli_epi32(t, 1);
+			h = _mm256_sub_epi32(h, t);
+			g = _mm256_add_epi32(g, h);
+			g = _mm256_and_si256(g, mask);
+			_mm256_store_si256((__m256i*) & B[8 * i], g);
 		}
 	}
+	else if (Gamma2 == (DILITHIUM_Q - 1) / 88)
+	{
+		const __m256i max = _mm256_set1_epi32(43);
+		PolyDecompose(B, a0, A, Gamma2);
+
+		for (size_t i = 0; i < DILITHIUM_N / 8; i++)
+		{
+			f = _mm256_load_si256((__m256i*)&a0[8 * i]);
+			g = _mm256_load_si256((__m256i*)&B[8 * i]);
+			h = _mm256_load_si256((__m256i*)&H[8 * i]);
+			t = _mm256_blendv_epi32(zero, h, f);
+			t = _mm256_slli_epi32(t, 1);
+			h = _mm256_sub_epi32(h, t);
+			g = _mm256_add_epi32(g, h);
+			g = _mm256_blendv_epi32(g, max, g);
+			f = _mm256_cmpgt_epi32(g, max);
+			g = _mm256_blendv_epi32(g, zero, f);
+			_mm256_store_si256((__m256i*)&B[8 * i], g);
+		}
+	}
+}
+
+size_t DLTMPolyMath::RejUniformAvx2(std::array<int32_t, 256> &R, size_t ROffset, size_t RLength, const std::vector<uint8_t> &Buffer, size_t BufLength)
+{
+    const __m256i bound = _mm256_set1_epi32(DILITHIUM_Q);
+    const __m256i mask = _mm256_set1_epi32(0x7FFFFF);
+    const __m256i idx8 = _mm256_set_epi8(-1, 15, 14, 13, -1, 12, 11, 10, -1, 9, 8, 7, -1, 6, 5, 4,
+        -1, 11, 10, 9, -1, 8, 7, 6, -1, 5, 4, 3, -1, 2, 1, 0);
+    __m256i d;
+    __m256i tmp;
+    size_t pos;
+    uint32_t ctr;
+    uint32_t good;
+    uint32_t t;
+
+    ctr = 0;
+    pos = 0;
+
+    while (pos <= BufLength - 24)
+    {
+        d = _mm256_loadu_si256((__m256i*)&Buffer[pos]);
+        d = _mm256_permute4x64_epi64(d, 0x94);
+        d = _mm256_shuffle_epi8(d, idx8);
+        d = _mm256_and_si256(d, mask);
+        pos += 24;
+
+        tmp = _mm256_sub_epi32(d, bound);
+        good = _mm256_movemask_ps(_mm256_castsi256_ps(tmp));
+        tmp = _mm256_cvtepu8_epi32(_mm_loadl_epi64((__m128i*)&RejAvx2[good]));
+        d = _mm256_permutevar8x32_epi32(d, tmp);
+        _mm256_storeu_si256((__m256i*)&R[ROffset + ctr], d);
+        ctr += _mm_popcnt_u32(good);
+
+        if (ctr > DILITHIUM_N - 8)
+        {
+            break;
+        }
+    }
+
+    while (ctr < DILITHIUM_N && pos <= BufLength - 3)
+    {
+        t = Buffer[pos];
+        ++pos;
+        t |= (uint32_t)Buffer[pos] << 8;
+        ++pos;
+        t |= (uint32_t)Buffer[pos] << 16;
+        ++pos;
+        t &= 0x7FFFFF;
+
+        if (t < DILITHIUM_Q)
+        {
+            R[ROffset + ctr] = t;
+            ++ctr;
+        }
+    }
+
+    return ctr;
+}
+
+void DLTMPolyMath::PolyUniform4x(std::array<int32_t, 256> &A0, std::array<int32_t, 256> &A1, std::array<int32_t, 256> &A2, std::array<int32_t, 256> &A3,
+    const std::vector<uint8_t> &Seed, uint16_t Nonce0, uint16_t Nonce1, uint16_t Nonce2, uint16_t Nonce3)
+{
+    std::vector<__m256i> ksi(Keccak::KECCAK_STATE_SIZE);
+	std::vector<std::vector<uint8_t>> buf(4);
+    __m256i f;
+    size_t ctr0;
+    size_t ctr1;
+    size_t ctr2;
+    size_t ctr3;
+	
+	buf[0].resize(864);
+	buf[1].resize(864);
+	buf[2].resize(864);
+	buf[3].resize(864);
+
+    f = _mm256_loadu_si256((__m256i*)Seed.data());
+    _mm256_store_si256((__m256i*)buf[0].data(), f);
+    _mm256_store_si256((__m256i*)buf[1].data(), f);
+    _mm256_store_si256((__m256i*)buf[2].data(), f);
+    _mm256_store_si256((__m256i*)buf[3].data(), f);
+
+    buf[0][DILITHIUM_SEED_SIZE] = (uint8_t)Nonce0;
+    buf[0][DILITHIUM_SEED_SIZE + 1] = (uint8_t)(Nonce0 >> 8);
+    buf[1][DILITHIUM_SEED_SIZE] = (uint8_t)Nonce1;
+    buf[1][DILITHIUM_SEED_SIZE + 1] = (uint8_t)(Nonce1 >> 8);
+    buf[2][DILITHIUM_SEED_SIZE] = (uint8_t)Nonce2;
+    buf[2][DILITHIUM_SEED_SIZE + 1] = (uint8_t)(Nonce2 >> 8);
+    buf[3][DILITHIUM_SEED_SIZE] = (uint8_t)Nonce3;
+    buf[3][DILITHIUM_SEED_SIZE + 1] = (uint8_t)(Nonce3 >> 8);
+
+    Keccak::AbsorbR24x1600H(ksi, Keccak::KECCAK128_RATE_SIZE, buf[0], buf[1], buf[2], buf[3], DILITHIUM_SEED_SIZE + 2, Keccak::KECCAK_SHAKE_DOMAIN);
+    Keccak::SqueezeBlocksR24x1600H(ksi, Keccak::KECCAK128_RATE_SIZE, buf[0], buf[1], buf[2], buf[3], 5);
+
+    ctr0 = RejUniformAvx2(A0, 0, A0.size(), buf[0], buf[0].size());
+    ctr1 = RejUniformAvx2(A1, 0, A1.size(), buf[1], buf[1].size());
+    ctr2 = RejUniformAvx2(A2, 0, A2.size(), buf[2], buf[2].size());
+    ctr3 = RejUniformAvx2(A3, 0, A3.size(), buf[3], buf[3].size());
+
+    while (ctr0 < DILITHIUM_N || ctr1 < DILITHIUM_N || ctr2 < DILITHIUM_N || ctr3 < DILITHIUM_N)
+    {
+        Keccak::SqueezeBlocksR24x1600H(ksi, Keccak::KECCAK128_RATE_SIZE, buf[0], buf[1], buf[2], buf[3], 1);
+
+        ctr0 += RejUniform(A0, ctr0, DILITHIUM_N - ctr0, buf[0], Keccak::KECCAK128_RATE_SIZE);
+        ctr1 += RejUniform(A1, ctr1, DILITHIUM_N - ctr1, buf[1], Keccak::KECCAK128_RATE_SIZE);
+        ctr2 += RejUniform(A2, ctr2, DILITHIUM_N - ctr2, buf[2], Keccak::KECCAK128_RATE_SIZE);
+        ctr3 += RejUniform(A3, ctr3, DILITHIUM_N - ctr3, buf[3], Keccak::KECCAK128_RATE_SIZE);
+    }
+}
+
+void DLTMPolyMath::PolyUniformEta4x(std::array<int32_t, 256> &A0, std::array<int32_t, 256> &A1, std::array<int32_t, 256> &A2, std::array<int32_t, 256> &A3,
+    const std::vector<uint8_t> &Seed, uint16_t Nonce0, uint16_t Nonce1, uint16_t Nonce2, uint16_t Nonce3, size_t Blocks, uint32_t Eta)
+{
+    std::vector<__m256i> ksi(Keccak::KECCAK_STATE_SIZE);
+	std::vector<std::vector<uint8_t>> buf(4);
+    __m256i f;
+    size_t ctr0;
+    size_t ctr1;
+    size_t ctr2;
+    size_t ctr3;
+
+	if (Eta == 2)
+	{
+		buf[0].resize(192);
+		buf[1].resize(192);
+		buf[2].resize(192);
+		buf[3].resize(192);
+	}
+	else
+	{
+		buf[0].resize(352);
+		buf[1].resize(352);
+		buf[2].resize(352);
+		buf[3].resize(352);
+	}
+
+    f = _mm256_load_si256((__m256i*)Seed.data());
+    _mm256_store_si256((__m256i*)buf[0].data(), f);
+    _mm256_store_si256((__m256i*)buf[1].data(), f);
+    _mm256_store_si256((__m256i*)buf[2].data(), f);
+    _mm256_store_si256((__m256i*)buf[3].data(), f);
+
+    buf[0][DILITHIUM_SEED_SIZE] = (uint8_t)Nonce0;
+    buf[0][DILITHIUM_SEED_SIZE + 1] = (uint8_t)(Nonce0 >> 8);
+    buf[1][DILITHIUM_SEED_SIZE] = (uint8_t)Nonce1;
+    buf[1][DILITHIUM_SEED_SIZE + 1] = (uint8_t)(Nonce1 >> 8);
+    buf[2][DILITHIUM_SEED_SIZE] = (uint8_t)Nonce2;
+    buf[2][DILITHIUM_SEED_SIZE + 1] = (uint8_t)(Nonce2 >> 8);
+    buf[3][DILITHIUM_SEED_SIZE] = (uint8_t)Nonce3;
+    buf[3][DILITHIUM_SEED_SIZE + 1] = (uint8_t)(Nonce3 >> 8);
+
+    Keccak::AbsorbR24x1600H(ksi, Keccak::KECCAK128_RATE_SIZE, buf[0], buf[1], buf[2], buf[3], Seed.size() + 2, Keccak::KECCAK_SHAKE_DOMAIN);
+    Keccak::SqueezeBlocksR24x1600H(ksi, Keccak::KECCAK128_RATE_SIZE, buf[0], buf[1], buf[2], buf[3], Blocks);
+
+    ctr0 = RejEta(A0, 0, DILITHIUM_N, buf[0], Blocks * Keccak::KECCAK128_RATE_SIZE, Eta);
+    ctr1 = RejEta(A1, 0, DILITHIUM_N, buf[1], Blocks * Keccak::KECCAK128_RATE_SIZE, Eta);
+    ctr2 = RejEta(A2, 0, DILITHIUM_N, buf[2], Blocks * Keccak::KECCAK128_RATE_SIZE, Eta);
+    ctr3 = RejEta(A3, 0, DILITHIUM_N, buf[3], Blocks * Keccak::KECCAK128_RATE_SIZE, Eta);
+
+    while (ctr0 < DILITHIUM_N || ctr1 < DILITHIUM_N || ctr2 < DILITHIUM_N || ctr3 < DILITHIUM_N)
+    {
+        Keccak::SqueezeBlocksR24x1600H(ksi, Keccak::KECCAK128_RATE_SIZE, buf[0], buf[1], buf[2], buf[3], 1);
+
+        ctr0 += RejEta(A0, ctr0, DILITHIUM_N - ctr0, buf[0], Keccak::KECCAK128_RATE_SIZE, Eta);
+        ctr1 += RejEta(A1, ctr1, DILITHIUM_N - ctr1, buf[1], Keccak::KECCAK128_RATE_SIZE, Eta);
+        ctr2 += RejEta(A2, ctr2, DILITHIUM_N - ctr2, buf[2], Keccak::KECCAK128_RATE_SIZE, Eta);
+        ctr3 += RejEta(A3, ctr3, DILITHIUM_N - ctr3, buf[3], Keccak::KECCAK128_RATE_SIZE, Eta);
+    }
+}
+
+void DLTMPolyMath::PolyUniformGamma1x4(std::array<int32_t, 256> &A0, std::array<int32_t, 256> &A1, std::array<int32_t, 256> &A2, std::array<int32_t, 256> &A3,
+    const std::vector<uint8_t> &Seed, uint16_t Nonce0, uint16_t Nonce1, uint16_t Nonce2, uint16_t Nonce3, uint32_t Gamma1)
+{
+    std::vector<__m256i> ksi(Keccak::KECCAK_STATE_SIZE);
+	std::vector<std::vector<uint8_t>> buf(4);
+    __m256i f;
+    __m128i g;
+
+	buf[0].resize(704);
+	buf[1].resize(704);
+	buf[2].resize(704);
+	buf[3].resize(704);
+
+    f = _mm256_load_si256((__m256i*)Seed.data());
+    _mm256_store_si256((__m256i*)buf[0].data(), f);
+    _mm256_store_si256((__m256i*)buf[1].data(), f);
+    _mm256_store_si256((__m256i*)buf[2].data(), f);
+    _mm256_store_si256((__m256i*)buf[3].data(), f);
+    g = _mm_load_si128((__m128i*)&Seed[32]);
+    _mm_store_si128((__m128i*)&buf[0][32], g);
+    _mm_store_si128((__m128i*)&buf[1][32], g);
+    _mm_store_si128((__m128i*)&buf[2][32], g);
+    _mm_store_si128((__m128i*)&buf[3][32], g);
+
+    buf[0][DILITHIUM_CRH_SIZE] = (uint8_t)Nonce0;
+    buf[0][DILITHIUM_CRH_SIZE + 1] = (uint8_t)(Nonce0 >> 8);
+    buf[1][DILITHIUM_CRH_SIZE] = (uint8_t)Nonce1;
+    buf[1][DILITHIUM_CRH_SIZE + 1] = (uint8_t)(Nonce1 >> 8);
+    buf[2][DILITHIUM_CRH_SIZE] = (uint8_t)Nonce2;
+    buf[2][DILITHIUM_CRH_SIZE + 1] = (uint8_t)(Nonce2 >> 8);
+    buf[3][DILITHIUM_CRH_SIZE] = (uint8_t)Nonce3;
+    buf[3][DILITHIUM_CRH_SIZE + 1] = (uint8_t)(Nonce3 >> 8);
+
+    Keccak::AbsorbR24x1600H(ksi, Keccak::KECCAK256_RATE_SIZE, buf[0], buf[1], buf[2], buf[3], DILITHIUM_CRH_SIZE + 2, Keccak::KECCAK_SHAKE_DOMAIN);
+    Keccak::SqueezeBlocksR24x1600H(ksi, Keccak::KECCAK256_RATE_SIZE, buf[0], buf[1], buf[2], buf[3], 5);
+
+    PolyZUnpack(A0, buf[0], 0, Gamma1);
+    PolyZUnpack(A1, buf[1], 0, Gamma1);
+    PolyZUnpack(A2, buf[2], 0, Gamma1);
+    PolyZUnpack(A3, buf[3], 0, Gamma1);
+}
+
+void DLTMPolyMath::PolyW1Pack(std::vector<uint8_t> &R, size_t ROffset, const std::array<int32_t, 256> &A, uint32_t Gamma2)
+{
+	if (Gamma2 == (DILITHIUM_Q - 1) / 88)
+	{
+		for (size_t i = 0; i < DILITHIUM_N / 4; ++i)
+		{
+			R[ROffset + (3 * i)] = A[4 * i];
+			R[ROffset + (3 * i)] |= A[4 * i + 1] << 6;
+			R[ROffset + (3 * i) + 1] = A[4 * i + 1] >> 2;
+			R[ROffset + (3 * i) + 1] |= A[4 * i + 2] << 4;
+			R[ROffset + (3 * i) + 2] = A[4 * i + 2] >> 4;
+			R[ROffset + (3 * i) + 2] |= A[4 * i + 3] << 2;
+		}
+	}
+	else if (Gamma2 == (DILITHIUM_Q - 1) / 32)
+	{
+		const __m256i mask = _mm256_set1_epi64x(0xFF00FF00FF00FF00);
+		const __m256i idx = _mm256_set_epi8(15, 13, 14, 12, 11, 9, 10, 8, 7, 5, 6, 4, 3, 1, 2, 0,
+			15, 13, 14, 12, 11, 9, 10, 8, 7, 5, 6, 4, 3, 1, 2, 0);
+		__m256i f0;
+		__m256i f1;
+		__m256i f2;
+		__m256i f3;
+		__m256i f4;
+		__m256i f5;
+		__m256i f6;
+		__m256i f7;
+		size_t i;
+
+		for (i = 0; i < DILITHIUM_N / 64; ++i)
+		{
+			f0 = _mm256_load_si256((__m256i*)&A[64 * i]);
+			f1 = _mm256_load_si256((__m256i*)&A[64 * i + 8]);
+			f2 = _mm256_load_si256((__m256i*)&A[64 * i + 16]);
+			f3 = _mm256_load_si256((__m256i*)&A[64 * i + 24]);
+
+			f0 = _mm256_and_si256(f0, _mm256_set1_epi32(15));
+			f1 = _mm256_and_si256(f1, _mm256_set1_epi32(15));
+			f2 = _mm256_and_si256(f2, _mm256_set1_epi32(15));
+			f3 = _mm256_and_si256(f3, _mm256_set1_epi32(15));
+
+			f0 = _mm256_packus_epi32(f0, f1);
+			f4 = _mm256_load_si256((__m256i*)&A[64 * i + 32]);
+			f5 = _mm256_load_si256((__m256i*)&A[64 * i + 40]);
+
+			f1 = _mm256_packus_epi32(f2, f3);
+			f6 = _mm256_load_si256((__m256i*)&A[64 * i + 48]);
+			f7 = _mm256_load_si256((__m256i*)&A[64 * i + 56]);
+
+			f4 = _mm256_and_si256(f4, _mm256_set1_epi32(15));
+			f5 = _mm256_and_si256(f5, _mm256_set1_epi32(15));
+			f6 = _mm256_and_si256(f6, _mm256_set1_epi32(15));
+			f7 = _mm256_and_si256(f7, _mm256_set1_epi32(15));
+
+			f2 = _mm256_packus_epi32(f4, f5);
+			f3 = _mm256_packus_epi32(f6, f7);
+			f0 = _mm256_packus_epi16(f0, f1);
+			f1 = _mm256_packus_epi16(f2, f3);
+			f2 = _mm256_permute2x128_si256(f0, f1, 0x20);	// ABCD
+			f3 = _mm256_permute2x128_si256(f0, f1, 0x31);	// EFGH
+
+			f4 = _mm256_srli_epi16(f2, 8);					// B0D0
+			f5 = _mm256_slli_epi16(f3, 8);					// 0E0G
+			f0 = _mm256_blendv_epi8(f2, f5, mask);			// AECG
+			f1 = _mm256_blendv_epi8(f4, f3, mask);			// BFDH
+
+			f1 = _mm256_slli_epi16(f1, 4);
+			f0 = _mm256_add_epi16(f0, f1);
+
+			f0 = _mm256_shuffle_epi8(f0, idx);
+			_mm256_storeu_si256((__m256i*)&R[ROffset + (32 * i)], f0);
+		}
+    }
+}
+
+void DLTMPolyMath::PolyVecMatrixExpandAvx2(std::vector<std::vector<std::array<int32_t, 256>>> &Matrix, const std::vector<uint8_t> &Rho, uint32_t K, uint32_t L)
+{
+	if (K == 4 && L == 4)
+	{
+		PolyUniform4x(Matrix[0][0], Matrix[0][1], Matrix[0][2], Matrix[0][3], Rho, 0, 1, 2, 3);
+		PolyUniform4x(Matrix[1][0], Matrix[1][1], Matrix[1][2], Matrix[1][3], Rho, 256, 257, 258, 259);
+		PolyUniform4x(Matrix[2][0], Matrix[2][1], Matrix[2][2], Matrix[2][3], Rho, 512, 513, 514, 515);
+		PolyUniform4x(Matrix[3][0], Matrix[3][1], Matrix[3][2], Matrix[3][3], Rho, 768, 769, 770, 771);
+	}
+	else if (K == 6 && L == 5)
+	{
+		std::array<int32_t, 256> t0;
+		std::array<int32_t, 256> t1;
+		PolyUniform4x(Matrix[0][0], Matrix[0][1], Matrix[0][2], Matrix[0][3], Rho, 0, 1, 2, 3);
+		PolyUniform4x(Matrix[0][4], Matrix[1][0], Matrix[1][1], Matrix[1][2], Rho, 4, 256, 257, 258);
+		PolyUniform4x(Matrix[1][3], Matrix[1][4], Matrix[2][0], Matrix[2][1], Rho, 259, 260, 512, 513);
+		PolyUniform4x(Matrix[2][2], Matrix[2][3], Matrix[2][4], Matrix[3][0], Rho, 514, 515, 516, 768);
+		PolyUniform4x(Matrix[3][1], Matrix[3][2], Matrix[3][3], Matrix[3][4], Rho, 769, 770, 771, 772);
+		PolyUniform4x(Matrix[4][0], Matrix[4][1], Matrix[4][2], Matrix[4][3], Rho, 1024, 1025, 1026, 1027);
+		PolyUniform4x(Matrix[4][4], Matrix[5][0], Matrix[5][1], Matrix[5][2], Rho, 1028, 1280, 1281, 1282);
+		PolyUniform4x(Matrix[5][3], Matrix[5][4], t0, t1, Rho, 1283, 1284, 0, 0);
+	}
+	else if (K == 8 && L == 7)
+	{
+		PolyUniform4x(Matrix[0][0], Matrix[0][1], Matrix[0][2], Matrix[0][3], Rho, 0, 1, 2, 3);
+		PolyUniform4x(Matrix[0][4], Matrix[0][5], Matrix[0][6], Matrix[1][0], Rho, 4, 5, 6, 256);
+		PolyUniform4x(Matrix[1][1], Matrix[1][2], Matrix[1][3], Matrix[1][4], Rho, 257, 258, 259, 260);
+		PolyUniform4x(Matrix[1][5], Matrix[1][6], Matrix[2][0], Matrix[2][1], Rho, 261, 262, 512, 513);
+		PolyUniform4x(Matrix[2][2], Matrix[2][3], Matrix[2][4], Matrix[2][5], Rho, 514, 515, 516, 517);
+		PolyUniform4x(Matrix[2][6], Matrix[3][0], Matrix[3][1], Matrix[3][2], Rho, 518, 768, 769, 770);
+		PolyUniform4x(Matrix[3][3], Matrix[3][4], Matrix[3][5], Matrix[3][6], Rho, 771, 772, 773, 774);
+		PolyUniform4x(Matrix[4][0], Matrix[4][1], Matrix[4][2], Matrix[4][3], Rho, 1024, 1025, 1026, 1027);
+		PolyUniform4x(Matrix[4][4], Matrix[4][5], Matrix[4][6], Matrix[5][0], Rho, 1028, 1029, 1030, 1280);
+		PolyUniform4x(Matrix[5][1], Matrix[5][2], Matrix[5][3], Matrix[5][4], Rho, 1281, 1282, 1283, 1284);
+		PolyUniform4x(Matrix[5][5], Matrix[5][6], Matrix[6][0], Matrix[6][1], Rho, 1285, 1286, 1536, 1537);
+		PolyUniform4x(Matrix[6][2], Matrix[6][3], Matrix[6][4], Matrix[6][5], Rho, 1538, 1539, 1540, 1541);
+		PolyUniform4x(Matrix[6][6], Matrix[7][0], Matrix[7][1], Matrix[7][2], Rho, 1542, 1792, 1793, 1794);
+		PolyUniform4x(Matrix[7][3], Matrix[7][4], Matrix[7][5], Matrix[7][6], Rho, 1795, 1796, 1797, 1798);
+	}
+}
+
+void DLTMPolyMath::PolyVecMatrixExpandRow(std::vector<std::vector<std::array<int32_t, 256>>> &Matrix, const std::vector<uint8_t> &Rho, uint32_t K, uint32_t L, size_t Index)
+{
+	if (K == 4 && L == 4)
+	{
+		if (Index == 0)
+		{
+			PolyUniform4x(Matrix[0][0], Matrix[0][1], Matrix[0][2], Matrix[0][3], Rho, 0, 1, 2, 3);
+		}
+		if (Index == 1)
+		{
+			PolyUniform4x(Matrix[1][0], Matrix[1][1], Matrix[1][2], Matrix[1][3], Rho, 256, 257, 258, 259);
+		}
+		if (Index == 2)
+		{
+			PolyUniform4x(Matrix[2][0], Matrix[2][1], Matrix[2][2], Matrix[2][3], Rho, 512, 513, 514, 515);
+		}
+		if (Index == 3)
+		{
+			PolyUniform4x(Matrix[3][0], Matrix[3][1], Matrix[3][2], Matrix[3][3], Rho, 768, 769, 770, 771);
+		}
+	}
+	else if (K == 6 && L == 5)
+	{
+		if (Index == 0)
+		{
+			PolyUniform4x(Matrix[0][0], Matrix[0][1], Matrix[0][2], Matrix[0][3], Rho, 0, 1, 2, 3);
+			PolyUniform4x(Matrix[0][4], Matrix[1][0], Matrix[1][1], Matrix[1][2], Rho, 4, 256, 257, 258);
+		}
+		if (Index == 1)
+		{
+			PolyUniform4x(Matrix[1][3], Matrix[1][4], Matrix[2][0], Matrix[2][1], Rho, 259, 260, 512, 513);
+		}
+		if (Index == 2)
+		{
+			PolyUniform4x(Matrix[2][2], Matrix[2][3], Matrix[2][4], Matrix[3][0], Rho, 514, 515, 516, 768);
+		}
+		if (Index == 3)
+		{
+			PolyUniform4x(Matrix[3][1], Matrix[3][2], Matrix[3][3], Matrix[3][4], Rho, 769, 770, 771, 772);
+		}
+		if (Index == 4)
+		{
+			PolyUniform4x(Matrix[4][0], Matrix[4][1], Matrix[4][2], Matrix[4][3], Rho, 1024, 1025, 1026, 1027);
+			PolyUniform4x(Matrix[4][4], Matrix[5][0], Matrix[5][1], Matrix[5][2], Rho, 1028, 1280, 1281, 1282);
+		}
+		if (Index == 5)
+		{
+			std::array<int32_t, 256> t0;
+			std::array<int32_t, 256> t1;
+
+			PolyUniform4x(Matrix[5][3], Matrix[5][4], t0, t1, Rho, 1283, 1284, 0, 0);
+		}
+	}
+	else if (K == 8 && L == 7)
+	{
+		if (Index == 0)
+		{
+			PolyUniform4x(Matrix[0][0], Matrix[0][1], Matrix[0][2], Matrix[0][3], Rho, 0, 1, 2, 3);
+			PolyUniform4x(Matrix[0][4], Matrix[0][5], Matrix[0][6], Matrix[1][0], Rho, 4, 5, 6, 256);
+		}
+		if (Index == 1)
+		{
+			PolyUniform4x(Matrix[1][1], Matrix[1][2], Matrix[1][3], Matrix[1][4], Rho, 257, 258, 259, 260);
+			PolyUniform4x(Matrix[1][5], Matrix[1][6], Matrix[2][0], Matrix[2][1], Rho, 261, 262, 512, 513);
+		}
+		if (Index == 2)
+		{
+			PolyUniform4x(Matrix[2][2], Matrix[2][3], Matrix[2][4], Matrix[2][5], Rho, 514, 515, 516, 517);
+			PolyUniform4x(Matrix[2][6], Matrix[3][0], Matrix[3][1], Matrix[3][2], Rho, 518, 768, 769, 770);
+		}
+		if (Index == 3)
+		{
+			PolyUniform4x(Matrix[3][3], Matrix[3][4], Matrix[3][5], Matrix[3][6], Rho, 771, 772, 773, 774);
+		}
+		if (Index == 4)
+		{
+			PolyUniform4x(Matrix[4][0], Matrix[4][1], Matrix[4][2], Matrix[4][3], Rho, 1024, 1025, 1026, 1027);
+			PolyUniform4x(Matrix[4][4], Matrix[4][5], Matrix[4][6], Matrix[5][0], Rho, 1028, 1029, 1030, 1280);
+		}
+		if (Index == 5)
+		{
+			PolyUniform4x(Matrix[5][1], Matrix[5][2], Matrix[5][3], Matrix[5][4], Rho, 1281, 1282, 1283, 1284);
+			PolyUniform4x(Matrix[5][5], Matrix[5][6], Matrix[6][0], Matrix[6][1], Rho, 1285, 1286, 1536, 1537);
+		}
+		if (Index == 6)
+		{
+			PolyUniform4x(Matrix[6][2], Matrix[6][3], Matrix[6][4], Matrix[6][5], Rho, 1538, 1539, 1540, 1541);
+			PolyUniform4x(Matrix[6][6], Matrix[7][0], Matrix[7][1], Matrix[7][2], Rho, 1542, 1792, 1793, 1794);
+		}
+		if (Index == 7)
+		{
+			PolyUniform4x(Matrix[7][3], Matrix[7][4], Matrix[7][5], Matrix[7][6], Rho, 1795, 1796, 1797, 1798);
+		}
+	}
+}
+
+#else
+
+void DLTMPolyMath::PolyAdd(std::array<int32_t, 256> &C, const std::array<int32_t, 256> &A, const std::array<int32_t, 256> &B)
+{
+	for (size_t i = 0; i < C.size(); ++i)
+	{
+		C[i] = A[i] + B[i];
+	}
+}
+
+void DLTMPolyMath::PolyCaddQ(std::array<int32_t, 256> &A)
+{
+    for (size_t i = 0; i < A.size(); ++i)
+    {
+        A[i] = CaddQ(A[i]);
+    }
+}
+
+int32_t DLTMPolyMath::PolyChkNorm(const std::array<int32_t, 256> &A, uint32_t B)
+{
+	int32_t t;
+    int32_t res;
+
+    res = 0;
+
+    if (B > (DILITHIUM_Q - 1) / 8)
+    {
+        res = 1;
+    }
+    else
+    {
+        // It is ok to leak which coefficient violates the bound since
+        // the probability for each coefficient is independent of secret
+        // data but we must not leak the sign of the centralized representative.
+        for (size_t i = 0; i < DILITHIUM_N; ++i)
+        {
+            // absolute value
+            t = A[i] >> 31;
+            t = A[i] - (t & 2 * A[i]);
+
+            if (t >= (int32_t)B)
+            {
+                res = 1;
+                break;
+            }
+        }
+    }
+
+    return res;
+}
+
+
+void DLTMPolyMath::PolyDecompose(std::array<int32_t, 256> &A1, std::array<int32_t, 256> &A0, const std::array<int32_t, 256> &A, uint32_t Gamma2)
+{
+	size_t i;
+
+	for (i = 0; i < A1.size(); ++i)
+	{
+		A1[i] = Decompose(A0[i], A[i], Gamma2);
+	}
+}
+
+uint32_t DLTMPolyMath::PolyMakeHint(std::array<int32_t, 256> &H, const std::array<int32_t, 256> &A0, const std::array<int32_t, 256> &A1, uint32_t Gamma2)
+{
+    uint32_t s;
+
+    s = 0;
+
+    for (size_t i = 0; i < H.size(); ++i)
+    {
+        H[i] = MakeHint(A0[i], A1[i], Gamma2);
+        s += H[i];
+    }
+
+    return s;
+}
+
+void DLTMPolyMath::PolyPower2Round(std::array<int32_t, 256> &A1, std::array<int32_t, 256> &A0, const std::array<int32_t, 256> &A)
+{
+	size_t i;
+
+	for (i = 0; i < A1.size(); ++i)
+	{
+		A1[i] = Power2Round(A[i], A0[i]);
+	}
+}
+
+void DLTMPolyMath::PolyReduce(std::array<int32_t, 256> &A)
+{
+	size_t i;
+
+	for (i = 0; i < A.size(); ++i)
+	{
+		A[i] = Reduce32(A[i]);
+	}
+}
+
+void DLTMPolyMath::PolyShiftL(std::array<int32_t, 256> &A)
+{
+	size_t i;
+
+	for (i = 0; i < A.size(); ++i)
+	{
+		A[i] <<= DILITHIUM_D;
+	}
+}
+
+void DLTMPolyMath::PolySub(std::array<int32_t, 256> &C, const std::array<int32_t, 256> &A, const std::array<int32_t, 256> &B)
+{
+	size_t i;
+
+	for (i = 0; i < C.size(); ++i)
+	{
+		C[i] = A[i] - B[i];
+	}
+}
+
+void DLTMPolyMath::PolyUseHint(std::array<int32_t, 256> &B, const std::array<int32_t, 256> &A, const std::array<int32_t, 256> &H, uint32_t Gamma2)
+{
+	size_t i;
+
+    for (i = 0; i < DILITHIUM_N; ++i)
+    {
+        B[i] = UseHint(A[i], H[i], Gamma2);
+    }
+}
+
+void DLTMPolyMath::PolyW1Pack(std::vector<uint8_t> &R, size_t ROffset, const std::array<int32_t, 256> &A, uint32_t Gamma2)
+{
+	size_t i;
+
+	if (Gamma2 == (DILITHIUM_Q - 1) / 88)
+	{
+		for (i = 0; i < DILITHIUM_N / 4; ++i)
+		{
+			R[ROffset + 3 * i] = (uint8_t)A[4 * i];
+			R[ROffset + 3 * i] |= (uint8_t)(A[(4 * i) + 1] << 6);
+			R[ROffset + (3 * i) + 1] = (uint8_t)(A[(4 * i) + 1] >> 2);
+			R[ROffset + (3 * i) + 1] |= (uint8_t)(A[(4 * i) + 2] << 4);
+			R[ROffset + (3 * i) + 2] = (uint8_t)(A[(4 * i) + 2] >> 4);
+			R[ROffset + (3 * i) + 2] |= (uint8_t)(A[(4 * i) + 3] << 2);
+		}
+	}
+	else if (Gamma2 == (DILITHIUM_Q - 1) / 32)
+	{
+		for (i = 0; i < DILITHIUM_N / 2; ++i)
+		{
+			R[ROffset + i] = (uint8_t)(A[2 * i] | (A[(2 * i) + 1] << 4));
+		}
+	}
+}
+
+void DLTMPolyMath::PolyVecPackW1(std::vector<uint8_t> &R, const std::vector<std::array<int32_t, 256>> &W1, size_t W1PackedSize, uint32_t Gamma2)
+{
+	size_t i;
+
+    for (size_t i = 0; i < W1.size(); ++i)
+    {
+        PolyW1Pack(R, i * W1PackedSize, W1[i], Gamma2);
+    }
+}
+
+#endif
+
+// ntt.c //
+
+void DLTMPolyMath::InvNttToMont(std::array<int32_t, 256> &A)
+{
+    const int32_t F = 41978; // mont ^ 2 / 256
+	size_t j;
+    size_t k;
+	size_t len;
+    int32_t t;
+    int32_t zeta;
+
+    k = 256;
+
+    for (len = 1; len < DILITHIUM_N; len <<= 1)
+    {
+        for (size_t start = 0; start < DILITHIUM_N; start = j + len)
+        {
+            --k;
+            zeta = ~Zetas[k] + 1;
+
+            for (j = start; j < start + len; ++j)
+            {
+                t = A[j];
+                A[j] = t + A[j + len];
+                A[j + len] = t - A[j + len];
+                A[j + len] = MontReduce((int64_t)zeta * A[j + len]);
+            }
+        }
+    }
+
+    for (j = 0; j < DILITHIUM_N; ++j)
+    {
+        A[j] = MontReduce((int64_t)F * A[j]);
+    }
+}
+
+void DLTMPolyMath::Ntt(std::array<int32_t, 256> &A)
+{
+	size_t j;
+    size_t k;
+	size_t len;
+    int32_t zeta;
+    int32_t t;
+
+    k = 0;
+
+    for (len = 128; len > 0; len >>= 1)
+    {
+        for (size_t start = 0; start < DILITHIUM_N; start = j + len)
+        {
+            ++k;
+            zeta = Zetas[k];
+
+            for (j = start; j < start + len; ++j)
+            {
+                t = MontReduce((int64_t)zeta * A[j + len]);
+                A[j + len] = A[j] - t;
+                A[j] = A[j] + t;
+            }
+        }
+    }
 }
 
 // packing.c //
 
-void DLTMPolyMath::PackPk(std::vector<byte> &Pk, const std::vector<byte> &Rho, const std::vector<std::array<uint, 256>> &T1, uint PolT1Packed)
+void DLTMPolyMath::PackPk(std::vector<uint8_t> &Pk, const std::vector<uint8_t> &Rho, const std::vector<std::array<int32_t, 256>> &T1, uint32_t PolT1Packed)
 {
 	size_t i;
 
-	MemoryTools::Copy(Rho, 0, Pk, 0, Rho.size());
+    for (i = 0; i < Rho.size(); ++i)
+    {
+        Pk[i] = Rho[i];
+    }
 
-	for (i = 0; i < T1.size(); ++i)
-	{
-		PolyT1Pack(Pk, Rho.size() + (i * PolT1Packed), T1[i]);
-	}
+    for (i = 0; i < T1.size(); ++i)
+    {
+        PolyT1Pack(Pk, Rho.size() + (i * PolT1Packed), T1[i]);
+    }
 }
 
-void DLTMPolyMath::UnpackPk(std::vector<byte> &Rho, std::vector<std::array<uint, 256>> &T1, const std::vector<byte> &Pk, uint PolT1Packed)
+void DLTMPolyMath::UnpackPk(std::vector<uint8_t> &Rho, std::vector<std::array<int32_t, 256>> &T1, const std::vector<uint8_t> &Pk, uint32_t PolT1Packed)
 {
 	size_t i;
 	size_t poff;
@@ -173,8 +1077,8 @@ void DLTMPolyMath::UnpackPk(std::vector<byte> &Rho, std::vector<std::array<uint,
 	}
 }
 
-void DLTMPolyMath::PackSk(std::vector<byte> &Sk, const std::vector<byte> &Rho, const std::vector<byte> &Key, const std::vector<byte> &Tr, const std::vector<std::array<uint, 256>> &S1,
-	const std::vector<std::array<uint, 256>> &S2, const std::vector<std::array<uint, 256>> &T0, uint Eta, uint PolTAPacked, uint PolT0Packed)
+void DLTMPolyMath::PackSk(std::vector<uint8_t> &Sk, const std::vector<uint8_t> &Rho, const std::vector<uint8_t> &Key, const std::vector<uint8_t> &Tr, const std::vector<std::array<int32_t, 256>> &S1,
+	const std::vector<std::array<int32_t, 256>> &S2, const std::vector<std::array<int32_t, 256>> &T0, uint32_t Eta, uint32_t PolTAPacked, uint32_t PolT0Packed)
 {
 	size_t i;
 	size_t soff;
@@ -206,531 +1110,422 @@ void DLTMPolyMath::PackSk(std::vector<byte> &Sk, const std::vector<byte> &Rho, c
 	}
 }
 
-void DLTMPolyMath::UnpackSk(std::vector<byte> &Rho, std::vector<byte> &Key, std::vector<byte> &Tr, std::vector<std::array<uint, 256>> &S1, std::vector<std::array<uint, 256>> &S2,
-	std::vector<std::array<uint, 256>> &T0, const std::vector<byte> &Sk, uint Eta, uint PolTAPacked, uint PolT0Packed)
+void DLTMPolyMath::UnpackSk(std::vector<uint8_t> &Rho, std::vector<uint8_t> &Tr, std::vector<uint8_t> &Key, std::vector<std::array<int32_t, 256>> &T0, 
+	std::vector<std::array<int32_t, 256>> &S1, std::vector<std::array<int32_t, 256>> &S2, const std::vector<uint8_t> &Sk, uint32_t Eta, uint32_t PolyEtaPacked, uint32_t PolyT0Packed)
 {
 	size_t i;
 	size_t soff;
 
-	MemoryTools::Copy(Sk, 0, Rho, 0, Rho.size());
-	soff = Rho.size();
-	MemoryTools::Copy(Sk, soff, Key, 0, Key.size());
-	soff += Key.size();
-	MemoryTools::Copy(Sk, soff, Tr, 0, Tr.size());
-	soff += Tr.size();
+	MemoryTools::Copy(Sk, 0, Rho, 0, DILITHIUM_SEED_SIZE);
+	soff = DILITHIUM_SEED_SIZE;
+	MemoryTools::Copy(Sk, soff, Key, 0, DILITHIUM_SEED_SIZE);
+	soff += DILITHIUM_SEED_SIZE;
+	MemoryTools::Copy(Sk, soff, Tr, 0, DILITHIUM_CRH_SIZE);
+	soff += DILITHIUM_CRH_SIZE;
 
 	for (i = 0; i < S1.size(); ++i)
 	{
-		PolyEtaUnpack(S1[i], Sk, soff + (i * PolTAPacked), Eta);
+		PolyEtaUnpack(S1[i], Sk, soff + (i * PolyEtaPacked), Eta);
 	}
 
-	soff += S1.size() * PolTAPacked;
+	soff += S1.size() * PolyEtaPacked;
 
 	for (i = 0; i < S2.size(); ++i)
 	{
-		PolyEtaUnpack(S2[i], Sk, soff + (i * PolTAPacked), Eta);
+		PolyEtaUnpack(S2[i], Sk, soff + (i * PolyEtaPacked), Eta);
 	}
 
-	soff += S2.size() * PolTAPacked;
+	soff += S2.size() * PolyEtaPacked;
 
 	for (i = 0; i < T0.size(); ++i)
 	{
-		PolyT0Unpack(T0[i], Sk, soff + (i * PolT0Packed));
+		PolyT0Unpack(T0[i], Sk, soff + (i * PolyT0Packed));
 	}
 }
 
-void DLTMPolyMath::PackSig(std::vector<byte> &Sig, const std::vector<std::array<uint, 256>> &Z, const std::vector<std::array<uint, 256>> &H, const std::array<uint, 256> &C, uint Omega, uint PolZPacked)
+void DLTMPolyMath::PackSig(std::vector<uint8_t> &Signature, const std::vector<uint8_t> &C, const std::vector<std::array<int32_t, 256>> &Z, 
+	const std::vector<std::array<int32_t, 256>> &H, uint32_t K, uint32_t Omega, uint32_t PolyzPacked, uint32_t Gamma1)
 {
-	size_t i;
-	size_t j;
-	size_t k;
-	size_t soff;
-	ulong mask;
-	ulong signs;
+    size_t i;
+    size_t j;
+    size_t k;
+	size_t pos;
 
-	for (i = 0; i < Z.size(); ++i)
-	{
-		PolyZPack(Sig, (i * PolZPacked), Z[i]);
-	}
+    for (i = 0; i < DILITHIUM_SEED_SIZE; ++i)
+    {
+        Signature[i] = C[i];
+    }
+	
+    pos = DILITHIUM_SEED_SIZE;
 
-	soff = Z.size() * PolZPacked;
+    for (i = 0; i < Z.size(); ++i)
+    {
+        PolyZPack(Signature, pos + (i * PolyzPacked), Z[i], Gamma1);
+    }
 
-	// encode h 
-	k = 0;
+    pos += Z.size() * PolyzPacked;
 
-	for (i = 0; i < H.size(); ++i)
-	{
-		for (j = 0; j < DILITHIUM_N; ++j)
-		{
-			if (H[i][j] != 0)
-			{
-				Sig[soff + k] = static_cast<byte>(j);
-				++k;
-			}
-		}
+    // encode h
 
-		Sig[soff + Omega + i] = static_cast<byte>(k);
-	}
+    k = 0;
+	MemoryTools::Clear(Signature, pos, Omega + K);
 
-	while (k < Omega)
-	{
-		Sig[soff + k] = 0;
-		++k;
-	}
-
-	soff += Omega + H.size();
-
-	// encode c 
-	signs = 0;
-	mask = 1;
-
-	for (i = 0; i < DILITHIUM_N / 8; ++i)
-	{
-		Sig[soff + i] = 0;
-
-		for (j = 0; j < 8; ++j)
-		{
-			if (C[(8 * i) + j] != 0)
-			{
-				Sig[soff + i] |= (1U << j);
-
-				if (C[(8 * i) + j] == (DILITHIUM_Q - 1))
+    for (i = 0; i < K; ++i)
+    {
+        for (j = 0; j < DILITHIUM_N; ++j)
+        {
+            if (H[i][j] != 0)
+            {
+				if (pos + k == 2420)
 				{
-					signs |= mask;
-				}
-
-				mask <<= 1;
-			}
-		}
-	}
-
-	soff += DILITHIUM_N / 8;
-
-	for (i = 0; i < 8; ++i)
-	{
-		Sig[soff + i] = signs >> (8 * i);
-	}
-}
-
-int32_t DLTMPolyMath::UnpackSig(std::vector<std::array<uint, 256>> &Z, std::vector<std::array<uint, 256>> &H, std::array<uint, 256> &C, const std::vector<byte> &Sig, uint Omega, uint PolZPacked)
-{
-	ulong signs;
-	size_t i;
-	size_t j;
-	size_t k;
-	size_t soff;
-	int32_t ret;
-
-	ret = 0;
-
-	for (i = 0; i < Z.size(); ++i)
-	{
-		PolyZUnpack(Z[i], Sig, (i * PolZPacked));
-	}
-
-	soff = Z.size() * PolZPacked;
-
-	// decode h 
-	k = 0;
-
-	for (i = 0; i < H.size(); ++i)
-	{
-		MemoryTools::Clear(H[i], 0, H[i].size() * sizeof(uint));
-
-		if (Sig[soff + Omega + i] < k || Sig[soff + Omega + i] > Omega)
-		{
-			ret = 1;
-		}
-
-		if (ret == 0)
-		{
-			for (j = k; j < Sig[soff + Omega + i]; ++j)
-			{
-				// coefficients are ordered for strong unforgeability 
-				if (j > k && Sig[soff + j] <= Sig[soff + j - 1])
-				{
-					ret = 1;
 					break;
 				}
+                Signature[pos + k] = (uint8_t)j;
+                ++k;
+            }
+        }
+		
+        Signature[pos + Omega + i] = (uint8_t)k;
+    }
+}
 
-				H[i][Sig[soff + j]] = 1;
-			}
-		}
+int32_t DLTMPolyMath::UnpackSig(std::vector<uint8_t> &C, std::vector<std::array<int32_t, 256>> &Z, std::vector<std::array<int32_t, 256>> &H, 
+	const std::vector<uint8_t> &Signature, uint32_t PolZPacked, uint32_t Gamma1, uint32_t Omega)
+{
+	size_t i;
+    size_t j;
+    size_t k;
+	size_t pos;
+    int32_t res;
 
-		if (ret != 0)
-		{
-			break;
-		}
+    res = 0;
 
-		k = Sig[soff + Omega + i];
-	}
+    MemoryTools::Copy(Signature, 0, C, 0, DILITHIUM_SEED_SIZE);
+    pos = DILITHIUM_SEED_SIZE;
 
-	if (ret == 0)
-	{
-		// extra indices are zero for strong unforgeability 
-		for (j = k; j < Omega; ++j)
-		{
-			if (Sig[soff + j])
-			{
-				ret = 1;
-				break;
-			}
-		}
+    for (i = 0; i < Z.size(); ++i)
+    {
+        PolyZUnpack(Z[i], Signature, pos + (i * PolZPacked), Gamma1);
+    }
 
-		if (ret == 0)
-		{
-			soff += Omega + H.size();
+    pos += Z.size() * PolZPacked;
 
-			// decode c 
-			MemoryTools::Clear(C, 0, C.size() * sizeof(uint));
+    // decode h
+    k = 0;
 
-			signs = 0;
+    for (i = 0; i < H.size(); ++i)
+    {
+        for (j = 0; j < DILITHIUM_N; ++j)
+        {
+            H[i][j] = 0;
+        }
 
-			for (i = 0; i < 8; ++i)
-			{
-				signs |= static_cast<ulong>(Sig[soff + (DILITHIUM_N / 8) + i]) << (8 * i);
-			}
+        if (Signature[pos + Omega + i] < k || Signature[pos + Omega + i] > Omega)
+        {
+            res = 1;
+            break;
+        }
 
-			// extra sign bits are zero for strong unforgeability 
-			if (signs >> 60)
-			{
-				ret = 1;
-			}
+        for (j = k; j < Signature[pos + Omega + i]; ++j)
+        {
+            // coefficients are ordered for strong unforgeability
+            if (j > k && Signature[pos + j] <= Signature[pos + j - 1])
+            {
+                res = 1;
+                break;
+            }
 
-			if (ret == 0)
-			{
-				for (i = 0; i < DILITHIUM_N / 8; ++i)
-				{
-					for (j = 0; j < 8; ++j)
-					{
-						if ((Sig[soff + i] >> j) & 0x01)
-						{
-							C[(8 * i) + j] = 1;
-							C[(8 * i) + j] ^= static_cast<uint>(~(signs & 1) + 1) & (1 ^ (DILITHIUM_Q - 1));
-							signs >>= 1;
-						}
-					}
-				}
-			}
-		}
-	}
+            H[i][Signature[pos + j]] = 1;
+        }
 
-	return ret;
+        if (res != 0)
+        {
+            break;
+        }
+
+        k = Signature[pos + Omega + i];
+    }
+
+    if (res == 0)
+    {
+        // extra indices are zero for strong unforgeability
+        for (j = k; j < Omega; ++j)
+        {
+            if (Signature[pos + j] != 0)
+            {
+                res = 1;
+                break;
+            }
+        }
+    }
+
+    return res;
 }
 
 // poly.c //
 
-void DLTMPolyMath::PolyAdd(std::array<uint, 256> &C, const std::array<uint, 256> &A, const std::array<uint, 256> &B)
+void DLTMPolyMath::PolyChallenge(std::array<int32_t, 256> &C, const std::vector<uint8_t> &Seed, uint32_t Tau)
 {
-	size_t i;
+    std::vector<uint8_t> buf(Keccak::KECCAK256_RATE_SIZE);
+	std::array<uint64_t, 25> kctx = { 0 };
+    uint64_t signs;
+    size_t i;
+    size_t b;
+    size_t pos;
 
-	for (i = 0; i < C.size(); ++i)
-	{
-		C[i] = A[i] + B[i];
-	}
+	Keccak::Incremental(Seed, 0, DILITHIUM_SEED_SIZE, 0, Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, kctx, true);
+	Keccak::SqueezePartial(kctx, buf, 0, buf.size(), Keccak::KECCAK256_RATE_SIZE);
+
+    signs = 0;
+    pos = 8;
+
+    for (i = 0; i < 8; ++i)
+    {
+        signs |= (uint64_t)buf[i] << (8 * i);
+    }
+
+    for (i = 0; i < DILITHIUM_N; ++i)
+    {
+        C[i] = 0;
+    }
+
+    for (i = DILITHIUM_N - Tau; i < DILITHIUM_N; ++i)
+    {
+        do
+        {
+            if (pos >= Keccak::KECCAK256_RATE_SIZE)
+            {
+                Keccak::Squeeze(kctx, buf, 0, 1, Keccak::KECCAK256_RATE_SIZE);
+                pos = 0;
+            }
+
+            b = buf[pos];
+            ++pos;
+        } 
+		while (b > i);
+
+        C[i] = C[b];
+        C[b] = 1 - (2 * (signs & 1));
+        signs >>= 1;
+    }
 }
 
-int32_t DLTMPolyMath::PolyChkNorm(const std::array<uint, 256> &A, uint B)
+void DLTMPolyMath::PolyEtaPack(std::vector<uint8_t> &R, size_t ROffset, const std::array<int32_t, 256> &A, uint32_t Eta)
 {
-	size_t i;
-	int32_t s;
-	int32_t t;
+	std::array<uint8_t, 8> t;
 
-	// it is ok to leak which coefficient violates the bound since
-	// the probability for each coefficient is independent of secret
-	// data but we must not leak the sign of the centralized representative. 
-
-	s = 0;
-
-	for (i = 0; i < A.size(); ++i)
+	if (Eta == 2)
 	{
-		// absolute value of centralized representative 
-		t = ((DILITHIUM_Q - 1) / 2) - A[i];
-		t ^= (t >> 31);
-		t = ((DILITHIUM_Q - 1) / 2) - t;
-
-		if (static_cast<uint>(t) >= B)
+		for (size_t i = 0; i < A.size() / 8; ++i)
 		{
-			s = 1;
-			break;
+			t[0] = (uint8_t)(Eta - A[8 * i]);
+			t[1] = (uint8_t)(Eta - A[(8 * i) + 1]);
+			t[2] = (uint8_t)(Eta - A[(8 * i) + 2]);
+			t[3] = (uint8_t)(Eta - A[(8 * i) + 3]);
+			t[4] = (uint8_t)(Eta - A[(8 * i) + 4]);
+			t[5] = (uint8_t)(Eta - A[(8 * i) + 5]);
+			t[6] = (uint8_t)(Eta - A[(8 * i) + 6]);
+			t[7] = (uint8_t)(Eta - A[(8 * i) + 7]);
+
+			R[ROffset + (3 * i)] = (uint8_t)((t[0] >> 0) | (t[1] << 3) | (t[2] << 6));
+			R[ROffset + (3 * i) + 1] = (uint8_t)((t[2] >> 2) | (t[3] << 1) | (t[4] << 4) | (t[5] << 7));
+			R[ROffset + (3 * i) + 2] = (uint8_t)((t[5] >> 1) | (t[6] << 2) | (t[7] << 5));
 		}
 	}
-
-	return s;
-}
-
-void DLTMPolyMath::PolyCSubQ(std::array<uint, 256> &A)
-{
-	size_t i;
-
-	for (i = 0; i < A.size(); ++i)
+	else if (Eta == 4)
 	{
-		A[i] = CSubQ(A[i]);
-	}
-}
-
-void DLTMPolyMath::PolyDecompose(std::array<uint, 256> &A1, std::array<uint, 256> &A0, const std::array<uint, 256> &A)
-{
-	size_t i;
-
-	for (i = 0; i < A1.size(); ++i)
-	{
-		A1[i] = Decompose(A[i], A0[i]);
-	}
-}
-
-void DLTMPolyMath::PolyEtaPack(std::vector<byte> &R, size_t ROffset, const std::array<uint, 256> &A, uint Eta)
-{
-	size_t i;
-	std::array<byte, 8> t;
-
-	if ((2 * Eta) <= 7)
-	{
-		for (i = 0; i < A.size() / 8; ++i)
+		for (size_t i = 0; i < A.size() / 2; ++i)
 		{
-			t[0] = DILITHIUM_Q + Eta - A[(8 * i)];
-			t[1] = DILITHIUM_Q + Eta - A[(8 * i) + 1];
-			t[2] = DILITHIUM_Q + Eta - A[(8 * i) + 2];
-			t[3] = DILITHIUM_Q + Eta - A[(8 * i) + 3];
-			t[4] = DILITHIUM_Q + Eta - A[(8 * i) + 4];
-			t[5] = DILITHIUM_Q + Eta - A[(8 * i) + 5];
-			t[6] = DILITHIUM_Q + Eta - A[(8 * i) + 6];
-			t[7] = DILITHIUM_Q + Eta - A[(8 * i) + 7];
-
-			R[ROffset + (3 * i)] = (t[0] >> 0) | (t[1] << 3) | (t[2] << 6);
-			R[ROffset + (3 * i) + 1] = (t[2] >> 2) | (t[3] << 1) | (t[4] << 4) | (t[5] << 7);
-			R[ROffset + (3 * i) + 2] = (t[5] >> 1) | (t[6] << 2) | (t[7] << 5);
-		}
-	}
-	else
-	{
-		for (i = 0; i < A.size() / 2; ++i)
-		{
-			t[0] = DILITHIUM_Q + Eta - A[(2 * i)];
-			t[1] = DILITHIUM_Q + Eta - A[(2 * i) + 1];
-			R[ROffset + i] = t[0] | (t[1] << 4);
+			t[0] = (uint8_t)(Eta - A[2 * i]);
+			t[1] = (uint8_t)(Eta - A[(2 * i) + 1]);
+			R[ROffset + i] = (uint8_t)(t[0] | (t[1] << 4));
 		}
 	}
 }
 
-void DLTMPolyMath::PolyEtaUnpack(std::array<uint, 256> &R, const std::vector<byte> &A, size_t AOffset, uint Eta)
+void DLTMPolyMath::PolyEtaUnpack(std::array<int32_t, 256> &R, const std::vector<uint8_t> &A, size_t AOffset, uint32_t Eta)
 {
-	size_t i;
-
-	if ((2 * Eta) <= 7)
+	if (Eta == 2)
 	{
-		for (i = 0; i < R.size() / 8; ++i)
+		for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
 		{
-			R[(8 * i)] = A[AOffset + (3 * i)] & 0x07;
-			R[(8 * i) + 1] = (A[AOffset + (3 * i)] >> 3) & 0x07;
-			R[(8 * i) + 2] = ((A[AOffset + (3 * i)] >> 6) | (A[AOffset + (3 * i) + 1] << 2)) & 0x07;
-			R[(8 * i) + 3] = (A[AOffset + (3 * i) + 1] >> 1) & 0x07;
-			R[(8 * i) + 4] = (A[AOffset + (3 * i) + 1] >> 4) & 0x07;
-			R[(8 * i) + 5] = ((A[AOffset + (3 * i) + 1] >> 7) | (A[AOffset + (3 * i) + 2] << 1)) & 0x07;
-			R[(8 * i) + 6] = (A[AOffset + (3 * i) + 2] >> 2) & 0x07;
-			R[(8 * i) + 7] = (A[AOffset + (3 * i) + 2] >> 5) & 0x07;
+			R[8 * i] = (A[AOffset + (3 * i)] >> 0) & 7;
+			R[(8 * i) + 1] = (A[AOffset + (3 * i)] >> 3) & 7;
+			R[(8 * i) + 2] = ((A[AOffset + 3 * i] >> 6) | (A[AOffset + (3 * i) + 1] << 2)) & 7;
+			R[(8 * i) + 3] = (A[AOffset + (3 * i) + 1] >> 1) & 7;
+			R[(8 * i) + 4] = (A[AOffset + (3 * i) + 1] >> 4) & 7;
+			R[(8 * i) + 5] = ((A[AOffset + (3 * i) + 1] >> 7) | (A[AOffset + (3 * i) + 2] << 1)) & 7;
+			R[(8 * i) + 6] = (A[AOffset + (3 * i) + 2] >> 2) & 7;
+			R[(8 * i) + 7] = (A[AOffset + (3 * i) + 2] >> 5) & 7;
 
-			R[(8 * i)] = DILITHIUM_Q + Eta - R[(8 * i)];
-			R[(8 * i) + 1] = DILITHIUM_Q + Eta - R[(8 * i) + 1];
-			R[(8 * i) + 2] = DILITHIUM_Q + Eta - R[(8 * i) + 2];
-			R[(8 * i) + 3] = DILITHIUM_Q + Eta - R[(8 * i) + 3];
-			R[(8 * i) + 4] = DILITHIUM_Q + Eta - R[(8 * i) + 4];
-			R[(8 * i) + 5] = DILITHIUM_Q + Eta - R[(8 * i) + 5];
-			R[(8 * i) + 6] = DILITHIUM_Q + Eta - R[(8 * i) + 6];
-			R[(8 * i) + 7] = DILITHIUM_Q + Eta - R[(8 * i) + 7];
+			R[8 * i] = Eta - R[8 * i];
+			R[(8 * i) + 1] = Eta - R[(8 * i) + 1];
+			R[(8 * i) + 2] = Eta - R[(8 * i) + 2];
+			R[(8 * i) + 3] = Eta - R[(8 * i) + 3];
+			R[(8 * i) + 4] = Eta - R[(8 * i) + 4];
+			R[(8 * i) + 5] = Eta - R[(8 * i) + 5];
+			R[(8 * i) + 6] = Eta - R[(8 * i) + 6];
+			R[(8 * i) + 7] = Eta - R[(8 * i) + 7];
 		}
 	}
-	else
+	else if (Eta == 4)
 	{
-		for (i = 0; i < R.size() / 2; ++i)
+		for (size_t i = 0; i < DILITHIUM_N / 2; ++i)
 		{
-			R[(2 * i)] = A[AOffset + i] & 0x0F;
+			R[2 * i] = A[AOffset + i] & 0x0F;
 			R[(2 * i) + 1] = A[AOffset + i] >> 4;
-			R[(2 * i)] = DILITHIUM_Q + Eta - R[2 * i];
-			R[(2 * i) + 1] = DILITHIUM_Q + Eta - R[(2 * i) + 1];
+			R[2 * i] = Eta - R[2 * i];
+			R[(2 * i) + 1] = Eta - R[(2 * i) + 1];
 		}
 	}
 }
 
-void DLTMPolyMath::PolyFreeze(std::array<uint, 256> &A)
+void DLTMPolyMath::PolyInvNttMont(std::array<int32_t, 256> &A)
 {
-	size_t i;
-
-	for (i = 0; i < A.size(); ++i)
-	{
-		A[i] = Freeze(A[i]);
-	}
+	InvNttToMont(A);
 }
 
-void DLTMPolyMath::PolyInvNttMontgomery(std::array<uint, 256> &A)
-{
-	InvNttFromInvMont(A);
-}
-
-uint DLTMPolyMath::PolyMakeHint(std::array<uint, 256> &H, const std::array<uint, 256> &A0, const std::array<uint, 256> &A1)
-{
-	size_t i;
-	uint s;
-
-	s = 0;
-
-	for (i = 0; i < H.size(); ++i)
-	{
-		H[i] = MakeHint(A0[i], A1[i]);
-		s += H[i];
-	}
-
-	return s;
-}
-
-void DLTMPolyMath::PolyNtt(std::array<uint, 256> &A)
+void DLTMPolyMath::PolyNtt(std::array<int32_t, 256> &A)
 {
 	Ntt(A);
 }
 
-void DLTMPolyMath::PolyPointwiseInvMontgomery(std::array<uint, 256> &C, const std::array<uint, 256> &A, const std::array<uint, 256> &B)
+void DLTMPolyMath::PolyPointwiseInvMont(std::array<int32_t, 256> &C, const std::array<int32_t, 256> &A, const std::array<int32_t, 256> &B)
 {
 	size_t i;
 
 	for (i = 0; i < C.size(); ++i)
 	{
-		C[i] = MontgomeryReduce(static_cast<ulong>(A[i]) * B[i]);
+		C[i] = MontReduce(static_cast<uint64_t>(A[i]) * B[i]);
 	}
 }
 
-void DLTMPolyMath::PolyPower2Round(std::array<uint, 256> &A1, std::array<uint, 256> &A0, const std::array<uint, 256> &A)
+void DLTMPolyMath::PolyPointwiseMont(std::array<int32_t, 256> &C, const std::array<int32_t, 256> &A, const std::array<int32_t, 256> &B)
 {
-	size_t i;
-
-	for (i = 0; i < A1.size(); ++i)
-	{
-		A1[i] = Power2Round(A[i], A0[i]);
-	}
+    for (size_t i = 0; i < C.size(); ++i)
+    {
+        C[i] = MontReduce(static_cast<int64_t>(A[i]) * B[i]);
+    }
 }
 
-void DLTMPolyMath::PolyReduce(std::array<uint, 256> &A)
+void DLTMPolyMath::PolyT0Pack(std::vector<uint8_t> &R, size_t ROffset, const std::array<int32_t, 256> &A)
 {
-	size_t i;
+	std::array<int32_t, 8> t;
 
-	for (i = 0; i < A.size(); ++i)
-	{
-		A[i] = Reduce32(A[i]);
-	}
+    for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
+    {
+        t[0] = (1 << (DILITHIUM_D - 1)) - A[8 * i];
+        t[1] = (1 << (DILITHIUM_D - 1)) - A[(8 * i) + 1];
+        t[2] = (1 << (DILITHIUM_D - 1)) - A[(8 * i) + 2];
+        t[3] = (1 << (DILITHIUM_D - 1)) - A[(8 * i) + 3];
+        t[4] = (1 << (DILITHIUM_D - 1)) - A[(8 * i) + 4];
+        t[5] = (1 << (DILITHIUM_D - 1)) - A[(8 * i) + 5];
+        t[6] = (1 << (DILITHIUM_D - 1)) - A[(8 * i) + 6];
+        t[7] = (1 << (DILITHIUM_D - 1)) - A[(8 * i) + 7];
+
+        R[ROffset + (13 * i)] = (uint8_t)t[0];
+        R[ROffset + (13 * i) + 1] = (uint8_t)(t[0] >> 8);
+        R[ROffset + (13 * i) + 1] |= (uint8_t)(t[1] << 5);
+        R[ROffset + (13 * i) + 2] = (uint8_t)(t[1] >> 3);
+        R[ROffset + (13 * i) + 3] = (uint8_t)(t[1] >> 11);
+        R[ROffset + (13 * i) + 3] |= (uint8_t)(t[2] << 2);
+        R[ROffset + (13 * i) + 4] = (uint8_t)(t[2] >> 6);
+        R[ROffset + (13 * i) + 4] |= (uint8_t)(t[3] << 7);
+        R[ROffset + (13 * i) + 5] = (uint8_t)(t[3] >> 1);
+        R[ROffset + (13 * i) + 6] = (uint8_t)(t[3] >> 9);
+        R[ROffset + (13 * i) + 6] |= (uint8_t)(t[4] << 4);
+        R[ROffset + (13 * i) + 7] = (uint8_t)(t[4] >> 4);
+        R[ROffset + (13 * i) + 8] = (uint8_t)(t[4] >> 12);
+        R[ROffset + (13 * i) + 8] |= (uint8_t)(t[5] << 1);
+        R[ROffset + (13 * i) + 9] = (uint8_t)(t[5] >> 7);
+        R[ROffset + (13 * i) + 9] |= (uint8_t)(t[6] << 6);
+        R[ROffset + (13 * i) + 10] = (uint8_t)(t[6] >> 2);
+        R[ROffset + (13 * i) + 11] = (uint8_t)(t[6] >> 10);
+        R[ROffset + (13 * i) + 11] |= (uint8_t)(t[7] << 3);
+        R[ROffset + (13 * i) + 12] = (uint8_t)(t[7] >> 5);
+    }
 }
 
-void DLTMPolyMath::PolyShiftL(std::array<uint, 256> &A)
+void DLTMPolyMath::PolyT0Unpack(std::array<int32_t, 256> &R, const std::vector<uint8_t> &A, size_t AOffset)
 {
-	size_t i;
+	for (size_t i = 0; i < DILITHIUM_N / 8; ++i)
+    {
+        R[8 * i] = A[AOffset + (13 * i)];
+        R[8 * i] |= (uint32_t)A[AOffset + (13 * i) + 1] << 8;
+        R[8 * i] &= 0x00001FFFL;
 
-	for (i = 0; i < A.size(); ++i)
-	{
-		A[i] <<= DILITHIUM_D;
-	}
+        R[(8 * i) + 1] = A[AOffset + (13 * i) + 1] >> 5;
+        R[(8 * i) + 1] |= (uint32_t)A[AOffset + (13 * i) + 2] << 3;
+        R[(8 * i) + 1] |= (uint32_t)A[AOffset + (13 * i) + 3] << 11;
+        R[(8 * i) + 1] &= 0x00001FFFL;
+
+        R[(8 * i) + 2] = A[AOffset + (13 * i) + 3] >> 2;
+        R[(8 * i) + 2] |= (uint32_t)A[AOffset + (13 * i) + 4] << 6;
+        R[(8 * i) + 2] &= 0x00001FFFL;
+
+        R[(8 * i) + 3] = A[AOffset + (13 * i) + 4] >> 7;
+        R[(8 * i) + 3] |= (uint32_t)A[AOffset + (13 * i) + 5] << 1;
+        R[(8 * i) + 3] |= (uint32_t)A[AOffset + (13 * i) + 6] << 9;
+        R[(8 * i) + 3] &= 0x00001FFFL;
+
+        R[(8 * i) + 4] = A[AOffset + (13 * i) + 6] >> 4;
+        R[(8 * i) + 4] |= (uint32_t)A[AOffset + (13 * i) + 7] << 4;
+        R[(8 * i) + 4] |= (uint32_t)A[AOffset + (13 * i) + 8] << 12;
+        R[(8 * i) + 4] &= 0x00001FFFL;
+
+        R[(8 * i) + 5] = A[AOffset + (13 * i) + 8] >> 1;
+        R[(8 * i) + 5] |= (uint32_t)A[AOffset + (13 * i) + 9] << 7;
+        R[(8 * i) + 5] &= 0x00001FFFL;
+
+        R[(8 * i) + 6] = A[AOffset + (13 * i) + 9] >> 6;
+        R[(8 * i) + 6] |= (uint32_t)A[AOffset + (13 * i) + 10] << 2;
+        R[(8 * i) + 6] |= (uint32_t)A[AOffset + (13 * i) + 11] << 10;
+        R[(8 * i) + 6] &= 0x00001FFFL;
+
+        R[(8 * i) + 7] = A[AOffset + (13 * i) + 11] >> 3;
+        R[(8 * i) + 7] |= (uint32_t)A[AOffset + (13 * i) + 12] << 5;
+        R[(8 * i) + 7] &= 0x00001FFFL;
+
+        R[8 * i] = (1 << (DILITHIUM_D - 1)) - R[8 * i];
+        R[(8 * i) + 1] = (1 << (DILITHIUM_D - 1)) - R[(8 * i) + 1];
+        R[(8 * i) + 2] = (1 << (DILITHIUM_D - 1)) - R[(8 * i) + 2];
+        R[(8 * i) + 3] = (1 << (DILITHIUM_D - 1)) - R[(8 * i) + 3];
+        R[(8 * i) + 4] = (1 << (DILITHIUM_D - 1)) - R[(8 * i) + 4];
+        R[(8 * i) + 5] = (1 << (DILITHIUM_D - 1)) - R[(8 * i) + 5];
+        R[(8 * i) + 6] = (1 << (DILITHIUM_D - 1)) - R[(8 * i) + 6];
+        R[(8 * i) + 7] = (1 << (DILITHIUM_D - 1)) - R[(8 * i) + 7];
+    }
 }
 
-void DLTMPolyMath::PolySub(std::array<uint, 256> &C, const std::array<uint, 256> &A, const std::array<uint, 256> &B)
+void DLTMPolyMath::PolyT1Pack(std::vector<uint8_t> &R, size_t ROffset, const std::array<int32_t, 256> &A)
 {
-	size_t i;
-
-	for (i = 0; i < C.size(); ++i)
-	{
-		C[i] = A[i] + (2 * DILITHIUM_Q) - B[i];
-	}
+	for (size_t i = 0; i < A.size() / 4; ++i)
+    {
+        R[ROffset + (5 * i)] = (uint8_t)(A[4 * i] >> 0);
+        R[ROffset + (5 * i) + 1] = (uint8_t)((A[4 * i] >> 8) | (A[(4 * i) + 1] << 2));
+        R[ROffset + (5 * i) + 2] = (uint8_t)((A[(4 * i) + 1] >> 6) | (A[(4 * i) + 2] << 4));
+        R[ROffset + (5 * i) + 3] = (uint8_t)((A[(4 * i) + 2] >> 4) | (A[(4 * i) + 3] << 6));
+        R[ROffset + (5 * i) + 4] = (uint8_t)(A[(4 * i) + 3] >> 2);
+    }
 }
 
-void DLTMPolyMath::PolyT0Pack(std::vector<byte> &R, size_t ROffset, const std::array<uint, 256> &A)
+void DLTMPolyMath::PolyT1Unpack(std::array<int32_t, 256> &R, const std::vector<uint8_t> &A, size_t AOffset)
 {
-	size_t i;
-	std::array<uint, 4> t;
-
-	for (i = 0; i < A.size() / 4; ++i)
-	{
-		t[0] = DILITHIUM_Q + (1U << (DILITHIUM_D - 1)) - A[(4 * i)];
-		t[1] = DILITHIUM_Q + (1U << (DILITHIUM_D - 1)) - A[(4 * i) + 1];
-		t[2] = DILITHIUM_Q + (1U << (DILITHIUM_D - 1)) - A[(4 * i) + 2];
-		t[3] = DILITHIUM_Q + (1U << (DILITHIUM_D - 1)) - A[(4 * i) + 3];
-
-		R[ROffset + (7 * i)] = t[0];
-		R[ROffset + (7 * i) + 1] = t[0] >> 8;
-		R[ROffset + (7 * i) + 1] |= t[1] << 6;
-		R[ROffset + (7 * i) + 2] = t[1] >> 2;
-		R[ROffset + (7 * i) + 3] = t[1] >> 10;
-		R[ROffset + (7 * i) + 3] |= t[2] << 4;
-		R[ROffset + (7 * i) + 4] = t[2] >> 4;
-		R[ROffset + (7 * i) + 5] = t[2] >> 12;
-		R[ROffset + (7 * i) + 5] |= t[3] << 2;
-		R[ROffset + (7 * i) + 6] = t[3] >> 6;
-	}
+	for (size_t i = 0; i < DILITHIUM_N / 4; ++i)
+    {
+        R[4 * i] = ((A[AOffset + (5 * i)] >> 0) | ((uint32_t)A[AOffset + (5 * i) + 1] << 8)) & 0x000003FF;
+        R[(4 * i) + 1] = ((A[AOffset + (5 * i) + 1] >> 2) | ((uint32_t)A[AOffset + (5 * i) + 2] << 6)) & 0x000003FF;
+        R[(4 * i) + 2] = ((A[AOffset + (5 * i) + 2] >> 4) | ((uint32_t)A[AOffset + (5 * i) + 3] << 4)) & 0x000003FF;
+        R[(4 * i) + 3] = ((A[AOffset + (5 * i) + 3] >> 6) | ((uint32_t)A[AOffset + (5 * i) + 4] << 2)) & 0x000003FF;
+    }
 }
 
-void DLTMPolyMath::PolyT0Unpack(std::array<uint, 256> &R, const std::vector<byte> &A, size_t AOffset)
-{
-	size_t i;
-
-	for (i = 0; i < R.size() / 4; ++i)
-	{
-		R[(4 * i)] = A[AOffset + (7 * i)];
-		R[(4 * i)] |= static_cast<uint>(A[AOffset + (7 * i) + 1] & 0x3F) << 8;
-
-		R[(4 * i) + 1] = A[AOffset + (7 * i) + 1] >> 6;
-		R[(4 * i) + 1] |= static_cast<uint>(A[AOffset + (7 * i) + 2]) << 2;
-		R[(4 * i) + 1] |= static_cast<uint>(A[AOffset + (7 * i) + 3] & 0x0F) << 10;
-
-		R[(4 * i) + 2] = A[AOffset + (7 * i) + 3] >> 4;
-		R[(4 * i) + 2] |= static_cast<uint>(A[AOffset + (7 * i) + 4]) << 4;
-		R[(4 * i) + 2] |= static_cast<uint>(A[AOffset + (7 * i) + 5] & 0x03) << 12;
-
-		R[(4 * i) + 3] = A[AOffset + (7 * i) + 5] >> 2;
-		R[(4 * i) + 3] |= static_cast<uint>(A[AOffset + (7 * i) + 6]) << 6;
-
-		R[(4 * i)] = DILITHIUM_Q + (1U << (DILITHIUM_D - 1)) - R[(4 * i)];
-		R[(4 * i) + 1] = DILITHIUM_Q + (1U << (DILITHIUM_D - 1)) - R[(4 * i) + 1];
-		R[(4 * i) + 2] = DILITHIUM_Q + (1U << (DILITHIUM_D - 1)) - R[(4 * i) + 2];
-		R[(4 * i) + 3] = DILITHIUM_Q + (1U << (DILITHIUM_D - 1)) - R[(4 * i) + 3];
-	}
-}
-
-void DLTMPolyMath::PolyT1Pack(std::vector<byte> &R, size_t ROffset, const std::array<uint, 256> &A)
-{
-	size_t i;
-
-	for (i = 0; i < A.size() / 8; ++i)
-	{
-		R[ROffset + (9 * i)] = (A[(8 * i)] >> 0);
-		R[ROffset + (9 * i) + 1] = (A[(8 * i)] >> 8) | (A[(8 * i) + 1] << 1);
-		R[ROffset + (9 * i) + 2] = (A[(8 * i) + 1] >> 7) | (A[(8 * i) + 2] << 2);
-		R[ROffset + (9 * i) + 3] = (A[(8 * i) + 2] >> 6) | (A[(8 * i) + 3] << 3);
-		R[ROffset + (9 * i) + 4] = (A[(8 * i) + 3] >> 5) | (A[(8 * i) + 4] << 4);
-		R[ROffset + (9 * i) + 5] = (A[(8 * i) + 4] >> 4) | (A[(8 * i) + 5] << 5);
-		R[ROffset + (9 * i) + 6] = (A[(8 * i) + 5] >> 3) | (A[(8 * i) + 6] << 6);
-		R[ROffset + (9 * i) + 7] = (A[(8 * i) + 6] >> 2) | (A[(8 * i) + 7] << 7);
-		R[ROffset + (9 * i) + 8] = (A[(8 * i) + 7] >> 1);
-	}
-}
-
-void DLTMPolyMath::PolyT1Unpack(std::array<uint, 256> &R, const std::vector<byte> &A, size_t AOffset)
-{
-	size_t i;
-
-	for (i = 0; i < R.size() / 8; ++i)
-	{
-		R[(8 * i)] = ((A[AOffset + (9 * i)] >> 0) | (static_cast<uint>(A[AOffset + (9 * i) + 1]) << 8)) & 0x000001FFUL;
-		R[(8 * i) + 1] = ((A[AOffset + (9 * i) + 1] >> 1) | (static_cast<uint>(A[AOffset + (9 * i) + 2]) << 7)) & 0x000001FFUL;
-		R[(8 * i) + 2] = ((A[AOffset + (9 * i) + 2] >> 2) | (static_cast<uint>(A[AOffset + (9 * i) + 3]) << 6)) & 0x000001FFUL;
-		R[(8 * i) + 3] = ((A[AOffset + (9 * i) + 3] >> 3) | (static_cast<uint>(A[AOffset + (9 * i) + 4]) << 5)) & 0x000001FFUL;
-		R[(8 * i) + 4] = ((A[AOffset + (9 * i) + 4] >> 4) | (static_cast<uint>(A[AOffset + (9 * i) + 5]) << 4)) & 0x000001FFUL;
-		R[(8 * i) + 5] = ((A[AOffset + (9 * i) + 5] >> 5) | (static_cast<uint>(A[AOffset + (9 * i) + 6]) << 3)) & 0x000001FFUL;
-		R[(8 * i) + 6] = ((A[AOffset + (9 * i) + 6] >> 6) | (static_cast<uint>(A[AOffset + (9 * i) + 7]) << 2)) & 0x000001FFUL;
-		R[(8 * i) + 7] = ((A[AOffset + (9 * i) + 7] >> 7) | (static_cast<uint>(A[AOffset + (9 * i) + 8]) << 1)) & 0x000001FFUL;
-	}
-}
-
-void DLTMPolyMath::PolyUniform(std::array<uint, 256> &A, const std::vector<byte> &Seed, ushort Nonce)
+void DLTMPolyMath::PolyUniform(std::array<int32_t, 256> &A, const std::vector<uint8_t> &Seed, uint16_t Nonce)
 {
 	const size_t NBLKS = (769 + Keccak::KECCAK128_RATE_SIZE) / Keccak::KECCAK128_RATE_SIZE;
-	std::vector<byte> buf((NBLKS * Keccak::KECCAK128_RATE_SIZE) + 2);
-	std::array<ulong, Keccak::KECCAK_STATE_SIZE> state = { 0 };
-	std::vector<byte> tmps(Seed.size() + 2);
+	std::vector<uint8_t> buf((NBLKS * Keccak::KECCAK128_RATE_SIZE) + 2);
+	std::array<uint64_t, Keccak::KECCAK_STATE_SIZE> state = { 0 };
+	std::vector<uint8_t> tmps(Seed.size() + 2);
 	size_t buflen;
 	size_t ctr;
 	size_t i;
@@ -739,11 +1534,11 @@ void DLTMPolyMath::PolyUniform(std::array<uint, 256> &A, const std::vector<byte>
 	buflen = NBLKS * Keccak::KECCAK128_RATE_SIZE;
 
 	MemoryTools::Copy(Seed, 0, tmps, 0, Seed.size());
-	tmps[Seed.size()] = static_cast<byte>(Nonce);
+	tmps[Seed.size()] = static_cast<uint8_t>(Nonce);
 	tmps[Seed.size() + 1] = Nonce >> 8;
 
-	Keccak::AbsorbR24(tmps, 0, tmps.size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-	Keccak::SqueezeR24(state, buf, 0, NBLKS, Keccak::KECCAK128_RATE_SIZE);
+	Keccak::Absorb(tmps, 0, tmps.size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
+	Keccak::Squeeze(state, buf, 0, NBLKS, Keccak::KECCAK128_RATE_SIZE);
 
 	ctr = RejUniform(A, 0, A.size(), buf, buflen);
 
@@ -757,221 +1552,203 @@ void DLTMPolyMath::PolyUniform(std::array<uint, 256> &A, const std::vector<byte>
 		}
 
 		buflen = Keccak::KECCAK128_RATE_SIZE + off;
-		Keccak::SqueezeR24(state, buf, off, 1, Keccak::KECCAK128_RATE_SIZE);
+		Keccak::Squeeze(state, buf, off, 1, Keccak::KECCAK128_RATE_SIZE);
 		ctr += RejUniform(A, ctr, A.size() - ctr, buf, buflen);
 	}
 }
 
-void DLTMPolyMath::PolyUniformEta(std::array<uint, 256> &A, const std::vector<byte> &Seed, ushort nonce, uint Eta, uint Seta)
+void DLTMPolyMath::PolyUniformEta(std::array<int32_t, 256> &A, const std::vector<uint8_t> &Seed, uint16_t Nonce, uint32_t Eta, uint32_t Blocks)
 {
-	const size_t NBLKS = ((DILITHIUM_N / 2 * (1U << Seta)) / (2 * Eta + 1) + Keccak::KECCAK128_RATE_SIZE) / Keccak::KECCAK128_RATE_SIZE;
-	std::vector<byte> buf(NBLKS * Keccak::KECCAK128_RATE_SIZE);
-	std::array<ulong, Keccak::KECCAK_STATE_SIZE> state = { 0 };
-	std::vector<byte> tmps(Seed.size() + 2);
-	size_t buflen;
+	std::vector<uint8_t> buf(Blocks * Keccak::KECCAK128_RATE_SIZE);
+	std::array<uint64_t, Keccak::KECCAK_STATE_SIZE> state = { 0 };
+	std::vector<uint8_t> tmps(Seed.size() + 2);
 	size_t ctr;
-
-	buflen = NBLKS * Keccak::KECCAK128_RATE_SIZE;
+	size_t buflen;
 
 	MemoryTools::Copy(Seed, 0, tmps, 0, Seed.size());
-	tmps[Seed.size()] = static_cast<byte>(nonce);
-	tmps[Seed.size() + 1] = nonce >> 8;
+	tmps[Seed.size()] = static_cast<uint8_t>(Nonce);
+	tmps[Seed.size() + 1] = Nonce >> 8;
 
-	Keccak::AbsorbR24(tmps, 0, tmps.size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-	Keccak::SqueezeR24(state, buf, 0, NBLKS, Keccak::KECCAK128_RATE_SIZE);
+	buflen = Blocks * Keccak::KECCAK128_RATE_SIZE;
+	Keccak::Absorb(tmps, 0, tmps.size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
+	Keccak::Squeeze(state, buf, 0, Blocks, Keccak::KECCAK128_RATE_SIZE);
 
 	ctr = RejEta(A, 0, A.size(), buf, buflen, Eta);
 
 	while (ctr < DILITHIUM_N)
 	{
-		Keccak::SqueezeR24(state, buf, 0, 1, Keccak::KECCAK128_RATE_SIZE);
+		Keccak::Squeeze(state, buf, 0, 1, Keccak::KECCAK128_RATE_SIZE);
 		ctr += RejEta(A, ctr, A.size() - ctr, buf, Keccak::KECCAK128_RATE_SIZE, Eta);
 	}
 }
 
-void DLTMPolyMath::PolyUniformGamma1M1(std::array<uint, 256> &A, const std::vector<byte> &Seed, ushort Nonce)
+void DLTMPolyMath::PolyZPack(std::vector<uint8_t> &R, size_t ROffset, const std::array<int32_t, 256> &A, uint32_t Gamma1)
+{
+	std::array<uint32_t, 4> t = { 0 };
+
+	if (Gamma1 == (1 << 17))
+	{
+		for (size_t i = 0; i < DILITHIUM_N / 4; ++i)
+		{
+			t[0] = Gamma1 - A[4 * i];
+			t[1] = Gamma1 - A[(4 * i) + 1];
+			t[2] = Gamma1 - A[(4 * i) + 2];
+			t[3] = Gamma1 - A[(4 * i) + 3];
+
+			R[ROffset + (9 * i)] = (uint8_t)t[0];
+			R[ROffset + (9 * i) + 1] = (uint8_t)(t[0] >> 8);
+			R[ROffset + (9 * i) + 2] = (uint8_t)(t[0] >> 16);
+			R[ROffset + (9 * i) + 2] |= (uint8_t)(t[1] << 2);
+			R[ROffset + (9 * i) + 3] = (uint8_t)(t[1] >> 6);
+			R[ROffset + (9 * i) + 4] = (uint8_t)(t[1] >> 14);
+			R[ROffset + (9 * i) + 4] |= (uint8_t)(t[2] << 4);
+			R[ROffset + (9 * i) + 5] = (uint8_t)(t[2] >> 4);
+			R[ROffset + (9 * i) + 6] = (uint8_t)(t[2] >> 12);
+			R[ROffset + (9 * i) + 6] |= (uint8_t)(t[3] << 6);
+			R[ROffset + (9 * i) + 7] = (uint8_t)(t[3] >> 2);
+			R[ROffset + (9 * i) + 8] = (uint8_t)(t[3] >> 10);
+		}
+	}
+	else if (Gamma1 == (1 << 19))
+	{
+		for (size_t i = 0; i < DILITHIUM_N / 2; ++i)
+		{
+			t[0] = Gamma1 - A[2 * i];
+			t[1] = Gamma1 - A[(2 * i) + 1];
+
+			R[ROffset + (5 * i)] = (uint8_t)t[0];
+			R[ROffset + (5 * i) + 1] = (uint8_t)(t[0] >> 8);
+			R[ROffset + (5 * i) + 2] = (uint8_t)(t[0] >> 16);
+			R[ROffset + (5 * i) + 2] |= (uint8_t)(t[1] << 4);
+			R[ROffset + (5 * i) + 3] = (uint8_t)(t[1] >> 4);
+			R[ROffset + (5 * i) + 4] = (uint8_t)(t[1] >> 12);
+		}
+	}
+}
+
+void DLTMPolyMath::PolyZUnpack(std::array<int32_t, 256> &R, const std::vector<uint8_t> &A, size_t AOffset, uint32_t Gamma1)
+{
+	if (Gamma1 == (1 << 17))
+	{
+		for (size_t i = 0; i < DILITHIUM_N / 4; ++i)
+		{
+			R[4 * i] = A[AOffset + 9 * i];
+			R[4 * i] |= (uint32_t)A[AOffset + (9 * i) + 1] << 8;
+			R[4 * i] |= (uint32_t)A[AOffset + (9 * i) + 2] << 16;
+			R[4 * i] &= 0x0003FFFF;
+
+			R[(4 * i) + 1] = A[AOffset + (9 * i) + 2] >> 2;
+			R[(4 * i) + 1] |= (uint32_t)A[AOffset + (9 * i) + 3] << 6;
+			R[(4 * i) + 1] |= (uint32_t)A[AOffset + (9 * i) + 4] << 14;
+			R[(4 * i) + 1] &= 0x0003FFFF;
+
+			R[(4 * i) + 2] = A[AOffset + (9 * i) + 4] >> 4;
+			R[(4 * i) + 2] |= (uint32_t)A[AOffset + (9 * i) + 5] << 4;
+			R[(4 * i) + 2] |= (uint32_t)A[AOffset + (9 * i) + 6] << 12;
+			R[(4 * i) + 2] &= 0x0003FFFF;
+
+			R[(4 * i) + 3] = A[AOffset + (9 * i) + 6] >> 6;
+			R[(4 * i) + 3] |= (uint32_t)A[AOffset + (9 * i) + 7] << 2;
+			R[(4 * i) + 3] |= (uint32_t)A[AOffset + (9 * i) + 8] << 10;
+			R[(4 * i) + 3] &= 0x0003FFFF;
+
+			R[4 * i] = Gamma1 - R[4 * i];
+			R[(4 * i) + 1] = Gamma1 - R[(4 * i) + 1];
+			R[(4 * i) + 2] = Gamma1 - R[(4 * i) + 2];
+			R[(4 * i) + 3] = Gamma1 - R[(4 * i) + 3];
+		}
+	}
+	else if (Gamma1 == (1 << 19))
+	{
+		for (size_t i = 0; i < DILITHIUM_N / 2; ++i)
+		{
+			R[2 * i] = A[AOffset + 5 * i];
+			R[2 * i] |= (uint32_t)A[AOffset + (5 * i) + 1] << 8;
+			R[2 * i] |= (uint32_t)A[AOffset + (5 * i) + 2] << 16;
+			R[2 * i] &= 0x000FFFFFL;
+
+			R[(2 * i) + 1] = A[AOffset + (5 * i) + 2] >> 4;
+			R[(2 * i) + 1] |= (uint32_t)A[AOffset + (5 * i) + 3] << 4;
+			R[(2 * i) + 1] |= (uint32_t)A[AOffset + (5 * i) + 4] << 12;
+			R[2 * i] &= 0x000FFFFFL;
+
+			R[2 * i] = Gamma1 - R[2 * i];
+			R[(2 * i) + 1] = Gamma1 - R[(2 * i) + 1];
+		}
+	}
+}
+
+void DLTMPolyMath::PolyUniformGamma1M1(std::array<int32_t, 256> &A, const std::vector<uint8_t> &Seed, uint16_t Nonce, uint32_t Gamma1)
 {
 	const size_t NBLKS = (641 + Keccak::KECCAK256_RATE_SIZE) / Keccak::KECCAK256_RATE_SIZE;
-	std::vector<byte> buf((NBLKS * Keccak::KECCAK256_RATE_SIZE) + 4);
-	std::array<ulong, Keccak::KECCAK_STATE_SIZE> state = { 0 };
-	std::vector<byte> tmps(Seed.size() + 2);
-	size_t buflen;
-	size_t ctr;
-	size_t i;
-	size_t off;
+	std::vector<uint8_t> buf((NBLKS * Keccak::KECCAK256_RATE_SIZE) + 4);
+	std::array<uint64_t, Keccak::KECCAK_STATE_SIZE> kctx = { 0 };
+	std::vector<uint8_t> tmps(Seed.size() + 2);
 
 	MemoryTools::Copy(Seed, 0, tmps, 0, Seed.size());
-	tmps[Seed.size()] = static_cast<byte>(Nonce);
+	tmps[Seed.size()] = static_cast<uint8_t>(Nonce);
 	tmps[Seed.size() + 1] = Nonce >> 8;
-	Keccak::AbsorbR24(tmps, 0, tmps.size(), Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-	Keccak::SqueezeR24(state, buf, 0, NBLKS, Keccak::KECCAK256_RATE_SIZE);
+	Keccak::Absorb(tmps, 0, tmps.size(), Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, kctx);
+	Keccak::Squeeze(kctx, buf, 0, NBLKS, Keccak::KECCAK256_RATE_SIZE);
 
-	buflen = NBLKS * Keccak::KECCAK256_RATE_SIZE;
-	ctr = RejGamma1M1(A, 0, DILITHIUM_N, buf, buflen);
-
-	while (ctr < DILITHIUM_N)
-	{
-		off = buflen % 5;
-
-		for (i = 0; i < off; ++i)
-		{
-			buf[i] = buf[buflen - off + i];
-		}
-
-		buflen = Keccak::KECCAK256_RATE_SIZE + off;
-		Keccak::SqueezeR24(state, buf, off, 1, Keccak::KECCAK256_RATE_SIZE);
-		ctr += RejGamma1M1(A, ctr, DILITHIUM_N - ctr, buf, buflen);
-	}
+	PolyZUnpack(A, buf, 0, Gamma1);
 }
 
-void DLTMPolyMath::PolyUseHint(std::array<uint, 256> &A, const std::array<uint, 256> &B, const std::array<uint, 256> &H)
-{
-	size_t i;
-
-	for (i = 0; i < A.size(); ++i)
-	{
-		A[i] = UseHint(B[i], H[i]);
-	}
-}
-
-void DLTMPolyMath::PolyW1Pack(std::vector<byte> &R, size_t ROffset, const std::array<uint, 256> &A)
-{
-	size_t i;
-
-	for (i = 0; i < A.size() / 2; ++i)
-	{
-		R[ROffset + i] = A[(2 * i)] | (A[(2 * i) + 1] << 4);
-	}
-}
-
-void DLTMPolyMath::PolyZPack(std::vector<byte> &R, size_t ROffset, const std::array<uint, 256> &A)
-{
-	std::array<uint, 2> t;
-	size_t i;
-
-	for (i = 0; i < A.size() / 2; ++i)
-	{
-		// map to {0,...,2*GAMMA1 - 2} 
-		t[0] = DILITHIUM_GAMMA1 - 1 - A[(2 * i)];
-		t[0] += (static_cast<int32_t>(t[0]) >> 31) & DILITHIUM_Q;
-		t[1] = DILITHIUM_GAMMA1 - 1 - A[(2 * i) + 1];
-		t[1] += (static_cast<int32_t>(t[1]) >> 31) & DILITHIUM_Q;
-
-		R[ROffset + (5 * i)] = t[0];
-		R[ROffset + (5 * i) + 1] = t[0] >> 8;
-		R[ROffset + (5 * i) + 2] = t[0] >> 16;
-		R[ROffset + (5 * i) + 2] |= t[1] << 4;
-		R[ROffset + (5 * i) + 3] = t[1] >> 4;
-		R[ROffset + (5 * i) + 4] = t[1] >> 12;
-	}
-}
-
-void DLTMPolyMath::PolyZUnpack(std::array<uint, 256> &R, const std::vector<byte> &A, size_t AOffset)
-{
-	size_t i;
-
-	for (i = 0; i < R.size() / 2; ++i)
-	{
-		R[(2 * i)] = A[AOffset + (5 * i)];
-		R[(2 * i)] |= static_cast<uint>(A[AOffset + (5 * i) + 1]) << 8;
-		R[(2 * i)] |= static_cast<uint>(A[AOffset + (5 * i) + 2] & 0x0F) << 16;
-
-		R[(2 * i) + 1] = A[AOffset + (5 * i) + 2] >> 4;
-		R[(2 * i) + 1] |= static_cast<uint>(A[AOffset + (5 * i) + 3]) << 4;
-		R[(2 * i) + 1] |= static_cast<uint>(A[AOffset + (5 * i) + 4]) << 12;
-
-		R[(2 * i)] = DILITHIUM_GAMMA1 - 1 - R[(2 * i)];
-		R[(2 * i)] += (static_cast<int32_t>(R[(2 * i)]) >> 31) & DILITHIUM_Q;
-		R[(2 * i) + 1] = DILITHIUM_GAMMA1 - 1 - R[(2 * i) + 1];
-		R[(2 * i) + 1] += (static_cast<int32_t>(R[(2 * i) + 1]) >> 31) & DILITHIUM_Q;
-	}
-}
-
-size_t DLTMPolyMath::RejEta(std::array<uint, 256> &A, size_t AOffset, size_t ALength, const std::vector<byte> &Buffer, size_t BufLength, uint Eta)
+size_t DLTMPolyMath::RejEta(std::array<int32_t, 256> &A, size_t AOffset, size_t ALength, const std::vector<uint8_t> &Buffer, size_t BufLength, uint32_t Eta)
 {
 	size_t ctr;
 	size_t pos;
-	uint t0;
-	uint t1;
+	uint32_t t0;
+	uint32_t t1;
 
-	ctr = 0;
-	pos = 0;
+	ctr = pos = 0;
 
 	while (ctr < ALength && pos < BufLength)
 	{
-		if (Eta <= 3)
+		t0 = Buffer[pos] & 0x0F;
+		t1 = Buffer[pos] >> 4;
+		++pos;
+
+		if (Eta == 2)
 		{
-			t0 = Buffer[pos] & 0x07;
-			t1 = Buffer[pos] >> 5;
-			++pos;
+			if (t0 < 15)
+			{
+				t0 = t0 - (205 * t0 >> 10) * 5;
+				A[ctr] = 2 - t0;
+				++ctr;
+			}
+
+			if (t1 < 15 && ctr < ALength)
+			{
+				t1 = t1 - (205 * t1 >> 10) * 5;
+				A[ctr] = 2 - t1;
+				++ctr;
+			}
 		}
-		else
+		else if (Eta == 4)
 		{
-			t0 = Buffer[pos] & 0x0F;
-			t1 = Buffer[pos] >> 4;
-			++pos;
-		}
+			if (t0 < 9)
+			{
+				A[ctr] = 4 - t0;
+				++ctr;
+			}
 
-		if (t0 <= 2 * Eta)
-		{
-			A[AOffset + ctr] = DILITHIUM_Q + Eta - t0;
-			++ctr;
-		}
-
-		if (t1 <= 2 * Eta && ctr < ALength)
-		{
-			A[AOffset + ctr] = DILITHIUM_Q + Eta - t1;
-			++ctr;
-		}
-	}
-
-	return ctr;
-}
-
-size_t DLTMPolyMath::RejGamma1M1(std::array<uint, 256> &A, size_t AOffset, size_t ALength, const std::vector<byte> &Buffer, size_t BufLength)
-{
-	size_t ctr;
-	size_t pos;
-	uint t0;
-	uint t1;
-
-	ctr = 0;
-	pos = 0;
-
-	while (ctr < ALength && pos + 5 <= BufLength)
-	{
-		t0 = Buffer[pos];
-		t0 |= static_cast<uint>(Buffer[pos + 1]) << 8;
-		t0 |= static_cast<uint>(Buffer[pos + 2]) << 16;
-		t0 &= 0x000FFFFFUL;
-
-		t1 = Buffer[pos + 2] >> 4;
-		t1 |= static_cast<uint>(Buffer[pos + 3]) << 4;
-		t1 |= static_cast<uint>(Buffer[pos + 4]) << 12;
-
-		pos += 5;
-
-		if (t0 <= (2 * DILITHIUM_GAMMA1) - 2)
-		{
-			A[AOffset + ctr] = DILITHIUM_Q + DILITHIUM_GAMMA1 - 1 - t0;
-			++ctr;
-		}
-
-		if (t1 <= (2 * DILITHIUM_GAMMA1) - 2 && ctr < ALength)
-		{
-			A[AOffset + ctr] = DILITHIUM_Q + DILITHIUM_GAMMA1 - 1 - t1;
-			++ctr;
+			if (t1 < 9 && ctr < ALength)
+			{
+				A[ctr] = 4 - t1;
+				++ctr;
+			}
 		}
 	}
 
 	return ctr;
 }
 
-size_t DLTMPolyMath::RejUniform(std::array<uint, 256> &A, size_t AOffset, size_t ALength, const std::vector<byte> &Buffer, size_t BufLength)
+size_t DLTMPolyMath::RejUniform(std::array<int32_t, 256> &A, size_t AOffset, size_t ALength, const std::vector<uint8_t> &Buffer, size_t BufLength)
 {
 	size_t ctr;
 	size_t pos;
-	uint t;
+	uint32_t t;
 
 	ctr = 0;
 	pos = 0;
@@ -980,9 +1757,9 @@ size_t DLTMPolyMath::RejUniform(std::array<uint, 256> &A, size_t AOffset, size_t
 	{
 		t = Buffer[pos];
 		++pos;
-		t |= static_cast<uint>(Buffer[pos]) << 8;
+		t |= static_cast<uint32_t>(Buffer[pos]) << 8;
 		++pos;
-		t |= static_cast<uint>(Buffer[pos]) << 16;
+		t |= static_cast<uint32_t>(Buffer[pos]) << 16;
 		++pos;
 		t &= 0x007FFFFFUL;
 
@@ -998,7 +1775,7 @@ size_t DLTMPolyMath::RejUniform(std::array<uint, 256> &A, size_t AOffset, size_t
 
 // polyvec.c //
 
-void DLTMPolyMath::PolyVecAdd(std::vector<std::array<uint, 256>> &W, const std::vector<std::array<uint, 256>> &U, const std::vector<std::array<uint, 256>> &V)
+void DLTMPolyMath::PolyVecAdd(std::vector<std::array<int32_t, 256>> &W, const std::vector<std::array<int32_t, 256>> &U, const std::vector<std::array<int32_t, 256>> &V)
 {
 	size_t i;
 
@@ -1008,7 +1785,7 @@ void DLTMPolyMath::PolyVecAdd(std::vector<std::array<uint, 256>> &W, const std::
 	}
 }
 
-int32_t DLTMPolyMath::PolyVecChkNorm(const std::vector<std::array<uint, 256>> &V, uint bound)
+int32_t DLTMPolyMath::PolyVecChkNorm(const std::vector<std::array<int32_t, 256>> &V, uint32_t bound)
 {
 	size_t i;
 	int32_t r;
@@ -1027,62 +1804,47 @@ int32_t DLTMPolyMath::PolyVecChkNorm(const std::vector<std::array<uint, 256>> &V
 	return r;
 }
 
-void DLTMPolyMath::PolyVecCSubQ(std::vector<std::array<uint, 256>> &V)
-{
-	size_t i;
-
-	for (i = 0; i < V.size(); ++i)
-	{
-		PolyCSubQ(V[i]);
-	}
-}
-
-void DLTMPolyMath::PolyVecDecompose(std::vector<std::array<uint, 256>> &V1, std::vector<std::array<uint, 256>> &V0, const std::vector<std::array<uint, 256>> &V)
+void DLTMPolyMath::PolyVecDecompose(std::vector<std::array<int32_t, 256>> &V1, std::vector<std::array<int32_t, 256>> &V0, const std::vector<std::array<int32_t, 256>> &V, uint32_t Gamma2)
 {
 	size_t i;
 
 	for (i = 0; i < V1.size(); ++i)
 	{
-		PolyDecompose(V1[i], V0[i], V[i]);
+		PolyDecompose(V1[i], V0[i], V[i], Gamma2);
 	}
 }
 
-void DLTMPolyMath::PolyVecFreeze(std::vector<std::array<uint, 256>> &V)
+void DLTMPolyMath::PolyVecCaddQ(std::vector<std::array<int32_t, 256>> &V)
 {
+    for (size_t i = 0; i < V.size(); ++i)
+    {
+        PolyCaddQ(V[i]);
+    }
+}
+
+void DLTMPolyMath::PolyVecInvNttMont(std::vector<std::array<int32_t, 256>> &V)
+{
+		for (size_t i = 0; i < V.size(); ++i)
+	{
+		DLTMPolyMath::PolyInvNttMont(V[i]);
+	}
+}
+
+void DLTMPolyMath::PolyVecMatrixPointwiseMont(std::array<int32_t, 256> &W, const std::vector<std::array<int32_t, 256>> &U, const std::vector<std::array<int32_t, 256>> &V)
+{
+	std::array<int32_t, 256> t;
 	size_t i;
 
-	for (i = 0; i < V.size(); ++i)
+	PolyPointwiseInvMont(W, U[0], V[0]);
+
+	for (i = 1; i < U.size(); ++i)
 	{
-		PolyFreeze(V[i]);
+		PolyPointwiseInvMont(t, U[i], V[i]);
+		PolyAdd(W, W, t);
 	}
 }
 
-void DLTMPolyMath::PolyVecInvNttMontgomery(std::vector<std::array<uint, 256>> &V)
-{
-	size_t i;
-
-	for (i = 0; i < V.size(); ++i)
-	{
-		PolyInvNttMontgomery(V[i]);
-	}
-}
-
-uint DLTMPolyMath::PolyVecMakeHint(std::vector<std::array<uint, 256>> &H, const std::vector<std::array<uint, 256>> &V0, const std::vector<std::array<uint, 256>> &V1)
-{
-	size_t i;
-	uint s;
-
-	s = 0;
-
-	for (i = 0; i < H.size(); ++i)
-	{
-		s += PolyMakeHint(H[i], V0[i], V1[i]);
-	}
-
-	return s;
-}
-
-void DLTMPolyMath::PolyVecNtt(std::vector<std::array<uint, 256>> &V)
+void DLTMPolyMath::PolyVecNtt(std::vector<std::array<int32_t, 256>> &V)
 {
 	size_t i;
 
@@ -1092,21 +1854,37 @@ void DLTMPolyMath::PolyVecNtt(std::vector<std::array<uint, 256>> &V)
 	}
 }
 
-void DLTMPolyMath::PolyVecPointwiseAccInvMontgomery(std::array<uint, 256> &W, const std::vector<std::array<uint, 256>> &U, const std::vector<std::array<uint, 256>> &V)
+void DLTMPolyMath::PolyVecPointwiseInvMont(std::vector<std::array<int32_t, 256>> &C, const std::array<int32_t, 256> &A, const std::vector<std::array<int32_t, 256>> &B)
 {
-	std::array<uint, 256> t;
-	size_t i;
-
-	PolyPointwiseInvMontgomery(W, U[0], V[0]);
-
-	for (i = 1; i < U.size(); ++i)
+	for (size_t i = 0; i < C.size(); ++i)
 	{
-		PolyPointwiseInvMontgomery(t, U[i], V[i]);
-		PolyAdd(W, W, t);
+		PolyPointwiseInvMont(C[i], A, B[i]);
 	}
 }
 
-void DLTMPolyMath::PolyVecPower2Round(std::vector<std::array<uint, 256>> &V1, std::vector<std::array<uint, 256>> &V0, const std::vector<std::array<uint, 256>> &V)
+uint32_t DLTMPolyMath::PolyVecMakeHint(std::vector<std::array<int32_t, 256>> &H, const std::vector<std::array<int32_t, 256>> &A0, const std::vector<std::array<int32_t, 256>> &A1, uint32_t Gamma2)
+{
+	uint32_t n;
+
+	n = 0;
+
+	for (size_t i = 0; i < H.size(); ++i)
+	{
+		n += PolyMakeHint(H[i], A0[i], A1[i], Gamma2);
+	}
+
+	return n;
+}
+
+void DLTMPolyMath::PolyVecPointwiseMont(std::vector<std::array<int32_t, 256>> &C, const std::array<int32_t, 256> &A, const std::vector<std::array<int32_t, 256>> &B)
+{
+	for (size_t i = 0; i < C.size(); ++i)
+	{
+		PolyPointwiseMont(C[i], A, B[i]);
+	}
+}
+
+void DLTMPolyMath::PolyVecPower2Round(std::vector<std::array<int32_t, 256>> &V1, std::vector<std::array<int32_t, 256>> &V0, const std::vector<std::array<int32_t, 256>> &V)
 {
 	size_t i;
 
@@ -1116,17 +1894,15 @@ void DLTMPolyMath::PolyVecPower2Round(std::vector<std::array<uint, 256>> &V1, st
 	}
 }
 
-void DLTMPolyMath::PolyVecReduce(std::vector<std::array<uint, 256>> &V)
+void DLTMPolyMath::PolyVecReduce(std::vector<std::array<int32_t, 256>> &V)
 {
-	size_t i;
-
-	for (i = 0; i < V.size(); ++i)
+	for (size_t i = 0; i < V.size(); ++i)
 	{
-		PolyReduce(V[i]);
+		DLTMPolyMath::PolyReduce(V[i]);
 	}
 }
 
-void DLTMPolyMath::PolyVecShiftL(std::vector<std::array<uint, 256>> &V)
+void DLTMPolyMath::PolyVecShiftL(std::vector<std::array<int32_t, 256>> &V)
 {
 	size_t i;
 
@@ -1136,204 +1912,154 @@ void DLTMPolyMath::PolyVecShiftL(std::vector<std::array<uint, 256>> &V)
 	}
 }
 
-void DLTMPolyMath::PolyVecSub(std::vector<std::array<uint, 256>> &W, const std::vector<std::array<uint, 256>> &U, const std::vector<std::array<uint, 256>> &V)
+void DLTMPolyMath::PolyVecSub(std::vector<std::array<int32_t, 256>> &C, const std::vector<std::array<int32_t, 256>> &A, const std::vector<std::array<int32_t, 256>> &B)
 {
-	size_t i;
-
-	for (i = 0; i < W.size(); ++i)
+	for (size_t i = 0; i < C.size(); ++i)
 	{
-		PolySub(W[i], U[i], V[i]);
+		PolySub(C[i], A[i], B[i]);
 	}
 }
 
-void DLTMPolyMath::PolyVecUseHint(std::vector<std::array<uint, 256>> &W, const std::vector<std::array<uint, 256>> &U, const std::vector<std::array<uint, 256>> &H)
+void DLTMPolyMath::PolyVecUniformGamma1M1(std::vector<std::array<int32_t, 256>> &V, const std::vector<uint8_t> &Seed, uint16_t nonce, uint32_t Gamma1)
 {
-	size_t i;
+    for (size_t i = 0; i < V.size(); ++i)
+    {
+        PolyUniformGamma1M1(V[i], Seed, (uint16_t)((V.size() * nonce) + i), Gamma1);
+    }
+}
 
-	for (i = 0; i < W.size(); ++i)
+void DLTMPolyMath::PolyVecUseHint(std::vector<std::array<int32_t, 256>> &B, const std::vector<std::array<int32_t, 256>> &A, const std::vector<std::array<int32_t, 256>> &H, uint32_t Gamma2)
+{
+	for (size_t i = 0; i < B.size(); ++i)
 	{
-		PolyUseHint(W[i], U[i], H[i]);
+		PolyUseHint(B[i], A[i], H[i], Gamma2);
 	}
 }
 
 // reduce.c //
 
-uint DLTMPolyMath::CSubQ(uint A)
+int32_t DLTMPolyMath::CaddQ(int32_t a)
 {
-	A -= DILITHIUM_Q;
-	A += (static_cast<int32_t>(A) >> 31) & DILITHIUM_Q;
+    a += (a >> 31) & DILITHIUM_Q;
 
-	return A;
+    return a;
 }
 
-uint DLTMPolyMath::Freeze(uint A)
+int32_t DLTMPolyMath::MontReduce(int64_t A)
 {
+	int32_t t;
 
-	A = Reduce32(A);
-	A = CSubQ(A);
-
-	return A;
-}
-
-uint DLTMPolyMath::MontgomeryReduce(ulong A)
-{
-	ulong t;
-
-	t = A * DILITHIUM_QINV;
-	t &= (1ULL << 32) - 1;
-	t *= DILITHIUM_Q;
-	t = A + t;
-	t >>= 32;
+	t = (int32_t)A * DILITHIUM_QINV;
+	t = (A - (int64_t)t * DILITHIUM_Q) >> 32;
 
 	return t;
 }
 
-uint DLTMPolyMath::Reduce32(uint A)
+int32_t DLTMPolyMath::Reduce32(int32_t A)
 {
-	uint t;
+	int32_t t;
 
-	t = A & 0x007FFFFFUL;
-	A >>= 23;
-	t += (A << 13) - A;
+	t = (A + (1 << 22)) >> 23;
+	t = A - t * DILITHIUM_Q;
 
 	return t;
 }
 
 // rounding.c //
 
-uint DLTMPolyMath::Decompose(uint A, uint&A0)
+int32_t DLTMPolyMath::Decompose(int32_t &A0, int32_t A, uint32_t Gamma2)
 {
-	int32_t t;
-	int32_t u;
+    int32_t a1;
 
-	// centralized remainder mod ALPHA 
-	t = A & 0x0007FFFFL;
-	t += (A >> 19) << 9;
-	t -= (DILITHIUM_ALPHA / 2) + 1;
-	t += (t >> 31) & DILITHIUM_ALPHA;
-	t -= (DILITHIUM_ALPHA / 2) - 1;
-	A -= t;
+    a1 = (A + 127) >> 7;
 
-	// divide by ALPHA (possible to avoid) 
-	u = A - 1;
-	u >>= 31;
-	A = (A >> 19) + 1;
-	A -= u & 1;
+	if (Gamma2 == (DILITHIUM_Q - 1) / 32)
+	{
+		a1 = ((a1 * 1025) + (1 << 21)) >> 22;
+		a1 &= 15;
+	}
+	else if (Gamma2 == (DILITHIUM_Q - 1) / 88)
+	{
+		a1 = ((a1 * 11275) + (1 << 23)) >> 24;
+		a1 ^= ((43 - a1) >> 31) & a1;
+	}
 
-	// border case 
-	A0 = DILITHIUM_Q + t - (A >> 4);
-	A &= 0xF;
+    A0 = A - (a1 * 2 * Gamma2);
+    A0 -= ((((DILITHIUM_Q - 1) / 2) - A0) >> 31) & DILITHIUM_Q;
 
-	return A;
+    return a1;
 }
 
-uint DLTMPolyMath::MakeHint(const uint A0, const uint A1)
+int32_t DLTMPolyMath::MakeHint(int32_t A0, int32_t A1, int32_t Gamma2)
 {
-	uint r;
+    uint32_t res;
 
-	r = 1;
+    res = 1;
 
-	if (A0 <= DILITHIUM_GAMMA2 || A0 > DILITHIUM_Q - DILITHIUM_GAMMA2 || (A0 == DILITHIUM_Q - DILITHIUM_GAMMA2 && A1 == 0))
-	{
-		r = 0;
-	}
+    if (A0 <= Gamma2 || A0 > DILITHIUM_Q - Gamma2 || (A0 == DILITHIUM_Q - Gamma2 && A1 == 0))
+    {
+        res = 0;
+    }
 
-	return r;
+    return res;
 }
 
-uint DLTMPolyMath::Power2Round(uint A, uint&A0)
+int32_t DLTMPolyMath::Power2Round(int32_t A, int32_t &A0)
 {
-	int32_t t;
+    int32_t a1;
 
-	// Centralized remainder mod 2^DILITHIUM_D 
-	t = A & ((1U << DILITHIUM_D) - 1);
-	t -= (1U << (DILITHIUM_D - 1)) + 1;
-	t += (t >> 31) & (1U << DILITHIUM_D);
-	t -= (1U << (DILITHIUM_D - 1)) - 1;
-	A0 = DILITHIUM_Q + t;
-	A = (A - t) >> DILITHIUM_D;
+    a1 = (A + (1 << (DILITHIUM_D - 1)) - 1) >> DILITHIUM_D;
+    A0 = A - (a1 << DILITHIUM_D);
 
-	return A;
+    return a1;
 }
 
-uint DLTMPolyMath::UseHint(const uint A, const uint Hint)
+uint32_t DLTMPolyMath::UseHint(int32_t A, const int32_t Hint, uint32_t Gamma2)
 {
-	uint a0;
-	uint a1;
-	uint ret;
+    int32_t a0;
+    int32_t a1;
+    int32_t res;
 
-	a1 = Decompose(A, a0);
+	a0 = 0;
+	res = 0;
+    a1 = Decompose(a0, A, Gamma2);
 
-	if (Hint == 0)
-	{
-		ret = a1;
-	}
-	else if (a0 > DILITHIUM_Q)
-	{
-		ret = (a1 + 1) & 0x0F;
-	}
-	else
-	{
-		ret = (a1 - 1) & 0x0F;
-	}
+    if (Hint == 0)
+    {
+        res = a1;
+    }
+    else
+    {
+		if (Gamma2 == (DILITHIUM_Q - 1) / 32)
+		{
+			if (a0 > 0)
+			{
+				res = (a1 + 1) & 15;
+			}
+			else
+			{
+				res = (a1 - 1) & 15;
+			}
+		}
+		else if (Gamma2 == (DILITHIUM_Q - 1) / 88)
+		{
+			if (a0 > 0)
+			{
+				res = (a1 == 43) ? 0 : a1 + 1;
+			}
+			else
+			{
+				res = (a1 == 0) ? 43 : a1 - 1;
+			}
+		}
+    }
 
-	return ret;
+    return res;
 }
 
 // sign.c //
 
-void DLTMPolyMath::Challenge(std::array<uint, 256> &C, const std::vector<byte> &Mu, const std::vector<std::array<uint, 256>> &W1)
-{
-	std::vector<byte> inbuf(Mu.size() + W1.size() * DILITHIUM_POLW1_SIZE_PACKED);
-	std::vector<byte> outbuf(Keccak::KECCAK256_RATE_SIZE);
-	std::array<ulong, Keccak::KECCAK_STATE_SIZE> state = { 0 };
-	ulong signs;
-	size_t b;
-	size_t i;
-	size_t pos;
-
-	MemoryTools::Copy(Mu, 0, inbuf, 0, Mu.size());
-
-	for (i = 0; i < W1.size(); ++i)
-	{
-		PolyW1Pack(inbuf, Mu.size() + (i * DILITHIUM_POLW1_SIZE_PACKED), W1[i]);
-	}
-
-	Keccak::AbsorbR24(inbuf, 0, inbuf.size(), Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-	Keccak::SqueezeR24(state, outbuf, 0, 1, Keccak::KECCAK256_RATE_SIZE);
-	signs = 0;
-
-	for (i = 0; i < 8; ++i)
-	{
-		signs |= static_cast<ulong>(outbuf[i]) << 8 * i;
-	}
-
-	pos = 8;
-	MemoryTools::Clear(C, 0, C.size() * sizeof(uint));
-
-	for (i = 196; i < 256; ++i)
-	{
-		do
-		{
-			if (pos >= Keccak::KECCAK256_RATE_SIZE)
-			{
-				Keccak::SqueezeR24(state, outbuf, 0, 1, Keccak::KECCAK256_RATE_SIZE);
-				pos = 0;
-			}
-
-			b = static_cast<size_t>(outbuf[pos]);
-			++pos;
-		} 
-		while (b > i);
-
-		C[i] = C[b];
-		C[b] = 1;
-		C[b] ^= static_cast<uint>(~(signs & 1) + 1) & (1 ^ (DILITHIUM_Q - 1));
-		signs >>= 1;
-	}
-}
-
-void DLTMPolyMath::ExpandMat(std::vector<std::vector<std::array<uint, 256>>> &Matrix, const std::vector<byte> &Rho)
+void DLTMPolyMath::ExpandMat(std::vector<std::vector<std::array<int32_t, 256>>> &Matrix, const std::vector<uint8_t> &Rho)
 {
 	size_t i;
 	size_t j;
@@ -1342,7 +2068,7 @@ void DLTMPolyMath::ExpandMat(std::vector<std::vector<std::array<uint, 256>>> &Ma
 	{
 		for (j = 0; j < Matrix[i].size(); ++j)
 		{
-			PolyUniform(Matrix[i][j], Rho, static_cast<ushort>(((i << 8) + j)));
+			PolyUniform(Matrix[i][j], Rho, static_cast<uint16_t>(((i << 8) + j)));
 		}
 	}
 }

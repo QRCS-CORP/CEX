@@ -23,8 +23,8 @@ namespace Test
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t TEST_CYCLES = 25;
 
-		std::vector<std::vector<byte>> m_expected;
-		std::vector<std::vector<byte>> m_message;
+		std::vector<std::vector<uint8_t>> m_expected;
+		std::vector<std::vector<uint8_t>> m_message;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -72,7 +72,7 @@ namespace Test
 		/// <param name="Digest">The digest instance pointer</param>
 		/// <param name="Input">The input test message</param>
 		/// <param name="Expected">The expected output vector</param>
-		void Kat(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
+		void Kat(IDigest* Digest, std::vector<uint8_t> &Input, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compares synchronous to parallel random-sized, pseudo-random arrays in a looping [TEST_CYCLES] stress-test

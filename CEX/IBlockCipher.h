@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -128,7 +128,7 @@ public:
 	///
 	/// <param name="Input">Encrypted bytes</param>
 	/// <param name="Output">Decrypted bytes</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
@@ -140,7 +140,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Encrypt a block of bytes.
@@ -150,7 +150,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Encrypt a block of bytes with offset parameters.
@@ -162,7 +162,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Initialize the cipher
@@ -183,7 +183,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void Transform(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.
@@ -195,7 +195,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Transform 2 blocks of bytes.
@@ -207,7 +207,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void Transform256(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Transform 4 blocks of bytes.
@@ -219,7 +219,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void Transform512(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Transform 8 blocks of bytes.
@@ -231,7 +231,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void Transform1024(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Transform 16 blocks of bytes.
@@ -243,7 +243,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual void Transform2048(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset) = 0;
 };
 
 NAMESPACE_BLOCKEND

@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -22,7 +22,7 @@
 // Written by John G. Underhill, February 23, 2018
 // Updated: May 14, 2018
 // Updated: February 9, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_CSG_H
 #define CEX_CSG_H
@@ -104,7 +104,7 @@ private:
 	// 100mb: default before reseeded internally
 	static const size_t DEF_RESEED = 102400000;
 	// 10gb: maximum before rekey is required
-	static const ulong MAX_OUTPUT = 10240000000;
+	static const uint64_t MAX_OUTPUT = 10240000000;
 	// 100mb: maximum size of a single request
 	static const size_t MAX_REQUEST = 102400000;
 	// 10000: maximum reseed calls before exception
@@ -200,7 +200,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	void Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes
@@ -210,7 +210,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	void Generate(SecureVector<byte> &Output) override;
+	void Generate(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
@@ -222,7 +222,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes using offset and length parameters
@@ -234,7 +234,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	void Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string
@@ -252,7 +252,7 @@ public:
 	/// <param name="Key">The standard-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
-	void Update(const std::vector<byte> &Key) override;
+	void Update(const std::vector<uint8_t> &Key) override;
 
 	/// <summary>
 	/// Update the generators keying material with a secure-vector key
@@ -261,17 +261,16 @@ public:
 	/// <param name="Key">The secure-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
-	void Update(const SecureVector<byte> &Key) override; 
+	void Update(const SecureVector<uint8_t> &Key) override; 
 
 private:
 
-	static void Absorb(const SecureVector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<CsgState> &State);
-	static void Customize(const SecureVector<byte> &Customization, const SecureVector<byte> &Name, std::unique_ptr<CsgState> &State);
+	static void Absorb(const SecureVector<uint8_t> &Input, size_t InOffset, size_t Length, std::unique_ptr<CsgState> &State);
+	static void Customize(const SecureVector<uint8_t> &Customization, const SecureVector<uint8_t> &Name, std::unique_ptr<CsgState> &State);
 	static void Derive(std::unique_ptr<IProvider> &Provider, std::unique_ptr<CsgState> &State);
-	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<CsgState> &State);
+	static void Expand(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<CsgState> &State);
 	static void Fill(std::unique_ptr<CsgState> &State);
 	static void Permute(std::unique_ptr<CsgState> &State);
-	static void PermuteW(std::unique_ptr<CsgState> &State);
 	static void Reset(std::unique_ptr<CsgState> &State);
 };
 

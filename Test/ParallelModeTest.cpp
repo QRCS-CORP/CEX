@@ -87,15 +87,15 @@ namespace Test
 
 	void ParallelModeTest::Stress(IAeadMode* Cipher, bool Encryption)
 	{
-		const uint MINSMP = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
-		const uint MAXSMP = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize()) * 4;
-		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[1];
-		std::vector<byte> cpt1;
-		std::vector<byte> cpt2;
-		std::vector<byte> inp;
-		std::vector<byte> otp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.IVSize());
+		const uint32_t MINSMP = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXSMP = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize()) * 4;
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		std::vector<uint8_t> cpt1;
+		std::vector<uint8_t> cpt2;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> otp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> iv(ks.IVSize());
 		Prng::SecureRandom rnd;
 
 		cpt1.reserve(MAXSMP);
@@ -152,15 +152,15 @@ namespace Test
 
 	void ParallelModeTest::Stress(ICipherMode* Cipher, bool Encryption)
 	{
-		const uint MINSMP = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
-		const uint MAXSMP = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize()) * 4;
-		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[1];
-		std::vector<byte> cpt1;
-		std::vector<byte> cpt2;
-		std::vector<byte> inp;
-		std::vector<byte> otp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.IVSize());
+		const uint32_t MINSMP = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXSMP = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize()) * 4;
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		std::vector<uint8_t> cpt1;
+		std::vector<uint8_t> cpt2;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> otp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> iv(ks.IVSize());
 		Prng::SecureRandom rnd;
 
 		cpt1.reserve(MAXSMP);

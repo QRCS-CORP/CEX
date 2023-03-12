@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Pseudo Random Generators enumeration names
 /// </summary>
-enum class Prngs : byte
+enum class Prngs : uint8_t
 {
 	/// <summary>
 	/// No prng is specified

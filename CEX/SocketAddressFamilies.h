@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The socket address family type
 /// </summary>
-enum class SocketAddressFamilies : int
+enum class SocketAddressFamilies : int32_t
 {
 	/// <summary>
 	/// No address family is specified AF_UNSPEC

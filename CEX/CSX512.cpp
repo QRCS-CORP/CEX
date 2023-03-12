@@ -24,83 +24,80 @@ class CSX512::CSX512State
 {
 public:
 
-	std::array<ulong, 2> Nonce = { 0UL };
-	std::array<ulong, 14> State = { 0UL };
-	SecureVector<byte> Custom;
-	SecureVector<byte> MacKey;
-	SecureVector<byte> MacTag;
-	ulong Counter;
-	bool IsAuthenticated;
-	bool IsEncryption;
-	bool IsInitialized;
+	std::array<uint64_t, 2> Nonce = { 0 };
+	std::array<uint64_t, 14> State = { 0 };
+	SecureVector<uint8_t> Custom;
+	SecureVector<uint8_t> MacKey;
+	SecureVector<uint8_t> MacTag;
+	std::vector<SymmetricKeySize> LegalKeySizes{
+			SymmetricKeySize(IK512_SIZE, NONCE_SIZE * sizeof(uint64_t), INFO_SIZE)};
+	uint64_t Counter = 0;
+	bool IsAuthenticated = false;
+	bool IsEncryption = false;
+	bool IsInitialized = false;
 
 	CSX512State(bool Authenticate)
 		:
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
-		Counter(0),
-		IsAuthenticated(Authenticate),
-		IsEncryption(false),
-		IsInitialized(false)
+		IsAuthenticated(Authenticate)
 	{
 	}
 
-	CSX512State(SecureVector<byte> &State)
-		:
-		Custom(0),
-		MacKey(0),
-		MacTag(0),
-		Counter(0),
-		IsAuthenticated(false),
-		IsEncryption(false),
-		IsInitialized(false)
+	CSX512State(SecureVector<uint8_t> &State)
 	{
 		DeSerialize(State);
 	}
 
 	~CSX512State()
 	{
-		Reset();
+		LegalKeySizes.clear();
+		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(uint64_t));
+		MemoryTools::Clear(State, 0, State.size() * sizeof(uint64_t));
+		MemoryTools::Clear(MacTag, 0, MacTag.size());
+		Counter = 0;
 		IsAuthenticated = false;
+		IsEncryption = false;
+		IsInitialized = false;
 	}
 
-	void DeSerialize(SecureVector<byte> &SecureState)
+	void DeSerialize(SecureVector<uint8_t> &SecureState)
 	{
 		size_t soff;
-		ushort vlen;
+		uint16_t vlen;
 
 		vlen = 0;
 		soff = 0;
 
-		vlen = static_cast<ushort>(State.size()) * sizeof(ulong);
+		vlen = static_cast<uint16_t>(State.size()) * sizeof(uint64_t);
 		MemoryTools::Copy(SecureState, soff, State, 0, vlen);
 		soff = vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
 		Custom.resize(vlen);
-		soff += sizeof(ushort);
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, Custom, 0, Custom.size());
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
 		MacKey.resize(vlen);
-		soff += sizeof(ushort);
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, MacKey, 0, MacKey.size());
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(uint16_t));
 		MacTag.resize(vlen);
-		soff += sizeof(ushort);
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(SecureState, soff, MacTag, 0, MacTag.size());
 		soff += vlen;
 
-		vlen = static_cast<ushort>(Nonce.size()) * sizeof(ulong);
+		vlen = static_cast<uint16_t>(Nonce.size()) * sizeof(uint64_t);
 		MemoryTools::Copy(SecureState, soff, Nonce, 0, vlen);
 		soff += vlen;
 
-		MemoryTools::CopyToObject(SecureState, soff, &Counter, sizeof(ulong));
-		soff += sizeof(ulong);
+		MemoryTools::CopyToObject(SecureState, soff, &Counter, sizeof(uint64_t));
+		soff += sizeof(uint64_t);
 		MemoryTools::CopyToObject(SecureState, soff, &IsAuthenticated, sizeof(bool));
 		soff += sizeof(bool);
 		MemoryTools::CopyToObject(SecureState, soff, &IsEncryption, sizeof(bool));
@@ -110,51 +107,51 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(ulong));
-		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(uint64_t));
+		MemoryTools::Clear(State, 0, State.size() * sizeof(uint64_t));
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
 		Counter = 0;
 		IsEncryption = false;
 		IsInitialized = false;
 	}
 
-	SecureVector<byte> Serialize()
+	SecureVector<uint8_t> Serialize()
 	{
-		const size_t STALEN = ((State.size() * sizeof(ulong)) + Custom.size() + MacKey.size() + MacTag.size() + (Nonce.size() * sizeof(ulong)) + sizeof(ulong) + (3 * sizeof(ushort)) + (3 * sizeof(bool)));
+		const size_t STALEN = ((State.size() * sizeof(uint64_t)) + Custom.size() + MacKey.size() + MacTag.size() + (Nonce.size() * sizeof(uint64_t)) + sizeof(uint64_t) + (3 * sizeof(uint16_t)) + (3 * sizeof(bool)));
 
 		size_t soff;
-		ushort vlen;
-		SecureVector<byte> state(STALEN);
+		uint16_t vlen;
+		SecureVector<uint8_t> state(STALEN);
 
 		soff = 0;
-		vlen = static_cast<ushort>(State.size()) * sizeof(ulong);
+		vlen = static_cast<uint16_t>(State.size()) * sizeof(uint64_t);
 		MemoryTools::Copy(State, 0, state, soff, vlen);
 		soff += vlen;
 
-		vlen = static_cast<ushort>(Custom.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(Custom.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(Custom, 0, state, soff, Custom.size());
 		soff += Custom.size();
 
-		vlen = static_cast<ushort>(MacKey.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(MacKey.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(MacKey, 0, state, soff, MacKey.size());
 		soff += MacKey.size();
 
-		vlen = static_cast<ushort>(MacTag.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
+		vlen = static_cast<uint16_t>(MacTag.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(uint16_t));
+		soff += sizeof(uint16_t);
 		MemoryTools::Copy(MacTag, 0, state, soff, MacTag.size());
 		soff += MacTag.size();
 
-		vlen = static_cast<ushort>(Nonce.size()) * sizeof(ulong);
+		vlen = static_cast<uint16_t>(Nonce.size()) * sizeof(uint64_t);
 		MemoryTools::Copy(Nonce, 0, state, soff, vlen);
 		soff += vlen;
 
-		MemoryTools::CopyFromObject(&Counter, state, soff, sizeof(ulong));
-		soff += sizeof(ulong);
+		MemoryTools::CopyFromObject(&Counter, state, soff, sizeof(uint64_t));
+		soff += sizeof(uint64_t);
 		MemoryTools::CopyFromObject(&IsAuthenticated, state, soff, sizeof(bool));
 		soff += sizeof(bool);
 		MemoryTools::CopyFromObject(&IsEncryption, state, soff, sizeof(bool));
@@ -166,7 +163,7 @@ public:
 };
 
 const std::string CSX512::CLASS_NAME("CSX512");
-const std::vector<byte> CSX512::SIGMA_INFO = { 0x43, 0x53, 0x58, 0x35, 0x31, 0x32, 0x20, 0x4B, 0x4D, 0x41, 0x43, 0x20, 0x61, 0x75, 0x74, 0x68,
+const std::vector<uint8_t> CSX512::SIGMA_INFO = { 0x43, 0x53, 0x58, 0x35, 0x31, 0x32, 0x20, 0x4B, 0x4D, 0x41, 0x43, 0x20, 0x61, 0x75, 0x74, 0x68,
 	0x65, 0x6E, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6F, 0x6E, 0x20, 0x76, 0x65, 0x72, 0x2E, 0x20, 
 	0x31, 0x63, 0x20, 0x43, 0x45, 0x58, 0x2B, 0x2B, 0x20, 0x6C, 0x69, 0x62, 0x72, 0x61, 0x72, 0x79 };
 
@@ -175,13 +172,12 @@ const std::vector<byte> CSX512::SIGMA_INFO = { 0x43, 0x53, 0x58, 0x35, 0x31, 0x3
 CSX512::CSX512(bool Authenticate)
 	:
 	m_csx512State(new CSX512State(Authenticate)),
-	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, NONCE_SIZE * sizeof(ulong), INFO_SIZE) },
 	m_macAuthenticator(nullptr),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 }
 
-CSX512::CSX512(SecureVector<byte> &State)
+CSX512::CSX512(SecureVector<uint8_t> &State)
 	:
 	m_csx512State(State.size() >= STATE_THRESHOLD ? new CSX512State(State) :
 		throw CryptoSymmetricException(std::string("CSX512"), std::string("Constructor"), std::string("The State array is invalid!"), ErrorCodes::InvalidKey)),
@@ -208,8 +204,6 @@ CSX512::~CSX512()
 	{
 		m_macAuthenticator.reset(nullptr);
 	}
-
-	IntegerTools::Clear(m_legalKeySizes);
 }
 
 //~~~Accessors~~~//
@@ -247,7 +241,7 @@ const bool CSX512::IsParallel()
 
 const std::vector<SymmetricKeySize> &CSX512::LegalKeySizes()
 {
-	return m_legalKeySizes;
+	return m_csx512State->LegalKeySizes;
 }
 
 const std::string CSX512::Name()
@@ -262,12 +256,12 @@ const std::string CSX512::Name()
 	return name;
 }
 
-const std::vector<byte> CSX512::Nonce()
+const std::vector<uint8_t> CSX512::Nonce()
 {
-	std::vector<byte> tmpn(2 * sizeof(ulong));
+	std::vector<uint8_t> tmpn(2 * sizeof(uint64_t));
 
 	IntegerTools::Le64ToBytes(m_csx512State->Nonce[0], tmpn, 0);
-	IntegerTools::Le64ToBytes(m_csx512State->Nonce[1], tmpn, sizeof(ulong));
+	IntegerTools::Le64ToBytes(m_csx512State->Nonce[1], tmpn, sizeof(uint64_t));
 
 	return tmpn;
 }
@@ -282,7 +276,7 @@ ParallelOptions &CSX512::ParallelProfile()
 	return m_parallelProfile;
 }
 
-const std::vector<byte> CSX512::Tag()
+const std::vector<uint8_t> CSX512::Tag()
 {
 	if (m_csx512State->MacTag.size() == 0 || IsAuthenticator() == false)
 	{
@@ -292,7 +286,7 @@ const std::vector<byte> CSX512::Tag()
 	return SecureUnlock(m_csx512State->MacTag);
 }
 
-const void CSX512::Tag(SecureVector<byte> &Output)
+const void CSX512::Tag(SecureVector<uint8_t> &Output)
 {
 	if (m_csx512State->MacTag.size() == 0 || IsAuthenticator() == false)
 	{
@@ -311,13 +305,13 @@ const size_t CSX512::TagSize()
 
 void CSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (Parameters.KeySizes().KeySize() != KEY_SIZE)
+	if (Parameters.KeySizes().KeySize() != IK512_SIZE)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.KeySizes().IVSize() != NONCE_SIZE * sizeof(ulong))
+	if (Parameters.KeySizes().IVSize() != NONCE_SIZE * sizeof(uint64_t))
 	{
-		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid nonce size; an 16-byte nonce is required with CSX512!"), ErrorCodes::InvalidNonce);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid nonce size; an 16-uint8_t nonce is required with CSX512!"), ErrorCodes::InvalidNonce);
 	}
 
 	if (m_parallelProfile.IsParallel())
@@ -362,25 +356,25 @@ void CSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 		// store algorithm name
 		std::string tmpn = Name();
-		SecureVector<byte> name(tmpn.size());
+		SecureVector<uint8_t> name(tmpn.size());
 		MemoryTools::CopyFromObject(Name().data(), name, 0, name.size());
 
 		// initialize cSHAKE
 		Kdf::SHAKE gen(ShakeModes::SHAKE512);
 		// not using customization parameter
-		SecureVector<byte> zero(0);
+		SecureVector<uint8_t> zero(0);
 		gen.Initialize(Parameters.SecureKey(), zero, name);
 
 		// generate the new cipher key
-		SecureVector<byte> cprk(KEY_SIZE);
+		SecureVector<uint8_t> cprk(IK512_SIZE);
 		gen.Generate(cprk);
 
 		// load the ciphers state
 		Load(cprk, Parameters.SecureIV(), m_csx512State->Custom);
 
 		// generate the mac key
-		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[1];
-		SecureVector<byte> mack(ks.KeySize());
+		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[0];
+		SecureVector<uint8_t> mack(ks.KeySize());
 		gen.Generate(mack);
 
 		// initialize the mac
@@ -407,14 +401,14 @@ void CSX512::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-SecureVector<byte> CSX512::Serialize()
+SecureVector<uint8_t> CSX512::Serialize()
 {
-	SecureVector<byte> tmps = m_csx512State->Serialize();
+	SecureVector<uint8_t> tmps = m_csx512State->Serialize();
 
 	return tmps;
 }
 
-void CSX512::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
+void CSX512::SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -431,15 +425,15 @@ void CSX512::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, si
 
 	if (IsAuthenticator() == true)
 	{
-		std::vector<byte> code(sizeof(uint));
+		std::vector<uint8_t> code(sizeof(uint32_t));
 		// version 1.1a add AD and encoding to hash
 		m_macAuthenticator->Update(Input, Offset, Length);
-		IntegerTools::Le32ToBytes(static_cast<uint>(Length), code, 0);
+		IntegerTools::Le32ToBytes(static_cast<uint32_t>(Length), code, 0);
 		m_macAuthenticator->Update(code, 0, code.size());
 	}
 }
 
-void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CSX512::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsEncryption() == true)
 	{
@@ -447,12 +441,12 @@ void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 		{
 			if (Output.size() < Length + OutOffset + m_macAuthenticator->TagSize())
 			{
-				throw CryptoSymmetricException(Name(), std::string("Transform"), std::string("The vector is not long enough to add the MAC code!"), ErrorCodes::InvalidSize);
+				throw CryptoSymmetricException(Name(), std::string("Transform"), std::string("The vector is not int64_t enough to add the MAC code!"), ErrorCodes::InvalidSize);
 			}
 
 			// add the starting position of the nonce//506097522914230528 1084818905618843912
-			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_csx512State->Nonce[0]), 0, sizeof(ulong));
-			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_csx512State->Nonce[1]), 0, sizeof(ulong));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<uint8_t>>(m_csx512State->Nonce[0]), 0, sizeof(uint64_t));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<uint8_t>>(m_csx512State->Nonce[1]), 0, sizeof(uint64_t));
 			// encrypt the stream
 			Process(Input, InOffset, Output, OutOffset, Length);
 			// update the mac with the ciphertext
@@ -474,8 +468,8 @@ void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 		if (IsAuthenticator() == true)
 		{
 			// add the starting position of the nonce
-			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_csx512State->Nonce[0]), 0, sizeof(ulong));
-			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_csx512State->Nonce[1]), 0, sizeof(ulong));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<uint8_t>>(m_csx512State->Nonce[0]), 0, sizeof(uint64_t));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<uint8_t>>(m_csx512State->Nonce[1]), 0, sizeof(uint64_t));
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Input, InOffset, Length);
 			// update the mac counter
@@ -498,7 +492,7 @@ void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 
 void CSX512::Finalize(std::unique_ptr<CSX512State> &State, std::unique_ptr<IMac> &Authenticator)
 {
-	std::vector<byte> cust(sizeof(ulong));
+	std::vector<uint8_t> cust(sizeof(uint64_t));
 
 	// cap input with mac bytes counter
 	IntegerTools::Le64ToBytes(State->Counter, cust, 0);
@@ -510,7 +504,7 @@ void CSX512::Finalize(std::unique_ptr<CSX512State> &State, std::unique_ptr<IMac>
 	Authenticator->Finalize(State->MacTag, 0);
 }
 
-void CSX512::Generate(std::unique_ptr<CSX512State> &State, std::vector<byte> &Output, size_t OutOffset, std::array<ulong, 2> &Counter, size_t Length)
+void CSX512::Generate(std::unique_ptr<CSX512State> &State, std::vector<uint8_t> &Output, size_t OutOffset, std::array<uint64_t, 2> &Counter, size_t Length)
 {
 	size_t ctr;
 
@@ -523,7 +517,7 @@ void CSX512::Generate(std::unique_ptr<CSX512State> &State, std::vector<byte> &Ou
 	if (Length >= AVX512BLK)
 	{
 		const size_t SEGALN = Length - (Length % AVX512BLK);
-		std::array<ulong, 16> tmpc;
+		std::array<uint64_t, 16> tmpc = { 0 };
 
 		// process 8 blocks (uses avx if available)
 		while (ctr != SEGALN)
@@ -564,7 +558,7 @@ void CSX512::Generate(std::unique_ptr<CSX512State> &State, std::vector<byte> &Ou
 	if (Length >= AVX2BLK)
 	{
 		const size_t SEGALN = Length - (Length % AVX2BLK);
-		std::array<ulong, 8> tmpc;
+		std::array<uint64_t, 8> tmpc = { 0 };
 
 		// process 8 blocks (uses avx if available)
 		while (ctr != SEGALN)
@@ -599,7 +593,7 @@ void CSX512::Generate(std::unique_ptr<CSX512State> &State, std::vector<byte> &Ou
 
 	if (ctr != Length)
 	{
-		std::vector<byte> otp(BLOCK_SIZE, 0);
+		std::vector<uint8_t> otp(BLOCK_SIZE, 0);
 		ChaCha::PermuteP1024C(otp, 0, Counter, State->State, ROUND_COUNT);
 		IntegerTools::LeIncrementW(Counter);
 		const size_t FNLLEN = Length % BLOCK_SIZE;
@@ -607,11 +601,11 @@ void CSX512::Generate(std::unique_ptr<CSX512State> &State, std::vector<byte> &Ou
 	}
 }
 
-void CSX512::Load(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Code)
+void CSX512::Load(const SecureVector<uint8_t> &Key, const SecureVector<uint8_t> &Nonce, const SecureVector<uint8_t> &Code)
 {
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	MemoryTools::Copy(Key, 0, m_csx512State->State, 0, Key.size());
-	MemoryTools::Copy(Code, 0, m_csx512State->State, Key.size() / sizeof(ulong), Code.size());
+	MemoryTools::Copy(Code, 0, m_csx512State->State, Key.size() / sizeof(uint64_t), Code.size());
 	MemoryTools::Copy(Nonce, 0, m_csx512State->Nonce, 0, Nonce.size());
 #else
 	m_csx512State->State[0] = IntegerTools::LeBytesTo64(Key, 0);
@@ -634,7 +628,7 @@ void CSX512::Load(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce
 #endif
 }
 
-void CSX512::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CSX512::Process(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t PRCLEN = (Length >= Input.size() - InOffset) && Length >= Output.size() - OutOffset ? IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) : Length;
 
@@ -665,12 +659,12 @@ void CSX512::Process(const std::vector<byte> &Input, size_t InOffset, std::vecto
 		const size_t CNKLEN = (PRCLEN / BLOCK_SIZE / m_parallelProfile.ParallelMaxDegree()) * BLOCK_SIZE;
 		const size_t RNDLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 		const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
-		std::vector<ulong> tmpCtr(NONCE_SIZE);
+		std::vector<uint64_t> tmpCtr(NONCE_SIZE);
 
 		ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTRLEN](size_t i)
 		{
 			// thread level counter
-			std::array<ulong, 2> thdCtr;
+			std::array<uint64_t, 2> thdCtr = { 0 };
 			// offset counter by chunk size / block size
 			IntegerTools::LeIncreaseW(m_csx512State->Nonce, thdCtr, CTRLEN * i);
 			const size_t STMPOS = i * CNKLEN;
@@ -681,12 +675,12 @@ void CSX512::Process(const std::vector<byte> &Input, size_t InOffset, std::vecto
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{
-				MemoryTools::Copy(thdCtr, 0, tmpCtr, 0, NONCE_SIZE * sizeof(ulong));
+				MemoryTools::Copy(thdCtr, 0, tmpCtr, 0, NONCE_SIZE * sizeof(uint64_t));
 			}
 		});
 
 		// copy last counter to class variable
-		MemoryTools::Copy(tmpCtr, 0, m_csx512State->Nonce, 0, NONCE_SIZE * sizeof(ulong));
+		MemoryTools::Copy(tmpCtr, 0, m_csx512State->Nonce, 0, NONCE_SIZE * sizeof(uint64_t));
 
 		// last block processing
 		if (RNDLEN < PRCLEN)
@@ -696,7 +690,7 @@ void CSX512::Process(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 			for (size_t i = 0; i < FNLLEN; ++i)
 			{
-				Output[i + OutOffset + RNDLEN] ^= static_cast<byte>(Input[i + InOffset + RNDLEN]);
+				Output[i + OutOffset + RNDLEN] ^= static_cast<uint8_t>(Input[i + InOffset + RNDLEN]);
 			}
 		}
 	}

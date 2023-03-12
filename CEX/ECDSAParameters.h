@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The Elliptic Curve Digital Signature Alogorithm parameter sets enumeration
 /// </summary>
-enum class ECDSAParameters : byte
+enum class ECDSAParameters : uint8_t
 {
 	/// <summary>
 	/// No parameter set is specified
@@ -18,11 +18,11 @@ enum class ECDSAParameters : byte
 	/// <summary>
 	/// The ECDSA S1 parameter; elliptic ED25519 curve using the SHA3-512 digest (Keccak)
 	/// </summary>
-	ECDSAS1ED25519K = static_cast<byte>(AsymmetricParameters::ECDSAS1ED25519K),
+	ECDSAS1ED25519K = static_cast<uint8_t>(AsymmetricParameters::ECDSAS1ED25519K),
 	/// <summary>
 	/// The ECDSA S2 parameter; elliptic ED25519 curve using the SHA2-512 digest
 	/// </summary>
-	ECDSAS2ED25519S = static_cast<byte>(AsymmetricParameters::ECDSAS2ED25519S)
+	ECDSAS2ED25519S = static_cast<uint8_t>(AsymmetricParameters::ECDSAS2ED25519S)
 };
 
 class ECDSAParameterConvert

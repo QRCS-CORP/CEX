@@ -13,19 +13,18 @@ class KDF2::Kdf2State
 {
 public:
 
-	std::vector<byte> Counter;
-	std::vector<byte> Salt;
-	std::vector<byte> State;
+	std::vector<uint8_t> Counter;
+	std::vector<uint8_t> Salt;
+	std::vector<uint8_t> State;
 	bool IsDestroyed;
-	bool IsInitialized;
+	bool IsInitialized = false;
 
 	Kdf2State(size_t StateSize, size_t SaltSize, bool Destroyed)
 		:
 		Counter{ 0x00, 0x00, 0x00, 0x01 },
 		Salt(SaltSize),
 		State(StateSize),
-		IsDestroyed(Destroyed),
-		IsInitialized(false)
+		IsDestroyed(Destroyed)
 	{
 	}
 
@@ -40,8 +39,8 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(Counter, 0, Counter.size() - sizeof(byte));
-		Counter[Counter.size() - sizeof(byte)] = 1;
+		MemoryTools::Clear(Counter, 0, Counter.size() - sizeof(uint8_t));
+		Counter[Counter.size() - sizeof(uint8_t)] = 1;
 		MemoryTools::Clear(Salt, 0, Salt.size());
 		MemoryTools::Clear(State, 0, State.size());
 		IsInitialized = false;
@@ -125,7 +124,7 @@ const bool KDF2::IsInitialized()
 
 //~~~Public Functions~~~//
 
-void KDF2::Generate(std::vector<byte> &Output)
+void KDF2::Generate(std::vector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -139,7 +138,7 @@ void KDF2::Generate(std::vector<byte> &Output)
 	Expand(Output, 0, Output.size(), m_kdf2State, m_kdf2Generator);
 }
 
-void KDF2::Generate(SecureVector<byte> &Output)
+void KDF2::Generate(SecureVector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -153,7 +152,7 @@ void KDF2::Generate(SecureVector<byte> &Output)
 	Expand(Output, 0, Output.size(), m_kdf2State, m_kdf2Generator);
 }
 
-void KDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void KDF2::Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -165,13 +164,13 @@ void KDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	Expand(Output, OutOffset, Length, m_kdf2State, m_kdf2Generator);
 }
 
-void KDF2::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
+void KDF2::Generate(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -183,7 +182,7 @@ void KDF2::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	Expand(Output, OutOffset, Length, m_kdf2State, m_kdf2Generator);
@@ -270,15 +269,15 @@ void KDF2::Reset()
 
 //~~~Private Functions~~~//
 
-void KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator)
+void KDF2::Expand(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator)
 {
-	std::vector<byte> tmph(Generator->DigestSize());
+	std::vector<uint8_t> tmph(Generator->DigestSize());
 
 	do
 	{
 		// update the state and counter
 		Generator->Update(State->State, 0, State->State.size());
-		Generator->Update(State->Counter, 0, sizeof(uint));
+		Generator->Update(State->Counter, 0, sizeof(uint32_t));
 
 		// update the salt
 		if (State->Salt.size() != 0)
@@ -289,7 +288,7 @@ void KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, st
 		// generate the temporary hash
 		Generator->Finalize(tmph, 0);
 		// increment the state counter
-		IntegerTools::BeIncrement8(State->Counter, 0, sizeof(uint));
+		IntegerTools::BeIncrement8(State->Counter, 0, sizeof(uint32_t));
 		// copy to output
 		const size_t PRCRMD = IntegerTools::Min(Generator->DigestSize(), Length);
 		MemoryTools::Copy(tmph, 0, Output, OutOffset, PRCRMD);
@@ -299,9 +298,9 @@ void KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, st
 	while (Length != 0);
 }
 
-void KDF2::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator)
+void KDF2::Expand(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator)
 {
-	std::vector<byte> tmps(Length);
+	std::vector<uint8_t> tmps(Length);
 	Expand(tmps, OutOffset, Length, State, Generator);
 	SecureMove(tmps, 0, Output, OutOffset, Length);
 }

@@ -34,9 +34,9 @@ bool XMSSUtils::IsXMSS(XmssParameters Enumeral)
 	return res;
 }
 
-uint XMSSUtils::ToOid(XmssParameters Enumeral)
+uint32_t XMSSUtils::ToOid(XmssParameters Enumeral)
 {
-	uint oid;
+	uint32_t oid;
 
 	switch (Enumeral)
 	{	

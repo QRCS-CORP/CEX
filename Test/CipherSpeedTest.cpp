@@ -1,6 +1,5 @@
 #include "CipherSpeedTest.h"
 #include "../CEX/CpuDetect.h"
-#include "../CEX/AHX.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
 #include "../CEX/CTR.h"
@@ -10,7 +9,6 @@
 #include "../CEX/HBA.h"
 #include "../CEX/ICM.h"
 #include "../CEX/OFB.h"
-#include "../CEX/ACS.h"
 #include "../CEX/ChaChaP20.h"
 #include "../CEX/CSX512.h"
 #include "../CEX/RCS.h"
@@ -31,7 +29,6 @@ namespace Test
 	const std::string CipherSpeedTest::CLASSNAME = "CipherSpeedTest";
 	const std::string CipherSpeedTest::DESCRIPTION = "Cipher Speed Tests.";
 	const std::string CipherSpeedTest::MESSAGE = "COMPLETE! Speed tests have executed succesfully.";
-	const bool CipherSpeedTest::HAS_AESNI = HasAESNI();
 
 	CipherSpeedTest::CipherSpeedTest()
 		:
@@ -146,17 +143,6 @@ namespace Test
 
 	void CipherSpeedTest::RHXSpeedTest(size_t KeySize)
 	{
-#if defined(__AVX__)
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			ECB* cpr = new ECB(eng);
-			ParallelBlockLoop(cpr, true, true, MB100, KeySize, 0, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-#endif
 		{
 			RHX* eng = new RHX();
 			ECB* cpr = new ECB(eng);
@@ -179,17 +165,6 @@ namespace Test
 
 	void CipherSpeedTest::CBCSpeedTest(bool Encrypt, bool Parallel)
 	{
-#if defined(__AVX__)
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			CBC* cpr = new CBC(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-#endif
 		{
 			RHX* eng = new RHX();
 			CBC* cpr = new CBC(eng);
@@ -201,17 +176,6 @@ namespace Test
 
 	void CipherSpeedTest::CFBSpeedTest(bool Encrypt, bool Parallel)
 	{
-#if defined(__AVX__)
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			CFB* cpr = new CFB(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-#endif
 		{
 			RHX* eng = new RHX();
 			CFB* cpr = new CFB(eng);
@@ -223,17 +187,6 @@ namespace Test
 
 	void CipherSpeedTest::CTRSpeedTest(bool Encrypt, bool Parallel)
 	{
-#if defined(__AVX__)
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			CTR* cpr = new CTR(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-#endif
 		{
 			RHX* eng = new RHX();
 			CTR* cpr = new CTR(eng);
@@ -245,17 +198,6 @@ namespace Test
 
 	void CipherSpeedTest::ICMSpeedTest(bool Encrypt, bool Parallel)
 	{
-#if defined(__AVX__)
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			ICM* cpr = new ICM(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-#endif
 		{
 			RHX* eng = new RHX();
 			ICM* cpr = new ICM(eng);
@@ -267,17 +209,6 @@ namespace Test
 
 	void CipherSpeedTest::OFBSpeedTest(bool Encrypt, bool Parallel)
 	{
-#if defined(__AVX__)
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			OFB* cpr = new OFB(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-#endif
 		{
 			RHX* eng = new RHX();
 			OFB* cpr = new OFB(eng);
@@ -291,17 +222,6 @@ namespace Test
 
 	void CipherSpeedTest::HBASpeedTest(bool Encrypt, bool Parallel)
 	{
-#if defined(__AVX__)
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA2256);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-#endif
 		{
 			RHX* eng = new RHX();
 			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA2256);
@@ -329,18 +249,9 @@ namespace Test
 
 	void CipherSpeedTest::RCSSpeedTest()
 	{
-		if (HAS_AESNI)
-		{
-			ACS* cpr = new ACS(false);
-			ParallelStreamLoop(cpr, 32, 32, 10, m_progressEvent);
-			delete cpr;
-		}
-		else
-		{
-			RCS* cpr = new RCS(false);
-			ParallelStreamLoop(cpr, 32, 32, 10, m_progressEvent);
-			delete cpr;
-		}
+		RCS* cpr = new RCS(false);
+		ParallelStreamLoop(cpr, 32, 32, 10, m_progressEvent);
+		delete cpr;
 	}
 
 	void CipherSpeedTest::TSX256SpeedTest()
@@ -377,17 +288,6 @@ namespace Test
 		return static_cast<uint64_t>(sze / sec);
 	}
 
-	bool CipherSpeedTest::HasAESNI()
-	{
-#if defined(__AVX__)
-		CpuDetect dtc;
-
-		return dtc.AVX() && dtc.AESNI();
-#else
-		return false;
-#endif
-	}
-
 	void CipherSpeedTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
@@ -397,11 +297,11 @@ namespace Test
 	void CipherSpeedTest::CounterSpeedTest()
 	{
 		const size_t LOOPS = 1000 * 1000 * 100;
-		std::vector<byte> ctr1(16, 0);
-		std::vector<byte> ctr2(16, 0);
+		std::vector<uint8_t> ctr1(16, 0);
+		std::vector<uint8_t> ctr2(16, 0);
 		std::vector<uint64_t> ctr3(2, 0);
-		std::vector<byte> ctr4(16, 0);
-		std::vector<byte> ctr5(16, 0);
+		std::vector<uint8_t> ctr4(16, 0);
+		std::vector<uint8_t> ctr5(16, 0);
 		size_t itr(0);
 		size_t i(0);
 		uint64_t start(0);

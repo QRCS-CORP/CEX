@@ -26,8 +26,8 @@ namespace Test
 		static const size_t SAMPLE_SIZE = 2048000;
 		static const size_t TEST_CYCLES = 10;
 
-		std::vector<std::vector<byte>> m_expected;
-		std::vector<std::vector<byte>> m_key;
+		std::vector<std::vector<uint8_t>> m_expected;
+		std::vector<std::vector<uint8_t>> m_key;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -76,7 +76,7 @@ namespace Test
 		/// <param name="Rng">The DRBG instance</param>
 		/// <param name="Key">The input key</param>
 		/// <param name="Expected">The expected output</param>
-		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Expected);
+		void Kat(IDrbg* Rng, std::vector<uint8_t> &Key, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Test the auto re-seeding mechanism

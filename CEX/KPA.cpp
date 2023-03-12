@@ -30,8 +30,8 @@ public:
 #elif defined(CEX_HAS_AVX2)
 	std::vector<std::array<ULong256, Keccak::KECCAK_STATE_SIZE>> StateW;
 #endif
-	std::vector<std::array<ulong, Keccak::KECCAK_STATE_SIZE>> State;
-	std::vector<byte> Buffer;
+	std::vector<std::array<uint64_t, Keccak::KECCAK_STATE_SIZE>> State;
+	std::vector<uint8_t> Buffer;
 	size_t Rate;
 	size_t MacSize;
 	size_t Position;
@@ -150,7 +150,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 	//~~~Public Functions~~~//
 
-	void KPA::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+	void KPA::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 	{
 		if (IsInitialized() == false)
 		{
@@ -158,16 +158,16 @@ KPA::KPA(KpaModes KbaModeType)
 		}
 		if (Output.size() < TagSize())
 		{
-			throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+			throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 		}
 
 		Update(Input, 0, Input.size());
 		Finalize(Output, 0);
 	}
 
-	size_t KPA::Finalize(std::vector<byte> &Output, size_t OutOffset)
+	size_t KPA::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 	{
-		SecureVector<byte> tmph(Output.size() - OutOffset);
+		SecureVector<uint8_t> tmph(Output.size() - OutOffset);
 
 		Finalize(tmph, 0);
 		SecureMove(tmph, 0, Output, OutOffset, tmph.size());
@@ -175,7 +175,7 @@ KPA::KPA(KpaModes KbaModeType)
 		return tmph.size();
 	}
 
-	size_t KPA::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+	size_t KPA::Finalize(SecureVector<uint8_t> &Output, size_t OutOffset)
 	{
 		if (IsInitialized() == false)
 		{
@@ -183,7 +183,7 @@ KPA::KPA(KpaModes KbaModeType)
 		}
 		if ((Output.size() - OutOffset) < TagSize())
 		{
-			throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+			throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 		}
 		if (m_kbaState->Position != m_kbaState->Buffer.size())
 		{
@@ -194,9 +194,9 @@ KPA::KPA(KpaModes KbaModeType)
 			KPA_LEAF_HASH512 : (m_kbaState->Rate == Keccak::KECCAK256_RATE_SIZE) ?
 			KPA_LEAF_HASH256 : KPA_LEAF_HASH512;
 
-		std::vector<byte> fbuf(KPA_PARALLELISM * KPA_LEAF_HASH512);
-		std::vector<ulong> pstate(Keccak::KECCAK_STATE_SIZE);
-		std::vector<byte> prcb(2 * sizeof(uint64_t));
+		std::vector<uint8_t> fbuf(KPA_PARALLELISM * KPA_LEAF_HASH512);
+		std::vector<uint64_t> pstate(Keccak::KECCAK_STATE_SIZE);
+		std::vector<uint8_t> prcb(2 * sizeof(uint64_t));
 		size_t bitlen;
 		size_t i;
 		size_t outlen;
@@ -241,7 +241,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 		// add the domain id
 		m_kbaState->Buffer[bitlen] = Keccak::KECCAK_KPA_DOMAIN_ID;
-		// clamp the last byte
+		// clamp the last uint8_t
 		m_kbaState->Buffer[m_kbaState->Rate - 1] |= 128U;
 
 		// absorb the buffer into parent state
@@ -295,13 +295,13 @@ KPA::KPA(KpaModes KbaModeType)
 			Reset();
 		}
 
-		std::array<ulong, Keccak::KECCAK_STATE_SIZE> tmps = { 0 };
-		std::vector<byte> pad(Keccak::KECCAK_STATE_SIZE * sizeof(ulong));
-		std::vector<byte> algb = { 0x00, 0x00, 0x4B, 0x42, 0x41, 0xAD, 0x31, 0x32 };
-		std::vector<byte> cust;
-		std::vector<byte> key;
+		std::array<uint64_t, Keccak::KECCAK_STATE_SIZE> tmps = { 0 };
+		std::vector<uint8_t> pad(Keccak::KECCAK_STATE_SIZE * sizeof(uint64_t));
+		std::vector<uint8_t> algb = { 0x00, 0x00, 0x4B, 0x42, 0x41, 0xAD, 0x31, 0x32 };
+		std::vector<uint8_t> cust;
+		std::vector<uint8_t> key;
 
-		ulong algn;
+		uint64_t algn;
 		size_t oft;
 		size_t i;
 
@@ -335,7 +335,7 @@ KPA::KPA(KpaModes KbaModeType)
 				if (oft == m_kbaState->Rate)
 				{
 					Keccak::FastAbsorb(pad, 0, m_kbaState->Rate, tmps);
-					Keccak::PermuteR24P1600C(tmps, KPA_ROUNDS);
+					Keccak::Permute(tmps, Keccak::PermutationRounds::RX12);
 					oft = 0;
 				}
 
@@ -348,7 +348,7 @@ KPA::KPA(KpaModes KbaModeType)
 				// absorb custom and name, and permute state
 				MemoryTools::Clear(pad, oft, m_kbaState->Rate - oft);
 				Keccak::FastAbsorb(pad, 0, m_kbaState->Rate, tmps);
-				Keccak::PermuteR24P1600C(tmps, KPA_ROUNDS);
+				Keccak::Permute(tmps, Keccak::PermutationRounds::RX12);
 			}
 		}
 
@@ -366,7 +366,7 @@ KPA::KPA(KpaModes KbaModeType)
 				if (oft == m_kbaState->Rate)
 				{
 					Keccak::FastAbsorb(pad, 0, m_kbaState->Rate, tmps);
-					Keccak::PermuteR24P1600C(tmps, KPA_ROUNDS);
+					Keccak::Permute(tmps, Keccak::PermutationRounds::RX12);
 					oft = 0;
 				}
 
@@ -379,7 +379,7 @@ KPA::KPA(KpaModes KbaModeType)
 				// absorb the key and permute the state
 				MemoryTools::Clear(pad, oft, m_kbaState->Rate - oft);
 				Keccak::FastAbsorb(pad, 0, m_kbaState->Rate, tmps);
-				Keccak::PermuteR24P1600C(tmps, KPA_ROUNDS);
+				Keccak::Permute(tmps, Keccak::PermutationRounds::RX12);
 			}
 		}
 
@@ -388,7 +388,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 #if defined(CEX_HAS_AVX512)
 
-		std::vector<ulong> tmpi(8);
+		std::vector<uint64_t> tmpi(8);
 
 		for (i = 1; i < Keccak::KECCAK_STATE_SIZE; ++i)
 		{
@@ -409,7 +409,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 #elif defined(CEX_HAS_AVX2)
 
-		std::vector<ulong> tmpi(8);
+		std::vector<uint64_t> tmpi(8);
 
 		for (i = 1; i < Keccak::KECCAK_STATE_SIZE; ++i)
 		{
@@ -457,7 +457,7 @@ KPA::KPA(KpaModes KbaModeType)
 		m_kbaState->IsInitialized = false;
 	}
 
-	void KPA::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+	void KPA::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 	{
 		if (IsInitialized() == false)
 		{
@@ -465,7 +465,7 @@ KPA::KPA(KpaModes KbaModeType)
 		}
 		if ((Input.size() - InOffset) < Length)
 		{
-			throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
+			throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too int16_t!"), ErrorCodes::InvalidSize);
 		}
 
 		if (Length != 0)
@@ -510,7 +510,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 	//~~~Private Functions~~~//
 	
-	void KPA::FastAbsorbx8(std::unique_ptr<KpaState> &Ctx, const std::vector<byte> &Input, size_t InOffset)
+	void KPA::FastAbsorbx8(std::unique_ptr<KpaState> &Ctx, const std::vector<uint8_t> &Input, size_t InOffset)
 	{
 		size_t i;
 
@@ -531,14 +531,14 @@ KPA::KPA(KpaModes KbaModeType)
 		for (i = 0; i < Ctx->Rate / sizeof(uint64_t); ++i)
 		{
 			wbuf = ULong512(_mm512_i64gather_epi64(idx, (int64_t*)pos, 1));
-			pos += sizeof(ulong);
+			pos += sizeof(uint64_t);
 			Ctx->StateW[i] ^= wbuf;
 		}
 
 #elif defined(CEX_HAS_AVX2)
 
 		const size_t ROFT = Ctx->Rate;
-		std::vector<ulong> tmp(4);
+		std::vector<uint64_t> tmp(4);
 
 		for (i = 0; i < Ctx->Rate / sizeof(uint64_t); ++i)
 		{
@@ -555,7 +555,7 @@ KPA::KPA(KpaModes KbaModeType)
 			tmp[3] = IntegerTools::LeBytesTo64(Input, InOffset + (7 * ROFT));
 			ULong256 x2(tmp, 0);
 			Ctx->StateW[1][i] ^= x2;
-			InOffset += sizeof(ulong);
+			InOffset += sizeof(uint64_t);
 		}
 
 #else
@@ -574,7 +574,7 @@ KPA::KPA(KpaModes KbaModeType)
 #endif
 	}
 
-	void KPA::KpaAbsorbLeaves(std::vector<ulong> &State, size_t Rate, const std::vector<byte> &Input, size_t InOffset, size_t Length)
+	void KPA::KpaAbsorbLeaves(std::vector<uint64_t> &State, size_t Rate, const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 	{
 		while (Length >= Rate)
 		{
@@ -586,7 +586,7 @@ KPA::KPA(KpaModes KbaModeType)
 				State[i] ^= IntegerTools::LeBytesTo64(Input, (sizeof(uint64_t) * i));
 			}
 #endif
-			Keccak::PermuteR24P1600C(State, KPA_ROUNDS);
+			Keccak::Permute(State, Keccak::PermutationRounds::RX12);
 			Length -= Rate;
 			InOffset += Rate;
 		}
@@ -602,7 +602,7 @@ KPA::KPA(KpaModes KbaModeType)
 			}
 #endif
 
-			Keccak::PermuteR24P1600C(State, KPA_ROUNDS);
+			Keccak::Permute(State, Keccak::PermutationRounds::RX12);
 		}
 	}
 
@@ -656,12 +656,12 @@ KPA::KPA(KpaModes KbaModeType)
 #else
 		for (size_t i = 0; i < KPA_PARALLELISM; ++i)
 		{
-			Keccak::PermuteR24P1600C(Ctx->State[i], KPA_ROUNDS);
+			Keccak::Permute(Ctx->State[i], Keccak::PermutationRounds::RX12);
 		}
 #endif
 	}
 
-	void KPA::KpaSqueezeBlocks(std::vector<ulong> &State, std::vector<byte> &Output, size_t BlockCount, size_t Rate)
+	void KPA::KpaSqueezeBlocks(std::vector<uint64_t> &State, std::vector<uint8_t> &Output, size_t BlockCount, size_t Rate)
 	{
 		size_t oft;
 
@@ -669,14 +669,14 @@ KPA::KPA(KpaModes KbaModeType)
 
 		while (BlockCount > 0)
 		{
-			Keccak::PermuteR24P1600C(State, KPA_ROUNDS);
+			Keccak::Permute(State, Keccak::PermutationRounds::RX12);
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 			MemoryTools::Copy(State, 0, Output, oft, Rate);
 #else
 			for (size_t i = 0; i < (Rate >> 3); ++i)
 			{
-				IntegerTools::Le64ToBytes(State[i], Output, i * sizeof(ulong));
+				IntegerTools::Le64ToBytes(State[i], Output, i * sizeof(uint64_t));
 			}
 #endif
 			oft += Rate;
@@ -690,7 +690,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 #if defined(CEX_HAS_AVX512)
 
-		std::vector<ulong> tmp(8);
+		std::vector<uint64_t> tmp(8);
 
 		for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
 		{
@@ -707,7 +707,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 #elif defined(CEX_HAS_AVX2)
 
-		std::vector<ulong> tmp(4);
+		std::vector<uint64_t> tmp(4);
 
 		for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
 		{

@@ -21,7 +21,7 @@ namespace Test
 	using Cipher::SymmetricKeySize;
 
 	const std::string RWSTest::CLASSNAME = "RWSTest";
-	const std::string RWSTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit key versions of the  Rijndael 512-bit wide block (RWS) authenticated stream cipher.";
+	const std::string RWSTest::DESCRIPTION = "Tests the 256 and 512 bit key versions of the  Rijndael 512-bit wide block (RWS) authenticated stream cipher.";
 	const std::string RWSTest::SUCCESS = "SUCCESS! All RWS tests have executed succesfully.";
 	const bool RWSTest::HAS_AESNI = HasAESNI();
 
@@ -74,37 +74,34 @@ namespace Test
 
 			// stress test authentication and verification using random input and keys
 			Authentication(rwsa);
-			OnProgress(std::string("RWSTest: Passed RWS-256/512/1024 MAC authentication tests.."));
+			OnProgress(std::string("RWSTest: Passed RWS-256/512 MAC authentication tests.."));
 
 			// test all exception handlers for correct operation
 			Exception();
-			OnProgress(std::string("RWSTest: Passed RWS-256/512/1024 exception handling tests.."));
+			OnProgress(std::string("RWSTest: Passed RWS-256/512 exception handling tests.."));
 
 			// test 2 succesive finalization calls against mac output and expected ciphertext
 			Finalization(rwsa, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0], m_code[1]);
 			Finalization(rwsa, m_message[1], m_key[1], m_nonce[0], m_expected[2], m_code[2], m_code[3]);
-			Finalization(rwsa, m_message[2], m_key[2], m_nonce[0], m_expected[3], m_code[4], m_code[5]);
-			OnProgress(std::string("RWSTest: Passed RWS-256/512/1024 known answer finalization tests."));
+			OnProgress(std::string("RWSTest: Passed RWS-256/512 known answer finalization tests."));
 
 			// original known answer test vectors generated with this implementation
 			Kat(rwss, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
 			Kat(rwsa, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
 			Kat(rwsa, m_message[1], m_key[1], m_nonce[0], m_expected[2]);
-			Kat(rwsa, m_message[2], m_key[2], m_nonce[0], m_expected[3]);
-			OnProgress(std::string("RWSTest: Passed RWS-256/512/1024 known answer cipher tests.."));
+			OnProgress(std::string("RWSTest: Passed RWS-256/512 known answer cipher tests.."));
 
-			Sequential(rwsa, m_message[0], m_key[0], m_nonce[0], m_expected[4], m_expected[5], m_expected[6]);
-			Sequential(rwsa, m_message[1], m_key[1], m_nonce[0], m_expected[7], m_expected[8], m_expected[9]);
-			Sequential(rwsa, m_message[2], m_key[2], m_nonce[0], m_expected[10], m_expected[11], m_expected[12]);
+			Sequential(rwsa, m_message[0], m_key[0], m_nonce[0], m_expected[3], m_expected[4], m_expected[5]);
+			Sequential(rwsa, m_message[1], m_key[1], m_nonce[0], m_expected[6], m_expected[7], m_expected[8]);
 			OnProgress(std::string("RWSTest: Passed RWS sequential transformation calls test.."));
 
 			// run the monte carlo equivalency tests and compare encryption to a vector
 			MonteCarlo(rwss, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
-			OnProgress(std::string("RWSTest: Passed RWS-256/512/1024 monte carlo tests.."));
+			OnProgress(std::string("RWSTest: Passed RWS-256/512 monte carlo tests.."));
 
 			// compare parallel output with sequential for equality
 			Parallel(rwss);
-			OnProgress(std::string("RWSTest: Passed RWS-256/512/1024 parallel to sequential equivalence test.."));
+			OnProgress(std::string("RWSTest: Passed RWS-256/512 parallel to sequential equivalence test.."));
 
 			// tests the cipher state serialization feature
 			Serialization();
@@ -112,13 +109,12 @@ namespace Test
 
 			// looping test of successful decryption with random keys and input
 			Stress(rwss);
-			OnProgress(std::string("RWSTest: Passed RWS-256/512/1024 stress tests.."));
+			OnProgress(std::string("RWSTest: Passed RWS-256/512 stress tests.."));
 
 			// verify ciphertext output, decryption, and mac code generation
 			Verification(rwsa, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0]);
 			Verification(rwsa, m_message[1], m_key[1], m_nonce[0], m_expected[2], m_code[2]);
-			Verification(rwsa, m_message[2], m_key[2], m_nonce[0], m_expected[3], m_code[4]);
-			OnProgress(std::string("RWSTest: Passed RWS-256/512/1024 known answer authentication tests.."));
+			OnProgress(std::string("RWSTest: Passed RWS-256/512 known answer authentication tests.."));
 
 			delete rwss;
 			delete rwsa;
@@ -145,11 +141,11 @@ namespace Test
 		const size_t TAGLEN = ks.KeySize();
 		const size_t MINSMP = 64;
 		const size_t MAXSMP = 6400;
-		std::vector<byte> cpt;
-		std::vector<byte> inp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.IVSize());
-		std::vector<byte> otp;
+		std::vector<uint8_t> cpt;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> nonce(ks.IVSize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 
@@ -196,7 +192,7 @@ namespace Test
 		// test serialized loading with invalid state
 		try
 		{
-			SecureVector<byte> sta(100);
+			SecureVector<uint8_t> sta(100);
 			RWS cpr2(sta);
 
 			throw TestException(std::string("RWS"), std::string("Exception"), std::string("Exception handling failure! -AE1"));
@@ -215,8 +211,8 @@ namespace Test
 		{
 			RWS cpr(false);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.IVSize());
+			std::vector<uint8_t> key(ks.KeySize() + 1);
+			std::vector<uint8_t> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -236,7 +232,7 @@ namespace Test
 		{
 			RWS cpr(false);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize() + 1);
+			std::vector<uint8_t> key(ks.KeySize() + 1);
 			SymmetricKey kp(key);
 
 			cpr.Initialize(true, kp);
@@ -256,8 +252,8 @@ namespace Test
 		{
 			RWS cpr(false);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(1);
+			std::vector<uint8_t> key(ks.KeySize());
+			std::vector<uint8_t> nonce(1);
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -277,7 +273,7 @@ namespace Test
 		{
 			RWS cpr(false);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> key(ks.KeySize());
+			std::vector<uint8_t> key(ks.KeySize());
 			SymmetricKey kp(key);
 
 			cpr.Initialize(true, kp);
@@ -294,13 +290,13 @@ namespace Test
 		}
 	}
 
-	void RWSTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
+	void RWSTest::Finalization(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected, std::vector<uint8_t> &MacCode1, std::vector<uint8_t> &MacCode2)
 	{
 		const size_t TAGLEN = Key.size();
 		const size_t CPTLEN = Message.size() + TAGLEN;
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> cpt(CPTLEN * 2);
-		std::vector<byte> otp(MSGLEN * 2);
+		std::vector<uint8_t> cpt(CPTLEN * 2);
+		std::vector<uint8_t> otp(MSGLEN * 2);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt msg 1
@@ -349,14 +345,14 @@ namespace Test
 		}
 	}
 
-	void RWSTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void RWSTest::Kat(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected)
 	{
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
 		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Key.size() : Message.size();
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> cpt(CPTLEN);
-		std::vector<byte> otp(MSGLEN);
+		std::vector<uint8_t> cpt(CPTLEN);
+		std::vector<uint8_t> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt
@@ -378,12 +374,12 @@ namespace Test
 		}
 	}
 
-	void RWSTest::MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void RWSTest::MonteCarlo(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected)
 	{
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> msg = Message;
-		std::vector<byte> enc(MSGLEN);
-		std::vector<byte> dec(MSGLEN);
+		std::vector<uint8_t> msg = Message;
+		std::vector<uint8_t> enc(MSGLEN);
+		std::vector<uint8_t> dec(MSGLEN);
 		size_t i;
 
 		Cipher::SymmetricKey kp(Key, Nonce);
@@ -417,15 +413,15 @@ namespace Test
 
 	void RWSTest::Parallel(IStreamCipher* Cipher)
 	{
-		const uint MINSMP = static_cast<uint>(Cipher->ParallelBlockSize());
-		const uint MAXSMP = static_cast<uint>(Cipher->ParallelBlockSize()) * 4;
+		const uint32_t MINSMP = static_cast<uint32_t>(Cipher->ParallelBlockSize());
+		const uint32_t MAXSMP = static_cast<uint32_t>(Cipher->ParallelBlockSize()) * 4;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
-		std::vector<byte> cpt1;
-		std::vector<byte> cpt2;
-		std::vector<byte> inp;
-		std::vector<byte> otp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.IVSize());
+		std::vector<uint8_t> cpt1;
+		std::vector<uint8_t> cpt2;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> otp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> nonce(ks.IVSize());
 		Prng::SecureRandom rnd;
 		size_t i;
 
@@ -474,16 +470,16 @@ namespace Test
 		}
 	}
 
-	void RWSTest::Sequential(IStreamCipher* Cipher, const std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce,
-		const std::vector<byte> &Output1, const std::vector<byte> &Output2, const std::vector<byte> &Output3)
+	void RWSTest::Sequential(IStreamCipher* Cipher, const std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce,
+		const std::vector<uint8_t> &Output1, const std::vector<uint8_t> &Output2, const std::vector<uint8_t> &Output3)
 	{
-		std::vector<byte> ad(20, 0x01);
-		std::vector<byte> dec1(Message.size());
-		std::vector<byte> dec2(Message.size());
-		std::vector<byte> dec3(Message.size());
-		std::vector<byte> otp1(Output1.size());
-		std::vector<byte> otp2(Output2.size());
-		std::vector<byte> otp3(Output3.size());
+		std::vector<uint8_t> ad(20, 0x01);
+		std::vector<uint8_t> dec1(Message.size());
+		std::vector<uint8_t> dec2(Message.size());
+		std::vector<uint8_t> dec3(Message.size());
+		std::vector<uint8_t> otp1(Output1.size());
+		std::vector<uint8_t> otp2(Output2.size());
+		std::vector<uint8_t> otp3(Output3.size());
 
 		SymmetricKey kp(Key, Nonce);
 
@@ -563,19 +559,19 @@ namespace Test
 		const size_t MSGLEN = 137;
 		RWS cpr1(true);
 		Cipher::SymmetricKeySize ks = cpr1.LegalKeySizes()[0];
-		std::vector<byte> cpt1(MSGLEN + TAGLEN);
-		std::vector<byte> cpt2(MSGLEN + TAGLEN);
-		std::vector<byte> key(ks.KeySize(), 0x01);
-		std::vector<byte> cust(ks.InfoSize(), 0x02);
-		std::vector<byte> msg(MSGLEN, 0x03);
-		std::vector<byte> nonce(ks.IVSize(), 0x04);
-		std::vector<byte> plt1(MSGLEN);
-		std::vector<byte> plt2(MSGLEN);
+		std::vector<uint8_t> cpt1(MSGLEN + TAGLEN);
+		std::vector<uint8_t> cpt2(MSGLEN + TAGLEN);
+		std::vector<uint8_t> key(ks.KeySize(), 0x01);
+		std::vector<uint8_t> cust(ks.InfoSize(), 0x02);
+		std::vector<uint8_t> msg(MSGLEN, 0x03);
+		std::vector<uint8_t> nonce(ks.IVSize(), 0x04);
+		std::vector<uint8_t> plt1(MSGLEN);
+		std::vector<uint8_t> plt2(MSGLEN);
 
 		SymmetricKey kp(key, nonce, cust);
 		cpr1.Initialize(true, kp);
 
-		SecureVector<byte> sta1 = cpr1.Serialize();
+		SecureVector<uint8_t> sta1 = cpr1.Serialize();
 		RWS cpr2(sta1);
 
 		cpr1.Transform(msg, 0, cpt1, 0, msg.size());
@@ -588,7 +584,7 @@ namespace Test
 
 		cpr1.Initialize(false, kp);
 
-		SecureVector<byte> sta2 = cpr1.Serialize();
+		SecureVector<uint8_t> sta2 = cpr1.Serialize();
 		RWS cpr3(sta2);
 
 		cpr1.Transform(cpt1, 0, plt1, 0, plt1.size());
@@ -602,16 +598,16 @@ namespace Test
 
 	void RWSTest::Stress(IStreamCipher* Cipher)
 	{
-		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
-		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
+		const uint32_t MINPRL = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXPRL = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
-		std::vector<byte> cpt;
-		std::vector<byte> inp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.IVSize());
-		std::vector<byte> otp;
+		std::vector<uint8_t> cpt;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> nonce(ks.IVSize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 
@@ -645,12 +641,12 @@ namespace Test
 		}
 	}
 
-	void RWSTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
+	void RWSTest::Verification(IStreamCipher* Cipher, std::vector<uint8_t> &Message, std::vector<uint8_t> &Key, std::vector<uint8_t> &Nonce, std::vector<uint8_t> &Expected, std::vector<uint8_t> &Mac)
 	{
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Key.size();
-		std::vector<byte> cpt(MSGLEN + TAGLEN);
-		std::vector<byte> otp(MSGLEN);
+		std::vector<uint8_t> cpt(MSGLEN + TAGLEN);
+		std::vector<uint8_t> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt
@@ -709,14 +705,9 @@ namespace Test
 			std::string("F2D7B6D9D321D45C9D5307C6925E5CF77FBAEB8F63A831125D8037D793E82AF7"),
 			// qotc512k512
 			std::string("824A7428505B2917388F66243B564174C339532909C5A04FA788F1A3B2CA5818D52885541E7576641DA3D34430CB00BDA6197069E3838DDC8F9948C049FC4FC0"),
-			std::string("5AF5E8272DEDDB452E9CDDE68A1985B82A042597E47425E6A33D17FFC5412EC00B8CABD5CD2D0B081BE0F3A40CBDDBC4E31E053AE3C11D6E601B1B22A4AFA52D"),
-			// qot1024k1024
-			std::string("0D367770852AFC9BDDCC179B604E818782B54F695DF8F86070666E1414D0EFE58E573E3EDF4EDD0FC46D494DE73952EFBEDF62882506736EF15A91D7DD9E65A3"
-				"C11C37970DA2A81D2BDD74F1B4FC3D1ADF96C4F5C58413393458928E814D7A4610A8883FFEB46C0D5014BB431F516C184632C05A2B00DBD6FDA2E65F45129E37"),
-			std::string("465E2E8C90894756C6416343910D663DE4837D5E7D106A5A276FE6FF4D8A4EC77A8567B7C2C0AD4A0DFC4220ACE91A70CB376516D5FA2511C0D1EBD0458B6CF5"
-				"27513E4374D3F794379650CB9AD1BDCBE72F13595A4C7B44D0873962868BCBDD05F9C4728A484B84BD3B5BAA00AEADF23E3DC6CF9CAA3256B3CE889013F4A73E")
+			std::string("5AF5E8272DEDDB452E9CDDE68A1985B82A042597E47425E6A33D17FFC5412EC00B8CABD5CD2D0B081BE0F3A40CBDDBC4E31E053AE3C11D6E601B1B22A4AFA52D")
 		};
-		HexConverter::Decode(code, 6, m_code);
+		HexConverter::Decode(code, 4, m_code);
 
 		const std::vector<std::string> expected =
 		{
@@ -728,11 +719,6 @@ namespace Test
 			// qotc512k512
 			std::string("7C83DB1AED7C005BB0BBDB9F01B128DCB5BDB9741D4D383AC3659667962183FE1F11207E68F4B329F9D975E5CCE2DDF1E6F8BB3831B9F7B2AF7691E7F86CDC9B"
 				"824A7428505B2917388F66243B564174C339532909C5A04FA788F1A3B2CA5818D52885541E7576641DA3D34430CB00BDA6197069E3838DDC8F9948C049FC4FC0"),
-			// qotc1024k1024
-			std::string("C3F0A1F5D688ADB089273039F4BE6227547D0753AD16D1E8557A83B26B2E3A3AFCF6EFE55B2C668987C79864444BD793DF4AA98477D2FACC5367F48F628FAF46"
-				"B203DFDAF5134040A957F4E78F839AD474F9AA698E73E01BE51BA088E8BEB9A98903A747E9C103BA8FBA78869AAC69522A3C81E9187B6A57DE8BEAFDDF0CA6ED"
-				"0D367770852AFC9BDDCC179B604E818782B54F695DF8F86070666E1414D0EFE58E573E3EDF4EDD0FC46D494DE73952EFBEDF62882506736EF15A91D7DD9E65A3"
-				"C11C37970DA2A81D2BDD74F1B4FC3D1ADF96C4F5C58413393458928E814D7A4610A8883FFEB46C0D5014BB431F516C184632C05A2B00DBD6FDA2E65F45129E37"),
 			// sequential tests
 			// hbar256k256
 			std::string("3AF0F958D9172905EE1FE77DA3E80ABED2223E4DCBB0D9F9314BD5CE124FB8AAB5E0824563A6F57D04F7978F18C6D2F7CC19B74DB66957522B1C6F437A7A0A0A"),
@@ -744,40 +730,23 @@ namespace Test
 			std::string("C7DA61C5CBB92758E03CD166F9022EB03446927352001CDD009457D9449C157812DE0C08F7618F84E650CDAADFF412CFAB852A814F66885C9B8831CAFCFBB3C3"
 				"88ED25C91BFC893406B8CA0A6F19DFEF488CC11CA8FA26FFEAB8F7E952425E9D360FA8DCF730DF44562109492F45F5F95AFCB3C0D4C992E866CFBF77ECBB94A1"),
 			std::string("1DB31278E0C7F30032A7C045F7A8DC7D4CFD2E96DFC904A03AC539F7FFBD9D5FB27C81263BDE90E4D2D7E0D118F38BFC76B93797E97515D9A366259AC17D338B"
-				"2D0311C107BE7F070FF4462B2A1EC44F8C4ADD7ED59B8B7A582277250995A2BF2ADDDD509E41E3EFB4AB40E693250B22BE436D820C38C647C9BDE7505D766C0D"),
-			// hbar1024k1024
-			std::string("C3F0A1F5D688ADB089273039F4BE6227547D0753AD16D1E8557A83B26B2E3A3AFCF6EFE55B2C668987C79864444BD793DF4AA98477D2FACC5367F48F628FAF46"
-				"B203DFDAF5134040A957F4E78F839AD474F9AA698E73E01BE51BA088E8BEB9A98903A747E9C103BA8FBA78869AAC69522A3C81E9187B6A57DE8BEAFDDF0CA6ED"
-				"5773B604FE76BABDBE0FF3C156E918DD5ABDEF74FBC7241FA443ADD4E3150F6BA29E7CDB929D8DFF49BCC9642907360B0B63A906861FAD37DD8DFDF557EB867F"
-				"E75A3692BF3B3FA57FBD6D24982F1D48316A6FA0BBE1EA49B48143DCE3A3161EABE2EA486BA5EF4BE3799511387E989781052E10C10027F4EBDA59BFB6B69D56"),
-			std::string("2FD502232C9CCB6F640B680B2942B587DD8EA3A1B1AF0F3B1E49B7AA7AA92A95BBD7F9F52CC51AB0C7471A394E28D2CAB825CCD59C90711A8944D7C22FAD8EEE"
-				"FA72EC7E012B8F7595678E10617DFEAC006F8DC3000FB68DB6F6942DA76984A47A2495502DB1038AF07D58688D0000E23FC8698FCBDF1EFD77D9DFF87E9457FB"
-				"B095154544FC18F0E22C2A2154EA3C3D1E1C6F0CB92B95CE1CF4E31020C547881D03C5EB419D5B14B27DB3B272736F5EB11EE659ACA4EC17896DDF324631F2DC"
-				"612FE586C3198F9A6A921B888B7BADC75B38214605E2BEFA489DF62AC95300F40E72C2DFEE6EC2BC1476C032C3DFFC8D03E2B3663D21C9AF94019F0D9F2394CF"),
-			std::string("8DDA10570C6583BCB9F63744D0AC7CB491A4FF1B9C6BCAB503E0713D268B17F20FBC3D2D2BC423BAD14E5C4F2E185377653585EA47FF550D72F918EE419D4B37"
-				"4E0CBC3E98BE42444D8CF6CD800EE2F66E338C9981E9413BFE9448F95CB6590417E5A3F128D740782FFC72ADC73538FC975B0A777B0F2F6230E1C2B67034029A"
-				"72F76D9D33B5EBEB2F1D906B5E1C76F70B876327B6C546C5DBA6BF3AEF5128ACE6AAE1B0303DD8C17E82BDC0B6892CB3F71E0425DD69CF576E12E8AC206524BD"
-				"304F646FFFD8197CB94E8B54E15D9EDE3FF5DDCF218E50517A086E7350830E360AE5F77764593D506E090596E24045514589ED99633AC554D6988C2EB0B61EAF")
+				"2D0311C107BE7F070FF4462B2A1EC44F8C4ADD7ED59B8B7A582277250995A2BF2ADDDD509E41E3EFB4AB40E693250B22BE436D820C38C647C9BDE7505D766C0D")
 		};
-		HexConverter::Decode(expected, 13, m_expected);
+		HexConverter::Decode(expected, 9, m_expected);
 
 		const std::vector<std::string> key =
 		{
 			std::string("000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F"
-			"000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F")
+			std::string("000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F")
 		};
-		HexConverter::Decode(key, 3, m_key);
+		HexConverter::Decode(key, 2, m_key);
 
 		const std::vector<std::string> message =
 		{
 			std::string("000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F"),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F"
-				"404142434445464748494A4B4C4D4E4F505152535455565758595A5B5C5D5E5F606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F"),
+			std::string("000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F")
 		};
-		HexConverter::Decode(message, 3, m_message);
+		HexConverter::Decode(message, 2, m_message);
 
 		const std::vector<std::string> monte =
 		{

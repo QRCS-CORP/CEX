@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by January 28, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_KDF2_H
 #define CEX_KDF2_H
@@ -158,7 +158,7 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes
@@ -167,7 +167,7 @@ public:
 	/// <param name="Output">The destination secure-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(SecureVector<byte> &Output) override;
+	void Generate(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill an array with pseudo-random bytes, using offset and length parameters
@@ -178,7 +178,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes, using offset and length parameters
@@ -189,7 +189,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
@@ -207,8 +207,8 @@ public:
 
 private:
 
-	static void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator);
-	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator);
+	static void Expand(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator);
+	static void Expand(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator);
 };
 
 NAMESPACE_KDFEND

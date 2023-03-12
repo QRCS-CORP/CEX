@@ -15,7 +15,7 @@ class ICM::IcmState
 {
 public:
 
-	std::vector<byte> Nonce;
+	std::vector<uint8_t> Nonce;
 	bool Destroyed;
 	bool Encryption;
 	bool Initialized;
@@ -134,7 +134,7 @@ const std::string ICM::Name()
 	return tmpn;
 }
 
-const std::vector<byte> &ICM::Nonce()
+const std::vector<uint8_t> &ICM::Nonce()
 {
 	return m_icmState->Nonce;
 }
@@ -151,28 +151,28 @@ ParallelOptions &ICM::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void ICM::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+void ICM::DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
 	Encrypt128(Input, 0, Output, 0);
 }
 
-void ICM::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void ICM::DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void ICM::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+void ICM::EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
 	Encrypt128(Input, 0, Output, 0);
 }
 
-void ICM::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void ICM::EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
@@ -218,7 +218,7 @@ void ICM::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void ICM::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void ICM::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length!");
@@ -252,19 +252,19 @@ void ICM::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 //~~~Private Functions~~~//
 
-void ICM::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void ICM::Encrypt128(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the block-size!");
 
-	std::vector<byte> tmpc(BLOCK_SIZE);
+	std::vector<uint8_t> tmpc(BLOCK_SIZE);
 	MemoryTools::COPY128(m_icmState->Nonce, 0, tmpc, 0);
 	m_blockCipher->EncryptBlock(tmpc, 0, Output, OutOffset);
 	IntegerTools::LeIncrement(m_icmState->Nonce);
 	MemoryTools::XOR128(Input, InOffset, Output, OutOffset);
 }
 
-void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
+void ICM::Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::vector<uint8_t> &Counter)
 {
 	size_t bctr;
 
@@ -275,7 +275,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVX512BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX512BLK);
-		std::vector<byte> cblk(AVX512BLK);
+		std::vector<uint8_t> cblk(AVX512BLK);
 
 		// stagger counters and process 8 blocks with avx
 		while (bctr != PBKALN)
@@ -322,7 +322,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVX2BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX2BLK);
-		std::vector<byte> cblk(AVX2BLK);
+		std::vector<uint8_t> cblk(AVX2BLK);
 
 		// stagger counters and process 8 blocks with avx
 		while (bctr != PBKALN)
@@ -352,7 +352,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
-		std::vector<byte> cblk(AVXBLK);
+		std::vector<uint8_t> cblk(AVXBLK);
 
 		// 4 blocks with sse
 		while (bctr != PBKALN)
@@ -372,7 +372,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 #endif
 
 	const size_t ALNBLK = Length - (Length % BLOCK_SIZE);
-	std::vector<byte> tmpc(BLOCK_SIZE);
+	std::vector<uint8_t> tmpc(BLOCK_SIZE);
 
 	while (bctr != ALNBLK)
 	{
@@ -384,7 +384,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 
 	if (bctr != Length)
 	{
-		std::vector<byte> tmpr(BLOCK_SIZE);
+		std::vector<uint8_t> tmpr(BLOCK_SIZE);
 		MemoryTools::COPY128(Counter, 0, tmpc, 0);
 		m_blockCipher->EncryptBlock(tmpc, 0, tmpr, 0);
 		const size_t FNLLEN = Length % BLOCK_SIZE;
@@ -393,17 +393,17 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	}
 }
 
-void ICM::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void ICM::ProcessParallel(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
-	std::vector<byte> tmpc(m_icmState->Nonce.size());
+	std::vector<uint8_t> tmpc(m_icmState->Nonce.size());
 
 	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
-		std::vector<byte> thdc(BLOCK_SIZE, 0);
+		std::vector<uint8_t> thdc(BLOCK_SIZE, 0);
 		// offset counter by chunk size / block size  
 		IntegerTools::LeIncrease8(m_icmState->Nonce, thdc, CTRLEN * i);
 		const size_t STMPOS = i * CNKLEN;
@@ -436,7 +436,7 @@ void ICM::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	}
 }
 
-void ICM::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void ICM::ProcessSequential(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	size_t i;
 

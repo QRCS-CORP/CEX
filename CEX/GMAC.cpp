@@ -18,10 +18,10 @@ class GMAC::GmacState
 {
 public:
 
-	std::array<byte, CMUL::CMUL_BLOCK_SIZE> Buffer = { 0x00 };
-	std::array<ulong, CMUL::CMUL_STATE_SIZE> Hash = { 0ULL };
-	std::array<byte, CMUL::CMUL_BLOCK_SIZE> State = { 0x00 };
-	std::vector<byte> Nonce;
+	std::array<uint8_t, CMUL::CMUL_BLOCK_SIZE> Buffer = { 0x00 };
+	std::array<uint64_t, CMUL::CMUL_STATE_SIZE> Hash = { 0ULL };
+	std::array<uint8_t, CMUL::CMUL_BLOCK_SIZE> State = { 0x00 };
+	std::vector<uint8_t> Nonce;
 	size_t Counter;
 	size_t Position;
 	bool IsDestroyed;
@@ -47,7 +47,7 @@ public:
 		Counter = 0;
 		Position = 0;
 		MemoryTools::Clear(Buffer, 0, Buffer.size());
-		MemoryTools::Clear(Hash, 0, Hash.size() * sizeof(ulong));
+		MemoryTools::Clear(Hash, 0, Hash.size() * sizeof(uint64_t));
 		MemoryTools::Clear(Nonce, 0, Nonce.size());
 		MemoryTools::Clear(State, 0, State.size());
 		IsDestroyed = false;
@@ -150,7 +150,7 @@ const bool GMAC::IsInitialized()
 
 //~~~Public Functions~~~//
 
-void GMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void GMAC::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -158,14 +158,14 @@ void GMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 	}
 	if (Output.size() < TagSize())
 	{
-		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
+size_t GMAC::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	if (IsInitialized() == false)
 	{
@@ -173,7 +173,7 @@ size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 	if ((Output.size() - OutOffset) < TagSize())
 	{
-		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	PreCompute(m_gmacState, m_gmacState->State, m_gmacState->Counter, 0);
@@ -184,9 +184,9 @@ size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
-size_t GMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+size_t GMAC::Finalize(SecureVector<uint8_t> &Output, size_t OutOffset)
 {
-	std::vector<byte> tag(TagSize());
+	std::vector<uint8_t> tag(TagSize());
 
 	Finalize(tag, 0);
 	SecureMove(tag, 0, Output, OutOffset, tag.size());
@@ -196,7 +196,7 @@ size_t GMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 
 void GMAC::Initialize(ISymmetricKey &Parameters)
 {
-	std::vector<ulong> tmpk;
+	std::vector<uint64_t> tmpk;
 
 #if defined(CEX_ENFORCE_LEGALKEY)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
@@ -224,8 +224,8 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 	{
 		// key the cipher and generate H
 		m_blockCipher->Initialize(true, Parameters);
-		std::vector<byte> tmph(CMUL::CMUL_BLOCK_SIZE);
-		const std::vector<byte> ZEROES(CMUL::CMUL_BLOCK_SIZE, 0x00);
+		std::vector<uint8_t> tmph(CMUL::CMUL_BLOCK_SIZE);
+		const std::vector<uint8_t> ZEROES(CMUL::CMUL_BLOCK_SIZE, 0x00);
 		m_blockCipher->Transform(ZEROES, 0, tmph, 0);
 
 		tmpk =
@@ -234,7 +234,7 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 			IntegerTools::BeBytesTo64(tmph, 8)
 		};
 
-		MemoryTools::Copy(tmpk, 0, m_gmacState->Hash, 0, tmpk.size() * sizeof(ulong));
+		MemoryTools::Copy(tmpk, 0, m_gmacState->Hash, 0, tmpk.size() * sizeof(uint64_t));
 	}
 
 	// initialize the nonce
@@ -248,7 +248,7 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 	}
 	else
 	{
-		std::array<byte, CMUL::CMUL_BLOCK_SIZE> y0 = { 0x00 };
+		std::array<uint8_t, CMUL::CMUL_BLOCK_SIZE> y0 = { 0x00 };
 		Multiply(m_gmacState, y0);
 		PreCompute(m_gmacState, y0, 0, m_gmacState->Nonce.size());
 
@@ -274,7 +274,7 @@ void GMAC::Reset()
 	m_gmacState->Reset();
 }
 
-void GMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void GMAC::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -282,7 +282,7 @@ void GMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)
@@ -294,7 +294,7 @@ void GMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 //~~~Private Functions~~~//
 
-void GMAC::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<GmacState> &State)
+void GMAC::Absorb(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length, std::unique_ptr<GmacState> &State)
 {
 	if (Length != 0)
 	{
@@ -340,7 +340,7 @@ bool GMAC::HasCMUL()
 	return dtc.CMUL() && dtc.AVX();
 }
 
-void GMAC::Multiply(std::unique_ptr<GmacState> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output)
+void GMAC::Multiply(std::unique_ptr<GmacState> &State, std::array<uint8_t, CMUL::CMUL_BLOCK_SIZE> &Output)
 {
 	size_t blen;
 	size_t boff;
@@ -358,7 +358,7 @@ void GMAC::Multiply(std::unique_ptr<GmacState> &State, std::array<byte, CMUL::CM
 	}
 }
 
-void GMAC::Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output)
+void GMAC::Permute(std::array<uint64_t, CMUL::CMUL_STATE_SIZE> &State, std::array<uint8_t, CMUL::CMUL_BLOCK_SIZE> &Output)
 {
 	if (HAS_CMUL)
 	{
@@ -374,7 +374,7 @@ void GMAC::Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::array<b
 	}
 }
 
-void GMAC::PreCompute(std::unique_ptr<GmacState> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output, size_t Counter, size_t Length)
+void GMAC::PreCompute(std::unique_ptr<GmacState> &State, std::array<uint8_t, CMUL::CMUL_BLOCK_SIZE> &Output, size_t Counter, size_t Length)
 {
 	if (State->Position != 0)
 	{
@@ -387,9 +387,9 @@ void GMAC::PreCompute(std::unique_ptr<GmacState> &State, std::array<byte, CMUL::
 		Permute(State->Hash, Output);
 	}
 
-	std::vector<byte> tmpb(CMUL::CMUL_BLOCK_SIZE);
-	IntegerTools::Be64ToBytes(static_cast<ulong>(Counter) * 8, tmpb, 0);
-	IntegerTools::Be64ToBytes(static_cast<ulong>(Length) * 8, tmpb, sizeof(ulong));
+	std::vector<uint8_t> tmpb(CMUL::CMUL_BLOCK_SIZE);
+	IntegerTools::Be64ToBytes(static_cast<uint64_t>(Counter) * 8, tmpb, 0);
+	IntegerTools::Be64ToBytes(static_cast<uint64_t>(Length) * 8, tmpb, sizeof(uint64_t));
 	MemoryTools::XOR128(tmpb, 0, Output, 0);
 
 	Permute(State->Hash, Output);

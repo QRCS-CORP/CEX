@@ -1,16 +1,12 @@
 // Development Map
 //
-// 1.0.0.9a
-// internal migration to secure vectors
-// 
-// 1.0.0.9b
-// linux, gcc
-// 
-// 1.0.0.9c
-// upgrade asymmetric ciphers to round 3 versions
-// 
-// 1.0.0.9d
-// Post quantum TLS
+// TODO:
+// Asymmetric update
+// Merge RCS/ACS, RHX/AHX
+// Unify SHA3, Skein(?)..
+// Remove Skein, Threefish?
+// Simplify constructors
+// ...
 
 #include <iostream>
 #include <stdio.h>
@@ -41,14 +37,12 @@
 #include "../Test/DigestSpeedTest.h"
 #include "../Test/DigestStreamTest.h"
 #include "../Test/DilithiumTest.h"
-#include "../Test/DUKPTTest.h"
 #include "../Test/ECDHTest.h"
 #include "../Test/ECDSATest.h"
 #include "../Test/ECPTest.h"
 #include "../Test/GMACTest.h"
 #include "../Test/HCRTest.h"
 #include "../Test/HKDFTest.h"
-#include "../Test/HKDSTest.h"
 #include "../Test/HMACTest.h"
 #include "../Test/HCGTest.h"
 #include "../Test/ITest.h"
@@ -59,13 +53,10 @@
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
 #include "../Test/KyberTest.h"
-#include "../Test/NewHopeTest.h"
-#include "../Test/NTRUPrimeTest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
 #include "../Test/Poly1305Test.h"
-#include "../Test/RainbowTest.h"
 #include "../Test/RandomOutputTest.h"
 #include "../Test/RCSTest.h"
 #include "../Test/RDPTest.h"
@@ -162,12 +153,12 @@ void PrintRandom(size_t Lines)
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("************************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.8: CEX Library in C++    *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.1.0.0: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.9b (A9)                    *");
-	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      December 07, 2020                 *");
-	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
+	ConsoleUtils::WriteLine("* Release:   v1.1.0.0a (A10)                   *");
+	ConsoleUtils::WriteLine("* License:   AGPLv3                            *");
+	ConsoleUtils::WriteLine("* Date:      March 01, 2023                    *");
+	ConsoleUtils::WriteLine("* Contact:   develop@qscs.ca                   *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
 }
@@ -257,7 +248,7 @@ int32_t main()
 
 	try
 	{
-		TestUtils::Read(TestFiles::AESAVS::AESCBC128_VARKEY, data);
+		TestUtils::FileRead(TestFiles::AESAVS::AESCBC128_VARKEY, data);
 	}
 	catch (std::exception&) 
 	{
@@ -363,23 +354,23 @@ int32_t main()
 			if (hasAesni)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
-				TestRun(new AesAvsTest(true));
+				TestRun(new AesAvsTest());
 			}
 #endif
 
 			PrintHeader("Testing the AES software implementation (AES)");
-			TestRun(new AesAvsTest(false));
+			TestRun(new AesAvsTest());
 
 #if defined(CEX_HAS_AVX)
 			if (hasAesni)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
-				TestRun(new RijndaelTest(true));
+				TestRun(new RijndaelTest());
 			}
 #endif
 
 			PrintHeader("Testing the AES software implementation (RHX)");
-			TestRun(new RijndaelTest(false));
+			TestRun(new RijndaelTest());
 			PrintHeader("Testing the Serpent software implementation (SHX)");
 			TestRun(new SerpentTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
@@ -431,9 +422,6 @@ int32_t main()
 			TestRun(new PBKDF2Test());
 			TestRun(new SCBKDFTest());
 			TestRun(new SHAKETest());
-			PrintHeader("TESTING KEY MANAGEMENT SYSTEMS");
-			TestRun(new DUKPTTest());
-			TestRun(new HKDSTest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			TestRun(new BCGTest());
 			TestRun(new CSGTest());
@@ -452,12 +440,9 @@ int32_t main()
 			TestRun(new ECDHTest());
 			TestRun(new KyberTest());
 			TestRun(new McElieceTest());
-			TestRun(new NewHopeTest());
-			TestRun(new NTRUPrimeTest());
 			PrintHeader("TESTING ASYMMETRIC SIGNATURE SCHEMES");
 			TestRun(new DilithiumTest());
 			TestRun(new ECDSATest());
-			TestRun(new RainbowTest());
 			TestRun(new SphincsPlusTest());
 			TestRun(new XMSSTest());
 		}

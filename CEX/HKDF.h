@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by January 28, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_HKDF_H
 #define CEX_HKDF_H
@@ -58,7 +58,7 @@ using Enumeration::SHA2Digests;
 /// The Extract step is called if the KKDF is initialized with the salt parameter, this compresses the input material to a key used by HMAC. \n
 /// For best possible security, the Extract step should be skipped, and HKDF initialized with a key equal in size to the desired security level, and optimally to the HMAC functions internal block-size, 
 /// with the Info parameter used as a secondary source of pseudo-random key input. \n
-/// If used in this configuration, ideally the Info parameter should be sized to the hash output-size, less one byte of counter and any padding added by the hash functions finalizer. \n
+/// If used in this configuration, ideally the Info parameter should be sized to the hash output-size, less one uint8_t of counter and any padding added by the hash functions finalizer. \n
 /// Using this formula the HMAC is given the maximum amount of entropy on each expansion cycle without the need to call additional permutation compressions, and the underlying hash function processes only full blocks of input. \n
 /// The minimum key size should align with the expected security level of the generator function. \n
 /// For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. \n
@@ -91,7 +91,7 @@ using Enumeration::SHA2Digests;
 /// <item><description>The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material.</description></item>
 /// <item><description>Initializing with a salt parameter will call the HKDF Extract function, this is not recommended.</description></item>
 /// <item><description>The Info parameter can be set via a property, and can be used as an additional source of entropy.</description></item>
-/// <item><description>The recommended key and salt size is the digests block-size in bytes, the info size should be the HMAC output-size, less 1 byte of counter and any padding added by the digests finalizer.</description></item>
+/// <item><description>The recommended key and salt size is the digests block-size in bytes, the info size should be the HMAC output-size, less 1 uint8_t of counter and any padding added by the digests finalizer.</description></item>
 /// <item><description>The minimum recommended key size is the underlying digests output-size in bytes.</description></item>
 /// </list>
 /// 
@@ -162,7 +162,7 @@ public:
 	/// Read/Write: Sets the Info value in the HKDF initialization parameters.
 	/// <para>Must be set before Initialize() function is called.</para>
 	/// </summary>
-	std::vector<byte> &Info();
+	std::vector<uint8_t> &Info();
 
 	/// <summary>
 	/// Read Only: Generator is initialized and ready to produce pseudo-random
@@ -179,7 +179,7 @@ public:
 	/// <param name="Salt">The salt value, added to the key</param>
 	/// <param name="Output">Receives the newly generated key. 
 	/// The array size is the underlying digests output size (32 bytes with SHA2-256, and 64 bytes when using SHA2-512)</param>
-	void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output);
+	void Extract(const std::vector<uint8_t> &Key, const std::vector<uint8_t> &Salt, std::vector<uint8_t> &Output);
 
 	/// <summary>
 	/// HKDF-Extract function; generate a new secure-vector key using combined key and salt arrays as input.
@@ -189,7 +189,7 @@ public:
 	/// <param name="Salt">The salt value, added to the key</param>
 	/// <param name="Output">Receives the newly generated secure-vector key. 
 	/// The array size is the underlying digests output size (32 bytes with SHA2-256, and 64 bytes when using SHA2-512)</param>
-	void Extract(const SecureVector<byte> &Key, const SecureVector<byte> &Salt, SecureVector<byte> &Output);
+	void Extract(const SecureVector<uint8_t> &Key, const SecureVector<uint8_t> &Salt, SecureVector<uint8_t> &Output);
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes
@@ -198,7 +198,7 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes
@@ -207,7 +207,7 @@ public:
 	/// <param name="Output">The destination secure-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(SecureVector<byte> &Output) override;
+	void Generate(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill an array with pseudo-random bytes, using offset and length parameters
@@ -218,7 +218,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes, using offset and length parameters
@@ -229,7 +229,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
@@ -247,8 +247,8 @@ public:
 
 private:
 
-	static void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
-	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
+	static void Expand(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
+	static void Expand(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
 };
 
 NAMESPACE_KDFEND

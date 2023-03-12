@@ -56,7 +56,7 @@ public:
 	/// <param name="ParameterType">The asymmetric primitives parameter-set enumeration name</param>
 	///
 	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are passed</exception>
-	AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType);
+	AsymmetricKey(const std::vector<uint8_t> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType);
 
 	/// <summary>
 	/// Initialize an AsymmetricKey container
@@ -68,7 +68,7 @@ public:
 	/// <param name="ParameterType">The asymmetric primitives parameter-set enumeration name</param>
 	///
 	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are passed</exception>
-	AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType);
+	AsymmetricKey(const SecureVector<uint8_t> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -95,12 +95,12 @@ public:
 	/// <summary>
 	/// Read Only: Returns a copy of the asymmetric keys standard-vector polynomial
 	/// </summary>
-	const std::vector<byte> Polynomial() override;
+	const std::vector<uint8_t> Polynomial() override;
 
 	/// <summary>
 	/// Read Only: Returns a reference to the internal asymmetric keys secure-vector polynomial
 	/// </summary>
-	const SecureVector<byte> &SecurePolynomial();
+	const SecureVector<uint8_t> &SecurePolynomial();
 
 	//~~~Public Functions~~~//
 
@@ -118,7 +118,7 @@ public:
 	/// <param name="KeyStream">Stream containing the serialized AsymmetricKey</param>
 	/// 
 	/// <returns>A populated AsymmetricKey container</returns>
-	static AsymmetricKey* DeSerialize(SecureVector<byte> &KeyStream);
+	static AsymmetricKey* DeSerialize(SecureVector<uint8_t> &KeyStream);
 
 	/// <summary>
 	/// Serialize an AsymmetricKey into a secure-vector key-stream
@@ -127,7 +127,7 @@ public:
 	/// <param name="KeyParams">The AsymmetricKey key container</param>
 	/// 
 	/// <returns>A key-stream containing a serialized AsymmetricKey key</returns>
-	static SecureVector<byte> Serialize(AsymmetricKey &KeyParams);
+	static SecureVector<uint8_t> Serialize(AsymmetricKey &KeyParams);
 };
 
 NAMESPACE_ASYMMETRICEND

@@ -34,7 +34,7 @@ public:
 	StreamReader() = delete;
 
 	/// <summary>
-	/// Constructor: instantiate this class with a byte array
+	/// Constructor: instantiate this class with a uint8_t array
 	/// </summary>
 	///
 	/// <param name="DataStream">MemoryStream to read</param>
@@ -60,18 +60,18 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Read a single byte from the stream
+	/// Read a single uint8_t from the stream
 	/// </summary>
 	///
-	/// <returns>The byte value</returns>
-	byte ReadByte();
+	/// <returns>The uint8_t value</returns>
+	uint8_t ReadByte();
 
 	/// <summary>
 	/// Reads a portion of the stream into the buffer
 	/// </summary>
 	///
 	/// <param name="Length">The number of bytes to read</param>
-	std::vector<byte> ReadBytes(size_t Length);
+	std::vector<uint8_t> ReadBytes(size_t Length);
 
 	/// <summary>
 	/// Read elements from the base stream into an array of T

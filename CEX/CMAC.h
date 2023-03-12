@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 // Updated December 20, 2016
 // Updated December 23, 2018
 // Updated February 6, 2018
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_CMAC_H
 #define CEX_CMAC_H
@@ -101,11 +101,11 @@ class CMAC final : public MacBase
 private:
 
 	static const size_t BLOCK_SIZE = 16;
-	static const byte CMAC_FINAL = 0x80;
+	static const uint8_t CMAC_FINAL = 0x80;
 	static const size_t MINKEY_LENGTH = 16;
 	static const size_t MINSALT_LENGTH = 16;
-	static const byte MIX_C128 = 0x87;
-	static const byte MIX_C64 = 0x1b;
+	static const uint8_t MIX_C128 = 0x87;
+	static const uint8_t MIX_C64 = 0x1b;
 
 	class CmacState;
 	std::unique_ptr<Cipher::Block::Mode::CBC> m_cbcMode;
@@ -180,7 +180,7 @@ public:
 	/// <param name="Output">The output vector containing the MAC code</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
-	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
+	void Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Completes processing and returns the MAC code in a standard-vector
@@ -192,7 +192,7 @@ public:
 	/// <returns>The size of the MAC code in bytes</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
-	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
+	size_t Finalize(std::vector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Completes processing and returns the MAC code in a secure-vector
@@ -204,7 +204,7 @@ public:
 	/// <returns>The size of the MAC code in bytes</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
-	size_t Finalize(SecureVector<byte> &Output, size_t OutOffset) override;
+	size_t Finalize(SecureVector<uint8_t> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the MAC generator with an ISymmetricKey key container.
@@ -232,13 +232,13 @@ public:
 	/// <param name="Length">The length of data to process in bytes</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the input array is too small</exception>
-	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
+	void Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length) override;
 
 private:
 
-	static void DoubleLu(const std::vector<byte> &Input, std::vector<byte> &Output);
-	static void Pad(std::vector<byte> &Input, size_t Offset, size_t Length);
-	static uint ShiftLeft(const std::vector<byte> &Input, std::vector<byte> &Output);
+	static void DoubleLu(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output);
+	static void Pad(std::vector<uint8_t> &Input, size_t Offset, size_t Length);
+	static uint32_t ShiftLeft(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output);
 };
 
 NAMESPACE_MACEND

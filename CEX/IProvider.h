@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by January 28, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_IPROVIDER_H
 #define CEX_IPROVIDER_H
@@ -93,7 +93,7 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	virtual void Generate(std::vector<byte> &Output) = 0;
+	virtual void Generate(std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes
@@ -102,7 +102,7 @@ public:
 	/// <param name="Output">The destination SecureVector to fill</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	virtual void Generate(SecureVector<byte> &Output) = 0;
+	virtual void Generate(SecureVector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
@@ -113,7 +113,7 @@ public:
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	virtual void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
+	virtual void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes using offset and length parameters
@@ -124,28 +124,28 @@ public:
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	virtual void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) = 0;
+	virtual void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Get a pseudo-random unsigned 16bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
-	virtual ushort NextUInt16() = 0;
+	virtual uint16_t NextUInt16() = 0;
 
 	/// <summary>
 	/// Get a pseudo-random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt32</returns>
-	virtual uint NextUInt32() = 0;
+	virtual uint32_t NextUInt32() = 0;
 
 	/// <summary>
 	/// Get a pseudo-random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt64</returns>
-	virtual ulong NextUInt64() = 0;
+	virtual uint64_t NextUInt64() = 0;
 
 	/// <summary>
 	/// Reset the internal state

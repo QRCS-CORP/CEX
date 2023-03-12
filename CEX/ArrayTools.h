@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -51,9 +51,9 @@ public:
 #if defined(CEX_IS_LITTLE_ENDIAN)
 		MemoryTools::XOR(Input, InOffset, Output, 0, Length);
 #else
-		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
+		for (size_t i = 0; i < Length / sizeof(uint64_t); ++i)
 		{
-			Output[i] ^= IntegerTools::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
+			Output[i] ^= IntegerTools::LeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)));
 		}
 #endif
 	}
@@ -63,7 +63,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Input">The pointer to the object in memory</param>
-	/// <param name="Output">The destination byte array</param>
+	/// <param name="Output">The destination uint8_t array</param>
 	/// <param name="Length">The number of bytes to copy</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
@@ -83,7 +83,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Value">The source integer value</param>
-	/// <param name="Output">The destination byte array</param>
+	/// <param name="Output">The destination uint8_t array</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
 	template <typename Array>
@@ -108,7 +108,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Value">The source integer value</param>
-	/// <param name="Output">The destination byte array</param>
+	/// <param name="Output">The destination uint8_t array</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
 	template <typename T, typename Array>
@@ -129,7 +129,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source integer array</param>
-	/// <param name="Output">The destination byte array</param>
+	/// <param name="Output">The destination uint8_t array</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
 	template <typename ArrayA, typename ArrayB>
@@ -182,7 +182,7 @@ public:
 
 		for (size_t i = 0; i != CEIL; ++i)
 		{
-			uint pos = rnd.NextUInt32(0, CEIL);
+			uint32_t pos = rnd.NextUInt32(0, CEIL);
 
 			if (i != pos)
 			{
@@ -235,9 +235,33 @@ public:
 	/// 
 	/// <returns>The vector array of split strings</returns>
 	static std::vector<std::string> Split(const std::string &Input, char Delimiter);
+	
+	/// <summary>
+	/// Get the size of a string
+	/// </summary>
+	/// 
+	/// <param name="Input">The array to convert</param>
+	/// <param name="Length">The maximum string size</param>
+	/// 
+	/// <returns>The size of the string</returns>
+	template <typename T>
+	static size_t StringSize(T* Input, size_t Length)
+	{
+		size_t i;
+
+		for (i = 0; i < Length; ++i)
+		{
+			if (Input[i] == 0)
+			{
+				break;
+			}
+		}
+
+		return i;
+	}
 
 	/// <summary>
-	/// Convert an integer array (C style) to an 8bit byte array
+	/// Convert an integer array (C style) to an 8bit uint8_t array
 	/// </summary>
 	/// 
 	/// <param name="Input">The array to convert</param>
@@ -245,11 +269,11 @@ public:
 	/// 
 	/// <returns>The vector array of bytes</returns>
 	template <typename T>
-	static std::vector<byte> ToByteArray(T* Input, size_t Length)
+	static std::vector<uint8_t> ToByteArray(T* Input, size_t Length)
 	{
 		const size_t ELMLEN = sizeof(T);
 		const size_t RETLEN = Length * ELMLEN;
-		std::vector<byte> elems(RETLEN);
+		std::vector<uint8_t> elems(RETLEN);
 
 		if (Length != 0)
 		{
@@ -265,20 +289,21 @@ public:
 	/// 
 	/// <param name="Input">The array to convert</param>
 	/// <param name="Length">The length of the character array</param>
+	/// <param name="Width">The string is wide mode</param>
 	/// 
 	/// <returns>The string representation</returns>
 	template <typename T>
-	static std::string ToString(T* Input, size_t Length)
+	static std::string ToString(T* Input, size_t Length, bool Wide = false)
 	{
 		std::string ret;
-
-		if (sizeof(T) == 1)
+		
+		if (Wide == false)
 		{
 			ret = std::string(reinterpret_cast<char*>(Input), Length);
 		}
 		else
 		{
-			std::wstring tmp(reinterpret_cast<wchar_t*>(Input), Length * sizeof(T));
+			std::wstring tmp(reinterpret_cast<wchar_t*>(Input), Length * 2);
 			ret.assign(tmp.begin(), tmp.end());
 		}
 

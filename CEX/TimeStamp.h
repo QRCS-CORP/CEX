@@ -14,8 +14,8 @@ class TimeStamp
 private:
 
 	bool m_hasTsc;
-	ulong m_msCounter;
-	ulong m_tmFrequency;
+	uint64_t m_msCounter;
+	uint64_t m_tmFrequency;
 
 public:
 
@@ -29,12 +29,12 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Return elapsed interval</returns>
-	ulong Elapsed();
+	uint64_t Elapsed();
 
 	/// <summary>
 	/// The timing frequency in ticks
 	/// </summary>
-	ulong Frequency();
+	uint64_t Frequency();
 
 	/// <summary>
 	/// Reset the counter value to 0

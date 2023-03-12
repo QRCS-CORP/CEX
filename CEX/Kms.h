@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Key Management Systems enumeration names
 /// </summary>
-enum class Kms : byte
+enum class Kms : uint8_t
 {
 	/// <summary>
 	/// No Key Management System is specified

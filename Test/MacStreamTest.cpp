@@ -68,21 +68,21 @@ namespace Test
 	void MacStreamTest::EvaluateCMAC()
 	{
 		Prng::SecureRandom rnd;
-		std::vector<byte> data(rnd.NextUInt32(1000, 100));
+		std::vector<uint8_t> data(rnd.NextUInt32(1000, 100));
 		rnd.Generate(data);
-		std::vector<byte> key = rnd.Generate(32);
+		std::vector<uint8_t> key = rnd.Generate(32);
 		SymmetricKey kp(key);
 
 		// digest instance for baseline
 		Mac::CMAC* gen = new Mac::CMAC(Enumeration::BlockCiphers::AES);
 		size_t macSze = gen->TagSize();
-		std::vector<byte> hash1(macSze);
+		std::vector<uint8_t> hash1(macSze);
 		gen->Initialize(kp);
 		gen->Compute(data, hash1);
 		gen->Reset();
 
 		// test stream method
-		std::vector<byte> hash2(macSze);
+		std::vector<uint8_t> hash2(macSze);
 		Processing::MacStream ds(gen);
 		ds.Initialize(kp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
@@ -93,7 +93,7 @@ namespace Test
 			throw TestException(std::string("EvaluateCMAC"), gen->Name(), std::string("Expected hash is not equal!"));
 		}
 
-		// test byte access method
+		// test uint8_t access method
 		ds.Initialize(kp);
 		hash2 = ds.Compute(data, 0, data.size());
 
@@ -106,21 +106,21 @@ namespace Test
 	void MacStreamTest::EvaluateHMAC()
 	{
 		Prng::SecureRandom rnd;
-		std::vector<byte> data(rnd.NextUInt32(1000, 100));
+		std::vector<uint8_t> data(rnd.NextUInt32(1000, 100));
 		rnd.Generate(data);
-		std::vector<byte> key = rnd.Generate(32);
+		std::vector<uint8_t> key = rnd.Generate(32);
 		SymmetricKey kp(key);
 
 		// digest instance for baseline
 		Mac::HMAC* gen = new Mac::HMAC(Enumeration::SHA2Digests::SHA2256);
 		size_t macSze = gen->TagSize();
-		std::vector<byte> hash1(macSze);
+		std::vector<uint8_t> hash1(macSze);
 		gen->Initialize(kp);
 		gen->Compute(data, hash1);
 		gen->Reset();
 
 		// test stream method
-		std::vector<byte> hash2(macSze);
+		std::vector<uint8_t> hash2(macSze);
 		Processing::MacStream ds(gen);
 		ds.Initialize(kp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
@@ -131,7 +131,7 @@ namespace Test
 			throw TestException(std::string("EvaluateHMAC"), gen->Name(), std::string("Expected hash is not equal!"));
 		}
 
-		// test byte access method
+		// test uint8_t access method
 		ds.Initialize(kp);
 		hash2 = ds.Compute(data, 0, data.size());
 

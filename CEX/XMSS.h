@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // Updated by September 24, 2019
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_XMSS_H
 #define CEX_XMSS_H
@@ -43,7 +43,7 @@ using Enumeration::XmssParameters;
 /// 
 /// // serialize the public key
 ///	IAsymmetricKey* pubk = kp->PublicKey();
-/// std::vector&lt;byte&gt; pk = pubk->ToBytes();
+/// std::vector&lt;uint8_t&gt; pk = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Sign:</description>
@@ -51,8 +51,8 @@ using Enumeration::XmssParameters;
 /// XMSS sgn(XmssParameters::XMSSSHA2256H16);
 /// sgn.Initialize(PrivateKey);
 /// 
-/// std::vector&lt;byte&gt; msg(32);
-/// std::vector&lt;byte&gt; sig(0);
+/// std::vector&lt;uint8_t&gt; msg(32);
+/// std::vector&lt;uint8_t&gt; sig(0);
 /// // generate the signature
 /// sgn.Sign(msg, sig);
 /// </code>
@@ -61,7 +61,7 @@ using Enumeration::XmssParameters;
 /// <code>
 /// XMSS sgn(XmssParameters::XMSSSHA2256H16);
 /// sgn.Initialize(PublicKey);
-/// std::vector&lt;byte&gt; message(0);
+/// std::vector&lt;uint8_t&gt; message(0);
 ///
 ///	// authenticate the signature
 ///	if (!sgn.Verify(Signature, msg))
@@ -201,23 +201,23 @@ public:
 	/// Sign a message array and return the message and attached signature
 	/// </summary>
 	/// 
-	/// <param name="Message">The message byte array containing the message to sign</param>
+	/// <param name="Message">The message uint8_t array containing the message to sign</param>
 	/// <param name="Signature">The output signature array containing the signature and message</param>
 	/// 
 	/// <returns>Returns the size of the signed message</returns>
-	size_t Sign(const std::vector<byte> &Message, std::vector<byte> &Signature) override;
+	size_t Sign(const std::vector<uint8_t> &Message, std::vector<uint8_t> &Signature) override;
 
 	/// <summary>
 	/// Verify a signed message and return the message array
 	/// </summary>
 	/// 
 	/// <param name="Signature">The output signature array containing the signature and message</param>
-	/// <param name="Message">The message byte array containing the data to process</param>
+	/// <param name="Message">The message uint8_t array containing the data to process</param>
 	/// 
 	/// <returns>Returns true if the signature matches, false for authentication failure</returns>
-	bool Verify(const std::vector<byte> &Signature, std::vector<byte> &Message) override;
+	bool Verify(const std::vector<uint8_t> &Signature, std::vector<uint8_t> &Message) override;
 };
 
-NAMESPACE_SPHINCSEND
+NAMESPACE_SPHINCSPLUSEND
 #endif
 

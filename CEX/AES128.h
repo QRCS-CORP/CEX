@@ -70,11 +70,11 @@ public:
 	///
 	/// <param name="V">The 128-bit vector</param>
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline static __m128i RotL(__m128i &V, const int Shift)
+	inline static __m128i RotL(__m128i &V, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 
-		return _mm_or_si128(_mm_slli_si128(V, static_cast<int>(Shift)), _mm_slli_si128(V, static_cast<int>(32 - Shift)));
+		return _mm_or_si128(_mm_slli_si128(V, static_cast<int32_t>(Shift)), _mm_slli_si128(V, static_cast<int32_t>(32 - Shift)));
 	}
 
 	/// <summary>
@@ -94,7 +94,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="X">The source integer array; must be at least 128 bits in length</param>
-	inline __m128i Load(const byte* X)
+	inline __m128i Load(const uint8_t* X)
 	{
 		return _mm_loadu_si128(reinterpret_cast<const __m128i*>(X));
 	}
@@ -105,7 +105,7 @@ public:
 	///
 	/// <param name="V">The source 128-bit register</param>
 	/// <param name="X">The destination integer array</param>
-	inline static void Store(const __m128i V, byte* X)
+	inline static void Store(const __m128i V, uint8_t* X)
 	{
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(X), V);
 	}
@@ -167,10 +167,10 @@ public:
 	 /// </summary>
 	 ///
 	 /// <param name="K">The key vector</param>
-	 /// <param name="R">The byte round constant</param>
+	 /// <param name="R">The uint8_t round constant</param>
 	 ///
 	 /// <returns></returns>
-	inline static __m128i KeyGenerate(const __m128i K, const int R)
+	inline static __m128i KeyGenerate(const __m128i K, const int32_t R)
 	{
 		return _mm_aeskeygenassist_si128(K, R);
 	}
@@ -184,7 +184,7 @@ public:
 	/// <param name="P">Indicates which half of the vector to multiply</param>
 	///
 	/// <returns>The multiplied product</returns>
-	inline static __m128i CMUL64(const __m128i V1, const __m128i V2, const int P)
+	inline static __m128i CMUL64(const __m128i V1, const __m128i V2, const int32_t P)
 	{
 		return _mm_clmulepi64_si128(V1, V2, P);
 	}

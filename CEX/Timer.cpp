@@ -20,11 +20,11 @@ using Tools::IntegerTools;
 
 double TimerBase::ConvertTo(TimerWord t, Unit unit)
 {
-	static ulong unitsPerSecondTable[] = { 1, 1000, 1000 * 1000, 1000 * 1000 * 1000 };
+	static uint64_t unitsPerSecondTable[] = { 1, 1000, 1000 * 1000, 1000 * 1000 * 1000 };
 
 	assert(static_cast<size_t>(unit) < sizeof(unitsPerSecondTable) / sizeof(unitsPerSecondTable[0]));
 
-	return static_cast<double>(static_cast<long>(t) * unitsPerSecondTable[static_cast<size_t>(unit)] / static_cast<long>(TicksPerSecond()));
+	return static_cast<double>(static_cast<int64_t>(t) * unitsPerSecondTable[static_cast<size_t>(unit)] / static_cast<int64_t>(TicksPerSecond()));
 }
 
 void TimerBase::StartTimer()
@@ -63,7 +63,7 @@ double TimerBase::ElapsedTimeAsDouble()
 	return ret;
 }
 
-ulong TimerBase::ElapsedTime()
+uint64_t TimerBase::ElapsedTime()
 {
 	double elapsed;
 
@@ -71,7 +71,7 @@ ulong TimerBase::ElapsedTime()
 
 	assert(elapsed <= ULONG_MAX);
 
-	return static_cast<ulong>(elapsed);
+	return static_cast<uint64_t>(elapsed);
 }
 
 TimerWord Timer::GetCurrentTimerValue()
@@ -124,7 +124,7 @@ TimerWord ThreadUserTimer::GetCurrentTimerValue()
 #if defined(CEX_OS_WINDOWS)
 
 	TimerWord twrd;
-	ulong high;
+	uint64_t high;
 	static bool cthd;
 
 	cthd = true;
@@ -150,7 +150,7 @@ TimerWord ThreadUserTimer::GetCurrentTimerValue()
 		}
 		else
 		{
-			high = static_cast<ulong>(now.dwHighDateTime);
+			high = static_cast<uint64_t>(now.dwHighDateTime);
 			high <<= 32;
 
 			twrd = static_cast<TimerWord>(high) + now.dwLowDateTime;
@@ -175,7 +175,7 @@ TimerWord ThreadUserTimer::TicksPerSecond()
 #if defined(CEX_OS_WINDOWS)
 	return 10 * 1000 * 1000;
 #elif defined(CEX_OS_UNIX)
-	static const long ticksPerSecond = sysconf(_SC_CLK_TCK);
+	static const int64_t ticksPerSecond = sysconf(_SC_CLK_TCK);
 
 	return ticksPerSecond;
 #else

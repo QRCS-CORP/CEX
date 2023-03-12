@@ -9,50 +9,29 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.8h (A8).
+Welcome to the CEX++ Cryptographic Library, version 1.1.0.0a (A10).
 \brief
 CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.8h</B> (A8 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.1.0.0a</B> (A10 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John G. Underhill
-\version   v1.0.0.8h
-\date      October 06, 2020
-\copyright GPL version 3 license (GPLv3)
+\version   v1.1.0.0a
+\date      March 12, 2023
+\copyright AGPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.8h (A8 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.1.0.0a (A10 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Added tourrent Release v1.0.0.8h (version A8):</B> \n
-
-Elliptic Curve Diffie Hellman (ED25519) Key Exchange \n
-Elliptic Curve Digital Signature Algorithm ECDSA \n
-AES-NI wide block 256/512 added to RHX and RCS implementations \n
-The RWS cipher \n
-The SCBKDF KDF \n
-
-<B>Planned Release 1.1.0.1</B> \n
-NewHope \n
-McEliece \n
-Kyber \n
-NTRUPrime \n
-Dilithium \n
-SPHINCS+ \n \n
-
-<B>Planned Release 1.2.0.1</B> \n
-TLS-1.3 \n
-Android/iOS/Linux Compatability \n
-DLL API \n \n
+<B>Added tourrent Release v1.1.0.0a (version A10):</B> \n
 
 \section intro_link Links
-The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html  \n
 CEX++ on Github: https://github.com/Steppenwolfe65/CEX  \n
-CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET  \n
-The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477/Cipher-EX-V
+QSC on Github: https://github.com/QSC  \n
 */
 
 // end doxygen main //
@@ -101,30 +80,11 @@ NAMESPACE_ROOT
 			*  @{
 			*  @brief The McEliece Cipher Namespace
 			*/
-			NAMESPACE_MODULELWE
+			NAMESPACE_KYBER
 				class Kyber {};
-			NAMESPACE_MODULELWEEND
+			NAMESPACE_KYBEREND
 			/*! @} */
 
-			/*!
-			*  \addtogroup NTRUPrime
-			*  @{
-			*  @brief The NTRUPrime Cipher Namespace
-			*/
-			NAMESPACE_NTRUPRIME
-				class NTRUPrime {};
-			NAMESPACE_NTRUPRIMEEND
-			/*! @} */
-
-			/*!
-			*  \addtogroup NewHope
-			*  @{
-			*  @brief The NewHope Cipher Namespace
-			*/
-			NAMESPACE_RINGLWE
-				class NewHope {};
-			NAMESPACE_RINGLWEEND
-			/*! @} */
 		NAMESPACE_ASYMMETRICENCRYPTEND
 		/*! @} */
 
@@ -146,23 +106,13 @@ NAMESPACE_ROOT
 			/*! @} */
 
 			/*!
-			*  \addtogroup Rainbow
-			*  @{
-			*  @brief The Rainbow asymmetric signature scheme Namespace
-			*/
-			NAMESPACE_RAINBOW
-				class Rainbow {};
-			NAMESPACE_RAINBOWEND
-			/*! @} */
-
-			/*!
 			*  \addtogroup SphincsPlus
 			*  @{
 			*  @brief The SPHINCS+ asymmetric signature scheme Namespace
 			*/
 			NAMESPACE_SPHINCSPLUS
 				class SphincsPlus {};
-			NAMESPACE_SPHINCSEND
+			NAMESPACE_SPHINCSPLUSEND
 			/*! @} */
 
 			/*!
@@ -327,8 +277,6 @@ NAMESPACE_ROOT
 		enum class KyberParameters {};
 		enum class Macs {};
 		enum class McElieceParameters {};
-		enum class NewHopeParameters {};
-		enum class NTRUPrimeParameters {};
 		enum class PaddingModes {};
 		enum class Prngs {};
 		enum class Providers {};

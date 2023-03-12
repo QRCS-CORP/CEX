@@ -17,13 +17,11 @@ class GHASH::GhashState
 {
 public:
 
-	std::array<ulong, CMUL::CMUL_STATE_SIZE> State;
-	std::array<byte, CMUL::CMUL_BLOCK_SIZE> Buffer;
-	size_t Position;
+	std::array<uint64_t, CMUL::CMUL_STATE_SIZE> State = { 0 };
+	std::array<uint8_t, CMUL::CMUL_BLOCK_SIZE> Buffer = { 0 };
+	size_t Position = 0;
 
 	GhashState()
-		:
-		Position(0)
 	{
 	}
 
@@ -36,7 +34,7 @@ public:
 	{
 		Position = 0;
 		MemoryTools::Clear(Buffer, 0, Buffer.size());
-		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+		MemoryTools::Clear(State, 0, State.size() * sizeof(uint64_t));
 	}
 };
 
@@ -63,7 +61,7 @@ void GHASH::Clear()
 	m_dgtState->Position = 0;
 }
 
-void GHASH::Finalize(std::vector<byte> &Output, size_t ADLength, size_t TxtLength)
+void GHASH::Finalize(std::vector<uint8_t> &Output, size_t ADLength, size_t TxtLength)
 {
 	if (m_dgtState->Position != 0)
 	{
@@ -76,20 +74,20 @@ void GHASH::Finalize(std::vector<byte> &Output, size_t ADLength, size_t TxtLengt
 		Permute(m_dgtState->State, Output);
 	}
 
-	std::vector<byte> tmpb(CMUL::CMUL_BLOCK_SIZE);
-	IntegerTools::Be64ToBytes(static_cast<ulong>(ADLength) * 8, tmpb, 0);
-	IntegerTools::Be64ToBytes(static_cast<ulong>(TxtLength) * 8, tmpb, 8);
+	std::vector<uint8_t> tmpb(CMUL::CMUL_BLOCK_SIZE);
+	IntegerTools::Be64ToBytes(static_cast<uint64_t>(ADLength) * 8, tmpb, 0);
+	IntegerTools::Be64ToBytes(static_cast<uint64_t>(TxtLength) * 8, tmpb, 8);
 	MemoryTools::XOR128(tmpb, 0, Output, 0);
 
 	Permute(m_dgtState->State, Output);
 }
 
-void GHASH::Initialize(const std::vector<ulong> &Key)
+void GHASH::Initialize(const std::vector<uint64_t> &Key)
 {
-	MemoryTools::Copy(Key, 0, m_dgtState->State, 0, Key.size() * sizeof(ulong));
+	MemoryTools::Copy(Key, 0, m_dgtState->State, 0, Key.size() * sizeof(uint64_t));
 }
 
-void GHASH::Multiply(const std::vector<byte> &Input, std::vector<byte> &Output, size_t Length)
+void GHASH::Multiply(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output, size_t Length)
 {
 	size_t boff;
 
@@ -114,7 +112,7 @@ const size_t GHASH::TagSize()
 	return TAG_SIZE;
 }
 
-void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t Length)
+void GHASH::Update(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t Length)
 {
 	if (Length != 0)
 	{
@@ -153,9 +151,9 @@ void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<
 	}
 }
 
-void GHASH::Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::vector<byte> &Output)
+void GHASH::Permute(std::array<uint64_t, CMUL::CMUL_STATE_SIZE> &State, std::vector<uint8_t> &Output)
 {
-	std::array<byte, 16> tmp;
+	std::array<uint8_t, 16> tmp = { 0 };
 
 	MemoryTools::COPY128(Output, 0, tmp, 0);
 

@@ -68,7 +68,7 @@ public:
 	/// <param name="Length">The number of bytes to pad</param>
 	///
 	/// <exception cref="CryptoPaddingException">Thrown if the padding length is longer than the array length</exception>
-	void AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length)override;
+	void AddPadding(std::vector<uint8_t> &Input, size_t Offset, size_t Length)override;
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -77,7 +77,7 @@ public:
 	/// <param name="Input">The padded array of bytes</param>
 	///
 	/// <returns>Returns the length of padding in bytes</returns>
-	size_t GetBlockLength(const std::vector<byte> &Input) override;
+	size_t GetBlockLength(const std::vector<uint8_t> &Input) override;
 
 	/// <summary>
 	/// Get the length of padding in an array using offset and length
@@ -90,7 +90,7 @@ public:
 	/// <returns>Returns the length of padding in bytes</returns>
 	///
 	/// <exception cref="CryptoPaddingException">Thrown if the length is longer than the array length</exception>
-	size_t GetBlockLength(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
+	size_t GetBlockLength(const std::vector<uint8_t> &Input, size_t Offset, size_t Length) override;
 };
 
 NAMESPACE_PADDINGEND

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -88,7 +88,7 @@ public:
 	/// Initialize with an 8bit unsigned integer array
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 512 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 512 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
 	explicit UInt512(const Array &Input, size_t Offset)
@@ -116,8 +116,8 @@ public:
 	/// <param name="X13">uint32 13</param>
 	/// <param name="X14">uint32 14</param>
 	/// <param name="X15">uint32 15</param>
-	explicit UInt512(uint X0, uint X1, uint X2, uint X3, uint X4, uint X5, uint X6, uint X7,
-		uint X8, uint X9, uint X10, uint X11, uint X12, uint X13, uint X14, uint X15)
+	explicit UInt512(uint32_t X0, uint32_t X1, uint32_t X2, uint32_t X3, uint32_t X4, uint32_t X5, uint32_t X6, uint32_t X7,
+		uint32_t X8, uint32_t X9, uint32_t X10, uint32_t X11, uint32_t X12, uint32_t X13, uint32_t X14, uint32_t X15)
 	{
 		zmm = _mm512_set_epi32(X0, X1, X2, X3, X4, X5, X6, X7,
 			X8, X9, X10, X11, X12, X13, X14, X15);
@@ -127,8 +127,8 @@ public:
 	/// Initialize with 1 * 32bit unsigned integer; copied to every register
 	/// </summary>
 	///
-	/// <param name="X">The uint to add</param>
-	explicit UInt512(uint X)
+	/// <param name="X">The uint32_t to add</param>
+	explicit UInt512(uint32_t X)
 	{
 		zmm = _mm512_set1_epi32(X);
 	}
@@ -148,7 +148,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="X">Set all uint32 integers to this value</param>
-	inline void Load(uint X)
+	inline void Load(uint32_t X)
 	{
 		zmm = _mm512_set1_epi32(X);
 	}
@@ -157,7 +157,7 @@ public:
 	/// Load an array into a register
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 512 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 512 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
 	inline void Load(const Array &Input, size_t Offset)
@@ -185,8 +185,8 @@ public:
 	/// <param name="X13">uint32 13</param>
 	/// <param name="X14">uint32 14</param>
 	/// <param name="X15">uint32 15</param>
-	inline void Load(uint X0, uint X1, uint X2, uint X3, uint X4, uint X5, uint X6, uint X7,
-		uint X8, uint X9, uint X10, uint X11, uint X12, uint X13, uint X14, uint X15)
+	inline void Load(uint32_t X0, uint32_t X1, uint32_t X2, uint32_t X3, uint32_t X4, uint32_t X5, uint32_t X6, uint32_t X7,
+		uint32_t X8, uint32_t X9, uint32_t X10, uint32_t X11, uint32_t X12, uint32_t X13, uint32_t X14, uint32_t X15)
 	{
 		zmm = _mm512_set_epi32(X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15);
 	}
@@ -196,15 +196,15 @@ public:
 	/// <para>Integers are loaded as 32bit integers regardless the natural size of T</para>
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 512 bits long</param>
+	/// <param name="Input">The source integer array; must be at least 512 bits int64_t</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
 	inline void LoadUL(const Array &Input, size_t Offset)
 	{
-		zmm = _mm512_set_epi32(static_cast<uint>(Input[Offset]), static_cast<uint>(Input[Offset + 1]), static_cast<uint>(Input[Offset + 2]), static_cast<uint>(Input[Offset + 3]),
-			static_cast<uint>(Input[Offset + 4]), static_cast<uint>(Input[Offset + 5]), static_cast<uint>(Input[Offset + 6]), static_cast<uint>(Input[Offset + 7]),
-			static_cast<uint>(Input[Offset + 8]), static_cast<uint>(Input[Offset + 9]), static_cast<uint>(Input[Offset + 10]), static_cast<uint>(Input[Offset + 11]),
-			static_cast<uint>(Input[Offset + 12]), static_cast<uint>(Input[Offset + 13]), static_cast<uint>(Input[Offset + 14]), static_cast<uint>(Input[Offset + 15]));
+		zmm = _mm512_set_epi32(static_cast<uint32_t>(Input[Offset]), static_cast<uint32_t>(Input[Offset + 1]), static_cast<uint32_t>(Input[Offset + 2]), static_cast<uint32_t>(Input[Offset + 3]),
+			static_cast<uint32_t>(Input[Offset + 4]), static_cast<uint32_t>(Input[Offset + 5]), static_cast<uint32_t>(Input[Offset + 6]), static_cast<uint32_t>(Input[Offset + 7]),
+			static_cast<uint32_t>(Input[Offset + 8]), static_cast<uint32_t>(Input[Offset + 9]), static_cast<uint32_t>(Input[Offset + 10]), static_cast<uint32_t>(Input[Offset + 11]),
+			static_cast<uint32_t>(Input[Offset + 12]), static_cast<uint32_t>(Input[Offset + 13]), static_cast<uint32_t>(Input[Offset + 14]), static_cast<uint32_t>(Input[Offset + 15]));
 	}
 
 	/// <summary>
@@ -297,10 +297,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotL32(int Shift)
+	inline void RotL32(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
-		zmm = _mm512_or_si512(_mm512_slli_epi32(zmm, static_cast<int>(Shift)), _mm512_srli_epi32(zmm, static_cast<int>(32 - Shift)));
+		zmm = _mm512_or_si512(_mm512_slli_epi32(zmm, static_cast<int32_t>(Shift)), _mm512_srli_epi32(zmm, static_cast<int32_t>(32 - Shift)));
 	}
 
 	/// <summary>
@@ -311,10 +311,10 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt512</returns>
-	inline static UInt512 RotL32(const UInt512 &X, const int Shift)
+	inline static UInt512 RotL32(const UInt512 &X, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
-		return UInt512(_mm512_or_si512(_mm512_slli_epi32(X.zmm, static_cast<int>(Shift)), _mm512_srli_epi32(X.zmm, static_cast<int>(32 - Shift))));
+		return UInt512(_mm512_or_si512(_mm512_slli_epi32(X.zmm, static_cast<int32_t>(Shift)), _mm512_srli_epi32(X.zmm, static_cast<int32_t>(32 - Shift))));
 	}
 
 	/// <summary>
@@ -322,7 +322,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotR32(int Shift)
+	inline void RotR32(int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
@@ -336,7 +336,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt512</returns>
-	inline static UInt512 RotR32(const UInt512 &X, const int Shift)
+	inline static UInt512 RotR32(const UInt512 &X, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return RotL32(X, 32 - Shift);
@@ -350,7 +350,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt512</returns>
-	inline static UInt512 ShiftRA(const UInt512 &Value, const int Shift)
+	inline static UInt512 ShiftRA(const UInt512 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_sra_epi32(Value, _mm_set1_epi32(Shift)));
@@ -364,17 +364,17 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt512</returns>
-	inline static UInt512 ShiftRL(const UInt512 &Value, const int Shift)
+	inline static UInt512 ShiftRL(const UInt512 &Value, const int32_t Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 4 unsigned integers
+	/// Performs a uint8_t swap on 4 unsigned integers
 	/// </summary>
 	/// 
-	/// <returns>The byte swapped UInt512</returns>
+	/// <returns>The uint8_t swapped UInt512</returns>
 	inline UInt512 Swap() const
 	{
 		__m512i tmpX = zmm;
@@ -386,12 +386,12 @@ public:
 	}
 
 	/// <summary>
-	/// Performs a byte swap on 4 unsigned integers
+	/// Performs a uint8_t swap on 4 unsigned integers
 	/// </summary>
 	/// 		
 	/// <param name="X">The UInt512 to process</param>
 	/// 
-	/// <returns>The byte swapped UInt512</returns>
+	/// <returns>The uint8_t swapped UInt512</returns>
 	inline static UInt512 Swap(UInt512 &X)
 	{
 		__m512i tmpX = X.zmm;
@@ -463,7 +463,7 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	inline UInt512 operator ++ (int)
+	inline UInt512 operator ++ (int32_t)
 	{
 		return UInt512(zmm) + UInt512::ONE();
 	}
@@ -499,7 +499,7 @@ public:
 	/// <summary>
 	/// Decrease postfix operator
 	/// </summary>
-	inline UInt512 operator -- (int)
+	inline UInt512 operator -- (int32_t)
 	{
 		return UInt512(zmm) - UInt512::ONE();
 	}
@@ -531,8 +531,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline UInt512 operator / (const UInt512 &X) const
 	{
-		std::array<uint, 16> tmpA;
-		std::array<uint, 16> tmpB;
+		std::array<uint32_t, 16> tmpA;
+		std::array<uint32_t, 16> tmpB;
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
 		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 && 
@@ -554,8 +554,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UInt512 &X)
 	{
-		std::array<uint, 16> tmpA;
-		std::array<uint, 16> tmpB;
+		std::array<uint32_t, 16> tmpA;
+		std::array<uint32_t, 16> tmpB;
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
 		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 &&
@@ -675,9 +675,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UInt512 operator << (int Shift) const
+	inline UInt512 operator << (int32_t Shift) const
 	{
-		return UInt512(_mm512_slli_epi32(zmm, static_cast<int>(Shift)));
+		return UInt512(_mm512_slli_epi32(zmm, static_cast<int32_t>(Shift)));
 	}
 
 	/// <summary>
@@ -685,7 +685,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator <<= (int Shift)
+	inline void operator <<= (int32_t Shift)
 	{
 		zmm = _mm512_slli_epi32(zmm, Shift);
 	}
@@ -695,9 +695,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UInt512 operator >> (int Shift) const
+	inline UInt512 operator >> (int32_t Shift) const
 	{
-		return UInt512(_mm512_srli_epi32(zmm, static_cast<int>(Shift)));
+		return UInt512(_mm512_srli_epi32(zmm, static_cast<int32_t>(Shift)));
 	}
 
 	/// <summary>
@@ -705,7 +705,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator >>= (int Shift)
+	inline void operator >>= (int32_t Shift)
 	{
 		zmm = _mm512_srli_epi32(zmm, Shift);
 	}

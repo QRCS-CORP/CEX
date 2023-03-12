@@ -19,46 +19,54 @@ using Tools::ParallelTools;
 using Kdf::SHAKE;
 
 const std::string TSX256::CLASS_NAME("TSX256");
-const std::vector<byte> TSX256::OMEGA_INFO = { 0x54, 0x68, 0x72, 0x65, 0x65, 0x66, 0x69, 0x73, 0x68, 0x50, 0x32, 0x35, 0x36, 0x52, 0x37, 0x32 };
+const std::vector<uint8_t> TSX256::OMEGA_INFO = { 0x54, 0x68, 0x72, 0x65, 0x65, 0x66, 0x69, 0x73, 0x68, 0x50, 0x32, 0x35, 0x36, 0x52, 0x37, 0x32 };
 
 class TSX256::TSX256State
 {
 public:
 
-	std::array<ulong, 4> Key = { 0ULL };
-	std::array<ulong, 2> Nonce = { 0ULL };
-	std::array<ulong, 2> Tweak = { 0ULL };
-	SecureVector<byte> Custom;
-	SecureVector<byte> MacKey;
-	SecureVector<byte> MacTag;
-	ulong Counter;
-	bool IsAuthenticated;
-	bool IsEncryption;
-	bool IsInitialized;
+	std::array<uint64_t, 4> Key = { 0 };
+	std::array<uint64_t, 2> Nonce = { 0 };
+	std::array<uint64_t, 2> Tweak = { 0 };
+	SecureVector<uint8_t> Custom;
+	std::vector<SymmetricKeySize> LegalKeySizes{
+		SymmetricKeySize(IK256_SIZE, NONCE_SIZE * sizeof(uint64_t), INFO_SIZE)};
+	SecureVector<uint8_t> MacKey;
+	SecureVector<uint8_t> MacTag;
+	uint64_t Counter = 0;
+	bool IsAuthenticated = false;
+	bool IsEncryption = false;
+	bool IsInitialized = false;
 
 	TSX256State(bool Authenticated)
 		:
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
-		Counter(0),
-		IsAuthenticated(Authenticated),
-		IsEncryption(false),
-		IsInitialized(false)
+		IsAuthenticated(Authenticated)
 	{
 	}
 
 	~TSX256State()
 	{
-		Reset();
+		LegalKeySizes.clear();
+		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(uint64_t));
+		MemoryTools::Clear(Key, 0, Key.size() * sizeof(uint64_t));
+		MemoryTools::Clear(Tweak, 0, Tweak.size() * sizeof(uint64_t));
+		MemoryTools::Clear(Custom, 0, Custom.size());
+		MemoryTools::Clear(MacKey, 0, MacKey.size());
+		MemoryTools::Clear(MacTag, 0, MacTag.size());
+		Counter = 0;
 		IsAuthenticated = false;
+		IsEncryption = false;
+		IsInitialized = false;
 	}
 
 	void Reset()
 	{
-		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(ulong));
-		MemoryTools::Clear(Key, 0, Key.size() * sizeof(ulong));
-		MemoryTools::Clear(Tweak, 0, Tweak.size() * sizeof(ulong));
+		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(uint64_t));
+		MemoryTools::Clear(Key, 0, Key.size() * sizeof(uint64_t));
+		MemoryTools::Clear(Tweak, 0, Tweak.size() * sizeof(uint64_t));
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
@@ -73,7 +81,6 @@ public:
 TSX256::TSX256(bool Authenticate)
 	:
 	m_tsx256State(new TSX256State(Authenticate)),
-	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, NONCE_SIZE * sizeof(ulong), INFO_SIZE) },
 	m_macAuthenticator(nullptr),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
@@ -89,8 +96,6 @@ TSX256::~TSX256()
 	{
 		m_macAuthenticator.reset(nullptr);
 	}
-
-	IntegerTools::Clear(m_legalKeySizes);
 }
 
 //~~~Accessors~~~//
@@ -130,7 +135,7 @@ const bool TSX256::IsParallel()
 
 const std::vector<SymmetricKeySize> &TSX256::LegalKeySizes()
 {
-	return m_legalKeySizes;
+	return m_tsx256State->LegalKeySizes;
 }
 
 const std::string TSX256::Name()
@@ -147,12 +152,12 @@ const std::string TSX256::Name()
 	return name;
 }
 
-const std::vector<byte> TSX256::Nonce()
+const std::vector<uint8_t> TSX256::Nonce()
 {
-	std::vector<byte> tmpn(2 * sizeof(ulong));
+	std::vector<uint8_t> tmpn(2 * sizeof(uint64_t));
 
 	IntegerTools::Le64ToBytes(m_tsx256State->Nonce[0], tmpn, 0);
-	IntegerTools::Le64ToBytes(m_tsx256State->Nonce[1], tmpn, sizeof(ulong));
+	IntegerTools::Le64ToBytes(m_tsx256State->Nonce[1], tmpn, sizeof(uint64_t));
 
 	return tmpn;
 }
@@ -167,12 +172,12 @@ ParallelOptions &TSX256::ParallelProfile()
 	return m_parallelProfile;
 }
 
-const std::vector<byte> TSX256::Tag()
+const std::vector<uint8_t> TSX256::Tag()
 {
 	return SecureUnlock(m_tsx256State->MacTag);
 }
 
-const void TSX256::Tag(SecureVector<byte> &Output)
+const void TSX256::Tag(SecureVector<uint8_t> &Output)
 {
 	SecureCopy(m_tsx256State->MacTag, 0, Output, 0, m_tsx256State->MacTag.size());
 }
@@ -190,7 +195,7 @@ void TSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.KeySizes().IVSize() != (NONCE_SIZE * sizeof(ulong)))
+	if (Parameters.KeySizes().IVSize() != (NONCE_SIZE * sizeof(uint64_t)))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidNonce);
 	}
@@ -250,16 +255,16 @@ void TSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 		// create the cSHAKE customization string
 		std::string tmpn = Name();
-		m_tsx256State->Custom.resize(sizeof(ulong) + tmpn.size());
+		m_tsx256State->Custom.resize(sizeof(uint64_t) + tmpn.size());
 		// add mac counter and algorithm name to customization string
 		IntegerTools::Le64ToBytes(m_tsx256State->Counter, m_tsx256State->Custom, 0);
-		MemoryTools::CopyFromObject(tmpn.data(), m_tsx256State->Custom, sizeof(ulong), tmpn.size());
+		MemoryTools::CopyFromObject(tmpn.data(), m_tsx256State->Custom, sizeof(uint64_t), tmpn.size());
 
 		// initialize cSHAKE
 		SHAKE gen(ShakeModes::SHAKE256);
 		gen.Initialize(Parameters.SecureKey(), m_tsx256State->Custom);
 		// generate the new cipher key
-		SecureVector<byte> ck(KEY_SIZE);
+		SecureVector<uint8_t> ck(KEY_SIZE);
 		gen.Generate(ck);
 
 		// copy key to state
@@ -269,8 +274,8 @@ void TSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_tsx256State->Key[3] = IntegerTools::LeBytesTo64(ck, 24);
 
 		// generate the mac key
-		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[1];
-		SecureVector<byte> mack(ks.KeySize());
+		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[0];
+		SecureVector<uint8_t> mack(ks.KeySize());
 		gen.Generate(mack);
 		// initailize the mac
 		SymmetricKey kpm(mack);
@@ -295,7 +300,7 @@ void TSX256::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void TSX256::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
+void TSX256::SetAssociatedData(const std::vector<uint8_t> &Input, size_t Offset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -312,15 +317,15 @@ void TSX256::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, si
 
 	if (IsAuthenticator() == true)
 	{
-		std::vector<byte> code(sizeof(uint));
+		std::vector<uint8_t> code(sizeof(uint32_t));
 		// version 1.1a add AD and encoding to hash
 		m_macAuthenticator->Update(Input, Offset, Length);
-		IntegerTools::Le32ToBytes(static_cast<uint>(Length), code, 0);
+		IntegerTools::Le32ToBytes(static_cast<uint32_t>(Length), code, 0);
 		m_macAuthenticator->Update(code, 0, code.size());
 	}
 }
 
-void TSX256::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void TSX256::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsEncryption() == true)
 	{
@@ -328,12 +333,12 @@ void TSX256::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 		{
 			if (Output.size() < Length + OutOffset + m_macAuthenticator->TagSize())
 			{
-				throw CryptoSymmetricException(Name(), std::string("Transform"), std::string("The vector is not long enough to add the MAC code!"), ErrorCodes::InvalidSize);
+				throw CryptoSymmetricException(Name(), std::string("Transform"), std::string("The vector is not int64_t enough to add the MAC code!"), ErrorCodes::InvalidSize);
 			}
 
 			// add the starting position of the nonce
-			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_tsx256State->Nonce[0]), 0, sizeof(ulong));
-			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_tsx256State->Nonce[1]), 0, sizeof(ulong));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<uint8_t>>(m_tsx256State->Nonce[0]), 0, sizeof(uint64_t));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<uint8_t>>(m_tsx256State->Nonce[1]), 0, sizeof(uint64_t));
 			// encrypt the stream
 			Process(Input, InOffset, Output, OutOffset, Length);
 			// update the mac with the ciphertext
@@ -355,8 +360,8 @@ void TSX256::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 		if (IsAuthenticator() == true)
 		{
 			// add the starting position of the nonce
-			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_tsx256State->Nonce[0]), 0, sizeof(ulong));
-			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_tsx256State->Nonce[1]), 0, sizeof(ulong));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<uint8_t>>(m_tsx256State->Nonce[0]), 0, sizeof(uint64_t));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<uint8_t>>(m_tsx256State->Nonce[1]), 0, sizeof(uint64_t));
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Input, InOffset, Length);
 			// update the mac counter
@@ -389,7 +394,7 @@ void TSX256::Finalize(std::unique_ptr<TSX256State> &State, std::unique_ptr<IMac>
 	Authenticator->Finalize(State->MacTag, 0);
 }
 
-void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> &Nonce, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<uint64_t, 2> &Nonce, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	size_t ctr;
 
@@ -402,8 +407,8 @@ void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> 
 	if (Length >= AVX512BLK)
 	{
 		const size_t SEGALN = Length - (Length % AVX512BLK);
-		std::array<ulong, 16> ctr16;
-		std::array<ulong, 32> tmp32;
+		std::array<uint64_t, 16> ctr16;
+		std::array<uint64_t, 32> tmp32;
 
 		// process 8 blocks
 		while (ctr != SEGALN)
@@ -445,8 +450,8 @@ void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> 
 	if (Length >= AVX2BLK)
 	{
 		const size_t SEGALN = Length - (Length % AVX2BLK);
-		std::array<ulong, 8> ctr8;
-		std::array<ulong, 16> tmp16;
+		std::array<uint64_t, 8> ctr8;
+		std::array<uint64_t, 16> tmp16;
 
 		// process 4 blocks
 		while (ctr != SEGALN)
@@ -472,7 +477,7 @@ void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> 
 #endif
 
 	const size_t ALNLEN = Length - (Length % BLOCK_SIZE);
-	std::array<ulong, 4> tmp;
+	std::array<uint64_t, 4> tmp;
 
 	while (ctr != ALNLEN)
 	{
@@ -499,7 +504,7 @@ void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> 
 	}
 }
 
-void TSX256::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void TSX256::Process(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t PRCLEN = Length;
 
@@ -530,12 +535,12 @@ void TSX256::Process(const std::vector<byte> &Input, size_t InOffset, std::vecto
 		const size_t CNKLEN = (PRCLEN / BLOCK_SIZE / m_parallelProfile.ParallelMaxDegree()) * BLOCK_SIZE;
 		const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 		const size_t CTROFT = (CNKLEN / BLOCK_SIZE);
-		std::vector<ulong> tmpCtr(NONCE_SIZE);
+		std::vector<uint64_t> tmpCtr(NONCE_SIZE);
 
 		ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTROFT](size_t i)
 		{
 			// thread level counter
-			std::array<ulong, NONCE_SIZE> thdCtr;
+			std::array<uint64_t, NONCE_SIZE> thdCtr;
 			// offset counter by chunk size
 			IntegerTools::LeIncreaseW(m_tsx256State->Nonce, thdCtr, (CTROFT * i));
 			const size_t STMPOS = i * CNKLEN;
@@ -546,12 +551,12 @@ void TSX256::Process(const std::vector<byte> &Input, size_t InOffset, std::vecto
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{
-				MemoryTools::Copy(thdCtr, 0, tmpCtr, 0, NONCE_SIZE * sizeof(ulong));
+				MemoryTools::Copy(thdCtr, 0, tmpCtr, 0, NONCE_SIZE * sizeof(uint64_t));
 			}
 		});
 
 		// copy last counter to class variable
-		MemoryTools::Copy(tmpCtr, 0, m_tsx256State->Nonce, 0, NONCE_SIZE * sizeof(ulong));
+		MemoryTools::Copy(tmpCtr, 0, m_tsx256State->Nonce, 0, NONCE_SIZE * sizeof(uint64_t));
 
 		// last block processing
 		if (ALNLEN < PRCLEN)

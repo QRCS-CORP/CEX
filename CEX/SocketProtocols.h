@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The socket IP protocol type
 /// </summary>
-enum class SocketProtocols : int
+enum class SocketProtocols : int32_t
 {
 	/// <summary>
 	/// No protocol type specified

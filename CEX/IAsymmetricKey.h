@@ -68,7 +68,7 @@ public:
 	/// <summary>
 	/// Read Only: Returns a standard-vector copy of the asymmetric-key polynomial
 	/// </summary>
-	virtual const std::vector<byte> Polynomial() = 0;
+	virtual const std::vector<uint8_t> Polynomial() = 0;
 
 	//~~~Public Functions~~~//
 

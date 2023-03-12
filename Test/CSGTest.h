@@ -28,10 +28,10 @@ namespace Test
 		static const size_t SAMPLE_SIZE = 248000;
 		static const size_t TEST_CYCLES = 100;
 
-		std::vector<byte> m_custom;
-		std::vector<std::vector<byte>> m_expected;
-		std::vector < std::vector<byte>> m_info;
-		std::vector<std::vector<byte>> m_key;
+		std::vector<uint8_t> m_custom;
+		std::vector<std::vector<uint8_t>> m_expected;
+		std::vector < std::vector<uint8_t>> m_info;
+		std::vector<std::vector<uint8_t>> m_key;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -80,7 +80,7 @@ namespace Test
 		/// <param name="Rng">The DRBG instance</param>
 		/// <param name="Key">The input key</param>
 		/// <param name="Expected">The expected output</param>
-		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Expected);
+		void Kat(IDrbg* Rng, std::vector<uint8_t> &Key, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compare known answer test vectors to DRBG output
@@ -91,7 +91,7 @@ namespace Test
 		/// <param name="Custom">The customization string</param>
 		/// <param name="Info">The information string</param>
 		/// <param name="Expected">The expected output</param>
-		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Custom, std::vector<byte> &Info, std::vector<byte> &Expected);
+		void Kat(IDrbg* Rng, std::vector<uint8_t> &Key, std::vector<uint8_t> &Custom, std::vector<uint8_t> &Info, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Test the auto re-seeding mechanism

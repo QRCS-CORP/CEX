@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// SIMD integer wrappers
 /// </summary>
-enum class SimdIntegers : byte
+enum class SimdIntegers : uint8_t
 {
 	/// <summary>
 	/// The system does not support SIMD instructions

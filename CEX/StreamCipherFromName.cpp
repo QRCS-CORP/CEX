@@ -1,5 +1,4 @@
 #include "StreamCipherFromName.h"
-#include "ACS.h"
 #include "CpuDetect.h"
 #include "ChaChaP20.h"
 #include "CSX512.h"
@@ -53,32 +52,14 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 			}
 			case StreamCiphers::RCS:
 			{
-#if defined(CEX_HAS_AVX)
-				if (dtc.AESNI())
-				{
-					cptr = new ACS(false);
-				}
-				else
-#endif
-				{
-					cptr = new RCS(false);
-				}
+				cptr = new RCS(false);
 				break;
 			}
 			case StreamCiphers::RCSK256:
 			case StreamCiphers::RCSK512:
 			case StreamCiphers::RCSK1024:
 			{
-#if defined(CEX_HAS_AVX)
-				if (dtc.AESNI())
-				{
-					cptr = new ACS(true);
-				}
-				else
-#endif
-				{
-					cptr = new RCS(true);
-				}
+				cptr = new RCS(true);
 				break;
 			}
 			case StreamCiphers::RWS:
@@ -118,7 +99,7 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 				cptr = new TSX1024(false);
 				break;
 			}
-			case StreamCiphers::TSXR120K1024:
+			case StreamCiphers::TSXR120K512:
 			{
 				cptr = new TSX1024(true);
 				break;

@@ -71,7 +71,7 @@ namespace Test
 		// test symmetrickey initialization with zero sized key
 		try
 		{
-			std::vector<byte> key(0);
+			std::vector<uint8_t> key(0);
 			SymmetricKey kp(key);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE1"));
@@ -87,8 +87,8 @@ namespace Test
 		// test symmetrickey initialization with zero sized nonce
 		try
 		{
-			std::vector<byte> key(0);
-			std::vector<byte> nonce(0);
+			std::vector<uint8_t> key(0);
+			std::vector<uint8_t> nonce(0);
 			SymmetricKey kp(key, nonce);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE2"));
@@ -104,9 +104,9 @@ namespace Test
 		// test symmetrickey initialization with zero sized info
 		try
 		{
-			std::vector<byte> key(0);
-			std::vector<byte> nonce(0);
-			std::vector<byte> info(0);
+			std::vector<uint8_t> key(0);
+			std::vector<uint8_t> nonce(0);
+			std::vector<uint8_t> info(0);
 			SymmetricKey kp(key, nonce, info);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE3"));
@@ -122,7 +122,7 @@ namespace Test
 		// test symmetrickey initialization with zero sized secure-vector key
 		try
 		{
-			SecureVector<byte> key(0);
+			SecureVector<uint8_t> key(0);
 			SymmetricKey kp(key);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE1"));
@@ -138,8 +138,8 @@ namespace Test
 		// test symmetrickey initialization with zero sized secure-vector nonce
 		try
 		{
-			SecureVector<byte> key(0);
-			SecureVector<byte> nonce(0);
+			SecureVector<uint8_t> key(0);
+			SecureVector<uint8_t> nonce(0);
 			SymmetricKey kp(key, nonce);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE2"));
@@ -155,9 +155,9 @@ namespace Test
 		// test symmetrickey initialization with zero sized secure-vector info
 		try
 		{
-			SecureVector<byte> key(0);
-			SecureVector<byte> nonce(0);
-			SecureVector<byte> info(0);
+			SecureVector<uint8_t> key(0);
+			SecureVector<uint8_t> nonce(0);
+			SecureVector<uint8_t> info(0);
 			SymmetricKey kp(key, nonce, info);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE3"));
@@ -173,7 +173,7 @@ namespace Test
 		// test securekey initialization with zero sized key
 		try
 		{
-			std::vector<byte> key(0);
+			std::vector<uint8_t> key(0);
 			SymmetricSecureKey kp(key);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE4"));
@@ -189,8 +189,8 @@ namespace Test
 		// test securekey initialization with zero sized nonce
 		try
 		{
-			std::vector<byte> key(0);
-			std::vector<byte> nonce(0);
+			std::vector<uint8_t> key(0);
+			std::vector<uint8_t> nonce(0);
 			SymmetricSecureKey kp(key, nonce);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE5"));
@@ -206,9 +206,9 @@ namespace Test
 		// test securekey initialization with zero sized info
 		try
 		{
-			std::vector<byte> key(0);
-			std::vector<byte> nonce(0);
-			std::vector<byte> info(0);
+			std::vector<uint8_t> key(0);
+			std::vector<uint8_t> nonce(0);
+			std::vector<uint8_t> info(0);
 			SymmetricSecureKey kp(key, nonce, info);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE6"));
@@ -224,8 +224,8 @@ namespace Test
 		// test securekey initialization with key and zero sized salt
 		try
 		{
-			std::vector<byte> key(32);
-			std::vector<byte> salt(0);
+			std::vector<uint8_t> key(32);
+			std::vector<uint8_t> salt(0);
 			SymmetricSecureKey kp(key, SecurityPolicy::SPL256, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE7"));
@@ -241,9 +241,9 @@ namespace Test
 		// test securekey initialization with key and nonce, with zero sized salt
 		try
 		{
-			std::vector<byte> key(32);
-			std::vector<byte> nonce(16);
-			std::vector<byte> salt(0);
+			std::vector<uint8_t> key(32);
+			std::vector<uint8_t> nonce(16);
+			std::vector<uint8_t> salt(0);
 			SymmetricSecureKey kp(key, nonce, SecurityPolicy::SPL256, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE8"));
@@ -259,10 +259,10 @@ namespace Test
 		// test securekey initialization with key, nonce, and info, with zero sized salt
 		try
 		{
-			std::vector<byte> key(32);
-			std::vector<byte> nonce(16);
-			std::vector<byte> info(16);
-			std::vector<byte> salt(0);
+			std::vector<uint8_t> key(32);
+			std::vector<uint8_t> nonce(16);
+			std::vector<uint8_t> info(16);
+			std::vector<uint8_t> salt(0);
 			SymmetricSecureKey kp(key, nonce, info, SecurityPolicy::SPL256, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE9"));
@@ -278,7 +278,7 @@ namespace Test
 		// test securekey initialization with zero sized secure-vector key
 		try
 		{
-			SecureVector<byte> key(0);
+			SecureVector<uint8_t> key(0);
 			SymmetricSecureKey kp(key);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE4"));
@@ -294,8 +294,8 @@ namespace Test
 		// test securekey initialization with zero sized secure-vector nonce
 		try
 		{
-			SecureVector<byte> key(0);
-			SecureVector<byte> nonce(0);
+			SecureVector<uint8_t> key(0);
+			SecureVector<uint8_t> nonce(0);
 			SymmetricSecureKey kp(key, nonce);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE5"));
@@ -311,9 +311,9 @@ namespace Test
 		// test securekey initialization with zero sized secure-vector info
 		try
 		{
-			SecureVector<byte> key(0);
-			SecureVector<byte> nonce(0);
-			SecureVector<byte> info(0);
+			SecureVector<uint8_t> key(0);
+			SecureVector<uint8_t> nonce(0);
+			SecureVector<uint8_t> info(0);
 			SymmetricSecureKey kp(key, nonce, info);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE6"));
@@ -329,8 +329,8 @@ namespace Test
 		// test securekey initialization with secure-vector key and zero sized salt
 		try
 		{
-			SecureVector<byte> key(32);
-			SecureVector<byte> salt(0);
+			SecureVector<uint8_t> key(32);
+			SecureVector<uint8_t> salt(0);
 			SymmetricSecureKey kp(key, SecurityPolicy::SPL256, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE7"));
@@ -346,9 +346,9 @@ namespace Test
 		// test securekey initialization with secure-vector key and nonce, with zero sized salt
 		try
 		{
-			SecureVector<byte> key(32);
-			SecureVector<byte> nonce(16);
-			SecureVector<byte> salt(0);
+			SecureVector<uint8_t> key(32);
+			SecureVector<uint8_t> nonce(16);
+			SecureVector<uint8_t> salt(0);
 			SymmetricSecureKey kp(key, nonce, SecurityPolicy::SPL256, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE8"));
@@ -364,10 +364,10 @@ namespace Test
 		// test securekey initialization with secure-vector key, nonce, and info, with zero sized salt
 		try
 		{
-			SecureVector<byte> key(32);
-			SecureVector<byte> nonce(16);
-			SecureVector<byte> info(16);
-			SecureVector<byte> salt(0);
+			SecureVector<uint8_t> key(32);
+			SecureVector<uint8_t> nonce(16);
+			SecureVector<uint8_t> info(16);
+			SecureVector<uint8_t> salt(0);
 			SymmetricSecureKey kp(key, nonce, info, SecurityPolicy::SPL256, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE9"));
@@ -383,8 +383,8 @@ namespace Test
 		// test securekey initialization with invalid security policy
 		try
 		{
-			std::vector<byte> key(32);
-			std::vector<byte> salt(32);
+			std::vector<uint8_t> key(32);
+			std::vector<uint8_t> salt(32);
 			SymmetricSecureKey kp(key, SecurityPolicy::None, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE10"));
@@ -400,9 +400,9 @@ namespace Test
 		// test securekey initialization with invalid security policy
 		try
 		{
-			std::vector<byte> key(32);
-			std::vector<byte> nonce(16);
-			std::vector<byte> salt(32);
+			std::vector<uint8_t> key(32);
+			std::vector<uint8_t> nonce(16);
+			std::vector<uint8_t> salt(32);
 			SymmetricSecureKey kp(key, nonce, SecurityPolicy::None, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE11"));
@@ -418,10 +418,10 @@ namespace Test
 		// test securekey initialization with invalid security policy
 		try
 		{
-			std::vector<byte> key(32);
-			std::vector<byte> nonce(16);
-			std::vector<byte> info(16);
-			std::vector<byte> salt(32);
+			std::vector<uint8_t> key(32);
+			std::vector<uint8_t> nonce(16);
+			std::vector<uint8_t> info(16);
+			std::vector<uint8_t> salt(32);
 			SymmetricSecureKey kp(key, nonce, info, SecurityPolicy::None, salt);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE12"));
@@ -437,15 +437,15 @@ namespace Test
 
 	void SymmetricKeyTest::Initialization()
 	{
-		std::vector<byte> info;
-		std::vector<byte> key;
-		std::vector<byte> nonce;
-		std::vector<byte> salt;
+		std::vector<uint8_t> info;
+		std::vector<uint8_t> key;
+		std::vector<uint8_t> nonce;
+		std::vector<uint8_t> salt;
 
-		SecureVector<byte> secinfo;
-		SecureVector<byte> seckey;
-		SecureVector<byte> secnonce;
-		SecureVector<byte> secsalt;
+		SecureVector<uint8_t> secinfo;
+		SecureVector<uint8_t> seckey;
+		SecureVector<uint8_t> secnonce;
+		SecureVector<uint8_t> secsalt;
 		SecureRandom gen;
 
 		info = gen.Generate(64);
@@ -760,7 +760,7 @@ namespace Test
 
 		// test symmetric key serialization
 		SymmetricKey* kp1 = keyGen.GetSymmetricKey(keySize);
-		SecureVector<byte> ks1 = SymmetricKey::Serialize(*kp1);
+		SecureVector<uint8_t> ks1 = SymmetricKey::Serialize(*kp1);
 		SymmetricKey* kp2 = SymmetricKey::DeSerialize(ks1);
 
 		if (kp1->Key() != kp2->Key() || kp1->IV() != kp2->IV() || kp1->Info() != kp2->Info())
@@ -770,7 +770,7 @@ namespace Test
 
 		// test secure key serialization
 		SymmetricSecureKey* sk1 = keyGen.GetSecureKey(keySize);
-		SecureVector<byte> ks2 = SymmetricSecureKey::Serialize(*sk1);
+		SecureVector<uint8_t> ks2 = SymmetricSecureKey::Serialize(*sk1);
 		SymmetricKey* sk2 = SymmetricSecureKey::DeSerialize(ks2);
 
 		if (sk1->Key() != sk2->Key() || sk1->IV() != sk2->IV() || sk1->Info() != sk2->Info())
@@ -781,14 +781,14 @@ namespace Test
 
 	void SymmetricKeyTest::Stress()
 	{
-		std::vector<byte> info;
-		std::vector<byte> key;
-		std::vector<byte> nonce;
-		std::vector<byte> salt;
-		SecureVector<byte> secinfo;
-		SecureVector<byte> seckey;
-		SecureVector<byte> secnonce;
-		SecureVector<byte> secsalt;
+		std::vector<uint8_t> info;
+		std::vector<uint8_t> key;
+		std::vector<uint8_t> nonce;
+		std::vector<uint8_t> salt;
+		SecureVector<uint8_t> secinfo;
+		SecureVector<uint8_t> seckey;
+		SecureVector<uint8_t> secnonce;
+		SecureVector<uint8_t> secsalt;
 		size_t i;
 		SecureRandom gen;
 

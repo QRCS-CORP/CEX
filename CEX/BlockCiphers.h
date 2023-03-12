@@ -10,7 +10,7 @@ NAMESPACE_ENUMERATION
 /// Symmetric block cipher enumeration names
 /// <para>Note: HX ciphers are always ordinally higher in value than standard ciphers.</para>
 /// </summary>
-enum class BlockCiphers : byte
+enum class BlockCiphers : uint8_t
 {
 	/// <summary>
 	/// No block cipher is specified
@@ -20,62 +20,52 @@ enum class BlockCiphers : byte
 	/// An implementation of the AES Block Cipher.
 	/// <para>Standards based implementation: uses a 128-bit block and 128/192/256-bit key sizes.</para>
 	/// </summary>
-	AES = static_cast<byte>(SymmetricCiphers::AES),
+	AES = static_cast<uint8_t>(SymmetricCiphers::AES),
 	/// <summary>
 	/// An implementation of the Serpent Block Cipher.
 	/// <para>Standards based implementation: uses a 128-bit block and 128/192/256-bit key sizes.</para>
 	/// </summary>
-	Serpent = static_cast<byte>(SymmetricCiphers::Serpent),
+	Serpent = static_cast<uint8_t>(SymmetricCiphers::Serpent),
 	/// <summary>
 	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA2256) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RHXH256 = static_cast<byte>(SymmetricCiphers::RHXH256),
+	RHXH256 = static_cast<uint8_t>(SymmetricCiphers::RHXH256),
 	/// <summary>
 	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA2512) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RHXH512 = static_cast<byte>(SymmetricCiphers::RHXH512),
+	RHXH512 = static_cast<uint8_t>(SymmetricCiphers::RHXH512),
 	/// <summary>
 	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an cSHAKE-256 secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RHXS256 = static_cast<byte>(SymmetricCiphers::RHXS256),
+	RHXS256 = static_cast<uint8_t>(SymmetricCiphers::RHXS256),
 	/// <summary>
 	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an cSHAKE-512 secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RHXS512 = static_cast<byte>(SymmetricCiphers::RHXS512),
-	/// <summary>
-	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an cSHAKE-1024 secure key schedule.
-	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	RHXS1024 = static_cast<byte>(SymmetricCiphers::RHXS1024),
+	RHXS512 = static_cast<uint8_t>(SymmetricCiphers::RHXS512),
 	/// <summary>
 	/// An implementation of the Serpent Block Cipher extended with an HKDF(SHA2256) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	SHXH256 = static_cast<byte>(SymmetricCiphers::SHXH256),
+	SHXH256 = static_cast<uint8_t>(SymmetricCiphers::SHXH256),
 	/// <summary>
 	/// An implementation of the Serpent Block Cipher extended with an HKDF(SHA2512) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	SHXH512 = static_cast<byte>(SymmetricCiphers::SHXH512),
+	SHXH512 = static_cast<uint8_t>(SymmetricCiphers::SHXH512),
 	/// <summary>
 	/// An implementation of the Serpent Block Cipher extended with an cSHAKE-256 secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	SHXS256 = static_cast<byte>(SymmetricCiphers::SHXS256),
+	SHXS256 = static_cast<uint8_t>(SymmetricCiphers::SHXS256),
 	/// <summary>
 	/// An implementation of the Serpent Block Cipher extended with an cSHAKE-512 secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	SHXS512 = static_cast<byte>(SymmetricCiphers::SHXS512),
-	/// <summary>
-	/// An implementation of the Serpent Block Cipher extended with an cSHAKE-1024 secure key schedule.
-	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	SHXS1024 = static_cast<byte>(SymmetricCiphers::SHXS1024)
+	SHXS512 = static_cast<uint8_t>(SymmetricCiphers::SHXS512)
 };
 
 class BlockCipherConvert

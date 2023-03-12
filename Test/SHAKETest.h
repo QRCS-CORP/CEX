@@ -30,9 +30,9 @@ namespace Test
 		static const size_t MINM_ALLOC = 1024;
 		static const size_t TEST_CYCLES = 10;
 
-		std::vector<byte> m_custom;
-		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_expected;
+		std::vector<uint8_t> m_custom;
+		std::vector<std::vector<uint8_t>> m_key;
+		std::vector<std::vector<uint8_t>> m_expected;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -79,7 +79,7 @@ namespace Test
 		/// <param name="Generator">The kdf generator instance</param>
 		/// <param name="Key">The input key</param>
 		/// <param name="Expected">The expected output</param>
-		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected);
+		void Kat(IKdf* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Compare known answer test vectors to kdf output
@@ -89,7 +89,7 @@ namespace Test
 		/// <param name="Key">The input key</param>
 		/// <param name="Custom">The customization string</param>
 		/// <param name="Expected">The expected output</param>
-		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Custom, std::vector<byte> &Expected);
+		void Kat(IKdf* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Custom, std::vector<uint8_t> &Expected);
 
 		/// <summary>
 		/// Test the different constructor initialization options

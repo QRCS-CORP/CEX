@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -47,7 +47,7 @@ static const size_t RJD512_BLOCK_SIZE = 64;
 /// internal
 /// 
 
-static const std::array<uint, 30> Rcon =
+static const std::array<uint32_t, 30> Rcon =
 {
 	0x00000000UL, 0x01000000UL, 0x02000000UL, 0x04000000UL, 0x08000000UL, 0x10000000UL, 0x20000000UL, 0x40000000UL,
 	0x80000000UL, 0x1B000000UL, 0x36000000UL, 0x6C000000UL, 0xD8000000UL, 0xAB000000UL, 0x4D000000UL, 0x9A000000UL,
@@ -57,7 +57,7 @@ static const std::array<uint, 30> Rcon =
 
 //~~~Rijndael S-Box Tables~~~//
 
-static const std::vector<byte> ISBox =
+static const std::vector<uint8_t> ISBox =
 {
 	0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
 	0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB,
@@ -77,7 +77,7 @@ static const std::vector<byte> ISBox =
 	0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
 };
 
-static const std::vector<byte> SBox =
+static const std::vector<uint8_t> SBox =
 {
 	0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
 	0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -99,29 +99,29 @@ static const std::vector<byte> SBox =
 
 // Rijndael 128/256-bit block functions
 
-static byte Gf256Reduce(uint X)
+static uint8_t Gf256Reduce(uint32_t X)
 {
-	uint y;
+	uint32_t y;
 
 	y = X >> 8;
 
-	return static_cast<byte>((X ^ y ^ (y << 1) ^ (y << 3) ^ (y << 4)) & 0xFF);
+	return static_cast<uint8_t>((X ^ y ^ (y << 1) ^ (y << 3) ^ (y << 4)) & 0xFF);
 }
 
 template<typename ArrayU8, typename ArrayU32>
 static void KeyAddition(ArrayU8 &State, const ArrayU32 &Rkeys, size_t RkOffset)
 {
 	size_t i;
-	uint k;
+	uint32_t k;
 
-	for (i = 0; i < State.size(); i += sizeof(uint))
+	for (i = 0; i < State.size(); i += sizeof(uint32_t))
 	{
-		k = Rkeys[RkOffset + (i / sizeof(uint))];
+		k = Rkeys[RkOffset + (i / sizeof(uint32_t))];
 
-		State[i] ^= static_cast<byte>(k >> 24);
-		State[i + 1] ^= static_cast<byte>(k >> 16) & 0xFF;
-		State[i + 2] ^= static_cast<byte>(k >> 8) & 0xFF;
-		State[i + 3] ^= static_cast<byte>(k) & 0xFF;
+		State[i] ^= static_cast<uint8_t>(k >> 24);
+		State[i + 1] ^= static_cast<uint8_t>(k >> 16) & 0xFF;
+		State[i + 2] ^= static_cast<uint8_t>(k >> 8) & 0xFF;
+		State[i + 3] ^= static_cast<uint8_t>(k) & 0xFF;
 	}
 }
 
@@ -129,18 +129,18 @@ template<typename ArrayU8>
 static void InvMixColumns(ArrayU8 &State)
 {
 	size_t i;
-	uint s0;
-	uint s1;
-	uint s2;
-	uint s3;
-	uint t0;
-	uint t1;
-	uint t2;
-	uint t3;
+	uint32_t s0;
+	uint32_t s1;
+	uint32_t s2;
+	uint32_t s3;
+	uint32_t t0;
+	uint32_t t1;
+	uint32_t t2;
+	uint32_t t3;
 
-	for (i = 0; i < State.size(); i += sizeof(uint))
+	for (i = 0; i < State.size(); i += sizeof(uint32_t))
 	{
-		s0 = State[i + 0];
+		s0 = State[i];
 		s1 = State[i + 1];
 		s2 = State[i + 2];
 		s3 = State[i + 3];
@@ -157,7 +157,7 @@ static void InvMixColumns(ArrayU8 &State)
 		t3 = s0 ^ (s0 << 1) ^ (s0 << 3) ^ s1 ^ (s1 << 2) ^ (s1 << 3)
 			^ s2 ^ (s2 << 3) ^ (s3 << 1) ^ (s3 << 2) ^ (s3 << 3);
 
-		State[i + 0] = Gf256Reduce(t0);
+		State[i] = Gf256Reduce(t0);
 		State[i + 1] = Gf256Reduce(t1);
 		State[i + 2] = Gf256Reduce(t2);
 		State[i + 3] = Gf256Reduce(t3);
@@ -167,7 +167,7 @@ static void InvMixColumns(ArrayU8 &State)
 template<typename ArrayU8>
 static void InvShiftRows(ArrayU8 &State)
 {
-	byte tmp;
+	uint8_t tmp;
 
 	tmp = State[13];
 	State[13] = State[9];
@@ -204,18 +204,18 @@ template<typename ArrayU8>
 static void MixColumns(ArrayU8 &State)
 {
 	size_t i;
-	uint s0;
-	uint s1;
-	uint s2;
-	uint s3;
-	uint t0;
-	uint t1;
-	uint t2;
-	uint t3;
+	uint32_t s0;
+	uint32_t s1;
+	uint32_t s2;
+	uint32_t s3;
+	uint32_t t0;
+	uint32_t t1;
+	uint32_t t2;
+	uint32_t t3;
 
-	for (i = 0; i < State.size(); i += sizeof(uint))
+	for (i = 0; i < State.size(); i += sizeof(uint32_t))
 	{
-		s0 = State[i + 0];
+		s0 = State[i];
 		s1 = State[i + 1];
 		s2 = State[i + 2];
 		s3 = State[i + 3];
@@ -225,7 +225,7 @@ static void MixColumns(ArrayU8 &State)
 		t2 = s0 ^ s1 ^ (s2 << 1) ^ s3 ^ (s3 << 1);
 		t3 = s0 ^ (s0 << 1) ^ s1 ^ s2 ^ (s3 << 1);
 
-		State[i + 0] = t0 ^ ((~(t0 >> 8) + 1) & 0x0000011BUL);
+		State[i] = t0 ^ ((~(t0 >> 8) + 1) & 0x0000011BUL);
 		State[i + 1] = t1 ^ ((~(t1 >> 8) + 1) & 0x0000011BUL);
 		State[i + 2] = t2 ^ ((~(t2 >> 8) + 1) & 0x0000011BUL);
 		State[i + 3] = t3 ^ ((~(t3 >> 8) + 1) & 0x0000011BUL);
@@ -235,7 +235,7 @@ static void MixColumns(ArrayU8 &State)
 template<typename ArrayU8>
 static void ShiftRows128(ArrayU8 &State)
 {
-	byte tmp;
+	uint8_t tmp;
 
 	// row 0 - unchanged
 
@@ -265,7 +265,7 @@ static void ShiftRows128(ArrayU8 &State)
 template<typename ArrayU8>
 static void ShiftRows256(ArrayU8 &State)
 {
-	byte tmp;
+	uint8_t tmp;
 
 	tmp = State[1];
 	State[1] = State[5];
@@ -304,7 +304,7 @@ static void ShiftRows256(ArrayU8 &State)
 template<typename ArrayU8>
 static void ShiftRows512(ArrayU8 &State)
 {
-	byte tmp;
+	uint8_t tmp;
 
 	tmp = State[0];
 	State[0] = State[4];
@@ -412,129 +412,129 @@ static void Substitution256(ArrayU8 &State)
 	// Note that variables x* (input) and s* (output) are numbered
 	// in "reverse" order (x0 is the high bit, x7 is the low bit).
 
-	uint x0; 
-	uint x1; 
-	uint x2; 
-	uint x3; 
-	uint x4; 
-	uint x5; 
-	uint x6; 
-	uint x7;
-	uint y1; 
-	uint y2; 
-	uint y3; 
-	uint y4; 
-	uint y5; 
-	uint y6; 
-	uint y7; 
-	uint y8; 
-	uint y9;
-	uint y10; 
-	uint y11; 
-	uint y12; 
-	uint y13; 
-	uint y14; 
-	uint y15; 
-	uint y16; 
-	uint y17; 
-	uint y18; 
-	uint y19;
-	uint y20; 
-	uint y21;
-	uint z0; 
-	uint z1; 
-	uint z2; 
-	uint z3; 
-	uint z4; 
-	uint z5;
-	uint z6; 
-	uint z7; 
-	uint z8;
-	uint z9;
-	uint z10; 
-	uint z11; 
-	uint z12; 
-	uint z13; 
-	uint z14; 
-	uint z15; 
-	uint z16;
-	uint z17;
-	uint t0; 
-	uint t1; 
-	uint t2; 
-	uint t3; 
-	uint t4; 
-	uint t5; 
-	uint t6; 
-	uint t7; 
-	uint t8; 
-	uint t9;
-	uint t10; 
-	uint t11; 
-	uint t12; 
-	uint t13; 
-	uint t14; 
-	uint t15;
-	uint t16; 
-	uint t17; 
-	uint t18; 
-	uint t19;
-	uint t20; 
-	uint t21;
-	uint t22;
-	uint t23; 
-	uint t24;
-	uint t25; 
-	uint t26; 
-	uint t27; 
-	uint t28; 
-	uint t29;
-	uint t30; 
-	uint t31; 
-	uint t32;
-	uint t33; 
-	uint t34;
-	uint t35; 
-	uint t36;
-	uint t37; 
-	uint t38; 
-	uint t39;
-	uint t40; 
-	uint t41; 
-	uint t42; 
-	uint t43;
-	uint t44;
-	uint t45; 
-	uint t46; 
-	uint t47; 
-	uint t48; 
-	uint t49;
-	uint t50; 
-	uint t51;
-	uint t52; 
-	uint t53;
-	uint t54; 
-	uint t55;
-	uint t56;
-	uint t57;
-	uint t58;
-	uint t59;
-	uint t60;
-	uint t61;
-	uint t62; 
-	uint t63;
-	uint t64;
-	uint t65; 
-	uint t66;
-	uint t67;
-	uint s0; 
-	uint s1;
-	uint s2; 
-	uint s3; 
-	uint s4; 
-	uint s5; 
-	uint s6;
-	uint s7;
+	uint32_t x0; 
+	uint32_t x1; 
+	uint32_t x2; 
+	uint32_t x3; 
+	uint32_t x4; 
+	uint32_t x5; 
+	uint32_t x6; 
+	uint32_t x7;
+	uint32_t y1; 
+	uint32_t y2; 
+	uint32_t y3; 
+	uint32_t y4; 
+	uint32_t y5; 
+	uint32_t y6; 
+	uint32_t y7; 
+	uint32_t y8; 
+	uint32_t y9;
+	uint32_t y10; 
+	uint32_t y11; 
+	uint32_t y12; 
+	uint32_t y13; 
+	uint32_t y14; 
+	uint32_t y15; 
+	uint32_t y16; 
+	uint32_t y17; 
+	uint32_t y18; 
+	uint32_t y19;
+	uint32_t y20; 
+	uint32_t y21;
+	uint32_t z0; 
+	uint32_t z1; 
+	uint32_t z2; 
+	uint32_t z3; 
+	uint32_t z4; 
+	uint32_t z5;
+	uint32_t z6; 
+	uint32_t z7; 
+	uint32_t z8;
+	uint32_t z9;
+	uint32_t z10; 
+	uint32_t z11; 
+	uint32_t z12; 
+	uint32_t z13; 
+	uint32_t z14; 
+	uint32_t z15; 
+	uint32_t z16;
+	uint32_t z17;
+	uint32_t t0; 
+	uint32_t t1; 
+	uint32_t t2; 
+	uint32_t t3; 
+	uint32_t t4; 
+	uint32_t t5; 
+	uint32_t t6; 
+	uint32_t t7; 
+	uint32_t t8; 
+	uint32_t t9;
+	uint32_t t10; 
+	uint32_t t11; 
+	uint32_t t12; 
+	uint32_t t13; 
+	uint32_t t14; 
+	uint32_t t15;
+	uint32_t t16; 
+	uint32_t t17; 
+	uint32_t t18; 
+	uint32_t t19;
+	uint32_t t20; 
+	uint32_t t21;
+	uint32_t t22;
+	uint32_t t23; 
+	uint32_t t24;
+	uint32_t t25; 
+	uint32_t t26; 
+	uint32_t t27; 
+	uint32_t t28; 
+	uint32_t t29;
+	uint32_t t30; 
+	uint32_t t31; 
+	uint32_t t32;
+	uint32_t t33; 
+	uint32_t t34;
+	uint32_t t35; 
+	uint32_t t36;
+	uint32_t t37; 
+	uint32_t t38; 
+	uint32_t t39;
+	uint32_t t40; 
+	uint32_t t41; 
+	uint32_t t42; 
+	uint32_t t43;
+	uint32_t t44;
+	uint32_t t45; 
+	uint32_t t46; 
+	uint32_t t47; 
+	uint32_t t48; 
+	uint32_t t49;
+	uint32_t t50; 
+	uint32_t t51;
+	uint32_t t52; 
+	uint32_t t53;
+	uint32_t t54; 
+	uint32_t t55;
+	uint32_t t56;
+	uint32_t t57;
+	uint32_t t58;
+	uint32_t t59;
+	uint32_t t60;
+	uint32_t t61;
+	uint32_t t62; 
+	uint32_t t63;
+	uint32_t t64;
+	uint32_t t65; 
+	uint32_t t66;
+	uint32_t t67;
+	uint32_t s0; 
+	uint32_t s1;
+	uint32_t s2; 
+	uint32_t s3; 
+	uint32_t s4; 
+	uint32_t s5; 
+	uint32_t s6;
+	uint32_t s7;
 
 	x7 = IntegerTools::BeBytesTo32(State, 0);
 	x6 = IntegerTools::BeBytesTo32(State, 4);
@@ -675,12 +675,12 @@ static void Substitution256(ArrayU8 &State)
 }
 
 template<typename ArrayU8>
-static uint SubWord(uint X, const ArrayU8 &Sbox)
+static uint32_t SubWord(uint32_t X, const ArrayU8 &Sbox)
 {
-	return (static_cast<uint>(Sbox[X >> 24] << 24))
-		| (static_cast<uint>(Sbox[(X >> 16) & 0xFF] << 16))
-		| (static_cast<uint>(Sbox[(X >> 8) & 0xFF] << 8))
-		| static_cast<uint>(Sbox[X & 0xFF]);
+	return (static_cast<uint32_t>(Sbox[X >> 24] << 24))
+		| (static_cast<uint32_t>(Sbox[(X >> 16) & 0xFF] << 16))
+		| (static_cast<uint32_t>(Sbox[(X >> 8) & 0xFF] << 8))
+		| static_cast<uint32_t>(Sbox[X & 0xFF]);
 }
 
 

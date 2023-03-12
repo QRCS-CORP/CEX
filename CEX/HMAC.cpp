@@ -16,8 +16,8 @@ class HMAC::HmacState
 {
 public:
 
-	std::vector<byte> InputPad;
-	std::vector<byte> OutputPad;
+	std::vector<uint8_t> InputPad;
+	std::vector<uint8_t> OutputPad;
 	size_t BlockSize;
 	size_t HashSize;
 	bool IsDestroyed;
@@ -150,7 +150,7 @@ const bool HMAC::IsInitialized()
 
 //~~~Public Functions~~~//
 
-void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void HMAC::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	if (IsInitialized() == false)
 	{
@@ -158,16 +158,16 @@ void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 	}
 	if (Output.size() < TagSize())
 	{
-		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
+size_t HMAC::Finalize(std::vector<uint8_t> &Output, size_t OutOffset)
 {
-	std::vector<byte> tmpv(m_hmacGenerator->DigestSize(), 0x00);
+	std::vector<uint8_t> tmpv(m_hmacGenerator->DigestSize(), 0x00);
 
 	if (IsInitialized() == false)
 	{
@@ -175,7 +175,7 @@ size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 	if ((Output.size() - OutOffset) < TagSize())
 	{
-		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	m_hmacGenerator->Finalize(tmpv, 0);
@@ -187,9 +187,9 @@ size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
-size_t HMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+size_t HMAC::Finalize(SecureVector<uint8_t> &Output, size_t OutOffset)
 {
-	std::vector<byte> tag(TagSize());
+	std::vector<uint8_t> tag(TagSize());
 
 	Finalize(tag, 0);
 	SecureMove(tag, 0, Output, OutOffset, tag.size());
@@ -251,7 +251,7 @@ void HMAC::Reset()
 	m_hmacState->IsInitialized = false;
 }
 
-void HMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void HMAC::Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
 	if (IsInitialized() == false)
 	{
@@ -259,7 +259,7 @@ void HMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too int16_t!"), ErrorCodes::InvalidSize);
 	}
 
 	m_hmacGenerator->Update(Input, InOffset, Length);

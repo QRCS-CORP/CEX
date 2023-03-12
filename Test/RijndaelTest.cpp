@@ -1,6 +1,4 @@
 #include "RijndaelTest.h"
-#include "../CEX/AHX.h"
-#include "../CEX/CpuDetect.h"
 #include "../CEX/CTR.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/RHX.h"
@@ -16,17 +14,15 @@ namespace Test
 	const std::string RijndaelTest::CLASSNAME = "RijndaelTest";
 	const std::string RijndaelTest::DESCRIPTION = "NIST AES specification FIPS 197 Known Answer Tests.";
 	const std::string RijndaelTest::SUCCESS = "SUCCESS! AES tests have executed succesfully.";
-	const bool RijndaelTest::HAS_AESNI = HasAESNI();
 
 	//~~~Constructor~~~//
 
-	RijndaelTest::RijndaelTest(bool TestAesNi)
+	RijndaelTest::RijndaelTest()
 		:
 		m_cipherText(0),
 		m_keys(0),
 		m_plainText(0),
-		m_progressEvent(),
-		m_aesniTest(TestAesNi && HAS_AESNI)
+		m_progressEvent()
 	{
 		Initialize();
 	}
@@ -55,168 +51,82 @@ namespace Test
 
 	std::string RijndaelTest::Run()
 	{
-
 		try
 		{
 			Exception();
 			OnProgress(std::string("RijndaelTest: Passed Rijndael exception handling tests.."));
 
-#if defined(__AVX__)
-			if (m_aesniTest)
-			{
-				AHX* cpr1 = new AHX();
-				Kat(cpr1, m_keys[0], m_plainText[0], m_cipherText[0]);
-				Kat(cpr1, m_keys[1], m_plainText[1], m_cipherText[1]);
-				Kat(cpr1, m_keys[2], m_plainText[2], m_cipherText[2]);
-				Kat(cpr1, m_keys[3], m_plainText[3], m_cipherText[3]);
-				Kat(cpr1, m_keys[4], m_plainText[4], m_cipherText[4]);
-				Kat(cpr1, m_keys[5], m_plainText[5], m_cipherText[5]);
-				Kat(cpr1, m_keys[6], m_plainText[6], m_cipherText[6]);
-				Kat(cpr1, m_keys[7], m_plainText[7], m_cipherText[7]);
-				Kat(cpr1, m_keys[8], m_plainText[8], m_cipherText[8]);
-				Kat(cpr1, m_keys[9], m_plainText[9], m_cipherText[9]);
-				Kat(cpr1, m_keys[10], m_plainText[10], m_cipherText[10]);
-				Kat(cpr1, m_keys[11], m_plainText[11], m_cipherText[11]);
-				Kat(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
-				Kat(cpr1, m_keys[13], m_plainText[12], m_cipherText[13]);
-				Kat(cpr1, m_keys[14], m_plainText[12], m_cipherText[14]);
-				delete cpr1;
+			RHX* cpr1 = new RHX();
+			Kat(cpr1, m_keys[0], m_plainText[0], m_cipherText[0]);
+			Kat(cpr1, m_keys[1], m_plainText[1], m_cipherText[1]);
+			Kat(cpr1, m_keys[2], m_plainText[2], m_cipherText[2]);
+			Kat(cpr1, m_keys[3], m_plainText[3], m_cipherText[3]);
+			Kat(cpr1, m_keys[4], m_plainText[4], m_cipherText[4]);
+			Kat(cpr1, m_keys[5], m_plainText[5], m_cipherText[5]);
+			Kat(cpr1, m_keys[6], m_plainText[6], m_cipherText[6]);
+			Kat(cpr1, m_keys[7], m_plainText[7], m_cipherText[7]);
+			Kat(cpr1, m_keys[8], m_plainText[8], m_cipherText[8]);
+			Kat(cpr1, m_keys[9], m_plainText[9], m_cipherText[9]);
+			Kat(cpr1, m_keys[10], m_plainText[10], m_cipherText[10]);
+			Kat(cpr1, m_keys[11], m_plainText[11], m_cipherText[11]);
+			Kat(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
+			Kat(cpr1, m_keys[13], m_plainText[12], m_cipherText[13]);
+			Kat(cpr1, m_keys[14], m_plainText[12], m_cipherText[14]);
+			delete cpr1;
 
-				AHX* cpr2 = new AHX(BlockCipherExtensions::HKDF256);
-				Kat(cpr2, m_keys[27], m_plainText[0], m_cipherText[27]);
-				delete cpr2;
-				AHX* cpr3 = new AHX(BlockCipherExtensions::HKDF512);
-				Kat(cpr3, m_keys[28], m_plainText[0], m_cipherText[28]);
-				delete cpr3;
-				AHX* cpr4 = new AHX(BlockCipherExtensions::SHAKE256);
-				Kat(cpr4, m_keys[27], m_plainText[0], m_cipherText[29]);
-				delete cpr4;
-				AHX* cpr5 = new AHX(BlockCipherExtensions::SHAKE512);
-				Kat(cpr5, m_keys[28], m_plainText[0], m_cipherText[30]);
-				delete cpr5;
-			}
-			else
-#endif
-			{
-				RHX* cpr1 = new RHX();
-				Kat(cpr1, m_keys[0], m_plainText[0], m_cipherText[0]);
-				Kat(cpr1, m_keys[1], m_plainText[1], m_cipherText[1]);
-				Kat(cpr1, m_keys[2], m_plainText[2], m_cipherText[2]);
-				Kat(cpr1, m_keys[3], m_plainText[3], m_cipherText[3]);
-				Kat(cpr1, m_keys[4], m_plainText[4], m_cipherText[4]);
-				Kat(cpr1, m_keys[5], m_plainText[5], m_cipherText[5]);
-				Kat(cpr1, m_keys[6], m_plainText[6], m_cipherText[6]);
-				Kat(cpr1, m_keys[7], m_plainText[7], m_cipherText[7]);
-				Kat(cpr1, m_keys[8], m_plainText[8], m_cipherText[8]);
-				Kat(cpr1, m_keys[9], m_plainText[9], m_cipherText[9]);
-				Kat(cpr1, m_keys[10], m_plainText[10], m_cipherText[10]);
-				Kat(cpr1, m_keys[11], m_plainText[11], m_cipherText[11]);
-				Kat(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
-				Kat(cpr1, m_keys[13], m_plainText[12], m_cipherText[13]);
-				Kat(cpr1, m_keys[14], m_plainText[12], m_cipherText[14]);
-				delete cpr1;
-
-				RHX* cpr2 = new RHX(BlockCipherExtensions::HKDF256);
-				Kat(cpr2, m_keys[27], m_plainText[0], m_cipherText[27]);
-				delete cpr2;
-				RHX* cpr3 = new RHX(BlockCipherExtensions::HKDF512);
-				Kat(cpr3, m_keys[28], m_plainText[0], m_cipherText[28]);
-				delete cpr3;
-				RHX* cpr4 = new RHX(BlockCipherExtensions::SHAKE256);
-				Kat(cpr4, m_keys[27], m_plainText[0], m_cipherText[29]);
-				delete cpr4;
-				RHX* cpr5 = new RHX(BlockCipherExtensions::SHAKE512);
-				Kat(cpr5, m_keys[28], m_plainText[0], m_cipherText[30]);
-				delete cpr5;
-			}
+			RHX* cpr2 = new RHX(BlockCipherExtensions::HKDF256);
+			Kat(cpr2, m_keys[27], m_plainText[0], m_cipherText[27]);
+			delete cpr2;
+			RHX* cpr3 = new RHX(BlockCipherExtensions::HKDF512);
+			Kat(cpr3, m_keys[28], m_plainText[0], m_cipherText[28]);
+			delete cpr3;
+			RHX* cpr4 = new RHX(BlockCipherExtensions::SHAKE256);
+			Kat(cpr4, m_keys[27], m_plainText[0], m_cipherText[29]);
+			delete cpr4;
+			RHX* cpr5 = new RHX(BlockCipherExtensions::SHAKE512);
+			Kat(cpr5, m_keys[28], m_plainText[0], m_cipherText[30]);
+			delete cpr5;
 
 			OnProgress(std::string("RijndaelTest: Passed Rijndael FIPS 197 KAT tests.."));
 
-#if defined(__AVX__)
-			if (m_aesniTest)
-			{
-				AHX* cpr1 = new AHX();
-				MonteCarlo(cpr1, m_keys[15], m_plainText[13], m_cipherText[15]);
-				MonteCarlo(cpr1, m_keys[16], m_plainText[14], m_cipherText[16]);
-				MonteCarlo(cpr1, m_keys[17], m_plainText[15], m_cipherText[17]);
-				MonteCarlo(cpr1, m_keys[18], m_plainText[16], m_cipherText[18]);
-				MonteCarlo(cpr1, m_keys[19], m_plainText[17], m_cipherText[19]);
-				MonteCarlo(cpr1, m_keys[20], m_plainText[18], m_cipherText[20]);
-				MonteCarlo(cpr1, m_keys[21], m_plainText[19], m_cipherText[21]);
-				MonteCarlo(cpr1, m_keys[22], m_plainText[20], m_cipherText[22]);
-				MonteCarlo(cpr1, m_keys[23], m_plainText[21], m_cipherText[23]);
-				MonteCarlo(cpr1, m_keys[24], m_plainText[22], m_cipherText[24]);
-				MonteCarlo(cpr1, m_keys[25], m_plainText[23], m_cipherText[25]);
-				MonteCarlo(cpr1, m_keys[26], m_plainText[24], m_cipherText[26]);
-				delete cpr1;
+			RHX* cpr6 = new RHX();
+			MonteCarlo(cpr6, m_keys[15], m_plainText[13], m_cipherText[15]);
+			MonteCarlo(cpr6, m_keys[16], m_plainText[14], m_cipherText[16]);
+			MonteCarlo(cpr6, m_keys[17], m_plainText[15], m_cipherText[17]);
+			MonteCarlo(cpr6, m_keys[18], m_plainText[16], m_cipherText[18]);
+			MonteCarlo(cpr6, m_keys[19], m_plainText[17], m_cipherText[19]);
+			MonteCarlo(cpr6, m_keys[20], m_plainText[18], m_cipherText[20]);
+			MonteCarlo(cpr6, m_keys[21], m_plainText[19], m_cipherText[21]);
+			MonteCarlo(cpr6, m_keys[22], m_plainText[20], m_cipherText[22]);
+			MonteCarlo(cpr6, m_keys[23], m_plainText[21], m_cipherText[23]);
+			MonteCarlo(cpr6, m_keys[24], m_plainText[22], m_cipherText[24]);
+			MonteCarlo(cpr6, m_keys[25], m_plainText[23], m_cipherText[25]);
+			MonteCarlo(cpr6, m_keys[26], m_plainText[24], m_cipherText[26]);
+			delete cpr6;
 
-				AHX* cpr2 = new AHX(BlockCipherExtensions::HKDF256);
-				MonteCarlo(cpr2, m_keys[27], m_plainText[0], m_cipherText[31]);
-				delete cpr2;
-				AHX* cpr3 = new AHX(BlockCipherExtensions::HKDF512);
-				MonteCarlo(cpr3, m_keys[28], m_plainText[0], m_cipherText[32]);
-				delete cpr3;
-				AHX* cpr4 = new AHX(BlockCipherExtensions::SHAKE256);
-				MonteCarlo(cpr4, m_keys[27], m_plainText[0], m_cipherText[33]);
-				delete cpr4;
-				AHX* cpr5 = new AHX(BlockCipherExtensions::SHAKE512);
-				MonteCarlo(cpr5, m_keys[28], m_plainText[0], m_cipherText[34]);
-				delete cpr5;
-			}
-			else
-#endif
-			{
-				RHX* cpr1 = new RHX();
-				MonteCarlo(cpr1, m_keys[15], m_plainText[13], m_cipherText[15]);
-				MonteCarlo(cpr1, m_keys[16], m_plainText[14], m_cipherText[16]);
-				MonteCarlo(cpr1, m_keys[17], m_plainText[15], m_cipherText[17]);
-				MonteCarlo(cpr1, m_keys[18], m_plainText[16], m_cipherText[18]);
-				MonteCarlo(cpr1, m_keys[19], m_plainText[17], m_cipherText[19]);
-				MonteCarlo(cpr1, m_keys[20], m_plainText[18], m_cipherText[20]);
-				MonteCarlo(cpr1, m_keys[21], m_plainText[19], m_cipherText[21]);
-				MonteCarlo(cpr1, m_keys[22], m_plainText[20], m_cipherText[22]);
-				MonteCarlo(cpr1, m_keys[23], m_plainText[21], m_cipherText[23]);
-				MonteCarlo(cpr1, m_keys[24], m_plainText[22], m_cipherText[24]);
-				MonteCarlo(cpr1, m_keys[25], m_plainText[23], m_cipherText[25]);
-				MonteCarlo(cpr1, m_keys[26], m_plainText[24], m_cipherText[26]);
-				delete cpr1;
-
-				RHX* cpr2 = new RHX(BlockCipherExtensions::HKDF256);
-				MonteCarlo(cpr2, m_keys[27], m_plainText[0], m_cipherText[31]);
-				delete cpr2;
-				RHX* cpr3 = new RHX(BlockCipherExtensions::HKDF512);
-				MonteCarlo(cpr3, m_keys[28], m_plainText[0], m_cipherText[32]);
-				delete cpr3;
-				RHX* cpr4 = new RHX(BlockCipherExtensions::SHAKE256);
-				MonteCarlo(cpr4, m_keys[27], m_plainText[0], m_cipherText[33]);
-				delete cpr4;
-				RHX* cpr5 = new RHX(BlockCipherExtensions::SHAKE512);
-				MonteCarlo(cpr5, m_keys[28], m_plainText[0], m_cipherText[34]);
-				delete cpr5;
-			}
+			RHX* cpr7 = new RHX(BlockCipherExtensions::HKDF256);
+			MonteCarlo(cpr7, m_keys[27], m_plainText[0], m_cipherText[31]);
+			delete cpr7;
+			RHX* cpr8 = new RHX(BlockCipherExtensions::HKDF512);
+			MonteCarlo(cpr8, m_keys[28], m_plainText[0], m_cipherText[32]);
+			delete cpr8;
+			RHX* cpr9 = new RHX(BlockCipherExtensions::SHAKE256);
+			MonteCarlo(cpr9, m_keys[27], m_plainText[0], m_cipherText[33]);
+			delete cpr9;
+			RHX* cpr10 = new RHX(BlockCipherExtensions::SHAKE512);
+			MonteCarlo(cpr10, m_keys[28], m_plainText[0], m_cipherText[34]);
+			delete cpr10;
 
 			OnProgress(std::string("RijndaelTest: Passed Rijndael extended Monte Carlo tests.."));
 
-			if (m_aesniTest)
-			{
-				CTR* cpr1 = new CTR(BlockCiphers::AES);
-				Parallel(cpr1);
-				OnProgress(std::string("RijndaelTest: Passed Rijndael parallel to sequential equivalence test.."));
+			CTR* cpr11 = new CTR(BlockCiphers::AES);
+			Parallel(cpr11);
+			OnProgress(std::string("RijndaelTest: Passed Rijndael parallel to sequential equivalence test.."));
 
-				Stress(cpr1);
-				OnProgress(std::string("RijndaelTest: Passed Rijndaelstress tests.."));
-				delete cpr1;
-			}
-			else
-			{
-				CTR* cpr2 = new CTR(BlockCiphers::AES);
-				Parallel(cpr2);
-				OnProgress(std::string("RijndaelTest: Passed Rijndael parallel to sequential equivalence test.."));
+			Stress(cpr11);
+			OnProgress(std::string("RijndaelTest: Passed Rijndael stress tests.."));
+			delete cpr11;
 
-				Stress(cpr2);
-				OnProgress(std::string("RijndaelTest: Passed Rijndael stress tests.."));
-				delete cpr2;
-			}
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
@@ -240,7 +150,7 @@ namespace Test
 		{
 			RHX cpr;
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> k(ks.KeySize() + 1);
+			std::vector<uint8_t> k(ks.KeySize() + 1);
 			SymmetricKey kp(k);
 
 			cpr.Initialize(true, kp);
@@ -256,11 +166,11 @@ namespace Test
 		}
 	}
 
-	void RijndaelTest::Kat(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void RijndaelTest::Kat(IBlockCipher* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> enc(MSGLEN);
-		std::vector<byte> dec(MSGLEN);
+		std::vector<uint8_t> enc(MSGLEN);
+		std::vector<uint8_t> dec(MSGLEN);
 		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
@@ -280,12 +190,12 @@ namespace Test
 		}
 	}
 
-	void RijndaelTest::MonteCarlo(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void RijndaelTest::MonteCarlo(IBlockCipher* Cipher, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> msg = Message;
-		std::vector<byte> enc(MSGLEN);
-		std::vector<byte> dec(MSGLEN);
+		std::vector<uint8_t> msg = Message;
+		std::vector<uint8_t> enc(MSGLEN);
+		std::vector<uint8_t> dec(MSGLEN);
 		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
@@ -320,12 +230,12 @@ namespace Test
 		const size_t MINSMP = 2048;
 		const size_t MAXSMP = 16384;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
-		std::vector<byte> cpt1;
-		std::vector<byte> cpt2;
-		std::vector<byte> inp;
-		std::vector<byte> otp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.IVSize());
+		std::vector<uint8_t> cpt1;
+		std::vector<uint8_t> cpt2;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> otp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> iv(ks.IVSize());
 		Prng::SecureRandom rnd;
 		size_t prlSize = Cipher->ParallelProfile().ParallelBlockSize();
 
@@ -380,16 +290,16 @@ namespace Test
 
 	void RijndaelTest::Stress(ICipherMode* Cipher)
 	{
-		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
-		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
+		const uint32_t MINPRL = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint32_t MAXPRL = static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
-		std::vector<byte> cpt;
-		std::vector<byte> inp;
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.IVSize());
-		std::vector<byte> otp;
+		std::vector<uint8_t> cpt;
+		std::vector<uint8_t> inp;
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> iv(ks.IVSize());
+		std::vector<uint8_t> otp;
 		SecureRandom rnd;
 		size_t i;
 
@@ -423,17 +333,6 @@ namespace Test
 	}
 
 	//~~~Private Functions~~~//
-
-	bool RijndaelTest::HasAESNI()
-	{
-#if defined(__AVX__)
-		CpuDetect dtc;
-
-		return dtc.AVX() && dtc.AESNI();
-#else
-		return false;
-#endif
-	}
 
 	void RijndaelTest::Initialize()
 	{

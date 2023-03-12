@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -61,7 +61,7 @@ private:
 	template<typename T, typename ArrayU64x32>
 	static void Store4xULL512(std::array<T, 4> &C, ArrayU64x32 &State)
 	{
-		std::array<ulong, 8> tmp;
+		std::array<uint64_t, 8> tmp;
 		size_t i;
 
 		for (i = 0; i < 4; ++i)
@@ -81,7 +81,7 @@ private:
 	template<typename T, typename ArrayU64x64>
 	static void Store8xULL512(std::array<T, 8> &C, ArrayU64x64 &State)
 	{
-		std::array<ulong, 8> tmp;
+		std::array<uint64_t, 8> tmp;
 		size_t i;
 
 		for (i = 0; i < 8; ++i)
@@ -101,7 +101,7 @@ private:
 	template<typename T, typename ArrayU64x128>
 	static void Store16xULL512(std::array<T, 16> &C, ArrayU64x128 &State)
 	{
-		std::array<ulong, 8> tmp;
+		std::array<uint64_t, 8> tmp;
 		size_t i;
 
 		for (i = 0; i < 16; ++i)
@@ -124,7 +124,7 @@ private:
 	template<typename T, typename ArrayU64x16>
 	static void Store4xULL256(std::array<T, 4> &C, ArrayU64x16 &State)
 	{
-		std::array<ulong, 4> tmp;
+		std::array<uint64_t, 4> tmp;
 		size_t i;
 
 		for (i = 0; i < 4; ++i)
@@ -140,7 +140,7 @@ private:
 	template<typename T, typename ArrayU64x32>
 	static void Store8xULL256(std::array<T, 8> &C, ArrayU64x32 &State)
 	{
-		std::array<ulong, 4> tmp;
+		std::array<uint64_t, 4> tmp;
 		size_t i;
 
 		for (i = 0; i < 8; ++i)
@@ -156,7 +156,7 @@ private:
 	template<typename T, typename ArrayU64x64>
 	static void Store16xULL256(std::array<T, 16> &C, ArrayU64x64 &State)
 	{
-		std::array<ulong, 4> tmp;
+		std::array<uint64_t, 4> tmp;
 		size_t i;
 
 		for (i = 0; i < 16; ++i)
@@ -190,19 +190,19 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x4>
 	static void PemuteP256C(const ArrayU64x4 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x4 &State, size_t Rounds)
 	{
-		std::array<ulong, 4> C;
-		std::array<ulong, 5> K;
-		std::array<ulong, 3> T;
+		std::array<uint64_t, 4> C;
+		std::array<uint64_t, 5> K;
+		std::array<uint64_t, 3> T;
 		size_t i;
 		size_t r;
 		size_t x;
 		size_t y;
 
-		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(ulong));
-		MemoryTools::SetValue(C, 2, 2 * sizeof(ulong), 0xFF);
-		MemoryTools::Copy(Key, 0, K, 0, 4 * sizeof(ulong));
+		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(uint64_t));
+		MemoryTools::SetValue(C, 2, 2 * sizeof(uint64_t), 0xFF);
+		MemoryTools::Copy(Key, 0, K, 0, 4 * sizeof(uint64_t));
 		K[4] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ 0x1BD11BDAA9FC1A22ULL;
-		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(uint64_t));
 		T[2] = T[0] ^ T[1];
 
 		r = Rounds / 8;
@@ -218,7 +218,7 @@ public:
 			C[1] = IntegerTools::RotL64(C[1], 14) ^ C[0];
 			// mix
 			x > 1 ? x -= 2 : x += 3;
-			C[3] += K[x] + (static_cast<ulong>(i) * 2);
+			C[3] += K[x] + (static_cast<uint64_t>(i) * 2);
 			x > 0 ? x -= 1 : x += 4;
 			y != 2 ? y += 1 : y -= 2;
 			C[2] += C[3] + K[x] + T[y];
@@ -242,7 +242,7 @@ public:
 			C[1] = IntegerTools::RotL64(C[1], 25) ^ C[0];
 			// mix
 			x > 1 ? x -= 2 : x += 3;
-			C[3] += K[x] + (static_cast<ulong>(i) * 2) + 1;
+			C[3] += K[x] + (static_cast<uint64_t>(i) * 2) + 1;
 			x != 0 ? x -= 1 : x += 4;
 			y != 2 ? y += 1 : y -= 2;
 			C[2] += C[3] + K[x] + T[y];
@@ -280,18 +280,18 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x4>
 	static void PemuteR72P256U(const ArrayU64x4 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x4 &State)
 	{
-		ulong C0;
-		ulong C1;
-		ulong C2;
-		ulong C3;
-		ulong K0;
-		ulong K1;
-		ulong K2;
-		ulong K3;
-		ulong K4;
-		ulong T0;
-		ulong T1;
-		ulong T2;
+		uint64_t C0;
+		uint64_t C1;
+		uint64_t C2;
+		uint64_t C3;
+		uint64_t K0;
+		uint64_t K1;
+		uint64_t K2;
+		uint64_t K3;
+		uint64_t K4;
+		uint64_t T0;
+		uint64_t T1;
+		uint64_t T2;
 
 		C0 = Counter[0];
 		C1 = Counter[1];
@@ -800,7 +800,7 @@ public:
 			C[1] = ULong256::RotL64(C[1], 14) ^ C[0];
 			// mix
 			x > 1 ? x -= 2 : x += 3;
-			C[3] += K[x] + ULong256(static_cast<ulong>(i) * 2);
+			C[3] += K[x] + ULong256(static_cast<uint64_t>(i) * 2);
 			x > 0 ? x -= 1 : x += 4;
 			y != 2 ? y += 1 : y -= 2;
 			C[2] += C[3] + K[x] + T[y];
@@ -824,7 +824,7 @@ public:
 			C[1] = ULong256::RotL64(C[1], 25) ^ C[0];
 			// mix
 			x > 1 ? x -= 2 : x += 3;
-			C[3] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
+			C[3] += K[x] + ULong256((static_cast<uint64_t>(i) * 2) + 1);
 			x != 0 ? x -= 1 : x += 4;
 			y != 2 ? y += 1 : y -= 2;
 			C[2] += C[3] + K[x] + T[y];
@@ -870,19 +870,19 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x8>
 	static void PemuteP512C(const ArrayU64x8 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x8 &State, size_t Rounds)
 	{
-		std::array<ulong, 8> C;
-		std::array<ulong, 9> K;
-		std::array<ulong, 3> T;
+		std::array<uint64_t, 8> C;
+		std::array<uint64_t, 9> K;
+		std::array<uint64_t, 3> T;
 		size_t i;
 		size_t r;
 		size_t x;
 		size_t y;
 
-		MemoryTools::SetValue(C, 2, 6 * sizeof(ulong), 0xFF);
-		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(ulong));
-		MemoryTools::Copy(Key, 0, K, 0, 8 * sizeof(ulong));
+		MemoryTools::SetValue(C, 2, 6 * sizeof(uint64_t), 0xFF);
+		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(uint64_t));
+		MemoryTools::Copy(Key, 0, K, 0, 8 * sizeof(uint64_t));
 		K[8] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ 0x1BD11BDAA9FC1A22ULL;
-		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(uint64_t));
 		T[2] = T[0] ^ T[1];
 
 		r = Rounds / 8;
@@ -908,7 +908,7 @@ public:
 			C[5] = IntegerTools::RotL64(C[5], 19) ^ C[4];
 			// mix
 			x < 6 ? x += 3 : x -= 6;
-			C[7] += K[x] + (static_cast<ulong>(i) * 2);
+			C[7] += K[x] + (static_cast<uint64_t>(i) * 2);
 			x != 0 ? x -= 1 : x += 8;
 			y != 2 ? y += 1 : y -= 2;
 			C[6] += C[7] + K[x] + T[y];
@@ -955,7 +955,7 @@ public:
 			C[5] = IntegerTools::RotL64(C[5], 34) ^ C[4];
 			// mix
 			x < 6 ? x += 3 : x -= 6;
-			C[7] += K[x] + (static_cast<ulong>(i) * 2) + 1;
+			C[7] += K[x] + (static_cast<uint64_t>(i) * 2) + 1;
 			x != 0 ? x -= 1 : x += 8;
 			y != 2 ? y += 1 : y -= 2;
 			C[6] += C[7] + K[x] + T[y];
@@ -1010,26 +1010,26 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x8>
 	static void PemuteR96P512U(const ArrayU64x8 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x8 &State)
 	{
-		ulong C0;
-		ulong C1;
-		ulong C2;
-		ulong C3;
-		ulong C4;
-		ulong C5;
-		ulong C6;
-		ulong C7;
-		ulong K0;
-		ulong K1;
-		ulong K2;
-		ulong K3;
-		ulong K4;
-		ulong K5;
-		ulong K6;
-		ulong K7;
-		ulong K8;
-		ulong T0;
-		ulong T1;
-		ulong T2;
+		uint64_t C0;
+		uint64_t C1;
+		uint64_t C2;
+		uint64_t C3;
+		uint64_t C4;
+		uint64_t C5;
+		uint64_t C6;
+		uint64_t C7;
+		uint64_t K0;
+		uint64_t K1;
+		uint64_t K2;
+		uint64_t K3;
+		uint64_t K4;
+		uint64_t K5;
+		uint64_t K6;
+		uint64_t K7;
+		uint64_t K8;
+		uint64_t T0;
+		uint64_t T1;
+		uint64_t T2;
 
 		C0 = Counter[0];
 		C1 = Counter[1];
@@ -2169,7 +2169,7 @@ public:
 			C[5] = ULong256::RotL64(C[5], 19) ^ C[4];
 			// mix
 			x < 6 ? x += 3 : x -= 6;
-			C[7] += K[x] + ULong256(static_cast<ulong>(i) * 2);
+			C[7] += K[x] + ULong256(static_cast<uint64_t>(i) * 2);
 			x != 0 ? x -= 1 : x += 8;
 			y != 2 ? y += 1 : y -= 2;
 			C[6] += C[7] + K[x] + T[y];
@@ -2216,7 +2216,7 @@ public:
 			C[5] = ULong256::RotL64(C[5], 34) ^ C[4];
 			// mix
 			x < 6 ? x += 3 : x -= 6;
-			C[7] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
+			C[7] += K[x] + ULong256((static_cast<uint64_t>(i) * 2) + 1);
 			x != 0 ? x -= 1 : x += 8;
 			y != 2 ? y += 1 : y -= 2;
 			C[6] += C[7] + K[x] + T[y];
@@ -2279,19 +2279,19 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x16>
 	static void PemuteP1024C(const ArrayU64x16 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x16 &State, size_t Rounds)
 	{
-		std::array<ulong, 16> C;
-		std::array<ulong, 17> K;
-		std::array<ulong, 3> T;
+		std::array<uint64_t, 16> C;
+		std::array<uint64_t, 17> K;
+		std::array<uint64_t, 3> T;
 		size_t i;
 		size_t r;
 		size_t x;
 		size_t y;
 
-		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(ulong));
-		MemoryTools::SetValue(C, 2, 14 * sizeof(ulong), 0xFF);
-		MemoryTools::Copy(Key, 0, K, 0, 16 * sizeof(ulong));
+		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(uint64_t));
+		MemoryTools::SetValue(C, 2, 14 * sizeof(uint64_t), 0xFF);
+		MemoryTools::Copy(Key, 0, K, 0, 16 * sizeof(uint64_t));
 		K[16] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ K[8] ^ K[9] ^ K[10] ^ K[11] ^ K[12] ^ K[13] ^ K[14] ^ K[15] ^ 0x1BD11BDAA9FC1A22ULL;
-		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(uint64_t));
 		T[2] = T[0] ^ T[1];
 
 		r = Rounds / 8;
@@ -2337,7 +2337,7 @@ public:
 			C[13] = IntegerTools::RotL64(C[13], 22) ^ C[12];
 			// mix
 			x < 14 ? x += 3 : x -= 14;
-			C[15] += K[x] + (static_cast<ulong>(i) * 2);
+			C[15] += K[x] + (static_cast<uint64_t>(i) * 2);
 			x != 0 ? x -= 1 : x += 16;
 			y != 2 ? y += 1 : y -= 2;
 			C[14] += C[15] + K[x] + T[y];
@@ -2428,7 +2428,7 @@ public:
 			C[13] = IntegerTools::RotL64(C[13], 44) ^ C[12];
 			// mix
 			x < 14 ? x += 3 : x -= 14;
-			C[15] += K[x] + (static_cast<ulong>(i) * 2) + 1;
+			C[15] += K[x] + (static_cast<uint64_t>(i) * 2) + 1;
 			x != 0 ? x -= 1 : x += 16;
 			y != 2 ? y += 1 : y -= 2;
 			C[14] += C[15] + K[x] + T[y];
@@ -2515,42 +2515,42 @@ public:
 	template<typename ArrayU64x2, typename ArrayU64x16>
 	static void PemuteR120P1024U(const ArrayU64x16 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x16 &State)
 	{
-		ulong C0;
-		ulong C1;
-		ulong C2;
-		ulong C3;
-		ulong C4;
-		ulong C5;
-		ulong C6;
-		ulong C7;
-		ulong C8;
-		ulong C9;
-		ulong C10;
-		ulong C11;
-		ulong C12;
-		ulong C13;
-		ulong C14;
-		ulong C15;
-		ulong K0;
-		ulong K1;
-		ulong K2;
-		ulong K3;
-		ulong K4;
-		ulong K5;
-		ulong K6;
-		ulong K7;
-		ulong K8;
-		ulong K9;
-		ulong K10;
-		ulong K11;
-		ulong K12;
-		ulong K13;
-		ulong K14;
-		ulong K15;
-		ulong K16;
-		ulong T0;
-		ulong T1;
-		ulong T2;
+		uint64_t C0;
+		uint64_t C1;
+		uint64_t C2;
+		uint64_t C3;
+		uint64_t C4;
+		uint64_t C5;
+		uint64_t C6;
+		uint64_t C7;
+		uint64_t C8;
+		uint64_t C9;
+		uint64_t C10;
+		uint64_t C11;
+		uint64_t C12;
+		uint64_t C13;
+		uint64_t C14;
+		uint64_t C15;
+		uint64_t K0;
+		uint64_t K1;
+		uint64_t K2;
+		uint64_t K3;
+		uint64_t K4;
+		uint64_t K5;
+		uint64_t K6;
+		uint64_t K7;
+		uint64_t K8;
+		uint64_t K9;
+		uint64_t K10;
+		uint64_t K11;
+		uint64_t K12;
+		uint64_t K13;
+		uint64_t K14;
+		uint64_t K15;
+		uint64_t K16;
+		uint64_t T0;
+		uint64_t T1;
+		uint64_t T2;
 
 		C0 = Counter[0];
 		C1 = Counter[1];
@@ -5161,7 +5161,7 @@ public:
 			C[13] = ULong256::RotL64(C[13], 22) ^ C[12];
 			// mix
 			x < 14 ? x += 3 : x -= 14;
-			C[15] += K[x] + ULong256(static_cast<ulong>(i) * 2);
+			C[15] += K[x] + ULong256(static_cast<uint64_t>(i) * 2);
 			x != 0 ? x -= 1 : x += 16;
 			y != 2 ? y += 1 : y -= 2;
 			C[14] += C[15] + K[x] + T[y];
@@ -5252,7 +5252,7 @@ public:
 			C[13] = ULong256::RotL64(C[13], 44) ^ C[12];
 			// mix
 			x < 14 ? x += 3 : x -= 14;
-			C[15] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
+			C[15] += K[x] + ULong256((static_cast<uint64_t>(i) * 2) + 1);
 			x != 0 ? x -= 1 : x += 16;
 			y != 2 ? y += 1 : y -= 2;
 			C[14] += C[15] + K[x] + T[y];

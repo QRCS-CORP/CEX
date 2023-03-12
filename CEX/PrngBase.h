@@ -66,21 +66,21 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
-	ushort NextUInt16() override;
+	uint16_t NextUInt16() override;
 
 	/// <summary>
 	/// Get a pseudo-random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	uint NextUInt32() override;
+	uint32_t NextUInt32() override;
 
 	/// <summary>
 	/// Get a pseudo-random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextUInt64() override;
+	uint64_t NextUInt64() override;
 };
 
 NAMESPACE_PRNGEND

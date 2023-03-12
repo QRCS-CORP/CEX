@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -45,7 +45,7 @@ public:
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
 	/// <param name="Output">The output buffer receiving the permuted state</param>
-	static void PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::array<byte, CMUL_BLOCK_SIZE> &Output);
+	static void PermuteR128P128U(std::array<uint64_t, CMUL_STATE_SIZE> &State, std::array<uint8_t, CMUL_BLOCK_SIZE> &Output);
 
 	/// <summary>
 	/// The unrolled form of the 128 round (standard) CMUL permutation function.
@@ -55,7 +55,7 @@ public:
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
 	/// <param name="Output">The output buffer receiving the permuted state</param>
-	static void PermuteR128P128C(std::array<ulong, CMUL_STATE_SIZE> &State, std::array<byte, CMUL_BLOCK_SIZE> &Output);
+	static void PermuteR128P128C(std::array<uint64_t, CMUL_STATE_SIZE> &State, std::array<uint8_t, CMUL_BLOCK_SIZE> &Output);
 
 	/// <summary>
 	/// The vertically vectorized form of the 128 round (standard) CMUL permutation function.
@@ -64,7 +64,7 @@ public:
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
 	/// <param name="Output">The output buffer receiving the permuted state</param>
-	static void PermuteR128P128V(std::array<ulong, CMUL_STATE_SIZE> &State, std::array<byte, CMUL_BLOCK_SIZE> &Output);
+	static void PermuteR128P128V(std::array<uint64_t, CMUL_STATE_SIZE> &State, std::array<uint8_t, CMUL_BLOCK_SIZE> &Output);
 };
 
 NAMESPACE_NUMERICEND

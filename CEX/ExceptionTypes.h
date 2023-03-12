@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Symmetric AEAD cipher mode enumeration names
 /// </summary>
-enum class ExceptionTypes : byte
+enum class ExceptionTypes : uint8_t
 {
 	/// <summary>
 	/// No exception type is specified

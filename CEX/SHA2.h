@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -59,8 +59,8 @@ class SHA2
 {
 private:
 
-	static const std::vector<uint> SHA2256_RC64;
-	static const std::vector<ulong> SHA2512_RC80;
+	static const std::vector<uint32_t> SHA2256_RC64;
+	static const std::vector<uint64_t> SHA2512_RC80;
 
 	template<typename T>
 	static void Round256W(T &A, T &B, T &C, T &D, T &E, T &F, T &G, T &H, T &M, T &P)
@@ -102,25 +102,25 @@ private:
 		return T(((X >> 17) | (X << 15)) ^ ((X >> 19) | (X << 13)) ^ (X >> 10));
 	}
 
-	inline static void Round256(uint A, uint B, uint C, uint &D, uint E, uint F, uint G, uint &H, uint M, uint P)
+	inline static void Round256(uint32_t A, uint32_t B, uint32_t C, uint32_t &D, uint32_t E, uint32_t F, uint32_t G, uint32_t &H, uint32_t M, uint32_t P)
 	{
-		uint R(H + (((E >> 6) | (E << 26)) ^ ((E >> 11) | (E << 21)) ^ ((E >> 25) | (E << 7))) + ((E & F) ^ (~E & G)) + M + P);
+		uint32_t R(H + (((E >> 6) | (E << 26)) ^ ((E >> 11) | (E << 21)) ^ ((E >> 25) | (E << 7))) + ((E & F) ^ (~E & G)) + M + P);
 		D += R;
 		H = R + ((((A >> 2) | (A << 30)) ^ ((A >> 13) | (A << 19)) ^ ((A >> 22) | (A << 10))) + ((A & B) ^ (A & C) ^ (B & C)));
 	}
 
-	inline static void Round512(ulong A, ulong B, ulong C, ulong &D, ulong E, ulong F, ulong G, ulong &H, ulong M, ulong P)
+	inline static void Round512(uint64_t A, uint64_t B, uint64_t C, uint64_t &D, uint64_t E, uint64_t F, uint64_t G, uint64_t &H, uint64_t M, uint64_t P)
 	{
-		ulong R(H + (((E << 50) | (E >> 14)) ^ ((E << 46) | (E >> 18)) ^ ((E << 23) | (E >> 41))) + ((E & F) ^ (~E & G)) + M + P);
+		uint64_t R(H + (((E << 50) | (E >> 14)) ^ ((E << 46) | (E >> 18)) ^ ((E << 23) | (E >> 41))) + ((E & F) ^ (~E & G)) + M + P);
 		D += R;
 		H = R + (((A << 36) | (A >> 28)) ^ ((A << 30) | (A >> 34)) ^ ((A << 25) | (A >> 39))) + ((A & B) ^ (A & C) ^ (B & C));
 	}
 
 public:
 
-	static const std::vector<uint> SHA2256State;
-	static const std::vector<ulong> SHA2384State;
-	static const std::vector<ulong> SHA2512State;
+	static const std::vector<uint32_t> SHA2256State;
+	static const std::vector<uint64_t> SHA2384State;
+	static const std::vector<uint64_t> SHA2512State;
 
 	static const size_t SHA2256_DIGEST_SIZE = 32;
 	static const size_t SHA2384_DIGEST_SIZE = 48;
@@ -135,21 +135,21 @@ public:
 	/// A compact (stateless) form of the SHA2-256 message digest function; processes a message, and return the hash in the output array.
 	/// </summary>
 	/// 
-	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
-	/// <param name="InOffset">The starting offseet within the input byte array</param>
+	/// <param name="Input">The input uint8_t message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the input uint8_t array</param>
 	/// <param name="InLength">The number of message bytes to process</param>
 	/// <param name="Output">The output hash array; contains the output hash of 32 bytes</param>
-	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	/// <param name="OutOffset">The starting offseet within the output uint8_t array</param>
 	template<typename ArrayU8A, typename ArrayU8B>
 	static void Compute256(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset)
 	{
-		std::array<uint, 8> state = { 0 };
-		std::vector<byte> buf(SHA2256_RATE_SIZE);
-		ulong bitlen;
-		ulong t;
+		std::array<uint32_t, 8> state = { 0 };
+		std::vector<uint8_t> buf(SHA2256_RATE_SIZE);
+		uint64_t bitlen;
+		uint64_t t;
 
 		t = 0;
-		MemoryTools::Copy(SHA2256State, 0, state, 0, state.size() * sizeof(uint));
+		MemoryTools::Copy(SHA2256State, 0, state, 0, state.size() * sizeof(uint32_t));
 
 		while (InLength >= SHA2256_RATE_SIZE)
 		{
@@ -172,8 +172,8 @@ public:
 			MemoryTools::Clear(buf, 0, SHA2256_RATE_SIZE);
 		}
 
-		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen) >> 32), buf, 56);
-		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen)), buf, 60);
+		IntegerTools::Be32ToBytes(static_cast<uint32_t>(static_cast<uint64_t>(bitlen) >> 32), buf, 56);
+		IntegerTools::Be32ToBytes(static_cast<uint32_t>(static_cast<uint64_t>(bitlen)), buf, 60);
 
 		PermuteR64P512U(buf, 0, state);
 
@@ -186,25 +186,25 @@ public:
 	/// <para>Process a key, and a message, and return the hash in the output array.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input byte key array, can be either a standard array or vector</param>
-	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
-	/// <param name="InOffset">The starting offseet within the message byte array</param>
+	/// <param name="Key">The input uint8_t key array, can be either a standard array or vector</param>
+	/// <param name="Input">The input uint8_t message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the message uint8_t array</param>
 	/// <param name="InLength">The number of message bytes to process</param>
 	/// <param name="Output">The output hash array; contains the output mac code of 32 bytes</param>
-	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	/// <param name="OutOffset">The starting offseet within the output uint8_t array</param>
 	template<typename ArrayU8A, typename ArrayU8B, typename ArrayU8C>
 	static void MACR64P512(const ArrayU8A &Key, const ArrayU8B &Input, size_t InOffset, size_t InLength, ArrayU8C &Output, size_t OutOffset)
 	{
 		CEXASSERT(Key.size() <= SHA2256_RATE_SIZE, "The Mac key array must be a maximum of 64 bytes in length");
 
-		const byte IPAD = 0x36;
-		const byte OPAD = 0x5C;
-		std::vector<byte> buf(SHA2256_RATE_SIZE);
-		std::vector<byte> ipad(SHA2256_RATE_SIZE);
-		std::vector<byte> opad(SHA2256_RATE_SIZE);
-		std::array<uint, 8> state = { 0 };
-		ulong bitlen;
-		ulong t;
+		const uint8_t IPAD = 0x36;
+		const uint8_t OPAD = 0x5C;
+		std::vector<uint8_t> buf(SHA2256_RATE_SIZE);
+		std::vector<uint8_t> ipad(SHA2256_RATE_SIZE);
+		std::vector<uint8_t> opad(SHA2256_RATE_SIZE);
+		std::array<uint32_t, 8> state = { 0 };
+		uint64_t bitlen;
+		uint64_t t;
 
 		// copy in the key and xor the hamming weights into input and output pads
 		MemoryTools::Copy(Key, 0, ipad, 0, Key.size());
@@ -213,7 +213,7 @@ public:
 		MemoryTools::XorPad(opad, OPAD);
 
 		// initialize the sha256 state
-		MemoryTools::Copy(SHA2256State, 0, state, 0, state.size() * sizeof(uint));
+		MemoryTools::Copy(SHA2256State, 0, state, 0, state.size() * sizeof(uint32_t));
 
 		// permute the input pad
 		PermuteR64P512U(ipad, 0, state);
@@ -241,15 +241,15 @@ public:
 			MemoryTools::Clear(buf, 0, SHA2256_RATE_SIZE);
 		}
 
-		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen) >> 32), buf, 56);
-		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen)), buf, 60);
+		IntegerTools::Be32ToBytes(static_cast<uint32_t>(static_cast<uint64_t>(bitlen) >> 32), buf, 56);
+		IntegerTools::Be32ToBytes(static_cast<uint32_t>(static_cast<uint64_t>(bitlen)), buf, 60);
 		PermuteR64P512U(buf, 0, state);
 
 		// store the code in the buffer
 		IntegerTools::BeUL256ToBlock(state, 0, buf, 0);
 		MemoryTools::Clear(buf, SHA2256_DIGEST_SIZE, SHA2256_DIGEST_SIZE);
 		// reset the sha2 state
-		MemoryTools::Copy(SHA2256State, 0, state, 0, state.size() * sizeof(uint));
+		MemoryTools::Copy(SHA2256State, 0, state, 0, state.size() * sizeof(uint32_t));
 
 		// permute the output pad
 		PermuteR64P512U(opad, 0, state);
@@ -257,8 +257,8 @@ public:
 		t = SHA2256_RATE_SIZE + SHA2256_DIGEST_SIZE;
 		bitlen = (t << 3);
 		buf[SHA2256_DIGEST_SIZE] = 128;
-		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen) >> 32), buf, 56);
-		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen)), buf, 60);
+		IntegerTools::Be32ToBytes(static_cast<uint32_t>(static_cast<uint64_t>(bitlen) >> 32), buf, 56);
+		IntegerTools::Be32ToBytes(static_cast<uint32_t>(static_cast<uint64_t>(bitlen)), buf, 60);
 		PermuteR64P512U(buf, 0, state);
 
 		// copy as big endian aligned to output code
@@ -277,20 +277,20 @@ public:
 	template<typename ArrayU8, typename ArrayU32x8>
 	static void PermuteR64P512C(const ArrayU8 &Input, size_t InOffset, ArrayU32x8 &State)
 	{
-		std::array<uint, 8> A;
-		std::array<uint, 64> W;
+		std::array<uint32_t, 8> A;
+		std::array<uint32_t, 64> W;
 		size_t i;
 		size_t j;
 
-		MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(uint));
+		MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(uint32_t));
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 		for (i = 0; i < 16; ++i)
 		{
-			W[i] = IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)));
+			W[i] = IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)));
 		}
 #else
-		MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(uint));
+		MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(uint32_t));
 #endif
 
 		for (i = 16; i < 64; i++)
@@ -342,31 +342,31 @@ public:
 	template<typename ArrayU8, typename ArrayU32x8>
 	static void PermuteR64P512U(const ArrayU8 &Input, size_t InOffset, ArrayU32x8 &State)
 	{
-		uint A;
-		uint B;
-		uint C;
-		uint D;
-		uint E;
-		uint F;
-		uint G;
-		uint H;
-		uint R;
-		uint W0;
-		uint W1;
-		uint W2;
-		uint W3;
-		uint W4;
-		uint W5;
-		uint W6;
-		uint W7;
-		uint W8;
-		uint W9;
-		uint W10;
-		uint W11;
-		uint W12;
-		uint W13;
-		uint W14;
-		uint W15;
+		uint32_t A;
+		uint32_t B;
+		uint32_t C;
+		uint32_t D;
+		uint32_t E;
+		uint32_t F;
+		uint32_t G;
+		uint32_t H;
+		uint32_t R;
+		uint32_t W0;
+		uint32_t W1;
+		uint32_t W2;
+		uint32_t W3;
+		uint32_t W4;
+		uint32_t W5;
+		uint32_t W6;
+		uint32_t W7;
+		uint32_t W8;
+		uint32_t W9;
+		uint32_t W10;
+		uint32_t W11;
+		uint32_t W12;
+		uint32_t W13;
+		uint32_t W14;
+		uint32_t W15;
 
 		A = State[0];
 		B = State[1];
@@ -860,22 +860,22 @@ public:
 		for (i = 0; i < 16; ++i)
 		{
 			W[i].Load(
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint))),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 64),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 128),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 196),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 256),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 320),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 384),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 448),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 512),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 576),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 640),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 704),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 768),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 832),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 896),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 960));
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t))),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 64),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 128),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 196),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 256),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 320),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 384),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 448),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 512),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 576),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 640),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 704),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 768),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 832),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 896),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 960));
 		}
 #else
 		MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(UInt512));
@@ -950,14 +950,14 @@ public:
 		for (i = 0; i < 16; ++i)
 		{
 			W[i].Load(
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint))),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 64),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 128),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 196),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 256),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 320),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 384),
-				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 448));
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t))),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 64),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 128),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 196),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 256),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 320),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 384),
+				IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint32_t)) + 448));
 		}
 #else
 		MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(UInt256));
@@ -1015,20 +1015,20 @@ public:
 	/// A compact (stateless) form of the SHA2-384 message digest function; processes a message, and return the hash in the output array.
 	/// </summary>
 	/// 
-	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
-	/// <param name="InOffset">The starting offseet within the input byte array</param>
+	/// <param name="Input">The input uint8_t message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the input uint8_t array</param>
 	/// <param name="InLength">The number of message bytes to process</param>
 	/// <param name="Output">The output hash array; containst the output hash of 48 bytes</param>
-	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	/// <param name="OutOffset">The starting offseet within the output uint8_t array</param>
 	template<typename ArrayU8A, typename ArrayU8B>
 	static void Compute384(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset)
 	{
-		std::array<ulong, 8> state = { 0 };
-		std::vector<byte> buf(SHA2384_RATE_SIZE);
-		ulong bitlen;
-		std::array<ulong, 2> t = { 0 };
+		std::array<uint64_t, 8> state = { 0 };
+		std::vector<uint8_t> buf(SHA2384_RATE_SIZE);
+		uint64_t bitlen;
+		std::array<uint64_t, 2> t = { 0 };
 
-		MemoryTools::Copy(SHA2384State, 0, state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Copy(SHA2384State, 0, state, 0, state.size() * sizeof(uint64_t));
 
 		while (InLength >= SHA2384_RATE_SIZE)
 		{
@@ -1071,20 +1071,20 @@ public:
 	/// A compact (stateless) form of the SHA2-512 message digest function; processes a message, and return the hash in the output array.
 	/// </summary>
 	/// 
-	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
-	/// <param name="InOffset">The starting offseet within the input byte array</param>
+	/// <param name="Input">The input uint8_t message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the input uint8_t array</param>
 	/// <param name="InLength">The number of message bytes to process</param>
 	/// <param name="Output">The output hash array; containst the output hash of 64 bytes</param>
-	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	/// <param name="OutOffset">The starting offseet within the output uint8_t array</param>
 	template<typename ArrayU8A, typename ArrayU8B>
 	static void Compute512(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset)
 	{
-		std::array<ulong, 8> state = { 0 };
-		std::vector<byte> buf(SHA2512_RATE_SIZE);
-		ulong bitlen;
-		std::array<ulong, 2> t = { 0 };
+		std::array<uint64_t, 8> state = { 0 };
+		std::vector<uint8_t> buf(SHA2512_RATE_SIZE);
+		uint64_t bitlen;
+		std::array<uint64_t, 2> t = { 0 };
 
-		MemoryTools::Copy(SHA2512State, 0, state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Copy(SHA2512State, 0, state, 0, state.size() * sizeof(uint64_t));
 
 		while (InLength >= SHA2512_RATE_SIZE)
 		{
@@ -1121,25 +1121,25 @@ public:
 	/// <para>Process a key, and a message, and return the hash in the output array.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input byte key array, can be either a standard array or vector</param>
-	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
-	/// <param name="InOffset">The starting offseet within the message byte array</param>
+	/// <param name="Key">The input uint8_t key array, can be either a standard array or vector</param>
+	/// <param name="Input">The input uint8_t message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the message uint8_t array</param>
 	/// <param name="InLength">The number of message bytes to process</param>
 	/// <param name="Output">The output hash array; contains the output mac code of 64 bytes</param>
-	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	/// <param name="OutOffset">The starting offseet within the output uint8_t array</param>
 	template<typename ArrayU8A, typename ArrayU8B, typename ArrayU8C>
 	static void MACR80P1024(const ArrayU8A &Key, const ArrayU8B &Input, size_t InOffset, size_t InLength, ArrayU8C &Output, size_t OutOffset)
 	{
 		CEXASSERT(Key.size() <= SHA2512_RATE_SIZE, "The Mac key array must be a maximum of 128 bytes in length");
 
-		const byte IPAD = 0x36;
-		const byte OPAD = 0x5C;
-		std::vector<byte> buf(SHA2512_RATE_SIZE);
-		std::vector<byte> ipad(SHA2512_RATE_SIZE);
-		std::vector<byte> opad(SHA2512_RATE_SIZE);
-		std::array<ulong, 8> state = { 0 };
-		std::array<ulong, 2> t = { 0 };
-		ulong bitlen;
+		const uint8_t IPAD = 0x36;
+		const uint8_t OPAD = 0x5C;
+		std::vector<uint8_t> buf(SHA2512_RATE_SIZE);
+		std::vector<uint8_t> ipad(SHA2512_RATE_SIZE);
+		std::vector<uint8_t> opad(SHA2512_RATE_SIZE);
+		std::array<uint64_t, 8> state = { 0 };
+		std::array<uint64_t, 2> t = { 0 };
+		uint64_t bitlen;
 
 		// copy in the key and xor the hamming weights into input and output pads
 		MemoryTools::Copy(Key, 0, ipad, 0, Key.size());
@@ -1148,7 +1148,7 @@ public:
 		MemoryTools::XorPad(opad, OPAD);
 
 		// initialize the sha256 state
-		MemoryTools::Copy(SHA2512State, 0, state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Copy(SHA2512State, 0, state, 0, state.size() * sizeof(uint64_t));
 
 		// permute the input pad
 		PermuteR80P1024U(ipad, 0, state);
@@ -1184,7 +1184,7 @@ public:
 		IntegerTools::BeULL512ToBlock(state, 0, buf, 0);
 		MemoryTools::Clear(buf, SHA2512_DIGEST_SIZE, SHA2512_DIGEST_SIZE);
 		// reset the sha2 state
-		MemoryTools::Copy(SHA2512State, 0, state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Copy(SHA2512State, 0, state, 0, state.size() * sizeof(uint64_t));
 
 		// permute the output pad
 		PermuteR80P1024U(opad, 0, state);
@@ -1212,20 +1212,20 @@ public:
 	template<typename ArrayU8, typename ArrayU64x8>
 	static void PermuteR80P1024C(const ArrayU8 &Input, size_t InOffset, ArrayU64x8 &State)
 	{
-		std::array<ulong, 8> A;
-		std::array<ulong, 80> W;
+		std::array<uint64_t, 8> A;
+		std::array<uint64_t, 80> W;
 		size_t i;
 		size_t j;
 
-		MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(ulong));
+		MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(uint64_t));
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 		for (i = 0; i < 16; ++i)
 		{
-			W[i] = IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
+			W[i] = IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)));
 		}
 #else
-		MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ulong));
+		MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(uint64_t));
 #endif
 
 		for (i = 16; i < 80; i++)
@@ -1276,31 +1276,31 @@ public:
 	template<typename ArrayU8, typename ArrayU64x8>
 	static void PermuteR80P1024U(const ArrayU8 &Input, size_t InOffset, ArrayU64x8 &State)
 	{
-		ulong A;
-		ulong B;
-		ulong C;
-		ulong D;
-		ulong E;
-		ulong F;
-		ulong G;
-		ulong H;
-		ulong R;
-		ulong W0;
-		ulong W1;
-		ulong W2;
-		ulong W3;
-		ulong W4;
-		ulong W5;
-		ulong W6;
-		ulong W7;
-		ulong W8;
-		ulong W9;
-		ulong W10;
-		ulong W11;
-		ulong W12;
-		ulong W13;
-		ulong W14;
-		ulong W15;
+		uint64_t A;
+		uint64_t B;
+		uint64_t C;
+		uint64_t D;
+		uint64_t E;
+		uint64_t F;
+		uint64_t G;
+		uint64_t H;
+		uint64_t R;
+		uint64_t W0;
+		uint64_t W1;
+		uint64_t W2;
+		uint64_t W3;
+		uint64_t W4;
+		uint64_t W5;
+		uint64_t W6;
+		uint64_t W7;
+		uint64_t W8;
+		uint64_t W9;
+		uint64_t W10;
+		uint64_t W11;
+		uint64_t W12;
+		uint64_t W13;
+		uint64_t W14;
+		uint64_t W15;
 
 		A = State[0];
 		B = State[1];
@@ -1672,14 +1672,14 @@ public:
 		for (i = 0; i < 16; ++i)
 		{
 			W[i].Load(
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong))),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 128),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 256),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 384),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 512),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 640),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 768),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 896));
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t))),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 128),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 256),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 384),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 512),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 640),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 768),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 896));
 		}
 #else
 		MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ULong512));
@@ -1754,10 +1754,10 @@ public:
 		for (i = 0; i < 16; ++i)
 		{
 			W[i].Load(
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong))),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 128),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 256),
-				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 384));
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t))),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 128),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 256),
+				IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(uint64_t)) + 384));
 		}
 #else
 		MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ULong256));

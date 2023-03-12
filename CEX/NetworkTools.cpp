@@ -95,7 +95,7 @@ ipv4_info NetworkTools::GetIPv4Info(const std::string &Host, const std::string &
 	ipv4_info info = { 0 };
 	sockaddr_in sa;
 	std::string sai;
-	int res;
+	int32_t res;
 
 	std::memset(&info, 0x00, sizeof(info));
 	std::memset(&sa, 0x00, sizeof(sa));
@@ -144,7 +144,7 @@ ipv4_info NetworkTools::GetIPv4Info(const std::string &Host, const std::string &
 	if (res == 0)
 	{
 		sa.sin_addr.s_addr = reinterpret_cast<in_addr*>(lphost->h_addr)->s_addr;
-		ipv4_address ipa(reinterpret_cast<byte*>(sa.sin_addr));
+		ipv4_address ipa(reinterpret_cast<uint8_t*>(sa.sin_addr));
 		info.address = ipa;
 		info.port = sa.sin_port;
 	}
@@ -158,7 +158,7 @@ ipv6_info NetworkTools::GetIPv6Info(const std::string &Host, const std::string &
 {
 	ipv6_info info;
 	sockaddr_in6 sa;
-	int res;
+	int32_t res;
 
 	std::memset(&info, 0x00, sizeof(info));
 	std::memset(&sa, 0x00, sizeof(sa));
@@ -199,7 +199,7 @@ ipv6_info NetworkTools::GetIPv6Info(const std::string &Host, const std::string &
 		sai.assign(ipstr);
 		ipv6_address ipa = ipv6_address::FromString(sai);
 		info.address = ipa;
-		info.port = static_cast<ushort>(ntohs(sa.sin6_port));
+		info.port = static_cast<uint16_t>(ntohs(sa.sin6_port));
 
 		if (result != NULL)
 		{
@@ -219,7 +219,7 @@ ipv6_info NetworkTools::GetIPv6Info(const std::string &Host, const std::string &
 	if (res == 0)
 	{
 		sa.sin6_addr.s6_addr = reinterpret_cast<in6_addr*>(lphost->h_addr)->s6_addr;
-		ipv6_address ipa(reinterpret_cast<byte*>(sa.sin6_addr));
+		ipv6_address ipa(reinterpret_cast<uint8_t*>(sa.sin6_addr));
 		info.address = ipa;
 		info.port = sa.sin6_port;
 	}
@@ -340,7 +340,7 @@ std::string NetworkTools::GetPeerName(Socket &Source)
 	socklen_t psalen;
 	std::string name("");
 	size_t slen;
-	int res;
+	int32_t res;
 
 	psalen = 0;
 
@@ -369,7 +369,7 @@ std::string NetworkTools::GetSocketName(Socket &Source)
 	socklen_t psalen;
 	std::string name;
 	size_t slen;
-	int res;
+	int32_t res;
 
 	psalen = 0;
 
@@ -390,15 +390,15 @@ std::string NetworkTools::GetSocketName(Socket &Source)
 	return name;
 }
 
-ushort NetworkTools::PortNameToNumber(const std::string &Name, const std::string &Protocol)
+uint16_t NetworkTools::PortNameToNumber(const std::string &Name, const std::string &Protocol)
 {
 	CEXASSERT(Name.size() != 0, "the name parameter is invalid");
 	CEXASSERT(Protocol.size() != 0, "the protocol parameter is invalid");
 
 	servent* se;
-	ushort port;
+	uint16_t port;
 
-	port = static_cast<ushort>(atoi(Name.c_str()));
+	port = static_cast<uint16_t>(atoi(Name.c_str()));
 
 	if (IntegerTools::ToString(port) != Name)
 	{
@@ -409,7 +409,7 @@ ushort NetworkTools::PortNameToNumber(const std::string &Name, const std::string
 			throw CryptoSocketException(std::string("Socket"), std::string("PortNameToNumber"), std::string("The socket failed to identify the port name!"), ErrorCodes::SocketFailure);
 		}
 
-		port = static_cast<ushort>(ntohs(se->s_port));
+		port = static_cast<uint16_t>(ntohs(se->s_port));
 	}
 
 	return port;

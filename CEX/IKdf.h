@@ -93,7 +93,7 @@ public:
 	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	virtual void Generate(std::vector<byte> &Output) = 0;
+	virtual void Generate(std::vector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes
@@ -102,7 +102,7 @@ public:
 	/// <param name="Output">The destination secure-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	virtual void Generate(SecureVector<byte> &Output) = 0;
+	virtual void Generate(SecureVector<uint8_t> &Output) = 0;
 
 	/// <summary>
 	/// Fill an array with pseudo-random bytes, using offset and length parameters
@@ -113,7 +113,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	virtual void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
+	virtual void Generate(std::vector<uint8_t> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes, using offset and length parameters
@@ -124,7 +124,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	virtual void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) = 0;
+	virtual void Generate(SecureVector<uint8_t> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string

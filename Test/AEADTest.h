@@ -27,11 +27,11 @@ namespace Test
 		static const size_t MONTE_CYCLES = 10000;
 		static const size_t TEST_CYCLES = 10;
 
-		std::vector<std::vector<byte>> m_associatedText;
-		std::vector<std::vector<byte>> m_cipherText;
-		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_nonce;
-		std::vector<std::vector<byte>> m_plainText;
+		std::vector<std::vector<uint8_t>> m_associatedText;
+		std::vector<std::vector<uint8_t>> m_cipherText;
+		std::vector<std::vector<uint8_t>> m_key;
+		std::vector<std::vector<uint8_t>> m_nonce;
+		std::vector<std::vector<uint8_t>> m_plainText;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -82,8 +82,8 @@ namespace Test
 		/// <param name="AssociatedText">The associated text array</param>
 		/// <param name="PlainText">The plain-text array</param>
 		/// <param name="CipherText">The cipher-text array</param>
-		void Kat(IAeadMode* Cipher, const std::vector<byte> &Key, const std::vector<byte> &Nonce, 
-			const std::vector<byte> &AssociatedText, const std::vector<byte> &PlainText, const std::vector<byte> &CipherText);
+		void Kat(IAeadMode* Cipher, const std::vector<uint8_t> &Key, const std::vector<uint8_t> &Nonce, 
+			const std::vector<uint8_t> &AssociatedText, const std::vector<uint8_t> &PlainText, const std::vector<uint8_t> &CipherText);
 
 		/// <summary>
 		/// Compare parallel to sequential operation modes for equivalence
@@ -91,18 +91,6 @@ namespace Test
 		///
 		/// <param name="Cipher">The cipher instance</param>
 		void Parallel(IAeadMode* Cipher);
-
-		/// <summary>
-		/// Test a single initialization and sequential successive calls to the transform
-		/// </summary>
-		///
-		/// <param name="Cipher">The cipher instance</param>
-		/// <param name="PlainText">The plain-text array</param>
-		/// <param name="Output1">The first expected output</param>
-		/// <param name="Output2">The second expected output</param>
-		/// <param name="Output3">The third expected output</param>
-		void Sequential(IAeadMode* Cipher, const std::vector<byte> &PlainText, const std::vector<byte> &Output1, 
-			const std::vector<byte> &Output2, const std::vector<byte> &Output3);
 
 		/// <summary>
 		/// Test operations in a looping stress test

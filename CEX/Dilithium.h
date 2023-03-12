@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// Updated by September 24, 2019
-// Contact: develop@vtdev.com
+// Updated by March 03, 2023
+// Contact: develop@qscs.ca
 
 #ifndef CEX_DILITHIUM_H
 #define CEX_DILITHIUM_H
@@ -40,30 +40,30 @@ using Enumeration::DilithiumParameters;
 /// <example>
 /// <description>Generate the Public and Private key-pair</description>
 /// <code>
-/// Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
+/// Dilithium sgn(DilithiumParameters::DLTMS3P4016);
 /// IAsymmetricKeyPair* kp = sgn.Generate();
 /// 
 /// // serialize the public key
 ///	AsymmetricKey* pubk = kp->PublicKey();
-/// std::vector&lt;byte&gt; pk = pubk->ToBytes();
+/// std::vector&lt;uint8_t&gt; pk = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Sign a message:</description>
 /// <code>
-/// Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
+/// Dilithium sgn(DilithiumParameters::DLTMS3P4016);
 /// sgn.Initialize(PrivateKey);
 /// 
-/// std::vector&lt;byte&gt; msg(32);
-/// std::vector&lt;byte&gt; sig(0);
+/// std::vector&lt;uint8_t&gt; msg(32);
+/// std::vector&lt;uint8_t&gt; sig(0);
 /// // generate the signature
 /// sgn.Sign(msg, sig);
 /// </code>
 ///
 /// <description>Verify a signature and return the message:</description>
 /// <code>
-/// Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
+/// Dilithium sgn(DilithiumParameters::DLTMS3P4016);
 /// sgn.Initialize(PublicKey);
-/// std::vector&lt;byte&gt; message(0);
+/// std::vector&lt;uint8_t&gt; message(0);
 ///
 ///	// authenticate the signature
 ///	if (!sgn.Verify(Signature, msg))
@@ -78,7 +78,8 @@ using Enumeration::DilithiumParameters;
 /// <para>Dilithium is a digital signature scheme that is strongly secure under chosen message attacks based on the hardness of lattice problems over module lattices. \n
 /// The security notion means that an adversary having access to a signing oracle cannot produce a signature of a message whose signature he hasn't yet seen, 
 /// nor produce a different signature of a message that he already saw signed. \n
-/// Dilithium is one of the candidate algorithms submitted to the NIST post-quantum cryptography project. \n
+/// Dilithium is one of the candidate algorithms submitted to the NIST post-quantum cryptography project.
+/// This implementation is the Round 3 final version of the NIST PQ3 submissions. \n
 /// </para>
 /// <description>Scientific Background:</description>
 /// <para>The design of Dilithium is based on the "Fiat-Shamir with Aborts" technique of Lyubashevsky which uses rejection sampling to make lattice-based Fiat-Shamir schemes 
@@ -89,13 +90,13 @@ using Enumeration::DilithiumParameters;
 /// <description>:</description>
 /// 
 /// <list type="bullet">
-/// <item><description>There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); medium security: DLTMS1N256Q8380417, high security: DLTMS2N256Q8380417, highest security: DLTMS2N256Q8380417</description></item>
+/// <item><description>There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); medium security: DLTMS1P2544, high security: DLTMS3P4016, highest security: DLTMS5P4880</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The signature schemes operational mode (signing/verifying) is determined by the IAsymmetricKey key-type used to Initialize the cipher; the Public key is used for verification, and use the Private for signing a message.</description></item>
 /// <item><description>Use the Generate function to create a public/private key-pair, and the Sign function to sign a message</description></item>
-/// <item><description>The message-signature is tested using the Verify function, which checks the signature, populates the message array, and returns false on authentication failure</description></item>
+/// <item><description>The message-signature is tested using the Verify function, which checks the signature, conditionally populates the message array, and returns false on authentication failure</description></item>
 /// </list>
-/// 
+///
 /// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>Description: <a href="https://pq-crystals.org/dilithium/index.shtml">Dilithium</a> Introduction.</description></item>
@@ -215,11 +216,11 @@ public:
 	/// Sign a message array and return the message and attached signature
 	/// </summary>
 	/// 
-	/// <param name="Message">The byte array containing the message to sign</param>
+	/// <param name="Message">The uint8_t array containing the message to sign</param>
 	/// <param name="Signature">The output signature array containing the signature and message</param>
 	/// 
 	/// <returns>Returns the size of the signed message</returns>
-	size_t Sign(const std::vector<byte> &Message, std::vector<byte> &Signature) override;
+	size_t Sign(const std::vector<uint8_t> &Message, std::vector<uint8_t> &Signature) override;
 
 	/// <summary>
 	/// Verify a signed message and return the message array.
@@ -227,10 +228,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Signature">The output signature array containing the signature and message</param>
-	/// <param name="Message">The message byte array containing the data to process</param>
+	/// <param name="Message">The message uint8_t array containing the data to process</param>
 	/// 
 	/// <returns>Returns true if the signature matches, false for authentication failure</returns>
-	bool Verify(const std::vector<byte> &Signature, std::vector<byte> &Message) override;
+	bool Verify(const std::vector<uint8_t> &Signature, std::vector<uint8_t> &Message) override;
 };
 
 NAMESPACE_DILITHIUMEND

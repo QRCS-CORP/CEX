@@ -94,9 +94,9 @@ void* SecureMemory::Allocate(size_t Length)
 
 #else
 	
-	byte* ptr;
+	uint8_t* ptr;
 
-	ptr = (byte*)malloc(Length);
+	ptr = (uint8_t*)malloc(Length);
 
 	return ptr;
 
@@ -124,12 +124,12 @@ void SecureMemory::Erase(void* Pointer, size_t Length)
 
 #elif defined(CEX_VOLATILE_MEMSET)
 
-	static void* (*const volatile memsetptr)(void*, int, size_t) = std::memset;
+	static void* (*const volatile memsetptr)(void*, int32_t, size_t) = std::memset;
 	(memsetptr)(Pointer, 0, Length);
 
 #else
 
-	volatile byte* ptr = reinterpret_cast<volatile byte*>(Pointer);
+	volatile uint8_t* ptr = reinterpret_cast<volatile uint8_t*>(Pointer);
 	size_t i;
 
 	for (i = 0; i != Length; ++i)
@@ -167,7 +167,7 @@ void SecureMemory::Free(void* Pointer, size_t Length)
 
 #else
 
-		free((byte*)Pointer);
+		free((uint8_t*)Pointer);
 
 #endif
 	}
@@ -243,7 +243,7 @@ size_t SecureMemory::Limit()
 
 size_t SecureMemory::PageSize()
 {
-	long pagelen;
+	int64_t pagelen;
 
 	pagelen = 0x00001000LL;
 
@@ -260,7 +260,7 @@ size_t SecureMemory::PageSize()
 
 	SYSTEM_INFO sysinfo;
 	::GetSystemInfo(&sysinfo);
-	pagelen = static_cast<long>(sysinfo.dwPageSize);
+	pagelen = static_cast<int64_t>(sysinfo.dwPageSize);
 
 #endif
 

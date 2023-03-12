@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Asymmetric cipher and signature-scheme enumeration names
 /// </summary>
-enum class AsymmetricCiphers : byte
+enum class AsymmetricCiphers : uint8_t
 {
 	/// <summary>
 	/// No asymmetric cipher is specified
@@ -18,19 +18,15 @@ enum class AsymmetricCiphers : byte
 	/// <summary>
 	/// A Module-LWE cipher implementation
 	/// </summary>
-	Kyber = static_cast<byte>(AsymmetricPrimitives::Kyber),
+	Kyber = static_cast<uint8_t>(AsymmetricPrimitives::Kyber),
 	/// <summary>
 	/// A McEliece cipher implementation
 	/// </summary>
-	McEliece = static_cast<byte>(AsymmetricPrimitives::McEliece),
+	McEliece = static_cast<uint8_t>(AsymmetricPrimitives::McEliece),
 	/// <summary>
-	/// A Ring-LWE cipher implementation
+	/// An elliptic curve cipher implementation
 	/// </summary>
-	NewHope = static_cast<byte>(AsymmetricPrimitives::NewHope),
-	/// <summary>
-	/// An NTRUPrime cipher implementation
-	/// </summary>
-	NTRUPrime = static_cast<byte>(AsymmetricPrimitives::NTRUPrime)
+	ECDH = static_cast<uint8_t>(AsymmetricPrimitives::ECDH),
 };
 
 class AsymmetricCipherConvert

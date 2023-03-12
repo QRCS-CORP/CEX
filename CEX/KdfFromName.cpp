@@ -74,11 +74,6 @@ IKdf* KdfFromName::GetInstance(Kdfs KdfType)
 				kptr = new SCBKDF(ShakeModes::SHAKE512);
 				break;
 			}
-			case Kdfs::SCBKDF1024:
-			{
-				kptr = new SCBKDF(ShakeModes::SHAKE1024);
-				break;
-			}
 			case Kdfs::SHAKE128:
 			{
 				kptr = new SHAKE(ShakeModes::SHAKE128);
@@ -92,11 +87,6 @@ IKdf* KdfFromName::GetInstance(Kdfs KdfType)
 			case Kdfs::SHAKE512:
 			{
 				kptr = new SHAKE(ShakeModes::SHAKE512);
-				break;
-			}
-			case Kdfs::SHAKE1024:
-			{
-				kptr = new SHAKE(ShakeModes::SHAKE1024);
 				break;
 			}
 			default:
@@ -150,11 +140,6 @@ IKdf* KdfFromName::GetInstance(BlockCipherExtensions ExtensionType)
 			kptr = new SHAKE(ShakeModes::SHAKE512);
 			break;
 		}
-		case BlockCipherExtensions::SHAKE1024:
-		{
-			kptr = new SHAKE(ShakeModes::SHAKE1024);
-			break;
-		}
 		default:
 		{
 			throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The kdf type is not supported!"), ErrorCodes::InvalidParam);
@@ -203,11 +188,6 @@ IKdf* KdfFromName::GetInstance(KdfDigests DigestType)
 			case KdfDigests::SHAKE512:
 			{
 				kptr = new SHAKE(ShakeModes::SHAKE512);
-				break;
-			}
-			case KdfDigests::SHAKE1024:
-			{
-				kptr = new SHAKE(ShakeModes::SHAKE1024);
 				break;
 			}
 			default:

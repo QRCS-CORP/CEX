@@ -160,7 +160,7 @@ namespace Test
 		{
 			CMAC gen(BlockCiphers::AES);
 			// invalid key size
-			std::vector<byte> k(1);
+			std::vector<uint8_t> k(1);
 			SymmetricKey kp(k);
 			gen.Initialize(kp);
 
@@ -178,7 +178,7 @@ namespace Test
 		try
 		{
 			CMAC gen(BlockCiphers::AES);
-			std::vector<byte> code(16);
+			std::vector<uint8_t> code(16);
 			// generator was not initialized
 			gen.Finalize(code, 0);
 
@@ -243,9 +243,9 @@ namespace Test
 		HexConverter::Decode(expected, 20, m_expected);
 	}
 
-	void CMACTest::Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void CMACTest::Kat(IMac* Generator, std::vector<uint8_t> &Key, std::vector<uint8_t> &Message, std::vector<uint8_t> &Expected)
 	{
-		std::vector<byte> code(16);
+		std::vector<uint8_t> code(16);
 		SymmetricKey kp(Key);
 
 		Generator->Initialize(kp);
@@ -266,10 +266,10 @@ namespace Test
 	void CMACTest::Params(IMac* Generator)
 	{
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> msg;
-		std::vector<byte> otp1(Generator->TagSize());
-		std::vector<byte> otp2(Generator->TagSize());
+		std::vector<uint8_t> key(ks.KeySize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> otp1(Generator->TagSize());
+		std::vector<uint8_t> otp2(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -300,9 +300,9 @@ namespace Test
 	void CMACTest::Stress(IMac* Generator)
 	{
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
-		std::vector<byte> msg;
-		std::vector<byte> otp(Generator->TagSize());
-		std::vector<byte> key(ks.KeySize());
+		std::vector<uint8_t> msg;
+		std::vector<uint8_t> otp(Generator->TagSize());
+		std::vector<uint8_t> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
 

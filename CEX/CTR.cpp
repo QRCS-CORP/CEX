@@ -15,7 +15,7 @@ class CTR::CtrState
 {
 public:
 
-	std::vector<byte> Nonce;
+	std::vector<uint8_t> Nonce;
 	bool Destroyed;
 	bool Encryption;
 	bool Initialized;
@@ -134,7 +134,7 @@ const std::string CTR::Name()
 	return tmpn;
 }
 
-const std::vector<byte> &CTR::Nonce()
+const std::vector<uint8_t> &CTR::Nonce()
 { 
 	return m_ctrState->Nonce; 
 }
@@ -151,28 +151,28 @@ ParallelOptions &CTR::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void CTR::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+void CTR::DecryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
 	Encrypt(Input, 0, Output, 0);
 }
 
-void CTR::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CTR::DecryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
 	Encrypt(Input, InOffset, Output, OutOffset);
 }
 
-void CTR::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+void CTR::EncryptBlock(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
 	Encrypt(Input, 0, Output, 0);
 }
 
-void CTR::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CTR::EncryptBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
@@ -218,7 +218,7 @@ void CTR::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void CTR::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CTR::Transform(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the block-size!");
@@ -252,7 +252,7 @@ void CTR::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 //~~~Private Functions~~~//
 
-void CTR::Encrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void CTR::Encrypt(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the block-size!");
@@ -262,7 +262,7 @@ void CTR::Encrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<b
 	MemoryTools::XOR128(Input, InOffset, Output, OutOffset);
 }
 
-void CTR::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
+void CTR::Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length, std::vector<uint8_t> &Counter)
 {
 	size_t bctr = 0;
 
@@ -271,7 +271,7 @@ void CTR::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVX512BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX512BLK);
-		std::vector<byte> tmpc(AVX512BLK);
+		std::vector<uint8_t> tmpc(AVX512BLK);
 
 		// stagger counters and process 8 blocks with avx512
 		while (bctr != PBKALN)
@@ -317,7 +317,7 @@ void CTR::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVX2BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX2BLK);
-		std::vector<byte> tmpc(AVX2BLK);
+		std::vector<uint8_t> tmpc(AVX2BLK);
 		
 		// stagger counters and process 8 blocks with avx2
 		while (bctr != PBKALN)
@@ -347,7 +347,7 @@ void CTR::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	if (Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
-		std::vector<byte> tmpc(AVXBLK);
+		std::vector<uint8_t> tmpc(AVXBLK);
 
 		// 4 blocks with avx
 		while (bctr != PBKALN)
@@ -376,7 +376,7 @@ void CTR::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 
 	if (bctr != Length)
 	{
-		std::vector<byte> otp(BLOCK_SIZE);
+		std::vector<uint8_t> otp(BLOCK_SIZE);
 		m_blockCipher->EncryptBlock(Counter, otp);
 		IntegerTools::BeIncrement8(Counter);
 		const size_t RMDLEN = Length % BLOCK_SIZE;
@@ -384,20 +384,20 @@ void CTR::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	}
 }
 
-void CTR::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CTR::ProcessParallel(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
-	std::vector<byte> tmpc(m_ctrState->Nonce.size());
+	std::vector<uint8_t> tmpc(m_ctrState->Nonce.size());
 
 	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
-		std::vector<byte> thdc(BLOCK_SIZE);
+		std::vector<uint8_t> thdc(BLOCK_SIZE);
 		// offset counter by chunk size / block size  
-		IntegerTools::BeIncrease8(m_ctrState->Nonce, thdc, static_cast<uint>(CTRLEN * i));
+		IntegerTools::BeIncrease8(m_ctrState->Nonce, thdc, static_cast<uint32_t>(CTRLEN * i));
 		const size_t STMPOS = i * CNKLEN;
 		// generate random at output offset
 		this->Generate(Output, OutOffset + STMPOS, CNKLEN, thdc);
@@ -431,7 +431,7 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	}
 }
 
-void CTR::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CTR::ProcessSequential(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<uint8_t> &Output, size_t OutOffset, size_t Length)
 {
 	// get block aligned
 	const size_t ALNLEN = Length - (Length % BLOCK_SIZE);

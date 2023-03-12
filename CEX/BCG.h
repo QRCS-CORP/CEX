@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2020 vtdev.com
+// Copyright (c) 2023 QSCS.ca
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 // Updated April 18, 2017
 // Updated February 14, 2019
 // Updated June 14, 2020
-// Contact: develop@vtdev.com
+// Contact: develop@qscs.ca
 
 #ifndef CEX_BCG_H
 #define CEX_BCG_H
@@ -73,7 +73,7 @@ using Cipher::SymmetricKey;
 /// the Nonce used to initialize the internal counter, and the optional Info array which maps to the cSHAKE customization parameter. \n
 /// The Key value must be one of the LegalKeySizes in length, and must be a secret and random value. \n
 /// The supported nonce size is the block cipher functions internal block-size, in this function, that is always 256 bits (32 bytes). \n
-/// The 32 byte Nonce value should also be a secret value, used to initialize the counter to a non-zero random value. \n
+/// The 32 uint8_t Nonce value should also be a secret value, used to initialize the counter to a non-zero random value. \n
 /// The Update function uses the seed value to re-key the cipher via the internal key derivation function cSHAKE-256. \n
 /// The update functions Key parameter, must be a random key value which is added to the existing key state, if a random provider has been specified it is mixed with new entropy, 
 /// and permuted by a cSHAKE instance to generate the new generator key. \n 
@@ -118,7 +118,7 @@ private:
 	// generator strength is equal to the block size; 256-bits
 	static const size_t GEN_STRENGTH = 256;
 	// 10gb: maximum before rekey is required
-	static const ulong MAX_OUTPUT = 10240000000;
+	static const uint64_t MAX_OUTPUT = 10240000000;
 	// 100mb: maximum size of a single request
 	static const size_t MAX_REQUEST = 102400000;
 	// 10000: maximum reseed calls before exception
@@ -128,7 +128,7 @@ private:
 	// L2 cache reserved estimate
 	static const size_t RESERVE_CACHE = 2048;
 	// the bcg default info string
-	static const std::vector<byte> BCG_INFO;
+	static const std::vector<uint8_t> BCG_INFO;
 
 	class BcgState;
 	std::unique_ptr<IProvider> m_bcgProvider;
@@ -189,7 +189,7 @@ public:
 	const bool IsParallel();
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the requested output data array passed from the Generate function that triggers parallel processing.
+	/// Read Only: Parallel block size; the uint8_t-size of the requested output data array passed from the Generate function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.
 	/// IsParallel must be set to true, and generation requests must be of at least this size to trigger multi-threaded generation.</para>
 	/// </summary>
@@ -223,7 +223,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	void Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes
@@ -233,7 +233,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	void Generate(SecureVector<byte> &Output) override;
+	void Generate(SecureVector<uint8_t> &Output) override;
 
 	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
@@ -245,7 +245,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(std::vector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Fill a secure-vector with pseudo-random bytes using offset and length parameters
@@ -257,7 +257,7 @@ public:
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	void Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the generator with an ISymmetricKey container, containing the key and nonce, and optional info string.
@@ -288,7 +288,7 @@ public:
 	/// <param name="Key">The standard-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
-	void Update(const std::vector<byte> &Key) override;
+	void Update(const std::vector<uint8_t> &Key) override;
 
 	/// <summary>
 	/// Update the generators keying material with a secure-vector key
@@ -297,18 +297,18 @@ public:
 	/// <param name="Key">The secure-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
-	void Update(const SecureVector<byte> &Key) override;
+	void Update(const SecureVector<uint8_t> &Key) override;
 
 private:
 
-	static void Derive(SecureVector<byte> &Key, std::unique_ptr<IProvider> &Provider);
-	void Process(SecureVector<byte> &Output, size_t OutOffset, size_t Length);
+	static void Derive(SecureVector<uint8_t> &Key, std::unique_ptr<IProvider> &Provider);
+	void Process(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length);
 	static void PrefetchSbox();
-	void Transform(SecureVector<byte> &Output, size_t OutOffset, size_t Length, SecureVector<byte> &Counter);
-	void Transform256(const SecureVector<byte> &Input, size_t InOffset, SecureVector<byte> &Output, size_t OutOffset);
-	void Transform1024(const SecureVector<byte> &Input, size_t InOffset, SecureVector<byte> &Output, size_t OutOffset);
-	void Transform2048(const SecureVector<byte> &Input, size_t InOffset, SecureVector<byte> &Output, size_t OutOffset);
-	void Transform4096(const SecureVector<byte> &Input, size_t InOffset, SecureVector<byte> &Output, size_t OutOffset);
+	void Transform(SecureVector<uint8_t> &Output, size_t OutOffset, size_t Length, SecureVector<uint8_t> &Counter);
+	void Transform256(const SecureVector<uint8_t> &Input, size_t InOffset, SecureVector<uint8_t> &Output, size_t OutOffset);
+	void Transform1024(const SecureVector<uint8_t> &Input, size_t InOffset, SecureVector<uint8_t> &Output, size_t OutOffset);
+	void Transform2048(const SecureVector<uint8_t> &Input, size_t InOffset, SecureVector<uint8_t> &Output, size_t OutOffset);
+	void Transform4096(const SecureVector<uint8_t> &Input, size_t InOffset, SecureVector<uint8_t> &Output, size_t OutOffset);
 };
 
 NAMESPACE_DRBGEND

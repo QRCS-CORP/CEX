@@ -1,7 +1,5 @@
 #include "Dilithium.h"
-#include "DLTMK4Q8380417N256.h"
-#include "DLTMK5Q8380417N256.h"
-#include "DLTMK6Q8380417N256.h"
+#include "DLTMBase.h"
 #include "PrngFromName.h"
 
 NAMESPACE_DILITHIUM
@@ -38,9 +36,9 @@ public:
 
 Dilithium::Dilithium(DilithiumParameters Parameters, Prngs PrngType)
 	:
-	m_dilithiumState(new DilithiumState(Parameters == DilithiumParameters::DLTMS1N256Q8380417 || 
-		Parameters == DilithiumParameters::DLTMS2N256Q8380417 || 
-		Parameters == DilithiumParameters::DLTMS3N256Q8380417 ? 
+	m_dilithiumState(new DilithiumState(Parameters == DilithiumParameters::DLTMS1P2544 || 
+		Parameters == DilithiumParameters::DLTMS3P4016 || 
+		Parameters == DilithiumParameters::DLTMS5P4880 ? 
 			Parameters :
 			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium), std::string("Constructor"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
@@ -53,9 +51,9 @@ Dilithium::Dilithium(DilithiumParameters Parameters, Prngs PrngType)
 
 Dilithium::Dilithium(DilithiumParameters Parameters, IPrng* Rng)
 	:
-	m_dilithiumState(new DilithiumState(Parameters == DilithiumParameters::DLTMS1N256Q8380417 ||
-		Parameters == DilithiumParameters::DLTMS2N256Q8380417 ||
-		Parameters == DilithiumParameters::DLTMS3N256Q8380417 ?
+	m_dilithiumState(new DilithiumState(Parameters == DilithiumParameters::DLTMS1P2544 ||
+		Parameters == DilithiumParameters::DLTMS3P4016 ||
+		Parameters == DilithiumParameters::DLTMS5P4880 ?
 			Parameters :
 			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium), std::string("Constructor"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
@@ -121,19 +119,19 @@ const size_t Dilithium::PrivateKeySize()
 
 	switch (m_dilithiumState->Parameters)
 	{
-		case DilithiumParameters::DLTMS1N256Q8380417:
+		case DilithiumParameters::DLTMS1P2544:
 		{
-			klen = DLTMK4Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+			klen = DLTMBase::Params2544::DILITHIUM_SECRETKEY_SIZE;
 			break;
 		}
-		case DilithiumParameters::DLTMS2N256Q8380417:
+		case DilithiumParameters::DLTMS3P4016:
 		{
-			klen = DLTMK5Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+			klen = DLTMBase::Params4016::DILITHIUM_SECRETKEY_SIZE;
 			break;
 		}
-		case DilithiumParameters::DLTMS3N256Q8380417:
+		case DilithiumParameters::DLTMS5P4880:
 		{
-			klen = DLTMK6Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+			klen = DLTMBase::Params4880::DILITHIUM_SECRETKEY_SIZE;
 			break;
 		}
 		default:
@@ -152,19 +150,19 @@ const size_t Dilithium::PublicKeySize()
 
 	switch (m_dilithiumState->Parameters)
 	{
-		case DilithiumParameters::DLTMS1N256Q8380417:
+		case DilithiumParameters::DLTMS1P2544:
 		{
-			klen = DLTMK4Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+			klen = DLTMBase::Params2544::DILITHIUM_PUBLICKEY_SIZE;
 			break;
 		}
-		case DilithiumParameters::DLTMS2N256Q8380417:
+		case DilithiumParameters::DLTMS3P4016:
 		{
-			klen = DLTMK5Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+			klen = DLTMBase::Params4016::DILITHIUM_PUBLICKEY_SIZE;
 			break;
 		}
-		case DilithiumParameters::DLTMS3N256Q8380417:
+		case DilithiumParameters::DLTMS5P4880:
 		{
-			klen = DLTMK6Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+			klen = DLTMBase::Params4880::DILITHIUM_PUBLICKEY_SIZE;
 			break;
 		}
 		default:
@@ -177,28 +175,25 @@ const size_t Dilithium::PublicKeySize()
 	return klen;
 }
 
-/// <summary>
-/// Read Only: The base signature size in bytes
-/// </summary>
 const size_t Dilithium::SignatureSize()
 {
 	size_t slen;
 
 	switch (m_dilithiumState->Parameters)
 	{
-		case DilithiumParameters::DLTMS1N256Q8380417:
+		case DilithiumParameters::DLTMS1P2544:
 		{
-			slen = DLTMK4Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+			slen = DLTMBase::Params2544::DILITHIUM_SIGNATURE_SIZE;
 			break;
 		}
-		case DilithiumParameters::DLTMS2N256Q8380417:
+		case DilithiumParameters::DLTMS3P4016:
 		{
-			slen = DLTMK5Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+			slen = DLTMBase::Params4016::DILITHIUM_SIGNATURE_SIZE;
 			break;
 		}
-		case DilithiumParameters::DLTMS3N256Q8380417:
+		case DilithiumParameters::DLTMS5P4880:
 		{
-			slen = DLTMK6Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+			slen = DLTMBase::Params4880::DILITHIUM_SIGNATURE_SIZE;
 			break;
 		}
 		default:
@@ -213,30 +208,33 @@ const size_t Dilithium::SignatureSize()
 
 AsymmetricKeyPair* Dilithium::Generate()
 {
-	std::vector<byte> pk(0);
-	std::vector<byte> sk(0);
+	std::vector<uint8_t> pk(0);
+	std::vector<uint8_t> sk(0);
 
 	switch (m_dilithiumState->Parameters)
 	{
-		case DilithiumParameters::DLTMS1N256Q8380417:
+		case DilithiumParameters::DLTMS1P2544:
 		{
-			pk.resize(DLTMK4Q8380417N256::DILITHIUM_PUBLICKEY_SIZE);
-			sk.resize(DLTMK4Q8380417N256::DILITHIUM_SECRETKEY_SIZE);
-			DLTMK4Q8380417N256::Generate(pk, sk, m_rndGenerator);
+			pk.resize(DLTMBase::Params2544::DILITHIUM_PUBLICKEY_SIZE);
+			sk.resize(DLTMBase::Params2544::DILITHIUM_SECRETKEY_SIZE);
+			DLTMBase::Params2544 x;
+			DLTMBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
-		case DilithiumParameters::DLTMS2N256Q8380417:
+		case DilithiumParameters::DLTMS3P4016:
 		{
-			pk.resize(DLTMK5Q8380417N256::DILITHIUM_PUBLICKEY_SIZE);
-			sk.resize(DLTMK5Q8380417N256::DILITHIUM_SECRETKEY_SIZE);
-			DLTMK5Q8380417N256::Generate(pk, sk, m_rndGenerator);
+			pk.resize(DLTMBase::Params4016::DILITHIUM_PUBLICKEY_SIZE);
+			sk.resize(DLTMBase::Params4016::DILITHIUM_SECRETKEY_SIZE);
+			DLTMBase::Params4016 x;
+			DLTMBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
-		case DilithiumParameters::DLTMS3N256Q8380417:
+		case DilithiumParameters::DLTMS5P4880:
 		{
-			pk.resize(DLTMK6Q8380417N256::DILITHIUM_PUBLICKEY_SIZE);
-			sk.resize(DLTMK6Q8380417N256::DILITHIUM_SECRETKEY_SIZE);
-			DLTMK6Q8380417N256::Generate(pk, sk, m_rndGenerator);
+			pk.resize(DLTMBase::Params4880::DILITHIUM_PUBLICKEY_SIZE);
+			sk.resize(DLTMBase::Params4880::DILITHIUM_SECRETKEY_SIZE);
+			DLTMBase::Params4880 x;
+			DLTMBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
 		default:
@@ -280,7 +278,7 @@ const void Dilithium::Initialize(AsymmetricKey* Key)
 	m_dilithiumState->Initialized = true;
 }
 
-size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature)
+size_t Dilithium::Sign(const std::vector<uint8_t> &Message, std::vector<uint8_t> &Signature)
 {
 	if (!m_dilithiumState->Initialized)
 	{
@@ -299,22 +297,25 @@ size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Sign
 
 	switch (m_dilithiumState->Parameters)
 	{
-		case DilithiumParameters::DLTMS1N256Q8380417:
+		case DilithiumParameters::DLTMS1P2544:
 		{
-			Signature.resize(DLTMK4Q8380417N256::DILITHIUM_SIGNATURE_SIZE + Message.size());
-			DLTMK4Q8380417N256::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
+			Signature.resize(DLTMBase::Params2544::DILITHIUM_SIGNATURE_SIZE + Message.size());
+			DLTMBase::Params2544 x;
+			DLTMBase::Sign(x, Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
-		case DilithiumParameters::DLTMS2N256Q8380417:
+		case DilithiumParameters::DLTMS3P4016:
 		{
-			Signature.resize(DLTMK5Q8380417N256::DILITHIUM_SIGNATURE_SIZE + Message.size());
-			DLTMK5Q8380417N256::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
+			Signature.resize(DLTMBase::Params4016::DILITHIUM_SIGNATURE_SIZE + Message.size());
+			DLTMBase::Params4016 x;
+			DLTMBase::Sign(x, Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
-		case DilithiumParameters::DLTMS3N256Q8380417:
+		case DilithiumParameters::DLTMS5P4880:
 		{
-			Signature.resize(DLTMK6Q8380417N256::DILITHIUM_SIGNATURE_SIZE + Message.size());
-			DLTMK6Q8380417N256::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
+			Signature.resize(DLTMBase::Params4880::DILITHIUM_SIGNATURE_SIZE + Message.size());
+			DLTMBase::Params4880 x;
+			DLTMBase::Sign(x, Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
 		default:
@@ -327,9 +328,8 @@ size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Sign
 	return Signature.size();
 }
 
-bool Dilithium::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message)
+bool Dilithium::Verify(const std::vector<uint8_t> &Signature, std::vector<uint8_t> &Message)
 {
-	std::vector<byte> tmpm(Signature.size());
 	bool res;
 
 	if (!m_dilithiumState->Initialized)
@@ -343,25 +343,25 @@ bool Dilithium::Verify(const std::vector<byte> &Signature, std::vector<byte> &Me
 
 	switch (m_dilithiumState->Parameters)
 	{
-		case DilithiumParameters::DLTMS1N256Q8380417:
+		case DilithiumParameters::DLTMS1P2544:
 		{
-			res = DLTMK4Q8380417N256::Verify(tmpm, Signature, m_publicKey->Polynomial());
-			Message.resize(Signature.size() - DLTMK4Q8380417N256::DILITHIUM_SIGNATURE_SIZE);
-			MemoryTools::Copy(tmpm, 0, Message, 0, Message.size());
+			Message.resize(Signature.size() - DLTMBase::Params2544::DILITHIUM_SIGNATURE_SIZE);
+			DLTMBase::Params2544 x;
+			res = DLTMBase::Verify(x, Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
-		case DilithiumParameters::DLTMS2N256Q8380417:
+		case DilithiumParameters::DLTMS3P4016:
 		{
-			res = DLTMK5Q8380417N256::Verify(tmpm, Signature, m_publicKey->Polynomial());
-			Message.resize(Signature.size() - DLTMK5Q8380417N256::DILITHIUM_SIGNATURE_SIZE);
-			MemoryTools::Copy(tmpm, 0, Message, 0, Message.size());
+			Message.resize(Signature.size() - DLTMBase::Params4016::DILITHIUM_SIGNATURE_SIZE);
+			DLTMBase::Params4016 x;
+			res = DLTMBase::Verify(x, Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
-		case DilithiumParameters::DLTMS3N256Q8380417:
+		case DilithiumParameters::DLTMS5P4880:
 		{
-			res = DLTMK6Q8380417N256::Verify(tmpm, Signature, m_publicKey->Polynomial());
-			Message.resize(Signature.size() - DLTMK6Q8380417N256::DILITHIUM_SIGNATURE_SIZE);
-			MemoryTools::Copy(tmpm, 0, Message, 0, Message.size());
+			Message.resize(Signature.size() - DLTMBase::Params4880::DILITHIUM_SIGNATURE_SIZE);
+			DLTMBase::Params4880 x;
+			res = DLTMBase::Verify(x, Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
 		default:

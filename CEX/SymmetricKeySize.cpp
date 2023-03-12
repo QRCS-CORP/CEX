@@ -20,20 +20,20 @@ SymmetricKeySize::SymmetricKeySize()
 {
 }
 
-SymmetricKeySize::SymmetricKeySize(const std::vector<byte> &KeyArray)
+SymmetricKeySize::SymmetricKeySize(const std::vector<uint8_t> &KeyArray)
 	:
-	m_infoSize(KeyArray.size() >= sizeof(uint) * 3 ? IntegerTools::LeBytesTo32(KeyArray, 0) : 
+	m_infoSize(KeyArray.size() >= sizeof(uint32_t) * 3 ? IntegerTools::LeBytesTo32(KeyArray, 0) : 
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key array buffer is too small!"), ErrorCodes::InvalidSize)),
-	m_keySize(IntegerTools::LeBytesTo32(KeyArray, sizeof(uint))),
-	m_ivSize(IntegerTools::LeBytesTo32(KeyArray, sizeof(uint) * 2))
+	m_keySize(IntegerTools::LeBytesTo32(KeyArray, sizeof(uint32_t))),
+	m_ivSize(IntegerTools::LeBytesTo32(KeyArray, sizeof(uint32_t) * 2))
 {
 }
 
 SymmetricKeySize::SymmetricKeySize(size_t KeySize, size_t IVSize, size_t InfoSize)
 	:
-	m_infoSize(static_cast<uint>(InfoSize)),
-	m_keySize(static_cast<uint>(KeySize)),
-	m_ivSize(static_cast<uint>(IVSize))
+	m_infoSize(static_cast<uint32_t>(InfoSize)),
+	m_keySize(static_cast<uint32_t>(KeySize)),
+	m_ivSize(static_cast<uint32_t>(IVSize))
 {
 }
 
@@ -103,13 +103,13 @@ void SymmetricKeySize::Reset()
 	m_ivSize = 0;
 }
 
-std::vector<byte> SymmetricKeySize::ToBytes()
+std::vector<uint8_t> SymmetricKeySize::ToBytes()
 {
-	std::vector<byte> trs(0);
+	std::vector<uint8_t> trs(0);
 
-	ArrayTools::AppendValue(static_cast<uint>(m_infoSize), trs);
-	ArrayTools::AppendValue(static_cast<uint>(m_keySize), trs);
-	ArrayTools::AppendValue(static_cast<uint>(m_ivSize), trs);
+	ArrayTools::AppendValue(static_cast<uint32_t>(m_infoSize), trs);
+	ArrayTools::AppendValue(static_cast<uint32_t>(m_keySize), trs);
+	ArrayTools::AppendValue(static_cast<uint32_t>(m_ivSize), trs);
 
 	return trs;
 }
