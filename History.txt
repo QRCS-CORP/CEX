@@ -1,7 +1,12 @@
 
 ## Trajectory
-The current version is <B>1.0.0.7</B> (A7 version), which are the major, minor, patch, and release codes.
-The next planned release (1.0.0.8) is planned for February 2019.
+The current version is <B>1.1.0.0</B> (A10 version), which are the major, minor, patch, and release codes.
+All asymmetric primitives have been updated to NIST PQ Round 3 final versions
+
+### New in Current Release 1.1.0.0 (version A10):
+* Rainbow, NTRU Prime, and New Hope have been removed.
+* All remaining implementations have been updated to the NIST PQ Round 3 final versions
+* Asymmetric primitives that use AVX instructions have been added
 
 ### New in Current Release 1.0.0.8 (version A8):
 * The Rainbow signature scheme

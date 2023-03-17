@@ -14,23 +14,23 @@ There are some new ideas, and new technologies, as I intend to push the envelope
 
 This library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs, RNGs, TRNGs etc, preliminary work has been completed as of version v1.0. 
 That work is still evolving however, as improvements and additions to the symmetric cryptography will continue throughout the libraries lifetime.
-The second half is the the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work is well under way, and this release contains the NTRU (NTRU Prime), RingLWE (New Hope), ModuleLWE (Kyber) and McEliece (Niederreiter) asymmetric ciphers, as well as the Dilithium, XMSS, Rainbow, and SPHINCS+ signature schemes.
+The second half is the the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work is well under way, and this release contains the ModuleLWE (Kyber) and McEliece (Niederreiter) asymmetric ciphers, as well as the Dilithium, XMSS, and SPHINCS+ signature schemes.
 
-Though efforts have been made towards future compatibility with other platforms, this is currently a Windows-only library, but is currently scheduled for multi-platform compatibility (Android, Linux, and possibly iOS) by the spring of 2021.
-This has been tested on MSVC-2017 and MSVC-2019 in ARM/x86/x64 debug and release modes, using the MSVC and Intel compiler tool-chains, and future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems. This project also requires OpenMP support.
-
-Only a limited number of CPUs have been tested so far; an AMD K9, and Intel i3, i5, and i7 processors; for the moment, newer Intel and AMD cpu's are all that is supported, (testing on a wider range of hardware profiles is ongoing). 
+Though efforts have been made towards future compatibility with other platforms, this is currently a Windows-only library, but is currently scheduled for multi-platform compatibility (Android, Linux, and possibly iOS) by the spring of 2023.
+This has been tested on MSVC-2017, MSVC-2019, and MSVC-2022 in ARM/x86/x64 debug and release modes, using the MSVC and Intel compiler tool-chains, and the MacOS and Linux operating systems. This project optionally uses OpenMP support.
 
 Works with or without intrinsics, set the test project and the library to a supported instruction set to test the intrinsics enhanced implementations.
-The SIMD support is set to AVX2 by default, (AVX implementations are also in place on some ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX, or None, arch:IA32). The library also has experimental AVX512 support (untested), that can be enabled through the CexConfig.h file.
+The SIMD support is set to AVX2 by default, (AVX implementations are also in place on some ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX, or None, arch:IA32). The library also has AVX512 support, that can be enabled through the CexConfig.h file.
 
 The Win folder contains a visual studio test project, which tests each cipher and protocol with it's official test vectors, and has a set of digest and symmetric cipher speed tests. Make sure the project properties SIMD and OpenMP support are enabled before running the project, and for speed tests, compile in release mode.
 If running the executable, the Win\Test\Vectors folder containing the cipher KAT files must be in the executables path.
 
 For more information on the current capabilities of the library, refer to the libraries help pages.
 
-Note: This is still an early stage in the development of this library (pre-alpha), and much of the work is formative and evolving, so stay tuned, be patient.. writing a new library is a big job! (eta is the summer of 2021).
-
+### New in Current Release 1.1.0.0 (version A10):
+* Rainbow, NTRU Prime, and New Hope have been removed.
+* All remaining implementations have been updated to the NIST PQ Round 3 final versions
+* Asymmetric primitives that use AVX instructions have been added
 
 ### New in Current Release 1.0.0.8 (version A8)
 * The Elliptic Curve Diffie Hellman Key exchange (EC25519)
@@ -91,9 +91,9 @@ Note: Integrated an optional built-in authentication generator (KMAC) to each st
 ### Message Digests
 Note: Every message digest implementation has both parallel and sequential modes of operation
 * The Blake2 256 and 512 bit variants (Blake256/Blake512)
-* The SHA-3 256, 512, and (unofficial) 1024 bit variants (Keccak256/Keccak512/Keccak1024)
-* The SHA2 256 and 512 bit variants (SHA256/SHA512)
-* The Skein 256, 512, and 1024 bit variants(Skein256/Skein512/Skein1024)
+* The SHA-3 256 and 512 bit variants (Keccak256/Keccak512)
+* The SHA-2 256 and 512 bit variants (SHA256/SHA512)
+* The Skein 256, 512,bit variants(Skein256/Skein512/Skein1024)
 
 ### DRBGs
 * The Block cipher Counter mode Generator using the wide-block Rijndael-256 (BCG)
@@ -105,7 +105,7 @@ Note: Every message digest implementation has both parallel and sequential modes
 * Key Derivation Function Version 2 (KDF2)
 * Passphrase Based Key Derivation Version 2 (PBKDF2)
 * The SHAKE cost based passphrase generator (SCBKDF)
-* The 128/256/512/1024 SHAKE XOF function
+* The 128/256/512 SHAKE XOF function
 
 ### MACs
 * Cipher based Message Authentication Code generator (CMAC)
@@ -129,13 +129,8 @@ Note: Every message digest implementation has both parallel and sequential modes
 * Intel RdRand/RdSeed Provider (RDP)
 
 ## License
-This project is licensed under the GPL version 3 (GPLv3):
+This project is licensed under the AGPL version 3 (AGPLv3):
 https://www.gnu.org/licenses/gpl-3.0.en.html
-
-## Links
-##### API Help: http://www.vtdev.com/CEX-Plus/Help/html/index.html 
-##### Introduction to CEX++ 1.0: http://www.vtdev.com/CEX-Plus/CEX_1.0.pdf
-##### CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 
 ## Disclaimer
 This project contains strong cryptography, before downloading the source files, 
