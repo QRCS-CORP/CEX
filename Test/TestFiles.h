@@ -59,6 +59,7 @@ namespace Test
 			const std::string DILITHIUM2544 = "../../Test/Vectors/NPQCR3/dilithium-2544.rsp";
 			const std::string DILITHIUM4016 = "../../Test/Vectors/NPQCR3/dilithium-4016.rsp";
 			const std::string DILITHIUM4880 = "../../Test/Vectors/NPQCR3/dilithium-4880.rsp";
+			const std::string KYBER1632 = "../../Test/Vectors/NPQCR3/kyber-1632.rsp";
 			const std::string KYBER2400 = "../../Test/Vectors/NPQCR3/kyber-2400.rsp";
 			const std::string KYBER3168 = "../../Test/Vectors/NPQCR3/kyber-3168.rsp";
 			const std::string KYBER3936 = "../../Test/Vectors/NPQCR3/kyber-3936.rsp";

@@ -96,10 +96,10 @@ namespace Test
 		std::vector<uint8_t> sec1(32);
 		std::vector<uint8_t> sec2(32);
 
-		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
+		ECDH cpr1(ECDHParameters::ECDHS2P25519S);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
-		ECDH cpr2(ECDHParameters::ECDHS2EC25519S);
+		ECDH cpr2(ECDHParameters::ECDHS2P25519S);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr1.KeyExchange(kp2->PublicKey(), kp1->PrivateKey(), sec1);
@@ -120,7 +120,7 @@ namespace Test
 		std::vector<uint8_t> sec1(32);
 		std::vector<uint8_t> sec2(32);
 
-		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
+		ECDH cpr1(ECDHParameters::ECDHS2P25519S);
 		AsymmetricKeyPair* kp1 = cpr1.Generate(m_rngseed[0]);
 
 		if (kp1->PublicKey()->Polynomial() != m_pubexp[0])
@@ -141,7 +141,7 @@ namespace Test
 		std::vector<uint8_t> sec1(32);
 		std::vector<uint8_t> sec2(32);
 
-		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
+		ECDH cpr1(ECDHParameters::ECDHS2P25519S);
 		AsymmetricKeyPair* kp1 = cpr1.Generate(m_rngseed[0]);
 
 		if (kp1->PublicKey()->Polynomial() != m_pubexp[0])
@@ -154,7 +154,7 @@ namespace Test
 			throw TestException(std::string("Kat"), cpr1.Name(), std::string("The private key does not match the expected answer! -EK2"));
 		}
 
-		ECDH cpr2(ECDHParameters::ECDHS2EC25519S);
+		ECDH cpr2(ECDHParameters::ECDHS2P25519S);
 		AsymmetricKeyPair* kp2 = cpr2.Generate(m_rngseed[1]);
 
 		if (kp2->PublicKey()->Polynomial() != m_pubexp[1])
@@ -207,18 +207,18 @@ namespace Test
 		std::vector<uint8_t> sec1(32);
 		std::vector<uint8_t> sec2(32);
 
-		// test param 1: ECDHS2EC25519S
-		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
+		// test param 1: ECDHS2P25519S
+		ECDH cpr1(ECDHParameters::ECDHS2P25519S);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
-		ECDH cpr2(ECDHParameters::ECDHS2EC25519S);
+		ECDH cpr2(ECDHParameters::ECDHS2P25519S);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
 		std::vector<uint8_t> plm = kp1->PublicKey()->Polynomial();
 		plm[0] += 1;
 		plm[1] += 1;
-		AsymmetricKey* pk = new AsymmetricKey(plm, AsymmetricPrimitives::ECDH, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(ECDHParameters::ECDHS2EC25519S));
+		AsymmetricKey* pk = new AsymmetricKey(plm, AsymmetricPrimitives::ECDH, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(ECDHParameters::ECDHS2P25519S));
 
 		cpr1.KeyExchange(pk, kp1->PrivateKey(), sec1);
 		cpr2.KeyExchange(kp1->PublicKey(), kp2->PrivateKey(), sec2);
@@ -238,8 +238,8 @@ namespace Test
 		SecureVector<uint8_t> skey(0);
 		size_t i;
 
-		// test param 1: ECDHS2EC25519S
-		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
+		// test param 1: ECDHS2P25519S
+		ECDH cpr1(ECDHParameters::ECDHS2P25519S);
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -279,8 +279,8 @@ namespace Test
 		SecureRandom gen;
 		size_t i;
 
-		ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
-		ECDH cpr2(ECDHParameters::ECDHS2EC25519S);
+		ECDH cpr1(ECDHParameters::ECDHS2P25519S);
+		ECDH cpr2(ECDHParameters::ECDHS2P25519S);
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{

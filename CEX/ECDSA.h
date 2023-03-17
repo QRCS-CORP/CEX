@@ -42,7 +42,7 @@ using Digest::IDigest;
 /// <example>
 /// <description>Generate the Public and Private key-pair</description>
 /// <code>
-/// ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
+/// ECDSA sgn(ECDSAParameters::ECDSAS2P25519S);
 /// IAsymmetricKeyPair* kp = sgn.Generate();
 /// 
 /// // serialize the public key
@@ -52,7 +52,7 @@ using Digest::IDigest;
 ///
 /// <description>Sign a message:</description>
 /// <code>
-/// ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
+/// ECDSA sgn(ECDSAParameters::ECDSAS2P25519S);
 /// sgn.Initialize(PrivateKey);
 /// 
 /// std::vector&lt;uint8_t&gt; msg(32);
@@ -63,7 +63,7 @@ using Digest::IDigest;
 ///
 /// <description>Verify a signature and return the message:</description>
 /// <code>
-/// ECDSA sgn(ECDSAParameters::ECDSAS2ED25519S);
+/// ECDSA sgn(ECDSAParameters::ECDSAS2P25519S);
 /// sgn.Initialize(PublicKey);
 /// std::vector&lt;uint8_t&gt; message(0);
 ///

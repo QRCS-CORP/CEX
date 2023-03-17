@@ -743,7 +743,6 @@ namespace Test
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
-			const size_t CPTLEN = Cipher->IsAuthenticator() ? MSGLEN + Cipher->TagSize() : MSGLEN;
 			cpt.resize(MSGLEN);
 			inp.resize(MSGLEN);
 			otp.resize(MSGLEN);

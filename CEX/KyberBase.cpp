@@ -1,24 +1,6 @@
 #include "KyberBase.h"
-#include "IntegerTools.h"
-#include "Keccak.h"
-#include "MemoryTools.h"
 
 NAMESPACE_KYBER
-
-using Tools::IntegerTools;
-using Digest::Keccak;
-using Tools::MemoryTools;
-
-static const int32_t KYBER_N = 256;
-static const int32_t KYBER_Q = 3329;
-static const int32_t KYBER_ETA = 2;
-static const int32_t KYBER_MSGBYTES = 32;
-static const int32_t KYBER_SYMBYTES = 32;
-static const int32_t KYBER_POLYBYTES = 384;
-static const int32_t KYBER_ZETA_SIZE = 128;
-static const int32_t KYBER_MONT = 2285; // 2^16 mod q
-static const int32_t KYBER_QINV = 62209; // q^-1 mod 2^16
-static const uint32_t GEN_MATRIX_NBLOCKS = ((12 * KYBER_N / 8 * (1 << 12) / KYBER_Q + Keccak::KECCAK128_RATE_SIZE) / Keccak::KECCAK128_RATE_SIZE);
 
 const std::vector<uint16_t> KyberBase::Zetas =
 {
@@ -66,7 +48,7 @@ int16_t KyberBase::BarrettReduce(int16_t A)
     return (A - t);
 }
 
-// Ntt.c
+// ntt.c
 
 int16_t KyberBase::FqMul(int16_t A, int16_t B)
 {
@@ -143,22 +125,21 @@ void KyberBase::BaseMul(int16_t R[2], const int16_t A[2], const int16_t B[2], in
 
 // poly.c
 
-void KyberBase::PolyCbdEta1(Poly &R, const std::vector<uint8_t> &Buf)
+void KyberBase::PolyCbdEta1(Poly &R, const std::vector<uint8_t> &Buf, uint32_t Eta1)
 {
-#if defined(CEX_HAS_AVX2)
-    Cbd2Avx2(R, Buf);
-#else
-    Cbd2(R, Buf);
-#endif
+    if (Eta1 == 2)
+    {
+        Cbd2(R, Buf);
+    }
+    else
+    {
+        Cbd3(R, Buf);
+    }
 }
 
 void KyberBase::PolyCbdEta2(Poly &R, const std::vector<uint8_t> &Buf)
 {
-#if defined(CEX_HAS_AVX2)
-    Cbd2Avx2(R, Buf);
-#else
     Cbd2(R, Buf);
-#endif
 }
 
 void KyberBase::PolyToBytes(std::vector<uint8_t> &R, size_t ROffset, const Poly &A)
@@ -206,21 +187,21 @@ void KyberBase::PolyToMsg(std::vector<uint8_t> &Msg, const Poly &A)
     }
 }
 
-void KyberBase::PolyGetNoiseEta1(Poly &R, const std::vector<uint8_t> &Seed, size_t SOffset, uint8_t Nonce)
+void KyberBase::PolyGetNoiseEta1(Poly &R, const std::vector<uint8_t> &Seed, size_t SOffset, uint8_t Nonce, uint32_t Eta1)
 {
-    std::vector<uint8_t> buf(KYBER_ETA * KYBER_N / 4);
+    std::vector<uint8_t> buf(Eta1 * KYBER_N / 4);
     std::vector<uint8_t> extkey(KYBER_SYMBYTES + 1);
 
     MemoryTools::Copy(Seed, SOffset, extkey, 0, KYBER_SYMBYTES);
     extkey[KYBER_SYMBYTES] = Nonce;
     Keccak::XOFP1600(extkey, 0, extkey.size(), buf, 0, buf.size(), Keccak::KECCAK256_RATE_SIZE);
 
-    PolyCbdEta1(R, buf);
+    PolyCbdEta1(R, buf, Eta1);
 }
 
 void KyberBase::PolyGetNoiseEta2(Poly &R, const std::vector<uint8_t> &Seed, size_t SOffset, uint8_t Nonce)
 {
-    std::vector<uint8_t> buf(KYBER_ETA * KYBER_N / 4);
+    std::vector<uint8_t> buf(KYBER_ETA2 * KYBER_N / 4);
     std::vector<uint8_t> extkey(KYBER_SYMBYTES + 1);
 
     MemoryTools::Copy(Seed, SOffset, extkey, 0, KYBER_SYMBYTES);
@@ -305,7 +286,7 @@ void KyberBase::PolyVecCompress(std::vector<uint8_t> &R, const PolyVec &A)
             }
         }
     }
-    else if (A.vec.size() == 3)
+    else if (A.vec.size() == 2 || A.vec.size() == 3)
     {
         std::array<uint16_t, 4> t;
 
@@ -374,11 +355,7 @@ void KyberBase::PolyVecBaseMulAccMontgomery(Poly &R, const PolyVec &A, const Pol
     for (size_t i = 1; i < A.vec.size(); ++i)
     {
         PolyBaseMulMontgomery(t, A.vec[i], B.vec[i]);
-#if defined(CEX_HAS_AVX2)
-        PolyAddAvx2(R, R, t);
-#else
         PolyAdd(R, R, t);
-#endif
     }
 
     PolyReduce(R);
@@ -396,11 +373,7 @@ void KyberBase::PolyVecAdd(PolyVec &R, const PolyVec &A, const PolyVec &B)
 {
     for (size_t i = 0; i < R.vec.size(); ++i)
     {
-#if defined(CEX_HAS_AVX2)
-        PolyAddAvx2(R.vec[i], A.vec[i], B.vec[i]);
-#else
         PolyAdd(R.vec[i], A.vec[i], B.vec[i]);
-#endif
     }
 }
 
@@ -430,18 +403,18 @@ void KyberBase::UnPackSk(PolyVec &Sk, const std::vector<uint8_t> &PackedSk)
 
 void KyberBase::PackCiphertext(std::vector<uint8_t> &R, const PolyVec &B, const Poly &V, uint32_t K)
 {
-    const size_t ROFT = (K == 3 ? 320 : 352) * K;
+    const size_t ROFT = (K > 3 ? 352 : 320) * K;
 
     PolyVecCompress(R, B);
 
 #if defined(CEX_HAS_AVX2)
-    if (K != 3)
+    if (K == 2 || K == 3)
     {
-        PolyCompressAvx2P160(R, ROFT, V);
+        PolyCompressAvx2P128(R, ROFT, V);
     }
     else
     {
-        PolyCompressAvx2P128(R, ROFT, V);
+        PolyCompressAvx2P160(R, ROFT, V);
     }
 #else
     PolyCompress(R, ROFT, V, K);
@@ -450,19 +423,19 @@ void KyberBase::PackCiphertext(std::vector<uint8_t> &R, const PolyVec &B, const 
 
 void KyberBase::UnPackCiphertext(PolyVec &B, Poly &V, const std::vector<uint8_t> &C)
 {
-    const size_t K = B.vec.size();
-    const size_t AOFT = (K == 3 ? 320 : 352) * K;
+    const uint32_t K = static_cast<uint32_t>(B.vec.size());
+    const size_t AOFT = (K > 3 ? 352 : 320) * K;
 
 #if defined(CEX_HAS_AVX2)
-    PolyVecDecompressAvx2(B, C);
+    PolyVecDecompress(B, C);
 
-    if (K != 3)
+    if (K == 2 || K == 3)
     {
-        PolyDecompressAvx2P160(V, C, AOFT);
+        PolyDecompressAvx2P128(V, C, AOFT);
     }
     else
     {
-        PolyDecompressAvx2P128(V, C, AOFT);
+        PolyDecompressAvx2P160(V, C, AOFT);
     }
 #else
     PolyVecDecompress(B, C);
@@ -502,297 +475,11 @@ uint32_t KyberBase::RejUniform(Poly &R, uint32_t ROffset, uint32_t Rlen, const s
     return ctr;
 }
 
-void KyberBase::GenMatrix(std::vector<PolyVec> &A, const std::vector<uint8_t> &Seed, size_t SOffset, int32_t Transposed, uint32_t K)
-{
-    std::vector<uint64_t> state(25, 0);
-    std::vector<uint8_t> buf(GEN_MATRIX_NBLOCKS * Keccak::KECCAK128_RATE_SIZE + 2);
-    std::vector<uint8_t> extseed(KYBER_SYMBYTES + 2);
-    uint32_t buflen;
-    uint32_t ctr;
-    uint32_t off;
-
-    MemoryTools::Copy(Seed, SOffset, extseed, 0, KYBER_SYMBYTES);
-
-    for (size_t i = 0; i < K; ++i)
-    {
-        for (size_t j = 0; j < K; ++j)
-        {
-            if (Transposed != 0)
-            {
-                extseed[KYBER_SYMBYTES] = (uint8_t)i;
-                extseed[KYBER_SYMBYTES + 1] = (uint8_t)j;
-            }
-            else
-            {
-                extseed[KYBER_SYMBYTES] = (uint8_t)j;
-                extseed[KYBER_SYMBYTES + 1] = (uint8_t)i;
-            }
-
-            Keccak::Absorb(extseed, 0, extseed.size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
-            Keccak::Squeeze(state, buf, 0, GEN_MATRIX_NBLOCKS, Keccak::KECCAK128_RATE_SIZE);
-
-            buflen = GEN_MATRIX_NBLOCKS * Keccak::KECCAK128_RATE_SIZE;
-            ctr = RejUniform(A[i].vec[j], 0, KYBER_N, buf, buflen);
-
-            while (ctr < KYBER_N)
-            {
-                off = buflen % 3;
-
-                for (size_t k = 0; k < off; ++k)
-                {
-                    buf[k] = buf[buflen - off + k];
-                }
-
-                Keccak::Squeeze(state, buf, off, 1, Keccak::KECCAK1024_RATE_SIZE);
-                buflen = off + Keccak::KECCAK128_RATE_SIZE;
-                ctr += RejUniform(A[i].vec[j], ctr, KYBER_N - ctr, buf, buflen);
-            }
-
-            MemoryTools::Clear(state, 0, state.size() * sizeof(uint64_t));
-        }
-    }
-}
-
-void KyberBase::IndCpaKeyPair(std::vector<uint8_t> &Pk, std::vector<uint8_t> &Sk, std::unique_ptr<IPrng> &Rng, uint32_t K)
-{
-    std::vector<PolyVec> A(K);
-    PolyVec e;
-    PolyVec pkpv;
-    PolyVec skpv;
-    std::vector<uint8_t> buf(2 * KYBER_SYMBYTES);
-    size_t i;
-    uint8_t nonce;
-
-    for (i = 0; i < K; ++i)
-    {
-        A[i].vec.resize(K);
-    }
-
-    e.vec.resize(K);
-    pkpv.vec.resize(K);
-    skpv.vec.resize(K);
-
-    nonce = 0;
-    Rng->Generate(buf, 0, KYBER_SYMBYTES);
-    Keccak::Compute(buf, 0, KYBER_SYMBYTES, buf, 0, Keccak::KECCAK512_RATE_SIZE);
-
-#if defined(CEX_HAS_AVX2)
-    GenMatrixAvx2(A, buf, 0, K);
-#else
-    GenMatrix(A, buf, 0, 0, K);
-#endif
-
-    for (i = 0; i < K; ++i)
-    {
-        PolyGetNoiseEta1(skpv.vec[i], buf, KYBER_SYMBYTES, nonce);
-        ++nonce;
-    }
-
-    for (i = 0; i < K; ++i)
-    {
-        PolyGetNoiseEta1(e.vec[i], buf, KYBER_SYMBYTES, nonce);
-        ++nonce;
-    }
-
-    PolyVecNtt(skpv);
-    PolyVecNtt(e);
-
-    for (i = 0; i < K; ++i)
-    {
-        PolyVecBaseMulAccMontgomery(pkpv.vec[i], A[i], skpv);
-        PolyToMont(pkpv.vec[i]);
-    }
-
-    PolyVecAdd(pkpv, pkpv, e);
-    PolyVecReduce(pkpv);
-
-    PackSk(Sk, skpv);
-    PackPk(Pk, pkpv, buf);
-}
-
-void KyberBase::IndCpaEnc(std::vector<uint8_t> &C, const std::vector<uint8_t> &M, const std::vector<uint8_t> &Pk, const std::vector<uint8_t> &Coins, size_t COffset, uint32_t K)
-{
-    PolyVec sp;
-    PolyVec pkpv;
-    PolyVec ep;
-    std::vector<PolyVec> at(K);
-    PolyVec b;
-    Poly v;
-    Poly k;
-    Poly epp;
-    std::vector<uint8_t> seed(KYBER_SYMBYTES);
-    size_t i;
-    uint8_t nonce;
-
-    sp.vec.resize(K);
-    pkpv.vec.resize(K);
-    ep.vec.resize(K);
-    b.vec.resize(K);
-
-    for (i = 0; i < K; ++i)
-    {
-        at[i].vec.resize(K);
-    }
-
-    nonce = 0;
-    UnPackPk(pkpv, seed, Pk);
-
-#if defined(CEX_HAS_AVX2)
-    PolyFromMsgAvx2(k, M);
-    GenMatrixAvx2(at, seed, 1, K);
-#else
-    PolyFromMsg(k, M);
-    GenMatrix(at, seed, 0, 1, K);
-#endif
-
-    for (i = 0; i < K; ++i)
-    {
-        PolyGetNoiseEta1(sp.vec[i], Coins, COffset, nonce);
-        ++nonce;
-    }
-
-    for (i = 0; i < K; ++i)
-    {
-        PolyGetNoiseEta2(ep.vec[i], Coins, COffset, nonce);
-        ++nonce;
-    }
-
-    PolyGetNoiseEta2(epp, Coins, COffset, nonce);
-    PolyVecNtt(sp);
-
-    for (i = 0; i < K; ++i)
-    {
-        PolyVecBaseMulAccMontgomery(b.vec[i], at[i], sp);
-    }
-
-    PolyVecBaseMulAccMontgomery(v, pkpv, sp);
-    PolyVecInvNttToMont(b);
-    PolyInvNttToMontgomery(v);
-    PolyVecAdd(b, b, ep);
-
-#if defined(CEX_HAS_AVX2)
-    PolyAddAvx2(v, v, epp);
-    PolyAddAvx2(v, v, k);
-#else
-    PolyAdd(v, v, epp);
-    PolyAdd(v, v, k);
-#endif
-
-    PolyVecReduce(b);
-    PolyReduce(v);
-
-    PackCiphertext(C, b, v, K);
-}
-
-void KyberBase::IndCpaDec(std::vector<uint8_t> &M, const std::vector<uint8_t> &C, const std::vector<uint8_t> &Sk, uint32_t K)
-{
-    PolyVec b;
-    PolyVec skpv;
-    Poly v;
-    Poly mp;
-
-    b.vec.resize(K);
-    skpv.vec.resize(K);
-
-    UnPackCiphertext(b, v, C);
-    UnPackSk(skpv, Sk);
-    PolyVecNtt(b);
-    PolyVecBaseMulAccMontgomery(mp, skpv, b);
-    PolyInvNttToMontgomery(mp);
-
-#if defined(CEX_HAS_AVX2)
-    PolySubAvx2(mp, v, mp);
-#else
-    PolySub(mp, v, mp);
-#endif
-
-    PolyReduce(mp);
-    PolyToMsg(M, mp);
-}
-
 // kem.c
 
-void KyberBase::Generate(std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &PrivateKey, std::unique_ptr<IPrng> &Rng, uint32_t K)
-{
-    const size_t SKILEN = (K * KYBER_POLYBYTES);
-    const size_t PKILEN = (K * KYBER_POLYBYTES) + KYBER_SYMBYTES;
-    const size_t SKPLEN = SKILEN + PKILEN + (2 * KYBER_SYMBYTES);
-
-    IndCpaKeyPair(PublicKey, PrivateKey, Rng, K);
-    MemoryTools::Copy(PublicKey, 0, PrivateKey, SKILEN, PublicKey.size());
-    Keccak::Compute(PublicKey, 0, PublicKey.size(), PrivateKey, PKILEN + SKILEN, Keccak::KECCAK256_RATE_SIZE);
-    // Value z for pseudo-random output on reject
-    Rng->Generate(PrivateKey, SKPLEN - KYBER_SYMBYTES, KYBER_SYMBYTES);
-}
-
-void KyberBase::Encapsulate(const std::vector<uint8_t> &PublicKey, std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret, std::unique_ptr<IPrng> &Rng, uint32_t K)
-{
-    std::vector<uint8_t> buf(2 * KYBER_SYMBYTES);
-    std::vector<uint8_t> kr(2 * KYBER_SYMBYTES);
-
-    Rng->Generate(buf, 0, KYBER_SYMBYTES);
-    // Don't release system RNG output
-    Keccak::Compute(buf, 0, KYBER_SYMBYTES, buf, 0, Keccak::KECCAK256_RATE_SIZE);
-
-    // Multitarget countermeasure for coins + contributory KEM
-    Keccak::Compute(PublicKey, 0, PublicKey.size(), buf, KYBER_SYMBYTES, Keccak::KECCAK256_RATE_SIZE);
-    Keccak::Compute(buf, 0, 2 * KYBER_SYMBYTES, kr, 0, Keccak::KECCAK512_RATE_SIZE);
-
-    // coins are in kr+QSC_KYBER_SYMBYTES
-    IndCpaEnc(CipherText, buf, PublicKey, kr, KYBER_SYMBYTES, K);
-
-    // overwrite coins in kr with H(c)
-    Keccak::Compute(CipherText, 0, CipherText.size(), kr, KYBER_SYMBYTES, Keccak::KECCAK256_RATE_SIZE);
-    // hash concatenation of pre-k and H(c) to k
-    Keccak::XOFP1600(kr, 0, 2 * KYBER_SYMBYTES, SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
-}
-
-bool KyberBase::Decapsulate(const std::vector<uint8_t> &PrivateKey, const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret, uint32_t K)
-{
-    const size_t SKILEN = (K * KYBER_POLYBYTES);
-    const size_t PKILEN = (K * KYBER_POLYBYTES) + KYBER_SYMBYTES;
-    const size_t SKPLEN = SKILEN + PKILEN + (2 * KYBER_SYMBYTES);
-    std::vector<uint8_t> buf(2 * KYBER_SYMBYTES);
-    std::vector<uint8_t> cmp(CipherText.size());
-    std::vector<uint8_t> kr(2 * KYBER_SYMBYTES);
-    std::vector<uint8_t> pk(PrivateKey.size() - SKILEN);
-    int32_t fail;
-
-    MemoryTools::Copy(PrivateKey, SKILEN, pk, 0, pk.size());
-    IndCpaDec(buf, CipherText, PrivateKey, K);
-
-    // Multitarget countermeasure for coins + contributory KEM
-    MemoryTools::Copy(PrivateKey, SKPLEN - (2 * KYBER_SYMBYTES), buf, KYBER_SYMBYTES, KYBER_SYMBYTES);
-    Keccak::Compute(buf, 0, 2 * KYBER_SYMBYTES, kr, 0, Keccak::KECCAK512_RATE_SIZE);
-
-    // coins are in kr+QSC_KYBER_SYMBYTES
-    IndCpaEnc(cmp, buf, pk, kr, KYBER_SYMBYTES, K);
-
-#if defined(CEX_HAS_AVX2)
-    fail = VerifyAvx2(CipherText, cmp, CipherText.size());
-#else
-    fail = IntegerTools::Verify(CipherText, cmp, CipherText.size());
-#endif
-
-    // overwrite coins in kr with H(c)
-    Keccak::Compute(CipherText, 0, CipherText.size(), kr, KYBER_SYMBYTES, Keccak::KECCAK256_RATE_SIZE);
-
-    // Overwrite pre-k with z on re-encryption failure
-#if defined(CEX_HAS_AVX2)
-    CmovAvx2(kr, PrivateKey, SKPLEN - KYBER_SYMBYTES, KYBER_SYMBYTES, static_cast<uint8_t>(fail));
-#else
-    IntegerTools::CMov(PrivateKey, SKPLEN - KYBER_SYMBYTES, kr, 0, KYBER_SYMBYTES, static_cast<uint8_t>(fail));
-#endif
-
-    // hash concatenation of pre-k and H(c) to k 
-    Keccak::XOFP1600(kr, 0, 2 * KYBER_SYMBYTES, SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
-
-    return (fail == 0);
-}
-
 #if defined(CEX_HAS_AVX2)
 
-void KyberBase::Cbd2Avx2(Poly &R, const std::vector<uint8_t> &Buf)
+void KyberBase::Cbd2(Poly &R, const std::vector<uint8_t> &Buf)
 {
     __m256i f0;
     __m256i f1;
@@ -838,6 +525,62 @@ void KyberBase::Cbd2Avx2(Poly &R, const std::vector<uint8_t> &Buf)
         _mm256_store_si256(reinterpret_cast<__m256i*>((uint8_t*)&pr[(64 * i) + 16]), f2);
         _mm256_store_si256(reinterpret_cast<__m256i*>((uint8_t*)&pr[(64 * i) + 32]), f1);
         _mm256_store_si256(reinterpret_cast<__m256i*>((uint8_t*)&pr[(64 * i) + 48]), f3);
+    }
+}
+
+void KyberBase::Cbd3(Poly &R, const std::vector<uint8_t> &Buf)
+{
+    const __m256i mask249 = _mm256_set1_epi32(0x249249);
+    const __m256i mask6DB = _mm256_set1_epi32(0x6DB6DB);
+    const __m256i mask07 = _mm256_set1_epi32(7);
+    const __m256i mask70 = _mm256_set1_epi32(7 << 16);
+    const __m256i mask3 = _mm256_set1_epi16(3);
+    const __m256i shufbidx = _mm256_set_epi8(-1, 15, 14, 13, -1, 12, 11, 10, -1, 9, 8, 7, -1, 6, 5, 4,
+        -1, 11, 10, 9, -1, 8, 7, 6, -1, 5, 4, 3, -1, 2, 1, 0);
+    __m256i f0;
+    __m256i f1;
+    __m256i f2;
+    __m256i f3;
+    size_t i;
+
+    for (i = 0; i < R.coeffs.size() / 32; ++i)
+    {
+        f0 = _mm256_loadu_si256((__m256i*)&Buf[24 * i]);
+        f0 = _mm256_permute4x64_epi64(f0, 0x94);
+        f0 = _mm256_shuffle_epi8(f0, shufbidx);
+
+        f1 = _mm256_srli_epi32(f0, 1);
+        f2 = _mm256_srli_epi32(f0, 2);
+        f0 = _mm256_and_si256(mask249, f0);
+        f1 = _mm256_and_si256(mask249, f1);
+        f2 = _mm256_and_si256(mask249, f2);
+        f0 = _mm256_add_epi32(f0, f1);
+        f0 = _mm256_add_epi32(f0, f2);
+
+        f1 = _mm256_srli_epi32(f0, 3);
+        f0 = _mm256_add_epi32(f0, mask6DB);
+        f0 = _mm256_sub_epi32(f0, f1);
+
+        f1 = _mm256_slli_epi32(f0, 10);
+        f2 = _mm256_srli_epi32(f0, 12);
+        f3 = _mm256_srli_epi32(f0, 2);
+        f0 = _mm256_and_si256(f0, mask07);
+        f1 = _mm256_and_si256(f1, mask70);
+        f2 = _mm256_and_si256(f2, mask07);
+        f3 = _mm256_and_si256(f3, mask70);
+        f0 = _mm256_add_epi16(f0, f1);
+        f1 = _mm256_add_epi16(f2, f3);
+        f0 = _mm256_sub_epi16(f0, mask3);
+        f1 = _mm256_sub_epi16(f1, mask3);
+
+        f2 = _mm256_unpacklo_epi32(f0, f1);
+        f3 = _mm256_unpackhi_epi32(f0, f1);
+
+        f0 = _mm256_permute2x128_si256(f2, f3, 0x20);
+        f1 = _mm256_permute2x128_si256(f2, f3, 0x31);
+
+        _mm256_store_si256((__m256i*)&R.coeffs[32 * i], f0);
+        _mm256_store_si256((__m256i*)&R.coeffs[32 * i + 16], f1);
     }
 }
 
@@ -970,7 +713,7 @@ void KyberBase::PolyDecompressAvx2P160(Poly &R, const std::vector<uint8_t> &A, s
     }
 }
 
-void KyberBase::PolyFromMsgAvx2(Poly &R, const std::vector<uint8_t> &Msg)
+void KyberBase::PolyFromMsg(Poly &R, const std::vector<uint8_t> &Msg)
 {
     const __m256i shift = _mm256_broadcastsi128_si256(_mm_set_epi32(0, 1, 2, 3));
     const __m256i idx = _mm256_broadcastsi128_si256(_mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
@@ -1098,7 +841,7 @@ void KyberBase::PolyFromMsgAvx2(Poly &R, const std::vector<uint8_t> &Msg)
     _mm256_store_si256(reinterpret_cast<__m256i*>(&pr[128 + (32 * 3) + 16]), g3);
 }
 
-void KyberBase::PolyAddAvx2(Poly &R, const Poly &A, const Poly &B)
+void KyberBase::PolyAdd(Poly &R, const Poly &A, const Poly &B)
 {
     const int16_t* pa = A.coeffs.data();
     const int16_t* pb = B.coeffs.data();
@@ -1116,7 +859,7 @@ void KyberBase::PolyAddAvx2(Poly &R, const Poly &A, const Poly &B)
     }
 }
 
-void KyberBase::PolySubAvx2(Poly &R, const Poly &A, const Poly &B)
+void KyberBase::PolySub(Poly &R, const Poly &A, const Poly &B)
 {
     const int16_t* pa = A.coeffs.data();
     const int16_t* pb = B.coeffs.data();
@@ -1185,20 +928,20 @@ void KyberBase::PolyDecompress11Avx2P352(Poly &R, const std::vector<uint8_t> &A,
     }
 }
 
-void KyberBase::PolyVecDecompressAvx2(PolyVec &R, const std::vector<uint8_t> &A)
+void KyberBase::PolyVecDecompress(PolyVec &R, const std::vector<uint8_t> &A)
 {
-    if (R.vec.size() != 3)
+    if (R.vec.size() == 2 || R.vec.size() == 3)
     {
         for (size_t i = 0; i < R.vec.size(); ++i)
         {
-            PolyDecompress11Avx2P352(R.vec[i], A, 352 * i);
+            PolyDecompress10Avx2P320(R.vec[i], A, 320 * i);
         }
     }
     else
     {
         for (size_t i = 0; i < R.vec.size(); ++i)
         {
-            PolyDecompress10Avx2P320(R.vec[i], A, 320 * i);
+            PolyDecompress11Avx2P352(R.vec[i], A, 352 * i);
         }
     }
 }
@@ -1446,7 +1189,7 @@ uint32_t KyberBase::RejUniformAvx2(Poly &R, const std::vector<uint8_t> &Buf)
     return ctr;
 }
 
-void KyberBase::GenMatrixAvx2(std::vector<PolyVec> &A, const std::vector<uint8_t> &Seed, int32_t transposed, uint32_t K)
+void KyberBase::GenMatrix(std::vector<PolyVec> &A, const std::vector<uint8_t> &Seed, int32_t transposed, uint32_t K)
 {
     const size_t VLEN = (K == 5) ? 5 : 4;
     std::array<__m256i, 25> ksa = { 0 };
@@ -1624,6 +1367,42 @@ void KyberBase::Cbd2(Poly& R, const std::vector<uint8_t>& Buf)
     }
 }
 
+uint32_t KyberBase::LoadLe24(const std::vector<uint8_t> &X, size_t XOffset)
+{
+    uint32_t r;
+
+    r = (uint32_t)X[XOffset];
+    r |= (uint32_t)X[XOffset + 1] << 8;
+    r |= (uint32_t)X[XOffset + 2] << 16;
+
+    return r;
+}
+
+void KyberBase::Cbd3(Poly &R, const std::vector<uint8_t> &Buf)
+{
+    size_t i;
+    size_t j;
+    uint32_t t;
+    uint32_t d;
+    int16_t a;
+    int16_t b;
+
+    for (i = 0; i < R.coeffs.size() / 4; ++i)
+    {
+        t = LoadLe24(Buf, 3 * i);
+        d = t & 0x00249249;
+        d += (t >> 1) & 0x00249249;
+        d += (t >> 2) & 0x00249249;
+
+        for (j = 0; j < 4; ++j)
+        {
+            a = (d >> (6 * j + 0)) & 0x7;
+            b = (d >> (6 * j + 3)) & 0x7;
+            R.coeffs[4 * i + j] = a - b;
+        }
+    }
+}
+
 void KyberBase::PolyCompress(std::vector<uint8_t>& R, size_t ROffset, const Poly& A, uint32_t K)
 {
     uint8_t t[8];
@@ -1632,7 +1411,7 @@ void KyberBase::PolyCompress(std::vector<uint8_t>& R, size_t ROffset, const Poly
 
     idx = 0;
 
-    if (K == 3)
+    if (K == 2 || K == 3)
     {
         for (size_t i = 0; i < A.coeffs.size() / 8; ++i)
         {
@@ -1680,9 +1459,60 @@ void KyberBase::PolyCompress(std::vector<uint8_t>& R, size_t ROffset, const Poly
     }
 }
 
+void KyberBase::GenMatrix(std::vector<PolyVec> &A, const std::vector<uint8_t> &Seed, int32_t Transposed, uint32_t K)
+{
+    std::vector<uint64_t> state(25, 0);
+    std::vector<uint8_t> buf(GEN_MATRIX_NBLOCKS * Keccak::KECCAK128_RATE_SIZE + 2);
+    std::vector<uint8_t> extseed(KYBER_SYMBYTES + 2);
+    uint32_t buflen;
+    uint32_t ctr;
+    uint32_t off;
+
+    MemoryTools::Copy(Seed, 0, extseed, 0, KYBER_SYMBYTES);
+
+    for (size_t i = 0; i < K; ++i)
+    {
+        for (size_t j = 0; j < K; ++j)
+        {
+            if (Transposed != 0)
+            {
+                extseed[KYBER_SYMBYTES] = (uint8_t)i;
+                extseed[KYBER_SYMBYTES + 1] = (uint8_t)j;
+            }
+            else
+            {
+                extseed[KYBER_SYMBYTES] = (uint8_t)j;
+                extseed[KYBER_SYMBYTES + 1] = (uint8_t)i;
+            }
+
+            Keccak::Absorb(extseed, 0, extseed.size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
+            Keccak::Squeeze(state, buf, 0, GEN_MATRIX_NBLOCKS, Keccak::KECCAK128_RATE_SIZE);
+
+            buflen = GEN_MATRIX_NBLOCKS * Keccak::KECCAK128_RATE_SIZE;
+            ctr = RejUniform(A[i].vec[j], 0, KYBER_N, buf, buflen);
+
+            while (ctr < KYBER_N)
+            {
+                off = buflen % 3;
+
+                for (size_t k = 0; k < off; ++k)
+                {
+                    buf[k] = buf[buflen - off + k];
+                }
+
+                Keccak::Squeeze(state, buf, off, 1, Keccak::KECCAK1024_RATE_SIZE);
+                buflen = off + Keccak::KECCAK128_RATE_SIZE;
+                ctr += RejUniform(A[i].vec[j], ctr, KYBER_N - ctr, buf, buflen);
+            }
+
+            MemoryTools::Clear(state, 0, state.size() * sizeof(uint64_t));
+        }
+    }
+}
+
 void KyberBase::PolyDecompress(Poly& R, const std::vector<uint8_t>& A, size_t AOffset, uint32_t K)
 {
-    if (K == 3)
+    if (K == 2 || K == 3)
     {
         for (size_t i = 0; i < R.coeffs.size() / 2; ++i)
         {
@@ -1746,7 +1576,7 @@ void KyberBase::PolyVecDecompress(PolyVec& R, const std::vector<uint8_t>& A)
             }
         }
     }
-    else if (R.vec.size() == 3)
+    else if (R.vec.size() == 2 || R.vec.size() == 3)
     {
         std::array<uint16_t, 4> t;
 

@@ -53,14 +53,14 @@ namespace Test
 			OnProgress(std::string(""));
 
 			// Kyber
-			OnProgress(std::string("***Kyber Generating " + TSTITRF + " Keypairs using parameter KYBERS53168***"));
-			CipherGenerateLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS53168, TEST_ITERATIONSF);
+			OnProgress(std::string("***Kyber Generating " + TSTITRF + " Keypairs using parameter KYBERS5P3168***"));
+			CipherGenerateLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS5P3168, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Kyber Encrypting " + TSTITRF + " messages using parameter KYBERS53168***"));
-			CipherEncryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS53168, TEST_ITERATIONSF);
+			OnProgress(std::string("***Kyber Encrypting " + TSTITRF + " messages using parameter KYBERS5P3168***"));
+			CipherEncryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS5P3168, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Kyber Decrypting " + TSTITRF + " messages using parameter KYBERS53168***"));
-			CipherDecryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS53168, TEST_ITERATIONSF);
+			OnProgress(std::string("***Kyber Decrypting " + TSTITRF + " messages using parameter KYBERS5P3168***"));
+			CipherDecryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::KYBERS5P3168, TEST_ITERATIONSF);
 
 			// McEliece
 			OnProgress(std::string("***McEliece Generating " + TSTITRL + " Keypairs using parameter MPKCS3N4608T96***"));

@@ -39,16 +39,16 @@ public:
 
 ECDSA::ECDSA(ECDSAParameters Parameters, Prngs PrngType)
 	:
-	m_ecdsaState(new ECDSAState(Parameters == ECDSAParameters::ECDSAS1ED25519K ||
-		Parameters == ECDSAParameters::ECDSAS2ED25519S ?
+	m_ecdsaState(new ECDSAState(Parameters == ECDSAParameters::ECDSAS1P25519K ||
+		Parameters == ECDSAParameters::ECDSAS2P25519S ?
 		Parameters :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::ECDSA), std::string("Constructor"), std::string("The ECDSA parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
 	m_privateKey(nullptr),
 	m_publicKey(nullptr),
-	m_rndDigest(Parameters == ECDSAParameters::ECDSAS1ED25519K ? 
+	m_rndDigest(Parameters == ECDSAParameters::ECDSAS1P25519K ? 
 		Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA3512) : 
-		Parameters == ECDSAParameters::ECDSAS2ED25519S ?
+		Parameters == ECDSAParameters::ECDSAS2P25519S ?
 		Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA2512) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::ECDSA), std::string("Constructor"), std::string("The ECDSA paramerter type can not be none!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
@@ -58,16 +58,16 @@ ECDSA::ECDSA(ECDSAParameters Parameters, Prngs PrngType)
 
 ECDSA::ECDSA(ECDSAParameters Parameters, IPrng* Rng)
 	:
-	m_ecdsaState(new ECDSAState(Parameters == ECDSAParameters::ECDSAS1ED25519K || 
-		Parameters == ECDSAParameters::ECDSAS2ED25519S ?
+	m_ecdsaState(new ECDSAState(Parameters == ECDSAParameters::ECDSAS1P25519K || 
+		Parameters == ECDSAParameters::ECDSAS2P25519S ?
 		Parameters :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::ECDSA), std::string("Constructor"), std::string("The ECDSA parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
 	m_privateKey(nullptr),
 	m_publicKey(nullptr),
-	m_rndDigest(Parameters == ECDSAParameters::ECDSAS1ED25519K ?
+	m_rndDigest(Parameters == ECDSAParameters::ECDSAS1P25519K ?
 		Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA3512) :
-		Parameters == ECDSAParameters::ECDSAS2ED25519S ?
+		Parameters == ECDSAParameters::ECDSAS2P25519S ?
 		Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA2512) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::ECDSA), std::string("Constructor"), std::string("The ECDSA paramerter type can not be none!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(Rng != nullptr ? Rng :
@@ -230,7 +230,7 @@ size_t ECDSA::Sign(const std::vector<uint8_t> &Message, std::vector<uint8_t> &Si
 
 	switch (m_ecdsaState->Parameters)
 	{
-		case ECDSAParameters::ECDSAS2ED25519S:
+		case ECDSAParameters::ECDSAS2P25519S:
 		{
 			Signature.resize(SignatureSize() + Message.size());
 			ECDSABase::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndDigest);

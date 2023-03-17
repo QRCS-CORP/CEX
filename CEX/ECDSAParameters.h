@@ -18,11 +18,11 @@ enum class ECDSAParameters : uint8_t
 	/// <summary>
 	/// The ECDSA S1 parameter; elliptic ED25519 curve using the SHA3-512 digest (Keccak)
 	/// </summary>
-	ECDSAS1ED25519K = static_cast<uint8_t>(AsymmetricParameters::ECDSAS1ED25519K),
+	ECDSAS1P25519K = static_cast<uint8_t>(AsymmetricParameters::ECDSAS1P25519K),
 	/// <summary>
 	/// The ECDSA S2 parameter; elliptic ED25519 curve using the SHA2-512 digest
 	/// </summary>
-	ECDSAS2ED25519S = static_cast<uint8_t>(AsymmetricParameters::ECDSAS2ED25519S)
+	ECDSAS2P25519S = static_cast<uint8_t>(AsymmetricParameters::ECDSAS2P25519S)
 };
 
 class ECDSAParameterConvert

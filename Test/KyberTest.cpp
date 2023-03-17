@@ -93,8 +93,8 @@ namespace Test
 		std::vector<uint8_t> sec1(32);
 		std::vector<uint8_t> sec2(32);
 
-		// test param 1: KYBERS32400
-		Kyber cpr1(KyberParameters::KYBERS32400);
+		// test param 1: KYBERS3P2400
+		Kyber cpr1(KyberParameters::KYBERS3P2400);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
@@ -111,8 +111,8 @@ namespace Test
 		sec2.clear();
 		delete kp1;
 
-		// test param 2: KYBERS53168
-		Kyber cpr2(KyberParameters::KYBERS53168);
+		// test param 2: KYBERS5P3168
+		Kyber cpr2(KyberParameters::KYBERS5P3168);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr2.Initialize(kp2->PublicKey());
@@ -129,8 +129,8 @@ namespace Test
 		sec2.clear();
 		delete kp2;
 
-		// test param 3: KYBERS63936
-		Kyber cpr3(KyberParameters::KYBERS53168);
+		// test param 3: KYBERS6P3936
+		Kyber cpr3(KyberParameters::KYBERS5P3168);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 
 		cpr3.Initialize(kp3->PublicKey());
@@ -152,8 +152,8 @@ namespace Test
 		std::vector<uint8_t> sec2(32);
 		SecureRandom gen;
 
-		// test param 1: KYBERS32400
-		Kyber cpr1(KyberParameters::KYBERS32400);
+		// test param 1: KYBERS3P2400
+		Kyber cpr1(KyberParameters::KYBERS3P2400);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
@@ -174,8 +174,8 @@ namespace Test
 		sec2.clear();
 		delete kp1;
 
-		// test param 2: KYBERS53168
-		Kyber cpr2(KyberParameters::KYBERS53168);
+		// test param 2: KYBERS5P3168
+		Kyber cpr2(KyberParameters::KYBERS5P3168);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr2.Initialize(kp2->PublicKey());
@@ -196,8 +196,8 @@ namespace Test
 		sec2.clear();
 		delete kp2;
 
-		// test param 3: KYBERS63936
-		Kyber cpr3(KyberParameters::KYBERS63936);
+		// test param 3: KYBERS6P3936
+		Kyber cpr3(KyberParameters::KYBERS6P3936);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 
 		cpr3.Initialize(kp3->PublicKey());
@@ -214,6 +214,73 @@ namespace Test
 		}
 
 		delete kp3;
+	}
+	
+	void KyberTest::KatK1632()
+	{
+		std::vector<uint8_t> cpt(0);
+		std::vector<uint8_t> kcpt(0);
+		std::vector<uint8_t> kpk(0);
+		std::vector<uint8_t> ksk(0);
+		std::vector<uint8_t> kss(32);
+		std::vector<uint8_t> pk(0);
+		std::vector<uint8_t> seed(0);
+		std::vector<uint8_t> sk(0);
+		std::vector<uint8_t> ss1(32);
+		std::vector<uint8_t> ss2(32);
+		size_t cptlen;
+		size_t pklen;
+		size_t seedlen;
+		size_t sklen;
+		size_t sslen;
+		NistRng gen;
+
+		cptlen = 0;
+		pklen = 0;
+		seedlen = 0;
+		sklen = 0;
+
+		NistPqParser::ParseNistCipherKat(KYBER1632, seed, &seedlen, kpk, &pklen, ksk, &sklen, kcpt, &cptlen, kss, &sslen, 0);
+		gen.Initialize(seed);
+
+		Kyber cpr1(KyberParameters::KYBERS1P1632, &gen);
+		AsymmetricKeyPair* kp = cpr1.Generate();
+
+		if (kpk != kp->PublicKey()->Polynomial())
+		{
+			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Failed expected public key test! -KK1"));
+		}
+
+		if (ksk != kp->PrivateKey()->Polynomial())
+		{
+			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Failed expected private key test! -KK2"));
+		}
+
+		Kyber cpr2(KyberParameters::KYBERS1P1632, &gen);
+		cpr2.Initialize(kp->PublicKey());
+		cpr2.Encapsulate(cpt, ss1);
+
+		if (cpt != kcpt)
+		{
+			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Failed cipher-text test! -KK3"));
+		}
+
+		cpr2.Initialize(kp->PrivateKey());
+
+		if (!cpr2.Decapsulate(cpt, ss2))
+		{
+			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Failed authentication test! -KK4"));
+		}
+
+		if (ss1 != kss || ss1 != ss2)
+		{
+			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Shared secrets do not match! -KK5"));
+		}
+
+		cpt.clear();
+		ss1.clear();
+		ss2.clear();
+		delete kp;
 	}
 
 	void KyberTest::KatK2400()
@@ -244,7 +311,7 @@ namespace Test
 		// 1. c= 1088, pk= 1184, sk= 2400
 		gen.Initialize(seed);
 
-		Kyber cpr1(KyberParameters::KYBERS32400, &gen);
+		Kyber cpr1(KyberParameters::KYBERS3P2400, &gen);
 		AsymmetricKeyPair* kp = cpr1.Generate();
 
 		if (kpk != kp->PublicKey()->Polynomial())
@@ -257,7 +324,7 @@ namespace Test
 			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Failed expected private key test! -KK2"));
 		}
 
-		Kyber cpr2(KyberParameters::KYBERS32400, &gen);
+		Kyber cpr2(KyberParameters::KYBERS3P2400, &gen);
 		cpr2.Initialize(kp->PublicKey());
 		cpr2.Encapsulate(cpt, ss1);
 
@@ -312,7 +379,7 @@ namespace Test
 		// 2. c= 1568, pk= 1568, sk= 3168
 		gen.Initialize(seed);
 
-		Kyber cpr1(KyberParameters::KYBERS53168, &gen);
+		Kyber cpr1(KyberParameters::KYBERS5P3168, &gen);
 		AsymmetricKeyPair* kp = cpr1.Generate();
 
 		if (kpk != kp->PublicKey()->Polynomial())
@@ -325,7 +392,7 @@ namespace Test
 			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Failed expected private key test! -KK7"));
 		}
 
-		Kyber cpr2(KyberParameters::KYBERS53168, &gen);
+		Kyber cpr2(KyberParameters::KYBERS5P3168, &gen);
 		cpr2.Initialize(kp->PublicKey());
 		cpr2.Encapsulate(cpt, ss1);
 
@@ -380,7 +447,7 @@ namespace Test
 		// 3. c= 1920, pk= 1952, sk= 3936
 		gen.Initialize(seed);
 
-		Kyber cpr1(KyberParameters::KYBERS63936, &gen);
+		Kyber cpr1(KyberParameters::KYBERS6P3936, &gen);
 		AsymmetricKeyPair* kp = cpr1.Generate();
 
 		if (kpk != kp->PublicKey()->Polynomial())
@@ -393,7 +460,7 @@ namespace Test
 			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Failed expected private key test! -KK12"));
 		}
 
-		Kyber cpr2(KyberParameters::KYBERS63936, &gen);
+		Kyber cpr2(KyberParameters::KYBERS6P3936, &gen);
 		cpr2.Initialize(kp->PublicKey());
 		cpr2.Encapsulate(cpt, ss1);
 
@@ -422,6 +489,7 @@ namespace Test
 
 	void KyberTest::Kat()
 	{
+		KatK1632();
 		KatK2400();
 		KatK3168();
 		KatK3936(); 
@@ -446,7 +514,7 @@ namespace Test
 
 		try
 		{
-			Kyber cpr(KyberParameters::KYBERS53168, Enumeration::Prngs::None);
+			Kyber cpr(KyberParameters::KYBERS5P3168, Enumeration::Prngs::None);
 
 			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -ME2"));
 		}
@@ -465,15 +533,15 @@ namespace Test
 		std::vector<uint8_t> sec1(32);
 		std::vector<uint8_t> sec2(32);
 
-		// test param 1: KYBERS32400
-		Kyber cpr1(KyberParameters::KYBERS32400);
+		// test param 1: KYBERS3P2400
+		Kyber cpr1(KyberParameters::KYBERS3P2400);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
 		std::vector<uint8_t> pk1 = kp1->PublicKey()->Polynomial();
 		pk1[0] += 1;
 		pk1[1] += 1;
-		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(KyberParameters::KYBERS32400));
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(KyberParameters::KYBERS3P2400));
 		cpr1.Initialize(pk2);
 		cpr1.Encapsulate(cpt, sec1);
 
@@ -490,15 +558,15 @@ namespace Test
 		delete kp1;
 		delete pk2;
 
-		// test param 2: KYBERS53168
-		Kyber cpr2(KyberParameters::KYBERS53168);
+		// test param 2: KYBERS5P3168
+		Kyber cpr2(KyberParameters::KYBERS5P3168);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
 		std::vector<uint8_t> pk3 = kp2->PublicKey()->Polynomial();
 		pk3[0] += 1;
 		pk3[1] += 1;
-		AsymmetricKey* pk4 = new AsymmetricKey(pk3, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(KyberParameters::KYBERS53168));
+		AsymmetricKey* pk4 = new AsymmetricKey(pk3, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(KyberParameters::KYBERS5P3168));
 		cpr2.Initialize(pk4);
 		cpr2.Encapsulate(cpt, sec1);
 
@@ -515,15 +583,15 @@ namespace Test
 		delete kp2;
 		delete pk4;
 
-		// test param 3: KYBERS63936
-		Kyber cpr3(KyberParameters::KYBERS63936);
+		// test param 3: KYBERS6P3936
+		Kyber cpr3(KyberParameters::KYBERS6P3936);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 
 		// alter public key
 		std::vector<uint8_t> pk5 = kp3->PublicKey()->Polynomial();
 		pk5[0] += 1;
 		pk5[1] += 1;
-		AsymmetricKey* pk6 = new AsymmetricKey(pk5, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(KyberParameters::KYBERS63936));
+		AsymmetricKey* pk6 = new AsymmetricKey(pk5, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(KyberParameters::KYBERS6P3936));
 		cpr3.Initialize(pk6);
 		cpr3.Encapsulate(cpt, sec1);
 
@@ -543,8 +611,8 @@ namespace Test
 		SecureVector<uint8_t> skey(0);
 		size_t i;
 
-		// test param 1: KYBERS32400
-		Kyber cpr1(KyberParameters::KYBERS32400);
+		// test param 1: KYBERS3P2400
+		Kyber cpr1(KyberParameters::KYBERS3P2400);
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -574,8 +642,8 @@ namespace Test
 
 		skey.clear();
 
-		// test param 2: KYBERS53168
-		Kyber cpr2(KyberParameters::KYBERS53168);
+		// test param 2: KYBERS5P3168
+		Kyber cpr2(KyberParameters::KYBERS5P3168);
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -606,8 +674,8 @@ namespace Test
 
 		skey.clear();
 
-		// test param 3: KYBERS63936
-		Kyber cpr3(KyberParameters::KYBERS63936);
+		// test param 3: KYBERS6P3936
+		Kyber cpr3(KyberParameters::KYBERS6P3936);
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -644,7 +712,7 @@ namespace Test
 		SecureRandom gen;
 		size_t i;
 
-		Kyber cpr1(KyberParameters::KYBERS53168);
+		Kyber cpr1(KyberParameters::KYBERS5P3168);
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -673,7 +741,7 @@ namespace Test
 		sec1.clear();
 		sec2.clear();
 
-		Kyber cpr2(KyberParameters::KYBERS53168);
+		Kyber cpr2(KyberParameters::KYBERS5P3168);
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -702,7 +770,7 @@ namespace Test
 		sec1.clear();
 		sec2.clear();
 
-		Kyber cpr3(KyberParameters::KYBERS63936);
+		Kyber cpr3(KyberParameters::KYBERS6P3936);
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{

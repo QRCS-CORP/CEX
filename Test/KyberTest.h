@@ -88,6 +88,7 @@ namespace Test
 
 	private:
 
+		void KatK1632();
 		void KatK2400();
 		void KatK3168();
 		void KatK3936();

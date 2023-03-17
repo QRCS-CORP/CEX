@@ -780,7 +780,6 @@ public:
 		std::array<uint64_t, 25> kctx = { 0 };
 		size_t i;
 		size_t msglen;
-		size_t pos;
 		bool res;
 
 		res = false;

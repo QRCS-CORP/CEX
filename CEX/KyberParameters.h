@@ -16,17 +16,21 @@ enum class KyberParameters : uint8_t
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The S3 parameters; (Medium Security) A modulus of 3329 with 256 coefficients and K of 2
+	/// The S1 parameters; (Low-Medium Security) A modulus of 3329 with 256 coefficients and K of 2
 	/// </summary>
-	KYBERS32400 = static_cast<uint8_t>(AsymmetricParameters::KYBERS32400),
+	KYBERS1P1632 = static_cast<uint8_t>(AsymmetricParameters::KYBERS1P1632),
 	/// <summary>
-	/// The S5 parameters; (High Security) A modulus of 3329 with 256 coefficients and K of 3
+	/// The S3 parameters; (Medium Security) A modulus of 3329 with 256 coefficients and K of 3
 	/// </summary>
-	KYBERS53168 = static_cast<uint8_t>(AsymmetricParameters::KYBERS53168),
+	KYBERS3P2400 = static_cast<uint8_t>(AsymmetricParameters::KYBERS3P2400),
 	/// <summary>
-	/// The S6 parameters; (Highest Security) A modulus of 3329 with 256 coefficients and K of 4
+	/// The S5 parameters; (High Security) A modulus of 3329 with 256 coefficients and K of 4
 	/// </summary>
-	KYBERS63936 = static_cast<uint8_t>(AsymmetricParameters::KYBERS63936)
+	KYBERS5P3168 = static_cast<uint8_t>(AsymmetricParameters::KYBERS5P3168),
+	/// <summary>
+	/// The S6 parameters; (Highest Security) A modulus of 3329 with 256 coefficients and K of 5
+	/// </summary>
+	KYBERS6P3936 = static_cast<uint8_t>(AsymmetricParameters::KYBERS6P3936)
 };
 
 class KyberParameterConvert

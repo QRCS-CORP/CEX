@@ -37,7 +37,7 @@ using Enumeration::KyberParameters;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// Kyber cpr(KyberParameters::KYBERS53168);
+/// Kyber cpr(KyberParameters::KYBERS5P3168);
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// 
 /// // serialize the public key
@@ -50,7 +50,7 @@ using Enumeration::KyberParameters;
 /// std::vector&lt;uint8_t&gt; sec(0);
 /// std::vector&lt;uint8_t&gt; cpt(0);
 /// 
-/// Kyber cpr(KyberParameters::KYBERS53168);
+/// Kyber cpr(KyberParameters::KYBERS5P3168);
 /// cpr.Initialize(PublicKey);
 /// // generate the ciphertext and shared secret
 /// cpr.Encapsulate(cpt, sec);
@@ -61,7 +61,7 @@ using Enumeration::KyberParameters;
 /// std::vector&lt;uint8_t&gt; sec(0);
 /// bool status;
 /// 
-/// Kyber cpr(KyberParameters::KYBERS53168);
+/// Kyber cpr(KyberParameters::KYBERS5P3168);
 /// cpr.Initialize(PrivateKey);
 /// // decrypt the ciphertext and output the shared secret
 ///	status = cpr.Decapsulate(cpt, sec);
@@ -89,7 +89,7 @@ using Enumeration::KyberParameters;
 /// <list type="bullet">
 /// <item><description>This implementation of Kyber is the NIST PQ round 3 final version</description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MLWEPublicKey, or MLWEPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>The high-security KYBERS53168 parameter set is the default cipher configuration; optional parameters of medium-security KYBERS32400, and highest-security KYBERS63936 are also available through the class constructor parameter</description></item>
+/// <item><description>The high-security KYBERS5P3168 parameter set is the default cipher configuration; optional parameters of medium-security KYBERS3P2400, and highest-security KYBERS6P3936 are also available through the class constructor parameter</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The message is authenticated using SHAKE, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
 /// </list>
@@ -133,7 +133,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR (Rijndael-256 CTR) generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	Kyber(KyberParameters Parameters = KyberParameters::KYBERS53168, Prngs PrngType = Prngs::BCR);
+	Kyber(KyberParameters Parameters = KyberParameters::KYBERS5P3168, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances

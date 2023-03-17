@@ -560,7 +560,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 #else
 
-		for (size_t i = 0; i < KPA_PARALLELISM; ++i)
+		for (i = 0; i < KPA_PARALLELISM; ++i)
 		{
 #if defined(CEX_IS_LITTLE_ENDIAN)
 			MemoryTools::XOR(Input, InOffset + (i * Ctx->Rate), Ctx->State[i], 0, Ctx->Rate);
@@ -608,8 +608,6 @@ KPA::KPA(KpaModes KbaModeType)
 
 	void KPA::KpaLoadState(std::unique_ptr<KpaState> &Ctx)
 	{
-		size_t i;
-
 #if defined(CEX_HAS_AVX512)
 
 		__m512i idx;
@@ -620,7 +618,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 		pos = 0;
 
-		for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
+		for (size_t i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
 		{
 			Ctx->StateW[i] = ULong512(_mm512_i64gather_epi64(idx, (int64_t*)pos, 1));
 			pos += sizeof(uint64_t);
@@ -630,7 +628,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 		uint64_t tmp[4] = { 0 };
 
-		for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
+		for (size_t i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
 		{
 			tmp[0] = Ctx->State[0][i];
 			tmp[1] = Ctx->State[1][i];
@@ -686,13 +684,11 @@ KPA::KPA(KpaModes KbaModeType)
 
 	void KPA::KpaStoreState(std::unique_ptr<KpaState> &Ctx)
 	{
-		size_t i;
-
 #if defined(CEX_HAS_AVX512)
 
 		std::vector<uint64_t> tmp(8);
 
-		for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
+		for (size_t i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
 		{
 			Ctx->StateW[i].Store(tmp, 0);
 			Ctx->State[0][i] = tmp[0];
@@ -709,7 +705,7 @@ KPA::KPA(KpaModes KbaModeType)
 
 		std::vector<uint64_t> tmp(4);
 
-		for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
+		for (size_t i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
 		{
 			Ctx->StateW[0][i].Store(tmp, 0);
 			Ctx->State[0][i] = tmp[0];

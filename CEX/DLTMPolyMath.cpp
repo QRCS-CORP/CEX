@@ -972,8 +972,6 @@ void DLTMPolyMath::PolyW1Pack(std::vector<uint8_t> &R, size_t ROffset, const std
 
 void DLTMPolyMath::PolyVecPackW1(std::vector<uint8_t> &R, const std::vector<std::array<int32_t, 256>> &W1, size_t W1PackedSize, uint32_t Gamma2)
 {
-	size_t i;
-
     for (size_t i = 0; i < W1.size(); ++i)
     {
         PolyW1Pack(R, i * W1PackedSize, W1[i], Gamma2);

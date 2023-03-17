@@ -48,16 +48,16 @@ public:
 
 ECDH::ECDH(ECDHParameters Parameters, Prngs PrngType)
 	:
-	m_ecdhState(new EcdhState(Parameters == ECDHParameters::ECDHS1EC25519K ||
-		Parameters == ECDHParameters::ECDHS2EC25519S ?
+	m_ecdhState(new EcdhState(Parameters == ECDHParameters::ECDHS1P25519K ||
+		Parameters == ECDHParameters::ECDHS2P25519S ?
 		Parameters :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::ECDH), std::string("Constructor"), std::string("The ECDH parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
 	m_privateKey(nullptr),
 	m_publicKey(nullptr),
-	m_rndDigest(Parameters == ECDHParameters::ECDHS1EC25519K ?
+	m_rndDigest(Parameters == ECDHParameters::ECDHS1P25519K ?
 		Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA3512) :
-		Parameters == ECDHParameters::ECDHS2EC25519S ?
+		Parameters == ECDHParameters::ECDHS2P25519S ?
 		Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA2512) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::ECDH), std::string("Constructor"), std::string("The ECDH paramerter type can not be none!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
@@ -67,16 +67,16 @@ ECDH::ECDH(ECDHParameters Parameters, Prngs PrngType)
 
 ECDH::ECDH(ECDHParameters Parameters, IPrng* Prng)
 	:
-	m_ecdhState(new EcdhState(Parameters == ECDHParameters::ECDHS1EC25519K ||
-		Parameters == ECDHParameters::ECDHS2EC25519S ?
+	m_ecdhState(new EcdhState(Parameters == ECDHParameters::ECDHS1P25519K ||
+		Parameters == ECDHParameters::ECDHS2P25519S ?
 		Parameters :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::ECDH), std::string("Constructor"), std::string("The ECDH parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
 	m_privateKey(nullptr),
 	m_publicKey(nullptr),
-	m_rndDigest(Parameters == ECDHParameters::ECDHS1EC25519K ?
+	m_rndDigest(Parameters == ECDHParameters::ECDHS1P25519K ?
 		Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA3512) :
-		Parameters == ECDHParameters::ECDHS2EC25519S ?
+		Parameters == ECDHParameters::ECDHS2P25519S ?
 		Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA2512) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::ECDH), std::string("Constructor"), std::string("The ECDH paramerter type can not be none!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(Prng != nullptr ? Prng :

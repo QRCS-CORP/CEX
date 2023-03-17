@@ -1,13 +1,3 @@
-// Development Map
-//
-// TODO:
-// Asymmetric update
-// Merge RCS/ACS, RHX/AHX
-// Unify SHA3, Skein(?)..
-// Remove Skein, Threefish?
-// Simplify constructors
-// ...
-
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -155,9 +145,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.1.0.0: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.1.0.0a (A10)                   *");
+	ConsoleUtils::WriteLine("* Release:   v1.1.0.0b (A10)                   *");
 	ConsoleUtils::WriteLine("* License:   AGPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      March 01, 2023                    *");
+	ConsoleUtils::WriteLine("* Date:      March 17, 2023                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@qscs.ca                   *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -238,6 +228,8 @@ int32_t main()
 
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
+
+	TestRun(new KyberTest());
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library uses OpenMP which was not detected, performance may be sub-optimal!");

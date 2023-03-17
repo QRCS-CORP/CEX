@@ -39,10 +39,10 @@ using Digest::IDigest;
 /// <example>
 /// <description>Key exchange between 2 parties:</description>
 /// <code>
-/// ECDH cpr1(ECDHParameters::ECDHS2EC25519S);
+/// ECDH cpr1(ECDHParameters::ECDHS2P25519S);
 /// AsymmetricKeyPair* kp1 = cpr1.Generate();
 /// 
-/// ECDH cpr2(ECDHParameters::ECDHS2EC25519S);
+/// ECDH cpr2(ECDHParameters::ECDHS2P25519S);
 /// AsymmetricKeyPair* kp2 = cpr2.Generate();
 /// 
 /// cpr1.KeyExchange(kp2->PublicKey(), kp1->PrivateKey(), sec1);

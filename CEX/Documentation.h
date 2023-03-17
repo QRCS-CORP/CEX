@@ -9,25 +9,25 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.1.0.0a (A10).
+Welcome to the CEX++ Cryptographic Library, version 1.1.0.0b (A10).
 \brief
 CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.1.0.0a</B> (A10 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.1.0.0b</B> (A10 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John G. Underhill
-\version   v1.1.0.0a
+\version   v1.1.0.0b
 \date      March 12, 2023
 \copyright AGPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.1.0.0a (A10 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.1.0.0b (A10 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Added tourrent Release v1.1.0.0a (version A10):</B> \n
+<B>Added tourrent Release v1.1.0.0b (version A10):</B> \n
 
 \section intro_link Links
 CEX++ on Github: https://github.com/Steppenwolfe65/CEX  \n

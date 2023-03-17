@@ -17,26 +17,26 @@ std::string AsymmetricTransformConvert::ToName(AsymmetricParameters Enumeral)
 	case AsymmetricParameters::DLTMS5P4880:
 		name = std::string("DLTMS5P4880");
 		break;
-	case AsymmetricParameters::ECDHS1EC25519K:
-		name = std::string("ECDHS1EC25519K");
+	case AsymmetricParameters::ECDHS1P25519K:
+		name = std::string("ECDHS1P25519K");
 		break;
-	case AsymmetricParameters::ECDHS2EC25519S:
-		name = std::string("ECDHS2EC25519S");
+	case AsymmetricParameters::ECDHS2P25519S:
+		name = std::string("ECDHS2P25519S");
 		break;
-	case AsymmetricParameters::ECDSAS1ED25519K:
-		name = std::string("ECDSAS1ED25519K");
+	case AsymmetricParameters::ECDSAS1P25519K:
+		name = std::string("ECDSAS1P25519K");
 		break;
-	case AsymmetricParameters::ECDSAS2ED25519S:
-		name = std::string("ECDSAS2ED25519S");
+	case AsymmetricParameters::ECDSAS2P25519S:
+		name = std::string("ECDSAS2P25519S");
 		break;
-	case AsymmetricParameters::KYBERS32400:
-		name = std::string("KYBERS32400");
+	case AsymmetricParameters::KYBERS3P2400:
+		name = std::string("KYBERS3P2400");
 		break;
-	case AsymmetricParameters::KYBERS53168:
-		name = std::string("KYBERS53168");
+	case AsymmetricParameters::KYBERS5P3168:
+		name = std::string("KYBERS5P3168");
 		break;
-	case AsymmetricParameters::KYBERS63936:
-		name = std::string("KYBERS63936");
+	case AsymmetricParameters::KYBERS6P3936:
+		name = std::string("KYBERS6P3936");
 		break;
 	case AsymmetricParameters::MPKCS3N4608T96:
 		name = std::string("MPKCS3N4608T96");
@@ -215,33 +215,33 @@ AsymmetricParameters AsymmetricTransformConvert::FromName(std::string &Name)
 	{
 		tname = AsymmetricParameters::DLTMS5P4880;
 	}
-	else if (Name == std::string("ECDHS1EC25519K"))
+	else if (Name == std::string("ECDHS1P25519K"))
 	{
-		tname = AsymmetricParameters::ECDHS1EC25519K;
+		tname = AsymmetricParameters::ECDHS1P25519K;
 	}
-	else if (Name == std::string("ECDHS2EC25519S"))
+	else if (Name == std::string("ECDHS2P25519S"))
 	{
-		tname = AsymmetricParameters::ECDHS2EC25519S;
+		tname = AsymmetricParameters::ECDHS2P25519S;
 	}
-	else if (Name == std::string("ECDSAS1ED25519K"))
+	else if (Name == std::string("ECDSAS1P25519K"))
 	{
-		tname = AsymmetricParameters::ECDSAS1ED25519K;
+		tname = AsymmetricParameters::ECDSAS1P25519K;
 	}
-	else if (Name == std::string("ECDSAS2ED25519S"))
+	else if (Name == std::string("ECDSAS2P25519S"))
 	{
-		tname = AsymmetricParameters::ECDSAS2ED25519S;
+		tname = AsymmetricParameters::ECDSAS2P25519S;
 	}
-	else if (Name == std::string("KYBERS32400"))
+	else if (Name == std::string("KYBERS3P2400"))
 	{
-		tname = AsymmetricParameters::KYBERS32400;
+		tname = AsymmetricParameters::KYBERS3P2400;
 	}
-	else if (Name == std::string("KYBERS53168"))
+	else if (Name == std::string("KYBERS5P3168"))
 	{
-		tname = AsymmetricParameters::KYBERS53168;
+		tname = AsymmetricParameters::KYBERS5P3168;
 	}
-	else if (Name == std::string("KYBERS63936"))
+	else if (Name == std::string("KYBERS6P3936"))
 	{
-		tname = AsymmetricParameters::KYBERS63936;
+		tname = AsymmetricParameters::KYBERS6P3936;
 	}
 	else if (Name == std::string("MPKCS3N4608T96"))
 	{

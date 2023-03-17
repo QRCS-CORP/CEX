@@ -47,9 +47,10 @@ public:
 
 Kyber::Kyber(KyberParameters Parameters, Prngs PrngType)
 	:
-	m_kyberState(new KyberState(Parameters == KyberParameters::KYBERS32400 || 
-		Parameters == KyberParameters::KYBERS53168 || 
-		Parameters == KyberParameters::KYBERS63936 ? 
+	m_kyberState(new KyberState(Parameters == KyberParameters::KYBERS1P1632 || 
+		Parameters == KyberParameters::KYBERS3P2400 || 
+		Parameters == KyberParameters::KYBERS5P3168 || 
+		Parameters == KyberParameters::KYBERS6P3936 ? 
 			Parameters :
 			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
@@ -62,9 +63,10 @@ Kyber::Kyber(KyberParameters Parameters, Prngs PrngType)
 
 Kyber::Kyber(KyberParameters Parameters, IPrng* Prng)
 	:
-	m_kyberState(new KyberState(Parameters == KyberParameters::KYBERS32400 ||
-		Parameters == KyberParameters::KYBERS53168 ||
-		Parameters == KyberParameters::KYBERS63936 ? 
+	m_kyberState(new KyberState(Parameters == KyberParameters::KYBERS1P1632 || 
+		Parameters == KyberParameters::KYBERS3P2400 ||
+		Parameters == KyberParameters::KYBERS5P3168 ||
+		Parameters == KyberParameters::KYBERS6P3936 ? 
 			Parameters :
 			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
@@ -106,19 +108,24 @@ const size_t Kyber::CipherTextSize()
 
 	switch (m_kyberState->Parameters)
 	{
-		case (KyberParameters::KYBERS32400):
+		case (KyberParameters::KYBERS1P1632):
 		{
-			clen = KyberBase::CIPHERTEXT_SIZE_K2400;
+			clen = KyberBase::Params1632::KYBER_CIPHERTEXT_SIZE;
 			break;
 		}
-		case (KyberParameters::KYBERS53168):
+		case (KyberParameters::KYBERS3P2400):
 		{
-			clen = KyberBase::CIPHERTEXT_SIZE_K3168;
+			clen = KyberBase::Params2400::KYBER_CIPHERTEXT_SIZE;
 			break;
 		}
-		case (KyberParameters::KYBERS63936):
+		case (KyberParameters::KYBERS5P3168):
 		{
-			clen = KyberBase::CIPHERTEXT_SIZE_K3936;
+			clen = KyberBase::Params3168::KYBER_CIPHERTEXT_SIZE;
+			break;
+		}
+		case (KyberParameters::KYBERS6P3936):
+		{
+			clen = KyberBase::Params3936::KYBER_CIPHERTEXT_SIZE;
 			break;
 		}
 		default:
@@ -173,19 +180,24 @@ const size_t Kyber::PrivateKeySize()
 
 	switch (m_kyberState->Parameters)
 	{
-		case (KyberParameters::KYBERS32400):
+		case (KyberParameters::KYBERS1P1632):
 		{
-			klen = KyberBase::PRIVATEKEY_SIZE_K2400;
+			klen = KyberBase::Params1632::KYBER_PRIVATEKEY_SIZE;
 			break;
 		}
-		case (KyberParameters::KYBERS53168):
+		case (KyberParameters::KYBERS3P2400):
 		{
-			klen = KyberBase::PRIVATEKEY_SIZE_K3168;
+			klen = KyberBase::Params2400::KYBER_PRIVATEKEY_SIZE;
 			break;
 		}
-		case (KyberParameters::KYBERS63936):
+		case (KyberParameters::KYBERS5P3168):
 		{
-			klen = KyberBase::CIPHERTEXT_SIZE_K3936;
+			klen = KyberBase::Params3168::KYBER_PRIVATEKEY_SIZE;
+			break;
+		}
+		case (KyberParameters::KYBERS6P3936):
+		{
+			klen = KyberBase::Params3936::KYBER_PRIVATEKEY_SIZE;
 			break;
 		}
 		default:
@@ -204,19 +216,24 @@ const size_t Kyber::PublicKeySize()
 
 	switch (m_kyberState->Parameters)
 	{
-		case (KyberParameters::KYBERS32400):
+		case (KyberParameters::KYBERS1P1632):
 		{
-			klen = KyberBase::PUBLICKEY_SIZE_K2400;
+			klen = KyberBase::Params1632::KYBER_PUBLICKEY_SIZE;
 			break;
 		}
-		case (KyberParameters::KYBERS53168):
+		case (KyberParameters::KYBERS3P2400):
 		{
-			klen = KyberBase::PUBLICKEY_SIZE_K3168;
+			klen = KyberBase::Params2400::KYBER_PUBLICKEY_SIZE;
 			break;
 		}
-		case (KyberParameters::KYBERS63936):
+		case (KyberParameters::KYBERS5P3168):
 		{
-			klen = KyberBase::PUBLICKEY_SIZE_K3936;
+			klen = KyberBase::Params3168::KYBER_PUBLICKEY_SIZE;
+			break;
+		}
+		case (KyberParameters::KYBERS6P3936):
+		{
+			klen = KyberBase::Params3936::KYBER_PUBLICKEY_SIZE;
 			break;
 		}
 		default:
@@ -239,24 +256,32 @@ const size_t Kyber::SharedSecretSize()
 bool Kyber::Decapsulate(const std::vector<uint8_t> &CipherText, std::vector<uint8_t> &SharedSecret)
 {
 	std::vector<uint8_t> sec(SECRET_SIZE, 0x00);
-	uint32_t k;
 	bool res;
 
 	switch (m_kyberState->Parameters)
 	{
-		case KyberParameters::KYBERS32400:
+		case KyberParameters::KYBERS1P1632:
 		{
-			k = 3;
+			KyberBase::Params1632 x;
+			res = KyberBase::Decapsulate(x, m_privateKey->Polynomial(), CipherText, sec);
 			break;
 		}
-		case KyberParameters::KYBERS53168:
+		case KyberParameters::KYBERS3P2400:
 		{
-			k = 4;
+			KyberBase::Params2400 x;
+			res = KyberBase::Decapsulate(x, m_privateKey->Polynomial(), CipherText, sec);
 			break;
 		}
-		case KyberParameters::KYBERS63936:
+		case KyberParameters::KYBERS5P3168:
 		{
-			k = 5;
+			KyberBase::Params3168 x;
+			res = KyberBase::Decapsulate(x, m_privateKey->Polynomial(), CipherText, sec);
+			break;
+		}
+		case KyberParameters::KYBERS6P3936:
+		{
+			KyberBase::Params3936 x;
+			res = KyberBase::Decapsulate(x, m_privateKey->Polynomial(), CipherText, sec);
 			break;
 		}
 		default:
@@ -265,8 +290,6 @@ bool Kyber::Decapsulate(const std::vector<uint8_t> &CipherText, std::vector<uint
 			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
-
-	res = KyberBase::Decapsulate(m_privateKey->Polynomial(), CipherText, sec, k);
 
 	if (res == true)
 	{
@@ -290,26 +313,35 @@ void Kyber::Encapsulate(std::vector<uint8_t> &CipherText, std::vector<uint8_t> &
 	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<uint8_t> sec(SECRET_SIZE);
-	uint32_t k;
 
 	switch (m_kyberState->Parameters)
 	{
-		case KyberParameters::KYBERS32400:
+		case KyberParameters::KYBERS1P1632:
 		{
-			CipherText.resize(KyberBase::CIPHERTEXT_SIZE_K2400);
-			k = 3;
+			KyberBase::Params1632 x;
+			CipherText.resize(x.KYBER_CIPHERTEXT_SIZE);
+			KyberBase::Encapsulate(x, m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
 			break;
 		}
-		case KyberParameters::KYBERS53168:
+		case KyberParameters::KYBERS3P2400:
 		{
-			CipherText.resize(KyberBase::CIPHERTEXT_SIZE_K3168);
-			k = 4;
+			KyberBase::Params2400 x;
+			CipherText.resize(x.KYBER_CIPHERTEXT_SIZE);
+			KyberBase::Encapsulate(x, m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
 			break;
 		}
-		case KyberParameters::KYBERS63936:
+		case KyberParameters::KYBERS5P3168:
 		{
-			CipherText.resize(KyberBase::CIPHERTEXT_SIZE_K3936);
-			k = 5;
+			KyberBase::Params3168 x;
+			CipherText.resize(x.KYBER_CIPHERTEXT_SIZE);
+			KyberBase::Encapsulate(x, m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
+			break;
+		}
+		case KyberParameters::KYBERS6P3936:
+		{
+			KyberBase::Params3936 x;
+			CipherText.resize(x.KYBER_CIPHERTEXT_SIZE);
+			KyberBase::Encapsulate(x, m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
 			break;
 		}
 		default:
@@ -318,8 +350,6 @@ void Kyber::Encapsulate(std::vector<uint8_t> &CipherText, std::vector<uint8_t> &
 			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
-
-	KyberBase::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator, k);
 
 	if (m_kyberState->DomainKey.size() != 0)
 	{
@@ -336,29 +366,39 @@ AsymmetricKeyPair* Kyber::Generate()
 {
 	std::vector<uint8_t> pk(0);
 	std::vector<uint8_t> sk(0);
-	uint32_t k;
 
 	switch (m_kyberState->Parameters)
 	{
-		case KyberParameters::KYBERS32400:
+		case KyberParameters::KYBERS1P1632:
 		{
-			pk.resize(KyberBase::PUBLICKEY_SIZE_K2400);
-			sk.resize(KyberBase::PRIVATEKEY_SIZE_K2400);
-			k = 3;
+			KyberBase::Params1632 x;
+			pk.resize(x.KYBER_PUBLICKEY_SIZE);
+			sk.resize(x.KYBER_PRIVATEKEY_SIZE);
+			KyberBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
-		case KyberParameters::KYBERS53168:
+		case KyberParameters::KYBERS3P2400:
 		{
-			pk.resize(KyberBase::PUBLICKEY_SIZE_K3168);
-			sk.resize(KyberBase::PRIVATEKEY_SIZE_K3168);
-			k = 4;
+			KyberBase::Params2400 x;
+			pk.resize(x.KYBER_PUBLICKEY_SIZE);
+			sk.resize(x.KYBER_PRIVATEKEY_SIZE);
+			KyberBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
-		case KyberParameters::KYBERS63936:
+		case KyberParameters::KYBERS5P3168:
 		{
-			pk.resize(KyberBase::PUBLICKEY_SIZE_K3936);
-			sk.resize(KyberBase::PRIVATEKEY_SIZE_K3936);
-			k = 5;
+			KyberBase::Params3168 x;
+			pk.resize(x.KYBER_PUBLICKEY_SIZE);
+			sk.resize(x.KYBER_PRIVATEKEY_SIZE);
+			KyberBase::Generate(x, pk, sk, m_rndGenerator);
+			break;
+		}
+		case KyberParameters::KYBERS6P3936:
+		{
+			KyberBase::Params3936 x;
+			pk.resize(x.KYBER_PUBLICKEY_SIZE);
+			sk.resize(x.KYBER_PRIVATEKEY_SIZE);
+			KyberBase::Generate(x, pk, sk, m_rndGenerator);
 			break;
 		}
 		default:
@@ -367,8 +407,6 @@ AsymmetricKeyPair* Kyber::Generate()
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
-
-	KyberBase::Generate(pk, sk, m_rndGenerator, k);
 
 	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(m_kyberState->Parameters));
 	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Kyber, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricParameters>(m_kyberState->Parameters));
